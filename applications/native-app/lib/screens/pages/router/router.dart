@@ -10,7 +10,9 @@ import '../diary_book_page/diary_book_page.dart';
 import '../diary_detail_page/diary_detail_page.dart';
 import '../diary_editor_page/diary_editor_page.dart';
 import '../home_page/home_page.dart';
+import '../my_page/my_page.dart';
 import '../onboarding_page/onboarding_page.dart';
+import '../profile_edit_page/profile_edit_page.dart';
 import '../splash_page/splash_page.dart';
 import '../welcome_page/welcome_page.dart';
 
@@ -27,6 +29,8 @@ abstract final class AppRoutes {
   static const diaryBookInfo = '/diary-books/:id/info';
   static const diaryDetail = '/diary-books/:id/diaries/:date';
   static const diaryEditor = '/diaries/write';
+  static const myPage = '/me';
+  static const profileEdit = '/me/profile';
 
   /// [id] の日記帳のページ。
   static String diaryBookOf(String id) => '/diary-books/$id';
@@ -139,6 +143,11 @@ GoRouter router(Ref ref) {
             diaryBookId: state.uri.queryParameters['diaryBook'],
           ),
         ),
+      ),
+      GoRoute(path: AppRoutes.myPage, builder: (_, _) => const MyPage()),
+      GoRoute(
+        path: AppRoutes.profileEdit,
+        builder: (_, _) => const ProfileEditPage(),
       ),
     ],
   );

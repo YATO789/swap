@@ -87,8 +87,7 @@ class HomePage extends HookConsumerWidget {
               icon: const Icon(Icons.menu_book_outlined),
             ),
           IconButton(
-            // TODO: プロフィールと設定のページを開く。
-            onPressed: () {},
+            onPressed: () => context.push(AppRoutes.myPage),
             tooltip: 'プロフィールと設定',
             icon: UserAvatar(name: myName ?? '', filled: true, size: 30),
           ),

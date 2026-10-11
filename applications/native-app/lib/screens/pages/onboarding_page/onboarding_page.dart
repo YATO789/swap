@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/profile/profile.dart';
 import '../../../theme/app_theme.dart';
-import 'components/form_field.dart';
+import '../../components/form_field.dart';
 import '../../components/user_avatar.dart';
 import 'controller/onboarding_page_controller.dart';
 
