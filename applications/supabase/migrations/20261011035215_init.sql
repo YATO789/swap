@@ -18,8 +18,8 @@ create table public.diary_books (
   icon text generated always as (left(name, 1)) stored,
   -- 表紙の色（0xAARRGGBB）。int4 に収まらないので bigint。null なら決まったグレー。
   cover_color bigint check (cover_color between 0 and 4294967295),
-  -- 読み間違えやすい 0/O・1/I は使わない。
-  invite_code text not null unique check (invite_code ~ '^[A-HJ-NP-Z2-9]{6}$'),
+  -- 大文字と小文字を区別する。読み間違えやすい 0/O/o・1/I/l は使わない。
+  invite_code text not null unique check (invite_code ~ '^[A-HJ-NP-Za-kmnp-z2-9]{7}$'),
   created_by uuid references public.profiles (id) on delete set null,
   created_at timestamptz not null default now()
 );
@@ -320,7 +320,7 @@ returns public.diary_books
 language plpgsql security definer set search_path = ''
 as $$
 declare
-  v_chars constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  v_chars constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
   v_code text;
   v_diary_book public.diary_books;
 begin
@@ -330,7 +330,7 @@ begin
 
   loop
     v_code := '';
-    for i in 1..6 loop
+    for i in 1..7 loop
       v_code := v_code || substr(v_chars, 1 + floor(random() * length(v_chars))::int, 1);
     end loop;
     begin
@@ -378,7 +378,7 @@ as $$
       where m.diary_book_id = b.id and m.user_id = (select auth.uid())
     )
   from public.diary_books b
-  where b.invite_code = upper(btrim(p_code))
+  where b.invite_code = btrim(p_code)
     and (select auth.uid()) is not null;
 $$;
 
@@ -395,7 +395,7 @@ begin
   end if;
 
   select id into v_id from public.diary_books
-  where invite_code = upper(btrim(p_code));
+  where invite_code = btrim(p_code);
   if v_id is null then
     return null;
   end if;

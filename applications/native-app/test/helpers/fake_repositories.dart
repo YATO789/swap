@@ -4,6 +4,7 @@ import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
+import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/post/timeline_post.dart';
 import 'package:swap/domains/profile/profile.dart';
@@ -191,11 +192,51 @@ class FakeDiaryRepository implements DiaryRepository {
 }
 
 /// [diaryBooks] をそのまま返す。メンバーは日記帳の id ごとの [members] を返す。
+/// 招待コードは [invitable] の日記帳のコードで探し、参加すると一覧に足す。
 class FakeDiaryBookRepository extends DiaryBookRepository {
-  FakeDiaryBookRepository(this.diaryBooks, {this.members = const {}});
+  FakeDiaryBookRepository(
+    this.diaryBooks, {
+    this.members = const {},
+    this.invitable = const [],
+  });
 
   final List<DiaryBook> diaryBooks;
   final Map<String, List<DiaryBookMember>> members;
+
+  /// 招待コードで参加できる日記帳。参加しているものも含めてよい。
+  final List<DiaryBook> invitable;
+
+  DiaryBook? _byCode(String code) =>
+      invitable.where((diaryBook) => diaryBook.inviteCode == code).firstOrNull;
+
+  @override
+  Future<InvitedDiaryBook?> findByCode(String code) async {
+    final diaryBook = _byCode(code);
+    if (diaryBook == null) return null;
+    return InvitedDiaryBook(
+      id: diaryBook.id,
+      name: diaryBook.name,
+      icon: diaryBook.icon,
+      memberNames: [
+        for (final member in members[diaryBook.id] ?? const <DiaryBookMember>[])
+          member.displayName,
+      ],
+      alreadyJoined: [...?state.value]
+          .any((joined) => joined.id == diaryBook.id),
+      coverColor: diaryBook.coverColor,
+    );
+  }
+
+  @override
+  Future<DiaryBook?> join(String code) async {
+    final diaryBook = _byCode(code);
+    if (diaryBook == null) return null;
+    final current = [...?state.value];
+    if (!current.any((joined) => joined.id == diaryBook.id)) {
+      state = AsyncData([...current, diaryBook]);
+    }
+    return diaryBook;
+  }
 
   @override
   Future<List<DiaryBookMember>> fetchMembers(String diaryBookId) async {
@@ -211,7 +252,7 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
       id: 'created',
       name: name,
       icon: name.characters.first,
-      inviteCode: 'NEW234',
+      inviteCode: 'New2345',
       memberCount: 1,
       coverColor: coverColor,
     );

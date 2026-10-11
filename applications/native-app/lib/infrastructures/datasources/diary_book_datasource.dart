@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
+import 'package:swap/domains/diary_book/invited_diary_book.dart';
 
 part '_generated/diary_book_datasource.g.dart';
 
@@ -39,6 +40,30 @@ class DiaryBookDatasource {
     );
     // 作った人だけが入っている。
     return _toDiaryBook(row, memberCount: 1);
+  }
+
+  /// 招待コード [code] の日記帳を、参加する前に見せるために探す。見つからなければ null。
+  Future<InvitedDiaryBook?> findByCode(String code) async {
+    final rows = await _client.rpc<List<dynamic>>(
+      'find_diary_book_by_code',
+      params: {'p_code': code},
+    );
+    if (rows.isEmpty) return null;
+    final row = rows.first as Map<String, dynamic>;
+    return InvitedDiaryBook(
+      id: row['id'] as String,
+      name: row['name'] as String,
+      icon: row['icon'] as String,
+      memberNames: (row['member_names'] as List<dynamic>).cast<String>(),
+      alreadyJoined: row['already_joined'] as bool,
+      coverColor: row['cover_color'] as int?,
+    );
+  }
+
+  /// 招待コード [code] の日記帳に参加し、その id を返す。コードが違えば null。
+  /// もう参加していれば何もせず、その id を返す。
+  Future<String?> join(String code) {
+    return _client.rpc<String?>('join_diary_book', params: {'p_code': code});
   }
 
   /// [diaryBookId] の日記帳に参加している人を、参加した順に返す。

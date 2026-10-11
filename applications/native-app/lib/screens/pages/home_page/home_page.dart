@@ -10,6 +10,8 @@ import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_sheet.dart';
+import 'components/invite_sheet.dart';
+import 'components/join_diary_book_dialog/join_diary_book_dialog.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
@@ -35,20 +37,19 @@ class HomePage extends HookConsumerWidget {
     void openDiaryBook(DiaryBook diaryBook) =>
         context.push(AppRoutes.diaryBookOf(diaryBook.id));
 
-    // TODO: 作った日記帳を開いたら、招待シートを出す。
+    // 作ったらホームに戻り、そのまま友達を招待するシートを出す。
     Future<void> createDiaryBook() async {
       final diaryBook = await context.push<DiaryBook>(
         AppRoutes.createDiaryBook,
       );
       if (diaryBook == null || !context.mounted) return;
-      openDiaryBook(diaryBook);
+      await showInviteSheet(context, diaryBook, justCreated: true);
     }
 
-    // TODO: 招待コードで参加するページを開く。
-    void joinDiaryBook() {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('準備中です')));
+    Future<void> joinDiaryBook() async {
+      final diaryBook = await showJoinDiaryBookDialog(context);
+      if (diaryBook == null || !context.mounted) return;
+      openDiaryBook(diaryBook);
     }
 
     Future<void> addDiaryBook() async {

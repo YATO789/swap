@@ -23,3 +23,6 @@ abstract class DiaryBook with _$DiaryBook {
 
 /// 日記帳の名前の最大文字数。DB の diary_books.name の制約と合わせる。
 const maxDiaryBookNameLength = 15;
+
+/// 招待コードの文字数。DB の create_diary_book が作るコードと合わせる。大文字と小文字は区別する。
+const inviteCodeLength = 7;

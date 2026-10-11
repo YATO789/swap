@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/authentication/authentication.dart';
@@ -11,6 +12,7 @@ import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/screens/pages/create_diary_book_page/create_diary_book_page.dart';
 import 'package:swap/screens/pages/diary_book_page/diary_book_page.dart';
+import 'package:swap/screens/pages/home_page/home_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/theme/app_theme.dart';
 
@@ -60,7 +62,7 @@ Future<void> _pumpHome(
 }
 
 void main() {
-  testWidgets('名前を入れて作成すると、作った日記帳が開き、ホームの一覧にも出る', (tester) async {
+  testWidgets('名前を入れて作成すると、ホームに戻って招待シートが開き、一覧にも出る', (tester) async {
     await _pumpHome(tester);
 
     await tester.tap(find.text('日記帳を作る'));
@@ -73,11 +75,32 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(CreateDiaryBookPage), findsNothing);
-    expect(find.byType(DiaryBookPage), findsOneWidget);
-    expect(find.text('大学'), findsOneWidget);
+    expect(find.byType(HomePage), findsOneWidget);
+    expect(find.byType(DiaryBookPage), findsNothing);
+    expect(find.text('「大学」を作りました'), findsOneWidget);
+    expect(find.text('New2345'), findsOneWidget);
 
-    await tester.tap(find.byType(BackButton));
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+    await tester.tap(find.text('招待メッセージをコピー'));
     await tester.pumpAndSettle();
+    expect(find.text('招待メッセージをコピーしました'), findsOneWidget);
+    expect(copied, contains('招待コード: New2345'));
+    expect(find.text('「大学」を作りました'), findsNothing);
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('1人'), findsOneWidget);
   });
@@ -95,10 +118,11 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('作成'));
     await tester.pumpAndSettle();
-    expect(find.byType(DiaryBookPage), findsOneWidget);
 
-    await tester.tap(find.byType(BackButton));
+    await tester.tap(find.text('あとで招待する'));
     await tester.pumpAndSettle();
+    expect(find.text('「会社」を作りました'), findsNothing);
+    expect(find.byType(HomePage), findsOneWidget);
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('会社'), findsOneWidget);
   });
