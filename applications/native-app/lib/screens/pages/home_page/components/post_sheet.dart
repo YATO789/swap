@@ -1,0 +1,209 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../../../domains/diary_book/diary_book.dart';
+import '../../../../domains/post/post.dart';
+import '../../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../../theme/app_theme.dart';
+import '../../../components/discard_guard.dart';
+import '../controller/post_sheet_controller.dart';
+import 'diary_book_chip.dart';
+import 'ruled_lines.dart';
+
+const _lines = 3;
+// 罫線の間隔は日記の本文と揃える。
+const _fontSize = 16.0;
+const _lineHeight = 2.2;
+
+/// 投稿シートで前に選んだ共有先の日記帳。次に開いたときも選んだままにする。
+/// TODO: アプリを終了しても覚えておく。
+Set<String> _savedDiaryBookIds = {};
+
+/// 「今なにしてる？」の投稿シートを開く。
+/// 前に選んだ日記帳（今も参加しているもの）が選ばれた状態で、投稿先を選べる。
+Future<void> showPostSheet(BuildContext context) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) => const _PostSheet(),
+  );
+}
+
+class _PostSheet extends HookConsumerWidget {
+  const _PostSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final diaryBooks =
+        ref.watch(diaryBookRepositoryProvider).value ?? const <DiaryBook>[];
+    final controller = useTextEditingController();
+    useListenable(controller);
+    final message = controller.text.trim();
+
+    final savedIds = useState(_savedDiaryBookIds);
+    // 抜けた日記帳は外す。並び順は日記帳一覧と揃える。
+    final selectedIds = [
+      for (final diaryBook in diaryBooks)
+        if (savedIds.value.contains(diaryBook.id)) diaryBook.id,
+    ];
+
+    // 開いたまま時間が経っても、表示している時刻が古くならないようにする。
+    final now = useState(DateTime.now());
+    useEffect(() {
+      final clock = Timer.periodic(const Duration(seconds: 5), (_) {
+        final current = DateTime.now();
+        if (current.minute != now.value.minute) now.value = current;
+      });
+      return clock.cancel;
+    }, const []);
+
+    final submitting = ref.watch(postSheetControllerProvider).isLoading;
+    // 記録はどれかの日記帳に入れるので、1冊も選んでいなければ押せない。
+    final canSubmit =
+        message.isNotEmpty && selectedIds.isNotEmpty && !submitting;
+
+    void toggleDiaryBook(String id) {
+      final ids = {...selectedIds};
+      if (!ids.remove(id)) ids.add(id);
+      savedIds.value = ids;
+      _savedDiaryBookIds = ids;
+    }
+
+    Future<void> submit() async {
+      if (!canSubmit) return;
+      final ok = await ref
+          .read(postSheetControllerProvider.notifier)
+          .submit(Post(message: message, diaryBookIds: selectedIds));
+      if (!context.mounted) return;
+      if (!ok) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(content: Text('記録できませんでした。もう一度お試しください')),
+          );
+        return;
+      }
+      // 書けたので、書きかけの確認（DiscardGuard）を通さずに閉じる。
+      Navigator.of(context).pop();
+    }
+
+    return DiscardGuard(
+      dirty: message.isNotEmpty,
+      child: Padding(
+        // キーボードが出たらその上に持ち上げる。
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: SafeArea(
+          child: Padding(
+            // 上はドラッグハンドルがあるので詰める。
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  _formatTime(now.value),
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // 枠は付けず、時刻の見出しと左を揃えてそのまま書き込む。
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // 日記の本文と同じく、3行ぶんの罫線を敷いてノートに書くように見せる。
+                      RuledLines(
+                        lineHeight: _fontSize * _lineHeight,
+                        lineCount: _lines,
+                        child: TextField(
+                          controller: controller,
+                          autofocus: true,
+                          maxLength: maxPostMessageLength,
+                          minLines: _lines,
+                          maxLines: _lines,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => submit(),
+                          style: const TextStyle(
+                            fontSize: _fontSize,
+                            height: _lineHeight,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: '今なにしてる？',
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                            // 文字数は入力欄の右下に自前で出す。
+                            counterText: '',
+                          ),
+                        ),
+                      ),
+                      ExcludeSemantics(
+                        child: Text(
+                          '${controller.text.characters.length} / $maxPostMessageLength',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (diaryBooks.isNotEmpty) ...[
+                  Text(
+                    '共有する日記帳',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final diaryBook in diaryBooks)
+                        DiaryBookChip(
+                          label: diaryBook.name,
+                          selected: selectedIds.contains(diaryBook.id),
+                          onTap: () => toggleDiaryBook(diaryBook.id),
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: canSubmit ? submit : null,
+                  child: submitting
+                      ? SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colors.textSecondary,
+                          ),
+                        )
+                      : const Text('記録する'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 「09:05」の形にする。
+String _formatTime(DateTime time) =>
+    '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';

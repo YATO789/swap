@@ -8,7 +8,7 @@ import '../../../domains/diary_book/diary_book.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_cover.dart';
-import 'components/discard_guard.dart';
+import '../../components/discard_guard.dart';
 import 'controller/create_diary_book_page_controller.dart';
 
 /// 日記帳を作るページ。作ったら閉じて、作った日記帳を返す。

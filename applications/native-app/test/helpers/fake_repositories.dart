@@ -2,9 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
+import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
 /// Supabase につながず、サインインすると少し待ってからサインイン済みになる。
@@ -38,6 +40,16 @@ class FakeProfileRepository extends ProfileRepository {
   Future<Profile?> build() async {
     if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return null;
     return profile;
+  }
+}
+
+/// 書いた記録を [posts] にためる。
+class FakePostRepository implements PostRepository {
+  final posts = <Post>[];
+
+  @override
+  Future<void> create(Post post) async {
+    posts.add(post);
   }
 }
 

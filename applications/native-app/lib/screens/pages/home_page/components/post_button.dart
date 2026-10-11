@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../theme/app_theme.dart';
+import 'post_sheet.dart';
 
 /// 画面の下に置く書き込みバー。左は「今なにしてる？」の入力欄風の欄で、
 /// 押すと投稿シートを開く。右のペンは日記を書くページを開く。
@@ -29,8 +30,7 @@ class PostButton extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
-                    // TODO: 投稿シートを開く。
-                    onTap: () {},
+                    onTap: () => showPostSheet(context),
                     child: Container(
                       height: 48,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
