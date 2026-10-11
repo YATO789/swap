@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../domains/diary/diary.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
@@ -9,8 +10,6 @@ import '../../../theme/app_theme.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
 import 'controller/my_page_controller.dart';
-
-const _appVersion = '1.0.0';
 
 /// ホームの AppBar 右のアイコンから開く、プロフィールとその他の設定のページ。
 class MyPage extends HookConsumerWidget {
@@ -23,6 +22,10 @@ class MyPage extends HookConsumerWidget {
     // TODO: 通知の仕組みができたら保存して、実際に通知する。今は見た目だけ。
     final postNotification = useState(true);
     final diaryReminder = useState(true);
+
+    // pubspec.yaml の version（ビルド番号を除く）。読み込むまでは空にしておく。
+    final packageInfo = useFuture(useMemoized(PackageInfo.fromPlatform));
+    final appVersion = packageInfo.data?.version ?? '';
 
     /// ログアウトかアカウント削除の処理中か。二度押しできないようにする。
     final busy = ref.watch(myPageControllerProvider).isLoading;
@@ -127,7 +130,7 @@ class MyPage extends HookConsumerWidget {
           _LinkTile(title: 'ヘルプ', onTap: showNotReady),
           _LinkTile(title: '利用規約', onTap: showNotReady),
           _LinkTile(title: 'プライバシーポリシー', onTap: showNotReady),
-          const _InfoTile(title: 'バージョン', value: _appVersion),
+          _InfoTile(title: 'バージョン', value: appVersion),
           const _SectionHeader('アカウント'),
           ListTile(
             contentPadding: _tilePadding,
