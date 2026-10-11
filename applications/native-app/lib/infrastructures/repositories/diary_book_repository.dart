@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
+import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/infrastructures/datasources/diary_book_datasource.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 
@@ -29,5 +30,10 @@ class DiaryBookRepository extends _$DiaryBookRepository {
       state = AsyncData([...current, diaryBook]);
     }
     return diaryBook;
+  }
+
+  /// [diaryBookId] の日記帳に参加している人を、参加した順に返す。
+  Future<List<DiaryBookMember>> fetchMembers(String diaryBookId) {
+    return _datasource.fetchMembers(diaryBookId);
   }
 }

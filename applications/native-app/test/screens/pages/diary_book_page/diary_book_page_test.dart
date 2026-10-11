@@ -1,0 +1,188 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:swap/domains/authentication/authentication.dart';
+import 'package:swap/domains/diary/diary.dart';
+import 'package:swap/domains/diary_book/diary_book.dart';
+import 'package:swap/domains/diary_book/diary_book_member.dart';
+import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/repositories/authentication_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_repository.dart';
+import 'package:swap/infrastructures/repositories/post_repository.dart';
+import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/screens/pages/diary_book_page/diary_book_page.dart';
+import 'package:swap/screens/pages/router/router.dart';
+import 'package:swap/theme/app_theme.dart';
+
+import '../../../helpers/fake_repositories.dart';
+
+const _university = DiaryBook(
+  id: 'university',
+  name: '大学',
+  icon: '大',
+  inviteCode: 'UNI482',
+  memberCount: 3,
+);
+
+const _members = [
+  DiaryBookMember(userId: 'me', displayName: '彩人'),
+  DiaryBookMember(userId: 'mio', displayName: '美緒'),
+  DiaryBookMember(userId: 'ken', displayName: '健太'),
+];
+
+/// サインインした状態のホームから、大学の日記帳を開く。
+Future<void> _openDiaryBook(
+  WidgetTester tester, {
+  List<Diary> diaries = const [],
+  List<TimelinePost> posts = const [],
+}) async {
+  // タイムラインが画面に収まるよう、縦長の画面にする。
+  tester.view.physicalSize = const Size(1170, 2532);
+  tester.view.devicePixelRatio = 3;
+  addTearDown(tester.view.reset);
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        authenticationRepositoryProvider.overrideWith(
+          () => FakeAuthenticationRepository(
+            initial: const Authentication(isLoginApp: true),
+          ),
+        ),
+        profileRepositoryProvider.overrideWith(
+          () => FakeProfileRepository(
+            profile: const Profile(id: 'me', displayName: '彩人'),
+          ),
+        ),
+        diaryBookRepositoryProvider.overrideWith(
+          () => FakeDiaryBookRepository(
+            [_university],
+            members: {_university.id: _members},
+          ),
+        ),
+        diaryRepositoryProvider.overrideWithValue(
+          FakeDiaryRepository({_university.id: diaries}),
+        ),
+        postRepositoryProvider.overrideWithValue(
+          FakePostRepository(timelinePosts: {_university.id: [...posts]}),
+        ),
+      ],
+      child: Consumer(
+        builder: (context, ref, _) => MaterialApp.router(
+          theme: buildLightTheme(),
+          routerConfig: ref.watch(routerProvider),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('大学'));
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  final today = diaryDateOf(DateTime.now());
+
+  testWidgets('ホームで日記帳を押すと、日記帳のページが開く', (tester) async {
+    await _openDiaryBook(tester);
+
+    expect(find.byType(DiaryBookPage), findsOneWidget);
+    expect(find.textContaining('今日・'), findsOneWidget);
+    expect(find.byTooltip('日付を選ぶ'), findsOneWidget);
+  });
+
+  testWidgets('その日の日記と記録が出て、読めない日記は伏せてある', (tester) async {
+    await _openDiaryBook(
+      tester,
+      diaries: [
+        Diary(
+          id: 'd1',
+          authorId: 'mio',
+          date: today,
+          writtenAt: DateTime.now(),
+        ),
+        Diary(
+          id: 'd2',
+          authorId: 'me',
+          date: today,
+          writtenAt: DateTime.now(),
+          title: '',
+          body: '今日はゼミの発表だった',
+        ),
+      ],
+      posts: [
+        TimelinePost(
+          id: 'p1',
+          authorId: 'ken',
+          message: '図書館で勉強中',
+          postedAt: diaryDayStartOf(today),
+        ),
+      ],
+    );
+
+    expect(find.text('今日はゼミの発表だった'), findsOneWidget);
+    expect(find.text('この日記帳に今日の日記を書くと読めます'), findsOneWidget);
+    expect(find.text('図書館で勉強中'), findsOneWidget);
+  });
+
+  testWidgets('今の時間の欄の「記録」から、この日記帳に記録できる', (tester) async {
+    await _openDiaryBook(tester);
+
+    // 今日を見ているので、今の時間の欄にメンバー全員が出る。
+    expect(find.text('美緒'), findsOneWidget);
+    expect(find.text('健太'), findsOneWidget);
+    expect(find.text('まだ記録がありません'), findsNWidgets(2));
+
+    await tester.tap(find.widgetWithText(FilledButton, '記録'));
+    await tester.pumpAndSettle();
+    expect(find.text('大学に記録します'), findsOneWidget);
+    expect(find.text('共有する日記帳'), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'カフェで勉強中');
+    await tester.pump();
+    await tester.tap(find.text('記録する'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('カフェで勉強中'), findsOneWidget);
+  });
+
+  testWidgets('カレンダーでほかの日を選ぶと、その日を表示して今日に戻れる', (tester) async {
+    await _openDiaryBook(
+      tester,
+      posts: [
+        TimelinePost(
+          id: 'p1',
+          authorId: 'mio',
+          message: '昨日の記録',
+          postedAt: diaryDayStartOf(today).subtract(const Duration(hours: 1)),
+        ),
+      ],
+    );
+    expect(find.text('昨日の記録'), findsNothing);
+
+    final yesterday = DateTime(today.year, today.month, today.day - 1);
+    await tester.tap(find.byTooltip('日付を選ぶ'));
+    await tester.pumpAndSettle();
+    // 昨日が先月なら、前の月に戻してから選ぶ。
+    if (yesterday.month != today.month) {
+      await tester.tap(find.byTooltip('前の月'));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(
+      find.bySemanticsLabel(
+        RegExp('^${yesterday.month}月${yesterday.day}日'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('昨日の記録'), findsOneWidget);
+    // 今日ではないので、今の時間の欄は出ない。
+    expect(find.text('まだ記録がありません'), findsNothing);
+
+    await tester.tap(find.text('今日'));
+    await tester.pumpAndSettle();
+    expect(find.text('昨日の記録'), findsNothing);
+  });
+}

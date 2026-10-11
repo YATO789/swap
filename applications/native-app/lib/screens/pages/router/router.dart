@@ -5,6 +5,7 @@ import 'package:swap/infrastructures/repositories/authentication_repository.dart
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
 import '../create_diary_book_page/create_diary_book_page.dart';
+import '../diary_book_page/diary_book_page.dart';
 import '../home_page/home_page.dart';
 import '../onboarding_page/onboarding_page.dart';
 import '../splash_page/splash_page.dart';
@@ -19,6 +20,10 @@ abstract final class AppRoutes {
   static const splash = '/splash';
   static const onboarding = '/onboarding';
   static const createDiaryBook = '/diary-books/new';
+  static const diaryBook = '/diary-books/:id';
+
+  /// [id] の日記帳のページ。
+  static String diaryBookOf(String id) => '/diary-books/$id';
 }
 
 /// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
@@ -73,6 +78,12 @@ GoRouter router(Ref ref) {
           fullscreenDialog: true,
           child: const CreateDiaryBookPage(),
         ),
+      ),
+      // /diary-books/new に当たらないよう、日記帳を作るページより後に置く。
+      GoRoute(
+        path: AppRoutes.diaryBook,
+        builder: (_, state) =>
+            DiaryBookPage(diaryBookId: state.pathParameters['id']!),
       ),
     ],
   );

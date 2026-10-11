@@ -4,10 +4,10 @@ import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
-import 'package:swap/screens/pages/home_page/components/post_button.dart';
+import 'package:swap/screens/components/post_button.dart';
 
-import '../../../../helpers/fake_repositories.dart';
-import '../../../../helpers/pump_app.dart';
+import '../../../helpers/fake_repositories.dart';
+import '../../../helpers/pump_app.dart';
 
 const _university = DiaryBook(
   id: 'university',

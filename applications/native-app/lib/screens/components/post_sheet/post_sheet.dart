@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../domains/diary_book/diary_book.dart';
-import '../../../../domains/post/post.dart';
-import '../../../../infrastructures/repositories/diary_book_repository.dart';
-import '../../../../theme/app_theme.dart';
-import '../../../components/discard_guard.dart';
-import '../controller/post_sheet_controller.dart';
-import 'diary_book_chip.dart';
-import 'ruled_lines.dart';
+import '../../../domains/diary_book/diary_book.dart';
+import '../../../domains/post/post.dart';
+import '../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../theme/app_theme.dart';
+import '../../../utils/format.dart';
+import '../discard_guard.dart';
+import 'components/diary_book_chip.dart';
+import 'components/ruled_lines.dart';
+import 'controller/post_sheet_controller.dart';
 
 const _lines = 3;
 // 罫線の間隔は日記の本文と揃える。
@@ -22,22 +23,27 @@ const _lineHeight = 2.2;
 /// TODO: アプリを終了しても覚えておく。
 Set<String> _savedDiaryBookIds = {};
 
-/// 「今なにしてる？」の投稿シートを開く。
-/// 前に選んだ日記帳（今も参加しているもの）が選ばれた状態で、投稿先を選べる。
-Future<void> showPostSheet(BuildContext context) {
-  return showModalBottomSheet<void>(
+/// 「今なにしてる？」の投稿シートを開く。記録したら true を返す。
+/// [diaryBook] を渡すとその日記帳にだけ投稿し、日記帳の選択は出さない。
+/// 渡さなければ前に選んだ日記帳（今も参加しているもの）が選ばれた状態で、投稿先を選べる。
+Future<bool> showPostSheet(BuildContext context, {DiaryBook? diaryBook}) async {
+  final posted = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
-    builder: (context) => const _PostSheet(),
+    builder: (context) => _PostSheet(diaryBook: diaryBook),
   );
+  return posted ?? false;
 }
 
 class _PostSheet extends HookConsumerWidget {
-  const _PostSheet();
+  const _PostSheet({required this.diaryBook});
+
+  final DiaryBook? diaryBook;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final fixedDiaryBook = diaryBook;
     final diaryBooks =
         ref.watch(diaryBookRepositoryProvider).value ?? const <DiaryBook>[];
     final controller = useTextEditingController();
@@ -45,11 +51,13 @@ class _PostSheet extends HookConsumerWidget {
     final message = controller.text.trim();
 
     final savedIds = useState(_savedDiaryBookIds);
-    // 抜けた日記帳は外す。並び順は日記帳一覧と揃える。
-    final selectedIds = [
-      for (final diaryBook in diaryBooks)
-        if (savedIds.value.contains(diaryBook.id)) diaryBook.id,
-    ];
+    final selectedIds = fixedDiaryBook != null
+        ? [fixedDiaryBook.id]
+        // 抜けた日記帳は外す。並び順は日記帳一覧と揃える。
+        : [
+            for (final diaryBook in diaryBooks)
+              if (savedIds.value.contains(diaryBook.id)) diaryBook.id,
+          ];
 
     // 開いたまま時間が経っても、表示している時刻が古くならないようにする。
     final now = useState(DateTime.now());
@@ -88,7 +96,7 @@ class _PostSheet extends HookConsumerWidget {
         return;
       }
       // 書けたので、書きかけの確認（DiscardGuard）を通さずに閉じる。
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
     }
 
     return DiscardGuard(
@@ -107,7 +115,7 @@ class _PostSheet extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  _formatTime(now.value),
+                  formatTime(now.value),
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
@@ -159,7 +167,16 @@ class _PostSheet extends HookConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                if (diaryBooks.isNotEmpty) ...[
+                if (fixedDiaryBook != null)
+                  // 投稿先が決まっているときも、どこに出るかは見せておく。
+                  Text(
+                    '${fixedDiaryBook.name}に記録します',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colors.textSecondary,
+                    ),
+                  )
+                else if (diaryBooks.isNotEmpty) ...[
                   Text(
                     '共有する日記帳',
                     style: TextStyle(
@@ -203,7 +220,3 @@ class _PostSheet extends HookConsumerWidget {
     );
   }
 }
-
-/// 「09:05」の形にする。
-String _formatTime(DateTime time) =>
-    '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';

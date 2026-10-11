@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
+import 'package:swap/domains/diary_book/diary_book_member.dart';
 
 part '_generated/diary_book_datasource.g.dart';
 
@@ -38,6 +39,22 @@ class DiaryBookDatasource {
     );
     // 作った人だけが入っている。
     return _toDiaryBook(row, memberCount: 1);
+  }
+
+  /// [diaryBookId] の日記帳に参加している人を、参加した順に返す。
+  Future<List<DiaryBookMember>> fetchMembers(String diaryBookId) async {
+    final rows = await _client
+        .from('diary_book_members')
+        .select('user_id, profiles(display_name)')
+        .eq('diary_book_id', diaryBookId)
+        .order('joined_at');
+    return rows.map((row) {
+      final profile = row['profiles'] as Map<String, dynamic>;
+      return DiaryBookMember(
+        userId: row['user_id'] as String,
+        displayName: profile['display_name'] as String,
+      );
+    }).toList();
   }
 
   DiaryBook _toDiaryBook(Map<String, dynamic> row, {required int memberCount}) {

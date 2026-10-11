@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:swap/domains/post/post.dart';
+import 'package:swap/domains/post/timeline_post.dart';
 
 part '_generated/post_datasource.g.dart';
 
@@ -9,7 +10,7 @@ PostDatasource postDatasource(Ref ref) {
   return PostDatasource(Supabase.instance.client);
 }
 
-/// Supabase の posts テーブルに記録（「今なにしてる？」）を書く。
+/// Supabase の posts テーブルに記録（「今なにしてる？」）を読み書きする。
 class PostDatasource {
   const PostDatasource(this._client);
 
@@ -24,5 +25,52 @@ class PostDatasource {
         'p_diary_book_ids': post.diaryBookIds,
       },
     );
+  }
+
+  /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録を古い順に返す。
+  /// ブロックした人の記録は RLS で返らない。
+  Future<List<TimelinePost>> fetchInDiaryBook(
+    String diaryBookId, {
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    final rows = await _client
+        .from('posts')
+        .select(
+          'id, author_id, message, posted_at, '
+          'post_diary_books!inner(diary_book_id)',
+        )
+        .eq('post_diary_books.diary_book_id', diaryBookId)
+        .gte('posted_at', from.toUtc().toIso8601String())
+        .lt('posted_at', to.toUtc().toIso8601String())
+        .order('posted_at');
+    return rows
+        .map(
+          (row) => TimelinePost(
+            id: row['id'] as String,
+            authorId: row['author_id'] as String,
+            message: row['message'] as String,
+            postedAt: DateTime.parse(row['posted_at'] as String).toLocal(),
+          ),
+        )
+        .toList();
+  }
+
+  /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録の書いた時刻。
+  Future<List<DateTime>> fetchPostedTimesInDiaryBook(
+    String diaryBookId, {
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    final rows = await _client
+        .from('posts')
+        .select('posted_at, post_diary_books!inner(diary_book_id)')
+        .eq('post_diary_books.diary_book_id', diaryBookId)
+        .gte('posted_at', from.toUtc().toIso8601String())
+        .lt('posted_at', to.toUtc().toIso8601String());
+    return [
+      for (final row in rows)
+        DateTime.parse(row['posted_at'] as String).toLocal(),
+    ];
   }
 }

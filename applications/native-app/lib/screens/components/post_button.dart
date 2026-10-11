@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 
-import '../../../../theme/app_theme.dart';
-import 'post_sheet.dart';
+import '../../domains/diary_book/diary_book.dart';
+import '../../theme/app_theme.dart';
+import 'post_sheet/post_sheet.dart';
 
 /// 画面の下に置く書き込みバー。左は「今なにしてる？」の入力欄風の欄で、
 /// 押すと投稿シートを開く。右のペンは日記を書くページを開く。
 /// 浮かぶボタンだと一覧に重なるので、画面の一部として置く。
+/// [diaryBook] を渡すと、記録はその日記帳に入れる前提で開く。
 class PostButton extends StatelessWidget {
-  const PostButton({super.key});
+  const PostButton({super.key, this.diaryBook, this.onPosted});
+
+  final DiaryBook? diaryBook;
+
+  /// 記録したときに呼ぶ。表示している記録を読み直すのに使う。
+  final VoidCallback? onPosted;
+
+  Future<void> _openPostSheet(BuildContext context) async {
+    final posted = await showPostSheet(context, diaryBook: diaryBook);
+    if (posted) onPosted?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +42,7 @@ class PostButton extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
-                    onTap: () => showPostSheet(context),
+                    onTap: () => _openPostSheet(context),
                     child: Container(
                       height: 48,
                       padding: const EdgeInsets.symmetric(horizontal: 16),

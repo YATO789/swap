@@ -13,7 +13,7 @@ import 'components/add_diary_book_sheet.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
-import 'components/post_button.dart';
+import '../../components/post_button.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
 
@@ -32,13 +32,17 @@ class HomePage extends HookConsumerWidget {
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
 
-    void openDiaryBook(DiaryBook diaryBook) {
-      // TODO: 日記帳の詳細ページを開く。
-    }
+    void openDiaryBook(DiaryBook diaryBook) =>
+        context.push(AppRoutes.diaryBookOf(diaryBook.id));
 
-    // TODO: 作ったら日記帳の詳細ページを開き、招待シートを出す。
-    void createDiaryBook() =>
-        context.push<DiaryBook>(AppRoutes.createDiaryBook);
+    // TODO: 作った日記帳を開いたら、招待シートを出す。
+    Future<void> createDiaryBook() async {
+      final diaryBook = await context.push<DiaryBook>(
+        AppRoutes.createDiaryBook,
+      );
+      if (diaryBook == null || !context.mounted) return;
+      openDiaryBook(diaryBook);
+    }
 
     // TODO: 招待コードで参加するページを開く。
     void joinDiaryBook() {

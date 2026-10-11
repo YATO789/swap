@@ -6,8 +6,11 @@ import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_repository.dart';
+import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/screens/pages/create_diary_book_page/create_diary_book_page.dart';
+import 'package:swap/screens/pages/diary_book_page/diary_book_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/theme/app_theme.dart';
 
@@ -42,6 +45,8 @@ Future<void> _pumpHome(
         diaryBookRepositoryProvider.overrideWith(
           () => FakeDiaryBookRepository(diaryBooks),
         ),
+        diaryRepositoryProvider.overrideWithValue(FakeDiaryRepository()),
+        postRepositoryProvider.overrideWithValue(FakePostRepository()),
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
@@ -55,7 +60,7 @@ Future<void> _pumpHome(
 }
 
 void main() {
-  testWidgets('名前を入れて作成すると、ホームの一覧に出る', (tester) async {
+  testWidgets('名前を入れて作成すると、作った日記帳が開き、ホームの一覧にも出る', (tester) async {
     await _pumpHome(tester);
 
     await tester.tap(find.text('日記帳を作る'));
@@ -68,6 +73,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(CreateDiaryBookPage), findsNothing);
+    expect(find.byType(DiaryBookPage), findsOneWidget);
+    expect(find.text('大学'), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('1人'), findsOneWidget);
   });
@@ -85,7 +95,10 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('作成'));
     await tester.pumpAndSettle();
+    expect(find.byType(DiaryBookPage), findsOneWidget);
 
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('会社'), findsOneWidget);
   });
