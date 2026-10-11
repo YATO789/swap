@@ -90,7 +90,7 @@ class _EmptyDiaryBooks extends StatelessWidget {
               Center(
                 // 無地だと寂しいので、表紙にアプリの名前を入れておく。
                 child: DiaryCover(
-                  name: 'Daylog',
+                  name: 'Swap!',
                   color: initialCoverColor,
                   width: min(constraints.maxWidth * 0.5, 200),
                 ),
