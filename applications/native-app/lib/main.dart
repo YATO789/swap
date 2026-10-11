@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'screens/pages/home_page/home_page.dart';
+import 'screens/pages/welcome_page/welcome_page.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -25,7 +25,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
-      home: const HomePage(),
+      // TODO: ログイン済みならホームを出す。
+      home: const WelcomePage(),
     );
   }
 }
