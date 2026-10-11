@@ -23,17 +23,30 @@ class DiaryBookDatasource {
           'id, name, icon, cover_color, invite_code, diary_book_members(count)',
         )
         .order('created_at');
-    return rows.map(_toDiaryBook).toList();
+    return rows.map((row) {
+      final members = row['diary_book_members'] as List<dynamic>;
+      final count = (members.first as Map<String, dynamic>)['count'] as int;
+      return _toDiaryBook(row, memberCount: count);
+    }).toList();
   }
 
-  DiaryBook _toDiaryBook(Map<String, dynamic> row) {
-    final members = row['diary_book_members'] as List<dynamic>;
+  /// 日記帳を作って参加する。招待コードは DB が作る。
+  Future<DiaryBook> create(String name, {int? coverColor}) async {
+    final row = await _client.rpc<Map<String, dynamic>>(
+      'create_diary_book',
+      params: {'p_name': name, 'p_cover_color': coverColor},
+    );
+    // 作った人だけが入っている。
+    return _toDiaryBook(row, memberCount: 1);
+  }
+
+  DiaryBook _toDiaryBook(Map<String, dynamic> row, {required int memberCount}) {
     return DiaryBook(
       id: row['id'] as String,
       name: row['name'] as String,
       icon: row['icon'] as String,
       inviteCode: row['invite_code'] as String,
-      memberCount: (members.first as Map<String, dynamic>)['count'] as int,
+      memberCount: memberCount,
       coverColor: row['cover_color'] as int?,
     );
   }

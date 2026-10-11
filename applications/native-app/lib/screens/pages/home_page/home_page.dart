@@ -2,17 +2,20 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
+import 'components/add_diary_book_sheet.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
-import '../../components/post_button.dart';
+import 'components/post_button.dart';
 import '../../components/user_avatar.dart';
+import '../router/router.dart';
 
 /// ホーム。日記帳の一覧と、下に「今なにしてる？」と日記を書くバーを置く。
 class HomePage extends HookConsumerWidget {
@@ -33,6 +36,30 @@ class HomePage extends HookConsumerWidget {
       // TODO: 日記帳の詳細ページを開く。
     }
 
+    // TODO: 作ったら日記帳の詳細ページを開き、招待シートを出す。
+    void createDiaryBook() =>
+        context.push<DiaryBook>(AppRoutes.createDiaryBook);
+
+    // TODO: 招待コードで参加するページを開く。
+    void joinDiaryBook() {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('準備中です')));
+    }
+
+    Future<void> addDiaryBook() async {
+      final action = await showAddDiaryBookSheet(context);
+      if (!context.mounted) return;
+      switch (action) {
+        case AddDiaryBookAction.create:
+          createDiaryBook();
+        case AddDiaryBookAction.join:
+          joinDiaryBook();
+        case null:
+          break;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -50,8 +77,7 @@ class HomePage extends HookConsumerWidget {
           // 日記帳がないうちは、画面の真ん中から作るか参加できるので出さない。
           if (diaryBooks.isNotEmpty)
             IconButton(
-              // TODO: 「日記帳を作る」と「招待コードで参加」を選ぶシートを開く。
-              onPressed: () {},
+              onPressed: addDiaryBook,
               tooltip: '日記帳を追加',
               icon: const Icon(Icons.menu_book_outlined),
             ),
@@ -65,8 +91,10 @@ class HomePage extends HookConsumerWidget {
         ],
       ),
       body: switch (diaryBooksState) {
-        AsyncValue(hasValue: true) when diaryBooks.isEmpty =>
-          const _EmptyDiaryBooks(),
+        AsyncValue(hasValue: true) when diaryBooks.isEmpty => _EmptyDiaryBooks(
+          onCreate: createDiaryBook,
+          onJoin: joinDiaryBook,
+        ),
         AsyncValue(hasValue: true) when grid.value => _DiaryBookGrid(
           diaryBooks: diaryBooks,
           onTap: openDiaryBook,
@@ -104,7 +132,10 @@ class HomePage extends HookConsumerWidget {
 /// 日記帳に1冊も入っていないときの案内。真ん中に本を置き、
 /// その下からその場で作るか参加できるようにする。
 class _EmptyDiaryBooks extends StatelessWidget {
-  const _EmptyDiaryBooks();
+  const _EmptyDiaryBooks({required this.onCreate, required this.onJoin});
+
+  final VoidCallback onCreate;
+  final VoidCallback onJoin;
 
   @override
   Widget build(BuildContext context) {
@@ -140,15 +171,13 @@ class _EmptyDiaryBooks extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               OutlinedButton.icon(
-                // TODO: 日記帳を作るページを開く。
-                onPressed: () {},
+                onPressed: onCreate,
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('日記帳を作る'),
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
-                // TODO: 招待コードで参加するページを開く。
-                onPressed: () {},
+                onPressed: onJoin,
                 icon: const Icon(Icons.key_outlined),
                 label: const Text('招待コードで参加'),
               ),

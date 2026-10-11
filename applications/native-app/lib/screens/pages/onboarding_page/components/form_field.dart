@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../theme/app_theme.dart';
+import '../../../../theme/app_theme.dart';
 
 /// 入力欄の上に出す小さな見出し。
 class FieldLabel extends StatelessWidget {

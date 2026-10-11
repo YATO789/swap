@@ -20,3 +20,6 @@ abstract class DiaryBook with _$DiaryBook {
     int? coverColor,
   }) = _DiaryBook;
 }
+
+/// 日記帳の名前の最大文字数。DB の diary_books.name の制約と合わせる。
+const maxDiaryBookNameLength = 15;

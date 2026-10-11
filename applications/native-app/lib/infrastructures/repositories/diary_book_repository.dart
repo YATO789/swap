@@ -17,4 +17,17 @@ class DiaryBookRepository extends _$DiaryBookRepository {
     if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return [];
     return _datasource.fetchJoined();
   }
+
+  /// 日記帳を作って一覧の最後に足し、作った日記帳を返す。
+  Future<DiaryBook> create(String name, {int? coverColor}) async {
+    final diaryBook = await _datasource.create(name, coverColor: coverColor);
+    final current = state.value;
+    // 読み込み中などで一覧がまだなければ、読み直して作ったものも含める。
+    if (current == null) {
+      ref.invalidateSelf();
+    } else {
+      state = AsyncData([...current, diaryBook]);
+    }
+    return diaryBook;
+  }
 }

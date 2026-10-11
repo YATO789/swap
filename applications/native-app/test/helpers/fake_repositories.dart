@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
@@ -47,4 +49,18 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
 
   @override
   Future<List<DiaryBook>> build() async => diaryBooks;
+
+  @override
+  Future<DiaryBook> create(String name, {int? coverColor}) async {
+    final diaryBook = DiaryBook(
+      id: 'new',
+      name: name,
+      icon: name.characters.first,
+      inviteCode: 'NEW234',
+      memberCount: 1,
+      coverColor: coverColor,
+    );
+    state = AsyncData([...?state.value, diaryBook]);
+    return diaryBook;
+  }
 }

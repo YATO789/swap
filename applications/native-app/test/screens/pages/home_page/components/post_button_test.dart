@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:swap/screens/components/post_button.dart';
+import 'package:swap/screens/pages/home_page/components/post_button.dart';
 
-import '../../helpers/pump_app.dart';
+import '../../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('入力欄風の欄と日記を書くボタンが出る', (tester) async {

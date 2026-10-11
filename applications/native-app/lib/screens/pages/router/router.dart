@@ -1,9 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
+import '../create_diary_book_page/create_diary_book_page.dart';
 import '../home_page/home_page.dart';
 import '../onboarding_page/onboarding_page.dart';
 import '../splash_page/splash_page.dart';
@@ -17,6 +18,7 @@ abstract final class AppRoutes {
   static const welcome = '/welcome';
   static const splash = '/splash';
   static const onboarding = '/onboarding';
+  static const createDiaryBook = '/diary-books/new';
 }
 
 /// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
@@ -39,8 +41,7 @@ GoRouter router(Ref ref) {
     initialLocation: AppRoutes.home,
     refreshListenable: refresh,
     redirect: (_, state) {
-      String? goTo(String path) =>
-          state.matchedLocation == path ? null : path;
+      String? goTo(String path) => state.matchedLocation == path ? null : path;
 
       if (!ref.read(authenticationRepositoryProvider).isLoginApp) {
         return goTo(AppRoutes.welcome);
@@ -57,21 +58,21 @@ GoRouter router(Ref ref) {
       };
     },
     routes: [
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (_, _) => const HomePage(),
-      ),
-      GoRoute(
-        path: AppRoutes.welcome,
-        builder: (_, _) => const WelcomePage(),
-      ),
-      GoRoute(
-        path: AppRoutes.splash,
-        builder: (_, _) => const SplashPage(),
-      ),
+      GoRoute(path: AppRoutes.home, builder: (_, _) => const HomePage()),
+      GoRoute(path: AppRoutes.welcome, builder: (_, _) => const WelcomePage()),
+      GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashPage()),
       GoRoute(
         path: AppRoutes.onboarding,
         builder: (_, _) => const OnboardingPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.createDiaryBook,
+        // 下から出てくるモーダルにして、キャンセルで閉じる。
+        pageBuilder: (_, state) => MaterialPage(
+          key: state.pageKey,
+          fullscreenDialog: true,
+          child: const CreateDiaryBookPage(),
+        ),
       ),
     ],
   );
