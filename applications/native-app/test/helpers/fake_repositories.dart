@@ -24,6 +24,13 @@ class FakeAuthenticationRepository extends AuthenticationRepository {
   Authentication build() => initial;
 
   @override
+  Future<bool> signInWithApple() async {
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    state = const Authentication(isLoginApp: true);
+    return true;
+  }
+
+  @override
   Future<void> signInAnonymously() async {
     await Future<void>.delayed(const Duration(milliseconds: 10));
     state = const Authentication(isLoginApp: true);

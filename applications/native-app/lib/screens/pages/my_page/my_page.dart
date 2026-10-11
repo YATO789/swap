@@ -8,6 +8,7 @@ import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
+import 'controller/my_page_controller.dart';
 
 const _appVersion = '1.0.0';
 
@@ -23,10 +24,43 @@ class MyPage extends HookConsumerWidget {
     final postNotification = useState(true);
     final diaryReminder = useState(true);
 
-    void showNotReady() {
+    /// ログアウトの処理中か。二度押しできないようにする。
+    final signingOut = ref.watch(myPageControllerProvider).isLoading;
+
+    void showMessage(String message) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('準備中です')));
+        ..showSnackBar(SnackBar(content: Text(message)));
+    }
+
+    void showNotReady() => showMessage('準備中です');
+
+    Future<void> signOut() async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('ログアウトしますか？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('キャンセル'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('ログアウト'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true || !context.mounted) return;
+
+      // 成功したらルーターがウェルカム画面に切り替えるので、ここでは失敗だけ扱う。
+      if (!await ref.read(myPageControllerProvider.notifier).signOut()) {
+        showMessage('ログアウトできませんでした。もう一度お試しください');
+      }
     }
 
     return Scaffold(
@@ -62,6 +96,18 @@ class MyPage extends HookConsumerWidget {
           _LinkTile(title: '利用規約', onTap: showNotReady),
           _LinkTile(title: 'プライバシーポリシー', onTap: showNotReady),
           const _InfoTile(title: 'バージョン', value: _appVersion),
+          const _SectionHeader('アカウント'),
+          ListTile(
+            contentPadding: _tilePadding,
+            title: Text(
+              'ログアウト',
+              style: _titleStyle.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+            enabled: !signingOut,
+            onTap: signOut,
+          ),
         ],
       ),
     );

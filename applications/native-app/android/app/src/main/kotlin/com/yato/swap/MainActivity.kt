@@ -1,4 +1,4 @@
-package com.example.swap
+package com.yato.swap
 
 import io.flutter.embedding.android.FlutterActivity
 

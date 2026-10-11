@@ -15,7 +15,14 @@ class AuthenticationRepository extends _$AuthenticationRepository {
   @override
   Authentication build() => _datasource.current;
 
-  /// 匿名ユーザーとしてサインインする。
+  /// Apple アカウントでサインインする。利用者がやめたら false を返す。
+  Future<bool> signInWithApple() async {
+    final signedIn = await _datasource.signInWithApple();
+    state = _datasource.current;
+    return signedIn;
+  }
+
+  /// 匿名ユーザーとしてサインインする。開発中の確認用。
   Future<void> signInAnonymously() async {
     await _datasource.signInAnonymously();
     state = _datasource.current;
