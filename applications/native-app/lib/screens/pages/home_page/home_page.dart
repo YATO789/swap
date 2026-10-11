@@ -67,6 +67,19 @@ class HomePage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        // アプリアイコンから地色と星を抜いた、ロゴの文字だけを置く。
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 20),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Image.asset(
+              'assets/icons/swap_title.png',
+              height: 24,
+              semanticLabel: 'Swap!',
+            ),
+          ),
+        ),
+        leadingWidth: 120,
         actions: [
           // 日記帳がないうちは切り替えても見た目が変わらないので出さない。
           if (diaryBooks.isNotEmpty)
