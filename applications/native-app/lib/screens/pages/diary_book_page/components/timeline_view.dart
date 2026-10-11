@@ -323,7 +323,9 @@ class _MemberCard extends StatelessWidget {
         children: [
           Expanded(
             child: MergeSemantics(
+              // 記録が何行あっても、アイコンは左上に置いたままにする。
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   UserAvatar(name: name, filled: isMe),
                   const SizedBox(width: 12),
@@ -433,7 +435,9 @@ class _PostCard extends StatelessWidget {
           border: Border.all(color: colors.border),
           borderRadius: BorderRadius.circular(12),
         ),
+        // 記録が長くても、アイコンは左上に置いたままにする。
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             UserAvatar(name: name, filled: isMine),
             const SizedBox(width: 12),
