@@ -10,14 +10,16 @@ part '_generated/authentication_datasource.g.dart';
 
 @riverpod
 AuthenticationDatasource authenticationDatasource(Ref ref) {
-  return AuthenticationDatasource(Supabase.instance.client.auth);
+  return AuthenticationDatasource(Supabase.instance.client);
 }
 
 /// Supabase Auth を使ってサインイン状態を読み書きする。
 class AuthenticationDatasource {
-  const AuthenticationDatasource(this._auth);
+  const AuthenticationDatasource(this._client);
 
-  final GoTrueClient _auth;
+  final SupabaseClient _client;
+
+  GoTrueClient get _auth => _client.auth;
 
   /// 今のサインイン状態。
   Authentication get current => _toAuthentication(_auth.currentSession);
@@ -60,6 +62,13 @@ class AuthenticationDatasource {
 
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  /// アカウントとそのデータをサーバーから消し、端末のセッションも捨てる。
+  Future<void> deleteAccount() async {
+    await _client.rpc<void>('delete_account');
+    // サーバーのセッションはユーザーと一緒に消えているので、端末の分だけ捨てる。
+    await _auth.signOut(scope: SignOutScope.local);
   }
 
   Authentication _toAuthentication(Session? session) {

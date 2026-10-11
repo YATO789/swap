@@ -32,4 +32,10 @@ class AuthenticationRepository extends _$AuthenticationRepository {
     await _datasource.signOut();
     state = _datasource.current;
   }
+
+  /// アカウントとそのデータを消し、サインアウトした状態にする。
+  Future<void> deleteAccount() async {
+    await _datasource.deleteAccount();
+    state = _datasource.current;
+  }
 }

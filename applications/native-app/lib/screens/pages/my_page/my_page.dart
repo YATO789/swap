@@ -24,8 +24,8 @@ class MyPage extends HookConsumerWidget {
     final postNotification = useState(true);
     final diaryReminder = useState(true);
 
-    /// ログアウトの処理中か。二度押しできないようにする。
-    final signingOut = ref.watch(myPageControllerProvider).isLoading;
+    /// ログアウトかアカウント削除の処理中か。二度押しできないようにする。
+    final busy = ref.watch(myPageControllerProvider).isLoading;
 
     void showMessage(String message) {
       ScaffoldMessenger.of(context)
@@ -60,6 +60,38 @@ class MyPage extends HookConsumerWidget {
       // 成功したらルーターがウェルカム画面に切り替えるので、ここでは失敗だけ扱う。
       if (!await ref.read(myPageControllerProvider.notifier).signOut()) {
         showMessage('ログアウトできませんでした。もう一度お試しください');
+      }
+    }
+
+    Future<void> deleteAccount() async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('アカウントを削除しますか？'),
+          content: const Text(
+            'プロフィール・記録・日記がすべて削除され、元に戻せません。'
+            '日記帳からも抜け、ほかに誰もいない日記帳は削除されます。',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('キャンセル'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('削除'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true || !context.mounted) return;
+
+      // 成功したらルーターがウェルカム画面に切り替えるので、ここでは失敗だけ扱う。
+      if (!await ref.read(myPageControllerProvider.notifier).deleteAccount()) {
+        showMessage('アカウントを削除できませんでした。もう一度お試しください');
       }
     }
 
@@ -99,14 +131,20 @@ class MyPage extends HookConsumerWidget {
           const _SectionHeader('アカウント'),
           ListTile(
             contentPadding: _tilePadding,
+            title: const Text('ログアウト', style: _titleStyle),
+            enabled: !busy,
+            onTap: signOut,
+          ),
+          ListTile(
+            contentPadding: _tilePadding,
             title: Text(
-              'ログアウト',
+              'アカウントを削除',
               style: _titleStyle.copyWith(
                 color: Theme.of(context).colorScheme.error,
               ),
             ),
-            enabled: !signingOut,
-            onTap: signOut,
+            enabled: !busy,
+            onTap: deleteAccount,
           ),
         ],
       ),
