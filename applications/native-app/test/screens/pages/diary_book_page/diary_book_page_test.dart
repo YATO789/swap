@@ -7,6 +7,7 @@ import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/post/timeline_post.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
@@ -17,6 +18,7 @@ import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/theme/app_theme.dart';
 
 import '../../../helpers/fake_repositories.dart';
+import '../../../helpers/fake_stores.dart';
 
 const _university = DiaryBook(
   id: 'university',
@@ -68,6 +70,7 @@ Future<void> _openDiaryBook(
         postRepositoryProvider.overrideWithValue(
           FakePostRepository(timelinePosts: {_university.id: [...posts]}),
         ),
+        postDiaryBookStoreProvider.overrideWithValue(FakePostDiaryBookStore()),
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(

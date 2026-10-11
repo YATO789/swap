@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/post_diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/screens/components/post_button.dart';
 
@@ -25,8 +26,26 @@ const _family = DiaryBook(
   memberCount: 3,
 );
 
-/// 書き込みバーを置いて、押して投稿シートを開く。
-Future<FakePostRepository> _openSheet(WidgetTester tester) async {
+/// 前に [savedIds] の日記帳を選んだことにする。
+class _FakePostDiaryBookRepository extends PostDiaryBookRepository {
+  _FakePostDiaryBookRepository(this.savedIds);
+
+  final Set<String> savedIds;
+
+  @override
+  Set<String> build() => savedIds;
+
+  @override
+  Future<void> save(Set<String> diaryBookIds) async {
+    state = diaryBookIds;
+  }
+}
+
+/// 書き込みバーを置いて、押して投稿シートを開く。前に [savedIds] の日記帳を選んだことにする。
+Future<FakePostRepository> _openSheet(
+  WidgetTester tester, {
+  Set<String> savedIds = const {},
+}) async {
   final postRepository = FakePostRepository();
   await tester.pumpApp(
     const Scaffold(bottomNavigationBar: PostButton()),
@@ -35,6 +54,9 @@ Future<FakePostRepository> _openSheet(WidgetTester tester) async {
         () => FakeDiaryBookRepository([_university, _family]),
       ),
       postRepositoryProvider.overrideWithValue(postRepository),
+      postDiaryBookRepositoryProvider.overrideWith(
+        () => _FakePostDiaryBookRepository(savedIds),
+      ),
     ],
   );
   await tester.pumpAndSettle();
@@ -47,8 +69,6 @@ FilledButton _submitButton(WidgetTester tester) =>
     tester.widget(find.widgetWithText(FilledButton, '記録する'));
 
 void main() {
-  // 選んだ日記帳はシートを閉じても覚えているので、テストの順番に意味がある。
-
   testWidgets('書いて日記帳を選ぶまで記録できない', (tester) async {
     await _openSheet(tester);
 
@@ -65,7 +85,7 @@ void main() {
   });
 
   testWidgets('記録すると選んだ日記帳に出して閉じる', (tester) async {
-    final postRepository = await _openSheet(tester);
+    final postRepository = await _openSheet(tester, savedIds: {'family'});
 
     await tester.enterText(find.byType(TextField), ' カフェで勉強中 ');
     // 前に選んだ家族は選ばれたまま。大学も足す。

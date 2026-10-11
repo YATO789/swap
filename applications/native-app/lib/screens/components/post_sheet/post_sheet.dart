@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/post.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../infrastructures/repositories/post_diary_book_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../discard_guard.dart';
@@ -18,10 +19,6 @@ const _lines = 3;
 // 罫線の間隔は日記の本文と揃える。
 const _fontSize = 16.0;
 const _lineHeight = 2.2;
-
-/// 投稿シートで前に選んだ共有先の日記帳。次に開いたときも選んだままにする。
-/// TODO: アプリを終了しても覚えておく。
-Set<String> _savedDiaryBookIds = {};
 
 /// 「今なにしてる？」の投稿シートを開く。記録したら true を返す。
 /// [diaryBook] を渡すとその日記帳にだけ投稿し、日記帳の選択は出さない。
@@ -50,13 +47,13 @@ class _PostSheet extends HookConsumerWidget {
     useListenable(controller);
     final message = controller.text.trim();
 
-    final savedIds = useState(_savedDiaryBookIds);
+    final savedIds = ref.watch(postDiaryBookRepositoryProvider);
     final selectedIds = fixedDiaryBook != null
         ? [fixedDiaryBook.id]
         // 抜けた日記帳は外す。並び順は日記帳一覧と揃える。
         : [
             for (final diaryBook in diaryBooks)
-              if (savedIds.value.contains(diaryBook.id)) diaryBook.id,
+              if (savedIds.contains(diaryBook.id)) diaryBook.id,
           ];
 
     // 開いたまま時間が経っても、表示している時刻が古くならないようにする。
@@ -77,8 +74,7 @@ class _PostSheet extends HookConsumerWidget {
     void toggleDiaryBook(String id) {
       final ids = {...selectedIds};
       if (!ids.remove(id)) ids.add(id);
-      savedIds.value = ids;
-      _savedDiaryBookIds = ids;
+      ref.read(postDiaryBookRepositoryProvider.notifier).save(ids);
     }
 
     Future<void> submit() async {
