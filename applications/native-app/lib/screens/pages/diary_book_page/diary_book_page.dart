@@ -90,7 +90,6 @@ class DiaryBookPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        // TODO: 2冊以上あれば、タイトルからほかの日記帳に切り替えられるようにする。
         title: DatedTitle(title: diaryBook.name, date: date.value),
         actions: [
           if (date.value != today)
