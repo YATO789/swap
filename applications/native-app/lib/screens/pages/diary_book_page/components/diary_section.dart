@@ -124,8 +124,8 @@ class _DiaryCard extends StatelessWidget {
                       _CardHeader(name: name, writtenAt: diary.writtenAt),
                       const SizedBox(height: 4),
                       // 冒頭だけ見せて、続きはタップした詳細で読む。
-                      // タイトルがあればタイトル1行と本文1行、なければ本文2行にして、
-                      // 本文が短くてもカードの高さを2行ぶんに揃える。
+                      // タイトル1行と本文1行にして、本文が短くてもカードの高さを2行ぶんに揃える。
+                      // タイトルがなければ「タイトルなし」を灰色で出して見た目を揃える。
                       // 行の高さは端数が丸められるので、決め打ちの高さにはせず最低限の高さにする。
                       ConstrainedBox(
                         constraints: BoxConstraints(
@@ -139,21 +139,23 @@ class _DiaryCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (title.isNotEmpty)
-                              Text(
-                                title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                strutStyle: _previewStrut,
-                                style: const TextStyle(
-                                  fontSize: _previewFontSize,
-                                  height: _previewLineHeight,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            Text(
+                              title.isNotEmpty ? title : 'タイトルなし',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              strutStyle: _previewStrut,
+                              style: TextStyle(
+                                fontSize: _previewFontSize,
+                                height: _previewLineHeight,
+                                fontWeight: FontWeight.w700,
+                                color: title.isNotEmpty
+                                    ? null
+                                    : colors.disabled,
                               ),
+                            ),
                             Text(
                               diary.body ?? '',
-                              maxLines: title.isNotEmpty ? 1 : 2,
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               strutStyle: _previewStrut,
                               style: const TextStyle(
