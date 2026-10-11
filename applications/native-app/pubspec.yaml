@@ -56,6 +56,17 @@ dev_dependencies:
   freezed: ^4.0.2
   build_runner: ^2.16.2
   riverpod_generator: ^4.0.9
+  flutter_launcher_icons: ^0.14.4
+
+# `fvm dart run flutter_launcher_icons` でアプリアイコンを作り直す。
+flutter_launcher_icons:
+  image_path: assets/icons/app_icon_mint.png
+  ios: true
+  remove_alpha_ios: true
+  android: true
+  # アダプティブアイコンは中央しか見えないので、縮めた前景を地色に載せる。
+  adaptive_icon_background: "#38D9A9"
+  adaptive_icon_foreground: assets/icons/app_icon_mint_foreground.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
