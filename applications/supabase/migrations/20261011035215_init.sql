@@ -7,7 +7,7 @@
 -- 表示名。ログインした Apple アカウント（auth.users）と 1対1。初回設定で作る。
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
-  display_name text not null check (char_length(display_name) between 1 and 20),
+  display_name text not null check (char_length(display_name) between 1 and 15),
   created_at timestamptz not null default now()
 );
 
