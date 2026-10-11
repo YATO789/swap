@@ -59,6 +59,7 @@ void main() {
     expect(find.text('会社'), findsOneWidget);
     expect(find.text('5人'), findsOneWidget);
     expect(find.text('今なにしてる？'), findsOneWidget);
+    expect(find.byTooltip('日記帳を追加'), findsOneWidget);
   });
 
   testWidgets('日記帳がなければ作るか参加するよう案内する', (tester) async {
@@ -67,6 +68,7 @@ void main() {
     expect(find.text('日記帳を作る'), findsOneWidget);
     expect(find.text('招待コードで参加'), findsOneWidget);
     expect(find.text('今なにしてる？'), findsNothing);
+    expect(find.byTooltip('日記帳を追加'), findsNothing);
   });
 
   testWidgets('リストとグリッドを切り替えられる', (tester) async {

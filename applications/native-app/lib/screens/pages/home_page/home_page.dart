@@ -47,12 +47,14 @@ class HomePage extends HookConsumerWidget {
                     : Icons.grid_view_outlined,
               ),
             ),
-          IconButton(
-            // TODO: 「日記帳を作る」と「招待コードで参加」を選ぶシートを開く。
-            onPressed: () {},
-            tooltip: '日記帳を追加',
-            icon: const Icon(Icons.menu_book_outlined),
-          ),
+          // 日記帳がないうちは、画面の真ん中から作るか参加できるので出さない。
+          if (diaryBooks.isNotEmpty)
+            IconButton(
+              // TODO: 「日記帳を作る」と「招待コードで参加」を選ぶシートを開く。
+              onPressed: () {},
+              tooltip: '日記帳を追加',
+              icon: const Icon(Icons.menu_book_outlined),
+            ),
           IconButton(
             // TODO: プロフィールと設定のページを開く。
             onPressed: () {},
