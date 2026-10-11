@@ -92,8 +92,6 @@ class DiaryBookPage extends HookConsumerWidget {
       appBar: AppBar(
         title: DatedTitle(title: diaryBook.name, date: date.value),
         actions: [
-          if (date.value != today)
-            BackToTodayButton(onPressed: () => date.value = today),
           IconButton(
             onPressed: pickDate,
             tooltip: '日付を選ぶ',

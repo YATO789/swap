@@ -151,7 +151,7 @@ void main() {
     expect(find.text('カフェで勉強中'), findsOneWidget);
   });
 
-  testWidgets('カレンダーでほかの日を選ぶと、その日を表示して今日に戻れる', (tester) async {
+  testWidgets('カレンダーでほかの日を選ぶと、その日を表示する', (tester) async {
     await _openDiaryBook(
       tester,
       posts: [
@@ -183,9 +183,5 @@ void main() {
     expect(find.text('昨日の記録'), findsOneWidget);
     // 今日ではないので、今の時間の欄は出ない。
     expect(find.text('まだ記録がありません'), findsNothing);
-
-    await tester.tap(find.text('今日'));
-    await tester.pumpAndSettle();
-    expect(find.text('昨日の記録'), findsNothing);
   });
 }

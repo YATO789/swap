@@ -31,18 +31,3 @@ class DatedTitle extends StatelessWidget {
     );
   }
 }
-
-/// 今日以外を見ているときに AppBar に出す「今日」へ戻るボタン。
-class BackToTodayButton extends StatelessWidget {
-  const BackToTodayButton({super.key, required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      child: const Text('今日', style: TextStyle(fontSize: 14)),
-    );
-  }
-}
