@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../data/mock_data.dart';
+import '../../../domains/diary_book/diary_book.dart';
+import '../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_book_icon.dart';
@@ -21,8 +23,11 @@ class HomePage extends HookConsumerWidget {
     /// 日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
     final grid = useState(false);
 
-    // TODO: ストアから取り出す。
-    const diaryBooks = initialMockDiaryBooks;
+    final colors = context.appColors;
+    final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
+    // 読み込み中や失敗したときは、日記帳がないときと同じく切り替えや投稿を出さない。
+    final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
+    final myName = ref.watch(profileRepositoryProvider).value?.displayName;
 
     void openDiaryBook(DiaryBook diaryBook) {
       // TODO: 日記帳の詳細ページを開く。
@@ -52,16 +57,42 @@ class HomePage extends HookConsumerWidget {
             // TODO: プロフィールと設定のページを開く。
             onPressed: () {},
             tooltip: 'プロフィールと設定',
-            icon: const UserAvatar(name: me, filled: true, size: 30),
+            icon: UserAvatar(name: myName ?? '', filled: true, size: 30),
           ),
           const SizedBox(width: 8),
         ],
       ),
-      body: diaryBooks.isEmpty
-          ? const _EmptyDiaryBooks()
-          : grid.value
-          ? _DiaryBookGrid(diaryBooks: diaryBooks, onTap: openDiaryBook)
-          : _DiaryBookList(diaryBooks: diaryBooks, onTap: openDiaryBook),
+      body: switch (diaryBooksState) {
+        AsyncValue(hasValue: true) when diaryBooks.isEmpty =>
+          const _EmptyDiaryBooks(),
+        AsyncValue(hasValue: true) when grid.value => _DiaryBookGrid(
+          diaryBooks: diaryBooks,
+          onTap: openDiaryBook,
+        ),
+        AsyncValue(hasValue: true) => _DiaryBookList(
+          diaryBooks: diaryBooks,
+          onTap: openDiaryBook,
+        ),
+        AsyncError() => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '日記帳を読み込めませんでした',
+                style: TextStyle(color: colors.textSecondary),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => ref.invalidate(diaryBookRepositoryProvider),
+                child: const Text('もう一度試す'),
+              ),
+            ],
+          ),
+        ),
+        _ => Center(
+          child: CircularProgressIndicator(color: colors.textSecondary),
+        ),
+      },
       // 日記帳に1冊も入っていないうちは、書いても見せる相手がいないので出さない。
       bottomNavigationBar: diaryBooks.isEmpty ? null : const PostButton(),
     );
@@ -145,7 +176,7 @@ class _DiaryBookList extends StatelessWidget {
               coverColor: diaryBook.coverColor,
             ),
             title: diaryBook.name,
-            subtitle: '${diaryBook.members.length}人',
+            subtitle: '${diaryBook.memberCount}人',
             onTap: () => onTap(diaryBook),
           ),
       ],
@@ -188,7 +219,7 @@ class _DiaryBookGrid extends StatelessWidget {
           itemCount: diaryBooks.length,
           itemBuilder: (context, index) {
             final diaryBook = diaryBooks[index];
-            final memberCount = '${diaryBook.members.length}人';
+            final memberCount = '${diaryBook.memberCount}人';
 
             return Semantics(
               button: true,
