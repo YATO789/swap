@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'screens/pages/welcome_page/welcome_page.dart';
+import 'screens/pages/router/router.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -16,17 +16,16 @@ Future<void> main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
-      // TODO: ログイン済みならホームを出す。
-      home: const WelcomePage(),
+      routerConfig: ref.watch(routerProvider),
     );
   }
 }

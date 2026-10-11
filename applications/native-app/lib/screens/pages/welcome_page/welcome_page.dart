@@ -4,7 +4,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../theme/app_theme.dart';
-import '../home_page/home_page.dart';
 import 'controller/welcome_page_controller.dart';
 
 /// ログインしていないときに最初に出す画面。Apple アカウントでサインインする。
@@ -43,14 +42,9 @@ class WelcomePage extends HookConsumerWidget {
       final succeeded = await ref
           .read(welcomePageControllerProvider.notifier)
           .signIn();
-      if (!context.mounted) return;
-      if (!succeeded) {
-        showSnackBar('サインインできませんでした。もう一度お試しください');
-        return;
-      }
-      await Navigator.of(context).pushReplacement(
-        MaterialPageRoute<void>(builder: (_) => const HomePage()),
-      );
+      // 成功したらルーターがホームに切り替えるので、ここでは失敗だけ扱う。
+      if (!context.mounted || succeeded) return;
+      showSnackBar('サインインできませんでした。もう一度お試しください');
     }
 
     final linkStyle = TextStyle(
