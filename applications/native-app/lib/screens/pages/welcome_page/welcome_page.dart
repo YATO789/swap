@@ -1,26 +1,30 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../theme/app_theme.dart';
 import '../home_page/home_page.dart';
+import 'controller/welcome_page_controller.dart';
 
 /// ログインしていないときに最初に出す画面。Apple アカウントでサインインする。
-class WelcomePage extends HookWidget {
+class WelcomePage extends HookConsumerWidget {
   const WelcomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
 
     /// サインインの処理中か。ボタンを押せなくして、処理中の表示を出す。
-    final signingIn = useState(false);
+    final signingIn = ref.watch(welcomePageControllerProvider).isLoading;
 
-    void showComingSoon() {
+    void showSnackBar(String message) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('準備中です')));
+        ..showSnackBar(SnackBar(content: Text(message)));
     }
+
+    void showComingSoon() => showSnackBar('準備中です');
 
     // 同意文の中の「利用規約」「プライバシーポリシー」を押せるようにする。
     final termsRecognizer = useMemoized(TapGestureRecognizer.new);
@@ -36,10 +40,14 @@ class WelcomePage extends HookWidget {
     );
 
     Future<void> signIn() async {
-      signingIn.value = true;
-      // TODO: Supabase で Apple サインインする。今は少し待ってホームへ進むだけ。
-      await Future<void>.delayed(const Duration(milliseconds: 600));
+      final succeeded = await ref
+          .read(welcomePageControllerProvider.notifier)
+          .signIn();
       if (!context.mounted) return;
+      if (!succeeded) {
+        showSnackBar('サインインできませんでした。もう一度お試しください');
+        return;
+      }
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(builder: (_) => const HomePage()),
       );
@@ -90,8 +98,8 @@ class WelcomePage extends HookWidget {
               ),
               // 処理中は二度押しできないようにして、待っていることを見せる。
               FilledButton.icon(
-                onPressed: signingIn.value ? null : signIn,
-                icon: signingIn.value
+                onPressed: signingIn ? null : signIn,
+                icon: signingIn
                     ? SizedBox.square(
                         dimension: 20,
                         child: CircularProgressIndicator(
@@ -100,7 +108,7 @@ class WelcomePage extends HookWidget {
                         ),
                       )
                     : const Icon(Icons.apple, size: 24),
-                label: Text(signingIn.value ? 'サインイン中…' : 'Appleでサインイン'),
+                label: Text(signingIn ?'サインイン中…' : 'Appleでサインイン'),
               ),
               const SizedBox(height: 16),
               Text.rich(
