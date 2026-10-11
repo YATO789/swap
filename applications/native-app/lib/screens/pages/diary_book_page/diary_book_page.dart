@@ -85,6 +85,9 @@ class DiaryBookPage extends HookConsumerWidget {
       await controller().refresh();
     }
 
+    // 名前や表紙を変えても、日記帳の一覧から読んでいるのでそのまま映る。
+    void openInfo() => context.push(AppRoutes.diaryBookInfoOf(diaryBookId));
+
     return Scaffold(
       appBar: AppBar(
         // TODO: 2冊以上あれば、タイトルからほかの日記帳に切り替えられるようにする。
@@ -97,7 +100,11 @@ class DiaryBookPage extends HookConsumerWidget {
             tooltip: '日付を選ぶ',
             icon: const Icon(Icons.calendar_month_outlined),
           ),
-          // TODO: 日記帳の情報ページ（名前・表紙・メンバー・招待）を開くボタンを置く。
+          IconButton(
+            onPressed: openInfo,
+            tooltip: '日記帳の情報',
+            icon: const Icon(Icons.info_outline),
+          ),
           const SizedBox(width: 8),
         ],
       ),

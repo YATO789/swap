@@ -42,6 +42,16 @@ class DiaryDatasource {
     return {for (final row in rows) DateTime.parse(row['date'] as String)};
   }
 
+  /// [diaryBookId] の日記帳に書かれた日記の数。
+  Future<int> countIn(String diaryBookId) async {
+    final response = await _client
+        .from('diaries')
+        .select('id')
+        .eq('diary_book_id', diaryBookId)
+        .count(CountOption.exact);
+    return response.count;
+  }
+
   /// 自分が [date] に書いた日記を、日記帳の id ごとに返す。
   Future<Map<String, Diary>> fetchMineOn(DateTime date) async {
     final rows = await _client

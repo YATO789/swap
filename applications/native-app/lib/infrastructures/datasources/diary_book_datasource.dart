@@ -82,6 +82,31 @@ class DiaryBookDatasource {
     }).toList();
   }
 
+  /// [diaryBookId] の日記帳の名前を [name] にする。
+  Future<void> rename(String diaryBookId, String name) async {
+    await _client
+        .from('diary_books')
+        .update({'name': name})
+        .eq('id', diaryBookId);
+  }
+
+  /// [diaryBookId] の日記帳の表紙の色を [coverColor] にする。null なら決まったグレーに戻す。
+  Future<void> setCoverColor(String diaryBookId, int? coverColor) async {
+    await _client
+        .from('diary_books')
+        .update({'cover_color': coverColor})
+        .eq('id', diaryBookId);
+  }
+
+  /// [diaryBookId] の日記帳から自分が抜ける。
+  Future<void> leave(String diaryBookId) async {
+    await _client
+        .from('diary_book_members')
+        .delete()
+        .eq('diary_book_id', diaryBookId)
+        .eq('user_id', _client.auth.currentUser!.id);
+  }
+
   DiaryBook _toDiaryBook(Map<String, dynamic> row, {required int memberCount}) {
     return DiaryBook(
       id: row['id'] as String,

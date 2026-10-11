@@ -64,6 +64,16 @@ class PostDatasource {
     return rows.map(_toTimelinePost).toList();
   }
 
+  /// [diaryBookId] の日記帳に出された記録の数。ブロックした人の記録は RLS で数えない。
+  Future<int> countInDiaryBook(String diaryBookId) async {
+    final response = await _client
+        .from('posts')
+        .select('id, post_diary_books!inner(diary_book_id)')
+        .eq('post_diary_books.diary_book_id', diaryBookId)
+        .count(CountOption.exact);
+    return response.count;
+  }
+
   TimelinePost _toTimelinePost(Map<String, dynamic> row) => TimelinePost(
     id: row['id'] as String,
     authorId: row['author_id'] as String,

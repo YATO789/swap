@@ -52,4 +52,46 @@ class DiaryBookRepository extends _$DiaryBookRepository {
   Future<List<DiaryBookMember>> fetchMembers(String diaryBookId) {
     return _datasource.fetchMembers(diaryBookId);
   }
+
+  /// [diaryBookId] の日記帳の名前を [name] にし、一覧にも映す。
+  Future<void> rename(String diaryBookId, String name) async {
+    await _datasource.rename(diaryBookId, name);
+    // アイコンは DB が名前の1文字目から作るので、同じように作る。
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(
+        name: name,
+        icon: String.fromCharCodes(name.runes.take(1)),
+      ),
+    );
+  }
+
+  /// [diaryBookId] の日記帳の表紙の色を [coverColor] にし、一覧にも映す。
+  Future<void> setCoverColor(String diaryBookId, int? coverColor) async {
+    await _datasource.setCoverColor(diaryBookId, coverColor);
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(coverColor: coverColor),
+    );
+  }
+
+  /// [diaryBookId] の日記帳から抜け、一覧から外す。
+  Future<void> leave(String diaryBookId) async {
+    await _datasource.leave(diaryBookId);
+    final current = state.value;
+    if (current == null) return ref.invalidateSelf();
+    state = AsyncData([
+      for (final diaryBook in current)
+        if (diaryBook.id != diaryBookId) diaryBook,
+    ]);
+  }
+
+  void _replace(String diaryBookId, DiaryBook Function(DiaryBook) update) {
+    final current = state.value;
+    if (current == null) return ref.invalidateSelf();
+    state = AsyncData([
+      for (final diaryBook in current)
+        diaryBook.id == diaryBookId ? update(diaryBook) : diaryBook,
+    ]);
+  }
 }

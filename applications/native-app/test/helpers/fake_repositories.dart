@@ -101,6 +101,11 @@ class FakePostRepository implements PostRepository {
   }
 
   @override
+  Future<int> countInDiaryBook(String diaryBookId) async {
+    return timelinePosts[diaryBookId]?.length ?? 0;
+  }
+
+  @override
   Future<Set<DateTime>> fetchDatesInDiaryBook(
     String diaryBookId,
     DateTime month,
@@ -184,6 +189,11 @@ class FakeDiaryRepository implements DiaryRepository {
   }
 
   @override
+  Future<int> countIn(String diaryBookId) async {
+    return diaries[diaryBookId]?.length ?? 0;
+  }
+
+  @override
   Future<Set<DateTime>> fetchDatesIn(String diaryBookId, DateTime month) async {
     return {
       for (final diary in diaries[diaryBookId] ?? const <Diary>[]) diary.date,
@@ -245,6 +255,38 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
 
   @override
   Future<List<DiaryBook>> build() async => diaryBooks;
+
+  @override
+  Future<void> rename(String diaryBookId, String name) async {
+    _replace(
+      diaryBookId,
+      (diaryBook) =>
+          diaryBook.copyWith(name: name, icon: name.characters.first),
+    );
+  }
+
+  @override
+  Future<void> setCoverColor(String diaryBookId, int? coverColor) async {
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(coverColor: coverColor),
+    );
+  }
+
+  @override
+  Future<void> leave(String diaryBookId) async {
+    state = AsyncData([
+      for (final diaryBook in [...?state.value])
+        if (diaryBook.id != diaryBookId) diaryBook,
+    ]);
+  }
+
+  void _replace(String diaryBookId, DiaryBook Function(DiaryBook) update) {
+    state = AsyncData([
+      for (final diaryBook in [...?state.value])
+        diaryBook.id == diaryBookId ? update(diaryBook) : diaryBook,
+    ]);
+  }
 
   @override
   Future<DiaryBook> create(String name, {int? coverColor}) async {

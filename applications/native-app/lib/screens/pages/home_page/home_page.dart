@@ -10,7 +10,7 @@ import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_sheet.dart';
-import 'components/invite_sheet.dart';
+import '../../components/invite_sheet.dart';
 import 'components/join_diary_book_dialog/join_diary_book_dialog.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_book_icon.dart';

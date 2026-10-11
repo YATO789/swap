@@ -10,7 +10,7 @@ import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
-import 'package:swap/screens/pages/home_page/components/invite_sheet.dart';
+import 'package:swap/screens/components/invite_sheet.dart';
 import 'package:swap/screens/pages/diary_book_page/diary_book_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/theme/app_theme.dart';

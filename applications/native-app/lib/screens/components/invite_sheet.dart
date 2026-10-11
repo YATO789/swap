@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../domains/diary_book/diary_book.dart';
-import '../../../../theme/app_theme.dart';
+import '../../domains/diary_book/diary_book.dart';
+import '../../theme/app_theme.dart';
 
 /// 友達に送る招待メッセージ。
 String inviteMessage(DiaryBook diaryBook) {

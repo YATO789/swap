@@ -5,6 +5,7 @@ import 'package:swap/infrastructures/repositories/authentication_repository.dart
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
 import '../create_diary_book_page/create_diary_book_page.dart';
+import '../diary_book_info_page/diary_book_info_page.dart';
 import '../diary_book_page/diary_book_page.dart';
 import '../diary_detail_page/diary_detail_page.dart';
 import '../diary_editor_page/diary_editor_page.dart';
@@ -23,11 +24,15 @@ abstract final class AppRoutes {
   static const onboarding = '/onboarding';
   static const createDiaryBook = '/diary-books/new';
   static const diaryBook = '/diary-books/:id';
+  static const diaryBookInfo = '/diary-books/:id/info';
   static const diaryDetail = '/diary-books/:id/diaries/:date';
   static const diaryEditor = '/diaries/write';
 
   /// [id] の日記帳のページ。
   static String diaryBookOf(String id) => '/diary-books/$id';
+
+  /// [id] の日記帳の情報ページ。
+  static String diaryBookInfoOf(String id) => '/diary-books/$id/info';
 
   /// [diaryBookId] の日記帳の [date] の日記を読むページ。最初は [authorId] の日記を開く。
   static String diaryDetailOf(
@@ -109,6 +114,11 @@ GoRouter router(Ref ref) {
         path: AppRoutes.diaryBook,
         builder: (_, state) =>
             DiaryBookPage(diaryBookId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.diaryBookInfo,
+        builder: (_, state) =>
+            DiaryBookInfoPage(diaryBookId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: AppRoutes.diaryDetail,
