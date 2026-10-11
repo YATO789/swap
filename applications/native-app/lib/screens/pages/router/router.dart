@@ -6,6 +6,8 @@ import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
 import '../create_diary_book_page/create_diary_book_page.dart';
 import '../diary_book_page/diary_book_page.dart';
+import '../diary_detail_page/diary_detail_page.dart';
+import '../diary_editor_page/diary_editor_page.dart';
 import '../home_page/home_page.dart';
 import '../onboarding_page/onboarding_page.dart';
 import '../splash_page/splash_page.dart';
@@ -21,9 +23,32 @@ abstract final class AppRoutes {
   static const onboarding = '/onboarding';
   static const createDiaryBook = '/diary-books/new';
   static const diaryBook = '/diary-books/:id';
+  static const diaryDetail = '/diary-books/:id/diaries/:date';
+  static const diaryEditor = '/diaries/write';
 
   /// [id] の日記帳のページ。
   static String diaryBookOf(String id) => '/diary-books/$id';
+
+  /// [diaryBookId] の日記帳の [date] の日記を読むページ。最初は [authorId] の日記を開く。
+  static String diaryDetailOf(
+    String diaryBookId,
+    DateTime date, {
+    required String authorId,
+  }) => Uri(
+    path: '/diary-books/$diaryBookId/diaries/${_toDateParam(date)}',
+    queryParameters: {'author': authorId},
+  ).toString();
+
+  /// 自分の [date] の日記を書くページ。[diaryBookId] が null なら参加している日記帳すべてに書く。
+  static String diaryEditorOf(DateTime date, {String? diaryBookId}) => Uri(
+    path: diaryEditor,
+    queryParameters: {'date': _toDateParam(date), 'diaryBook': ?diaryBookId},
+  ).toString();
+
+  static String _toDateParam(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-'
+      '${date.month.toString().padLeft(2, '0')}-'
+      '${date.day.toString().padLeft(2, '0')}';
 }
 
 /// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
@@ -84,6 +109,26 @@ GoRouter router(Ref ref) {
         path: AppRoutes.diaryBook,
         builder: (_, state) =>
             DiaryBookPage(diaryBookId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: AppRoutes.diaryDetail,
+        builder: (_, state) => DiaryDetailPage(
+          diaryBookId: state.pathParameters['id']!,
+          date: DateTime.parse(state.pathParameters['date']!),
+          initialAuthorId: state.uri.queryParameters['author'],
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.diaryEditor,
+        // 下から出てくるモーダルにして、閉じるボタンで閉じる。
+        pageBuilder: (_, state) => MaterialPage(
+          key: state.pageKey,
+          fullscreenDialog: true,
+          child: DiaryEditorPage(
+            date: DateTime.parse(state.uri.queryParameters['date']!),
+            diaryBookId: state.uri.queryParameters['diaryBook'],
+          ),
+        ),
       ),
     ],
   );

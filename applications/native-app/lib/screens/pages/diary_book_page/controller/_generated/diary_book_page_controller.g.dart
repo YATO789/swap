@@ -56,7 +56,7 @@ final class DiaryBookPageControllerProvider
 }
 
 String _$diaryBookPageControllerHash() =>
-    r'dbbfcd647143498175da85e68964b35f01665e7f';
+    r'cb1abe04ca76df9c88d604ba563047c7e9d63c9c';
 
 /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
 

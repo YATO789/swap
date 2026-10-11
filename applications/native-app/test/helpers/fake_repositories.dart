@@ -85,6 +85,21 @@ class FakePostRepository implements PostRepository {
   }
 
   @override
+  Future<List<TimelinePost>> fetchByAuthorsOn(
+    List<String> authorIds,
+    DateTime date,
+  ) async {
+    // 同じ記録が複数の日記帳に出ていても1つにする。
+    final posts = {
+      for (final post in timelinePosts.values.expand((posts) => posts))
+        if (authorIds.contains(post.authorId) &&
+            diaryDateOf(post.postedAt) == date)
+          post.id: post,
+    }.values.toList();
+    return posts..sort((a, b) => a.postedAt.compareTo(b.postedAt));
+  }
+
+  @override
   Future<Set<DateTime>> fetchDatesInDiaryBook(
     String diaryBookId,
     DateTime month,
@@ -96,18 +111,75 @@ class FakePostRepository implements PostRepository {
   }
 }
 
-/// 日記帳の id ごとの [diaries] を返す。
+/// 日記帳の id ごとの [diaries] を返す。自分（id: me）の日記を書いたり消したりすると [diaries] が変わる。
+/// 自分がその日に書いていない日記帳の、ほかの人の日記の本文は伏せて返す。
 class FakeDiaryRepository implements DiaryRepository {
-  FakeDiaryRepository([this.diaries = const {}]);
+  FakeDiaryRepository([Map<String, List<Diary>> diaries = const {}])
+    : diaries = {
+        for (final entry in diaries.entries) entry.key: [...entry.value],
+      };
 
   final Map<String, List<Diary>> diaries;
 
   @override
   Future<List<Diary>> fetchOn(String diaryBookId, DateTime date) async {
-    return [
+    final onDate = [
       for (final diary in diaries[diaryBookId] ?? const <Diary>[])
         if (diary.date == date) diary,
     ];
+    final wroteToday = onDate.any((diary) => diary.authorId == 'me');
+    return [
+      for (final diary in onDate)
+        diary.authorId == 'me' || wroteToday
+            ? diary
+            : diary.copyWith(title: null, body: null),
+    ];
+  }
+
+  @override
+  Future<Map<String, Diary>> fetchMineOn(DateTime date) async {
+    return {
+      for (final entry in diaries.entries)
+        for (final diary in entry.value)
+          if (diary.authorId == 'me' && diary.date == date) entry.key: diary,
+    };
+  }
+
+  @override
+  Future<void> save({
+    required List<String> diaryBookIds,
+    required DateTime date,
+    required String title,
+    required String body,
+  }) async {
+    for (final id in diaryBookIds) {
+      final list = diaries[id] ??= [];
+      final index = list.indexWhere(
+        (diary) => diary.authorId == 'me' && diary.date == date,
+      );
+      if (index >= 0) {
+        list[index] = list[index].copyWith(title: title, body: body);
+      } else {
+        list.insert(
+          0,
+          Diary(
+            id: '$id-${list.length}',
+            authorId: 'me',
+            date: date,
+            writtenAt: DateTime.now(),
+            title: title,
+            body: body,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Future<void> delete(String diaryId) async {
+    for (final list in diaries.values) {
+      list.removeWhere((diary) => diary.id == diaryId);
+    }
   }
 
   @override

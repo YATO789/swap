@@ -42,6 +42,45 @@ class DiaryDatasource {
     return {for (final row in rows) DateTime.parse(row['date'] as String)};
   }
 
+  /// 自分が [date] に書いた日記を、日記帳の id ごとに返す。
+  Future<Map<String, Diary>> fetchMineOn(DateTime date) async {
+    final rows = await _client
+        .from('diaries')
+        .select(
+          'id, diary_book_id, author_id, date, written_at, '
+          'diary_contents(title, body)',
+        )
+        .eq('author_id', _client.auth.currentUser!.id)
+        .eq('date', _toDateString(date));
+    return {
+      for (final row in rows) row['diary_book_id'] as String: _toDiary(row),
+    };
+  }
+
+  /// [diaryBookId] の日記帳に自分の [date] の日記を書く。
+  /// もう書いていればタイトルと本文を書き換える（書いた時刻は変えない）。
+  Future<void> save({
+    required String diaryBookId,
+    required DateTime date,
+    required String title,
+    required String body,
+  }) async {
+    await _client.rpc<String>(
+      'save_diary',
+      params: {
+        'p_diary_book_id': diaryBookId,
+        'p_date': _toDateString(date),
+        'p_title': title,
+        'p_body': body,
+      },
+    );
+  }
+
+  /// 自分の日記を消す。本文（diary_contents）も一緒に消える。
+  Future<void> delete(String diaryId) async {
+    await _client.from('diaries').delete().eq('id', diaryId);
+  }
+
   Diary _toDiary(Map<String, dynamic> row) {
     // diary_id が主キーなので1対1になり、読めれば Map、読めなければ null が入る。
     final content = row['diary_contents'] as Map<String, dynamic>?;

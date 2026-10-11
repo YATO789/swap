@@ -26,6 +26,10 @@ abstract class Diary with _$Diary {
   bool get isLocked => body == null;
 }
 
+/// 日記のタイトルと本文の最大文字数。DB の diary_contents の制約と合わせる。
+const maxDiaryTitleLength = 40;
+const maxDiaryBodyLength = 1000;
+
 /// 日記の日付が切り替わる時刻。これより前に書いたものは前日の日記として扱う。
 const diaryDayStartHour = 4;
 

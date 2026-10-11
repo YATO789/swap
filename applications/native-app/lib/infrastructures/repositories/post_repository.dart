@@ -35,6 +35,19 @@ class PostRepository {
     );
   }
 
+  /// [authorIds] の人が日記の [date]（朝4時区切り）に書いた記録のうち、見られるものを古い順に返す。
+  Future<List<TimelinePost>> fetchByAuthorsOn(
+    List<String> authorIds,
+    DateTime date,
+  ) async {
+    if (authorIds.isEmpty) return [];
+    return _datasource.fetchByAuthors(
+      authorIds,
+      from: diaryDayStartOf(date),
+      to: diaryDayStartOf(DateTime(date.year, date.month, date.day + 1)),
+    );
+  }
+
   /// [diaryBookId] の日記帳に、[month] の月の間で記録が出された日（朝4時区切り）。
   Future<Set<DateTime>> fetchDatesInDiaryBook(
     String diaryBookId,

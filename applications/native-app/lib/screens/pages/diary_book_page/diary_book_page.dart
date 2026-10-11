@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
@@ -8,6 +9,7 @@ import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/post_button.dart';
 import '../../components/post_sheet/post_sheet.dart';
+import '../router/router.dart';
 import 'components/dated_title.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
@@ -64,11 +66,23 @@ class DiaryBookPage extends HookConsumerWidget {
       if (picked != null) date.value = picked;
     }
 
-    // TODO: 日記の詳細ページと日記を書くページを移植したらつなぐ。
-    void showNotReady(Diary _) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('準備中です')));
+    // 日記を読んだり書いたりしたページから戻ったら、編集や削除を映すため読み直す。
+    Future<void> openDiary(Diary diary) async {
+      await context.push(
+        AppRoutes.diaryDetailOf(
+          diaryBookId,
+          diary.date,
+          authorId: diary.authorId,
+        ),
+      );
+      await controller().refresh();
+    }
+
+    Future<void> writeDiary(Diary diary) async {
+      await context.push(
+        AppRoutes.diaryEditorOf(diary.date, diaryBookId: diaryBookId),
+      );
+      await controller().refresh();
     }
 
     return Scaffold(
@@ -96,8 +110,8 @@ class DiaryBookPage extends HookConsumerWidget {
           posts: value.posts,
           onRefresh: () => controller().refresh(),
           onRecord: record,
-          onOpenDiary: showNotReady,
-          onWriteDiary: showNotReady,
+          onOpenDiary: openDiary,
+          onWriteDiary: writeDiary,
         ),
         AsyncError() => _LoadError(onRetry: () => controller().refresh()),
         _ => Center(
@@ -105,9 +119,14 @@ class DiaryBookPage extends HookConsumerWidget {
         ),
       },
       // 開いている日記帳に、そのまま記録を書けるようにする。
+      // 見ている日が今日か昨日なら、日記はその日のものを書く。
       bottomNavigationBar: PostButton(
         diaryBook: diaryBook,
+        diaryDate: isEditableDiaryDate(date.value, today: today)
+            ? date.value
+            : null,
         onPosted: () => controller().reloadPosts(),
+        onDiaryClosed: () => controller().refresh(),
       ),
     );
   }

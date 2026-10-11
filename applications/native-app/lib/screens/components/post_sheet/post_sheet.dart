@@ -10,8 +10,8 @@ import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../discard_guard.dart';
+import '../ruled_lines.dart';
 import 'components/diary_book_chip.dart';
-import 'components/ruled_lines.dart';
 import 'controller/post_sheet_controller.dart';
 
 const _lines = 3;
@@ -171,10 +171,7 @@ class _PostSheet extends HookConsumerWidget {
                   // 投稿先が決まっているときも、どこに出るかは見せておく。
                   Text(
                     '${fixedDiaryBook.name}に記録します',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colors.textSecondary,
-                    ),
+                    style: TextStyle(fontSize: 13, color: colors.textSecondary),
                   )
                 else if (diaryBooks.isNotEmpty) ...[
                   Text(

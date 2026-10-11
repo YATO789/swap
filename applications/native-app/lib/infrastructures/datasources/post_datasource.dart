@@ -44,17 +44,32 @@ class PostDatasource {
         .gte('posted_at', from.toUtc().toIso8601String())
         .lt('posted_at', to.toUtc().toIso8601String())
         .order('posted_at');
-    return rows
-        .map(
-          (row) => TimelinePost(
-            id: row['id'] as String,
-            authorId: row['author_id'] as String,
-            message: row['message'] as String,
-            postedAt: DateTime.parse(row['posted_at'] as String).toLocal(),
-          ),
-        )
-        .toList();
+    return rows.map(_toTimelinePost).toList();
   }
+
+  /// [authorIds] の人が [from] 以降 [to] より前に書いた記録を古い順に返す。
+  /// 自分の記録と、自分の入っている日記帳に出た記録だけが RLS で返る。
+  Future<List<TimelinePost>> fetchByAuthors(
+    List<String> authorIds, {
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    final rows = await _client
+        .from('posts')
+        .select('id, author_id, message, posted_at')
+        .inFilter('author_id', authorIds)
+        .gte('posted_at', from.toUtc().toIso8601String())
+        .lt('posted_at', to.toUtc().toIso8601String())
+        .order('posted_at');
+    return rows.map(_toTimelinePost).toList();
+  }
+
+  TimelinePost _toTimelinePost(Map<String, dynamic> row) => TimelinePost(
+    id: row['id'] as String,
+    authorId: row['author_id'] as String,
+    message: row['message'] as String,
+    postedAt: DateTime.parse(row['posted_at'] as String).toLocal(),
+  );
 
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録の書いた時刻。
   Future<List<DateTime>> fetchPostedTimesInDiaryBook(

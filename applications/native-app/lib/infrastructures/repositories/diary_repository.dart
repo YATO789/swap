@@ -9,7 +9,7 @@ DiaryRepository diaryRepository(Ref ref) {
   return DiaryRepository(ref.read(diaryDatasourceProvider));
 }
 
-/// 日記を読む。
+/// 日記を読み書きする。
 class DiaryRepository {
   const DiaryRepository(this._datasource);
 
@@ -27,5 +27,29 @@ class DiaryRepository {
       from: DateTime(month.year, month.month),
       to: DateTime(month.year, month.month + 1, 0),
     );
+  }
+
+  /// 自分が [date] に書いた日記を、日記帳の id ごとに返す。
+  Future<Map<String, Diary>> fetchMineOn(DateTime date) {
+    return _datasource.fetchMineOn(date);
+  }
+
+  /// [diaryBookIds] の日記帳それぞれに、自分の [date] の日記として同じ内容を書く。
+  /// もう書いている日記帳では、タイトルと本文を書き換える。
+  Future<void> save({
+    required List<String> diaryBookIds,
+    required DateTime date,
+    required String title,
+    required String body,
+  }) async {
+    await Future.wait([
+      for (final id in diaryBookIds)
+        _datasource.save(diaryBookId: id, date: date, title: title, body: body),
+    ]);
+  }
+
+  /// 自分の日記を消す。
+  Future<void> delete(String diaryId) {
+    return _datasource.delete(diaryId);
   }
 }
