@@ -140,6 +140,8 @@ class _PostSheet extends HookConsumerWidget {
                             fontSize: _fontSize,
                             height: _lineHeight,
                           ),
+                          // 行の高さいっぱいだと罫線をはみ出すので、文字の高さに合わせる。
+                          cursorHeight: _fontSize * 1.4,
                           decoration: const InputDecoration(
                             hintText: '今なにしてる？',
                             border: InputBorder.none,

@@ -357,6 +357,8 @@ class _DiaryEditor extends HookWidget {
                     textCapitalization: TextCapitalization.sentences,
                     style: _bodyStyle,
                     strutStyle: _bodyStrut,
+                    // 行の高さいっぱいだと罫線をはみ出すので、文字の高さに合わせる。
+                    cursorHeight: _bodyFontSize * 1.4,
                     decoration: InputDecoration(
                       hintText: '$_dayLabelはどんな一日だった？',
                       border: InputBorder.none,
