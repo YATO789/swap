@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../usecase/users/authentication_usecase.dart';
+import '../../../../infrastructures/repositories/authentication_repository.dart';
 
 part '_generated/welcome_page_controller.g.dart';
 
@@ -16,7 +16,7 @@ class WelcomePageController extends _$WelcomePageController {
     state = const AsyncLoading();
     // TODO: Supabase で Apple サインインする。今は仮に匿名ユーザーとしてサインインする。
     state = await AsyncValue.guard(
-      ref.read(authenticationUsecaseProvider.notifier).signInAnonymously,
+      ref.read(authenticationRepositoryProvider.notifier).signInAnonymously,
     );
     if (state case AsyncError(:final error, :final stackTrace)) {
       debugPrint('サインインに失敗しました: $error\n$stackTrace');

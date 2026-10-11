@@ -4,29 +4,25 @@ import 'package:swap/infrastructures/datasources/authentication_datasource.dart'
 
 part '_generated/authentication_repository.g.dart';
 
-@riverpod
-AuthenticationRepository authenticationRepository(Ref ref) {
-  return AuthenticationRepository(ref.watch(authenticationDatasourceProvider));
-}
+/// 今のサインイン状態を持ち、サインイン・サインアウトで更新する。
+///
+/// サインイン状態はアプリ全体で使うので、誰も見ていなくても破棄しない。
+@Riverpod(keepAlive: true)
+class AuthenticationRepository extends _$AuthenticationRepository {
+  AuthenticationDatasource get _datasource =>
+      ref.read(authenticationDatasourceProvider);
 
-/// サインイン状態の取得とサインイン・サインアウトをまとめる。
-class AuthenticationRepository {
-  const AuthenticationRepository(this._datasource);
+  @override
+  Authentication build() => _datasource.current;
 
-  final AuthenticationDatasource _datasource;
-
-  /// 今のサインイン状態。
-  Authentication get current => _datasource.current;
-
-  /// 匿名ユーザーとしてサインインし、サインイン後の状態を返す。
-  Future<Authentication> signInAnonymously() async {
+  /// 匿名ユーザーとしてサインインする。
+  Future<void> signInAnonymously() async {
     await _datasource.signInAnonymously();
-    return _datasource.current;
+    state = _datasource.current;
   }
 
-  /// サインアウトし、サインアウト後の状態を返す。
-  Future<Authentication> signOut() async {
+  Future<void> signOut() async {
     await _datasource.signOut();
-    return _datasource.current;
+    state = _datasource.current;
   }
 }
