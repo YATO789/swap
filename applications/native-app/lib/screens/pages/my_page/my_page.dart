@@ -19,10 +19,6 @@ class MyPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
 
-    // TODO: 通知の仕組みができたら保存して、実際に通知する。今は見た目だけ。
-    final postNotification = useState(true);
-    final diaryReminder = useState(true);
-
     // pubspec.yaml の version（ビルド番号を除く）。読み込むまでは空にしておく。
     final packageInfo = useFuture(useMemoized(PackageInfo.fromPlatform));
     final appVersion = packageInfo.data?.version ?? '';
@@ -106,19 +102,6 @@ class MyPage extends HookConsumerWidget {
           _ProfileTile(
             name: myName ?? '',
             onTap: () => context.push(AppRoutes.profileEdit),
-          ),
-          const _SectionHeader('通知'),
-          _SwitchTile(
-            title: '記録の通知',
-            subtitle: '日記帳の誰かが記録したときに通知します',
-            value: postNotification.value,
-            onChanged: (value) => postNotification.value = value,
-          ),
-          _SwitchTile(
-            title: '日記のリマインド',
-            subtitle: '夜に今日の日記を書くようお知らせします',
-            value: diaryReminder.value,
-            onChanged: (value) => diaryReminder.value = value,
           ),
           const _SectionHeader('日記'),
           const _InfoTile(
@@ -240,34 +223,6 @@ class _SectionHeader extends StatelessWidget {
 
 const _titleStyle = TextStyle(fontSize: 16);
 const _tilePadding = EdgeInsets.symmetric(horizontal: 24);
-
-class _SwitchTile extends StatelessWidget {
-  const _SwitchTile({
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SwitchListTile(
-      contentPadding: _tilePadding,
-      title: Text(title, style: _titleStyle),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(fontSize: 12, color: context.appColors.textSecondary),
-      ),
-      value: value,
-      onChanged: onChanged,
-    );
-  }
-}
 
 class _LinkTile extends StatelessWidget {
   const _LinkTile({required this.title, required this.onTap});
