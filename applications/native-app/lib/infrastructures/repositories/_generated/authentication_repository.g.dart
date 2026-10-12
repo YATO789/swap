@@ -51,7 +51,7 @@ final class AuthenticationRepositoryProvider
 }
 
 String _$authenticationRepositoryHash() =>
-    r'8d7931092a5fab6340d9fc5d6851f2142cdc1dd9';
+    r'f8c2a6b3c51f4542e2004d39f35237a82d153aa4';
 
 /// 今のサインイン状態を持ち、サインイン・サインアウトで更新する。
 ///

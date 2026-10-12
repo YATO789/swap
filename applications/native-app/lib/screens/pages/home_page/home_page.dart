@@ -8,6 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../../infrastructures/repositories/push_token_repository.dart';
 import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_sheet.dart';
 import '../../components/invite_sheet.dart';
@@ -33,6 +34,8 @@ class HomePage extends HookConsumerWidget {
     // 読み込み中や失敗したときは、日記帳がないときと同じく切り替えや投稿を出さない。
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
+    // 通知の許可は、オンボーディングを終えてホームに来たときに聞く。結果は画面に出さない。
+    ref.listen(pushTokenRepositoryProvider, (_, _) {});
 
     void openDiaryBook(DiaryBook diaryBook) =>
         context.push(AppRoutes.diaryBookOf(diaryBook.id));
