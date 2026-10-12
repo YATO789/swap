@@ -220,8 +220,8 @@ return $default(_that.id,_that.name,_that.icon,_that.memberNames,_that.alreadyJo
 /// @nodoc
 
 
-class _InvitedDiaryBook implements InvitedDiaryBook {
-  const _InvitedDiaryBook({required this.id, required this.name, required this.icon, required  List<String> memberNames, required this.alreadyJoined, this.coverColor}): _memberNames = memberNames;
+class _InvitedDiaryBook extends InvitedDiaryBook {
+  const _InvitedDiaryBook({required this.id, required this.name, required this.icon, required  List<String> memberNames, required this.alreadyJoined, this.coverColor}): _memberNames = memberNames,super._();
   
 
 @override final  String id;

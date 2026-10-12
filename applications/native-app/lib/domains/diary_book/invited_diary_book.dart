@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'diary_book.dart';
+
 part '_generated/invited_diary_book.freezed.dart';
 
 /// 招待コードで見つけた日記帳。参加する前に、どんな日記帳かを見せるのに使う。
@@ -21,4 +23,10 @@ abstract class InvitedDiaryBook with _$InvitedDiaryBook {
     /// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
     int? coverColor,
   }) = _InvitedDiaryBook;
+
+  const InvitedDiaryBook._();
+
+  /// 人数が上限に達していて、新しく参加できないか。もう参加していれば開けるので false。
+  bool get isFull =>
+      !alreadyJoined && memberNames.length >= maxDiaryBookMembers;
 }

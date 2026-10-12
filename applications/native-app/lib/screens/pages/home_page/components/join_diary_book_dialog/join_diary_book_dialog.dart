@@ -73,6 +73,7 @@ class _JoinDiaryBookDialog extends HookConsumerWidget {
     final (label, onPressed) = switch (found) {
       null => ('確認する', isComplete ? check : null),
       InvitedDiaryBook(alreadyJoined: true) => ('日記帳を開く', join),
+      InvitedDiaryBook(isFull: true) => ('参加する', null),
       _ => ('参加する', join),
     };
 
@@ -116,6 +117,13 @@ class _JoinDiaryBookDialog extends HookConsumerWidget {
               const SizedBox(height: 12),
               Text(
                 'この日記帳にはもう参加しています',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: colors.textSecondary),
+              ),
+            ] else if (found.isFull) ...[
+              const SizedBox(height: 12),
+              Text(
+                'この日記帳は満員です（$maxDiaryBookMembers人まで）',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: colors.textSecondary),
               ),

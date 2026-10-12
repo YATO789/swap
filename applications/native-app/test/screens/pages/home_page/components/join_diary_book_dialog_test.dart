@@ -36,6 +36,14 @@ const _family = DiaryBook(
   memberCount: 1,
 );
 
+const _club = DiaryBook(
+  id: 'club',
+  name: 'サークル',
+  icon: 'サ',
+  inviteCode: 'Clb6789',
+  memberCount: maxDiaryBookMembers,
+);
+
 /// サインインした状態でホームを開き、招待コードで参加するダイアログを開く。
 Future<void> _openJoinDialog(
   WidgetTester tester, {
@@ -66,8 +74,12 @@ Future<void> _openJoinDialog(
                 DiaryBookMember(userId: 'mio', displayName: '美緒'),
                 DiaryBookMember(userId: 'ken', displayName: '健太'),
               ],
+              _club.id: [
+                for (var i = 0; i < maxDiaryBookMembers; i++)
+                  DiaryBookMember(userId: 'member$i', displayName: 'メンバー$i'),
+              ],
             },
-            invitable: const [_university, _family],
+            invitable: const [_university, _family, _club],
           ),
         ),
         diaryRepositoryProvider.overrideWithValue(FakeDiaryRepository()),
@@ -154,6 +166,34 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('満員の日記帳には参加できない', (tester) async {
+    await _openJoinDialog(tester);
+
+    await tester.enterText(find.byType(TextField), 'Clb6789');
+    await tester.pump();
+    await tester.tap(find.text('確認する'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('この日記帳は満員です（8人まで）'), findsOneWidget);
+    final join = find.widgetWithText(TextButton, '参加する');
+    expect(tester.widget<TextButton>(join).onPressed, isNull);
+  });
+
+  testWidgets('満員の日記帳でも、もう参加していれば開ける', (tester) async {
+    await _openJoinDialog(tester, joined: const [_club]);
+
+    await tester.enterText(find.byType(TextField), 'Clb6789');
+    await tester.pump();
+    await tester.tap(find.text('確認する'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('この日記帳にはもう参加しています'), findsOneWidget);
+    await tester.tap(find.text('日記帳を開く'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DiaryBookPage), findsOneWidget);
   });
 
   testWidgets('もう参加している日記帳なら、参加せずに開ける', (tester) async {
