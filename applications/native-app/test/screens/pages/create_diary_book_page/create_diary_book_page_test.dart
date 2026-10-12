@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
@@ -18,6 +19,7 @@ import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/theme/app_theme.dart';
 
 import '../../../helpers/fake_repositories.dart';
+import '../../../helpers/fake_stores.dart';
 
 const _university = DiaryBook(
   id: 'university',
@@ -35,6 +37,7 @@ Future<void> _pumpHome(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),

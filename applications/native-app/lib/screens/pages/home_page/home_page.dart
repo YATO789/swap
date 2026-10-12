@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary_book/diary_book.dart';
+import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/opened_notification_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
@@ -27,8 +28,7 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    /// 日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
-    final grid = useState(false);
+    final grid = ref.watch(diaryBookGridRepositoryProvider);
 
     final colors = context.appColors;
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
@@ -101,17 +101,6 @@ class HomePage extends HookConsumerWidget {
         ),
         leadingWidth: 120,
         actions: [
-          // 日記帳がないうちは切り替えても見た目が変わらないので出さない。
-          if (diaryBooks.isNotEmpty)
-            IconButton(
-              onPressed: () => grid.value = !grid.value,
-              tooltip: grid.value ? 'リストで表示' : '表紙を大きく表示',
-              icon: Icon(
-                grid.value
-                    ? Icons.view_agenda_outlined
-                    : Icons.grid_view_outlined,
-              ),
-            ),
           // 日記帳がないうちは、画面の真ん中から作るか参加できるので出さない。
           if (diaryBooks.isNotEmpty)
             IconButton(
@@ -132,7 +121,7 @@ class HomePage extends HookConsumerWidget {
           onCreate: createDiaryBook,
           onJoin: joinDiaryBook,
         ),
-        AsyncValue(hasValue: true) when grid.value => _DiaryBookGrid(
+        AsyncValue(hasValue: true) when grid => _DiaryBookGrid(
           diaryBooks: diaryBooks,
           onTap: openDiaryBook,
         ),

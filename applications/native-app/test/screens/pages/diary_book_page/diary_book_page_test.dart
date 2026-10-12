@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
@@ -49,6 +50,7 @@ Future<void> _openDiaryBook(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
@@ -72,7 +74,11 @@ Future<void> _openDiaryBook(
           FakeDiaryRepository({_university.id: diaries}),
         ),
         postRepositoryProvider.overrideWithValue(
-          FakePostRepository(timelinePosts: {_university.id: [...posts]}),
+          FakePostRepository(
+            timelinePosts: {
+              _university.id: [...posts],
+            },
+          ),
         ),
         postDiaryBookStoreProvider.overrideWithValue(FakePostDiaryBookStore()),
       ],
@@ -178,9 +184,7 @@ void main() {
       await tester.pumpAndSettle();
     }
     await tester.tap(
-      find.bySemanticsLabel(
-        RegExp('^${yesterday.month}月${yesterday.day}日'),
-      ),
+      find.bySemanticsLabel(RegExp('^${yesterday.month}月${yesterday.day}日')),
     );
     await tester.pumpAndSettle();
 

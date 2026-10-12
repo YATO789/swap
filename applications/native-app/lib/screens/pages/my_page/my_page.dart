@@ -5,10 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../domains/diary/diary.dart';
+import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
+import 'components/diary_book_layout_picker.dart';
 import 'controller/my_page_controller.dart';
 
 /// ホームの AppBar 右のアイコンから開く、プロフィールとその他の設定のページ。
@@ -18,6 +20,7 @@ class MyPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
+    final diaryBookGrid = ref.watch(diaryBookGridRepositoryProvider);
 
     // pubspec.yaml の version（ビルド番号を除く）。読み込むまでは空にしておく。
     final packageInfo = useFuture(useMemoized(PackageInfo.fromPlatform));
@@ -102,6 +105,11 @@ class MyPage extends HookConsumerWidget {
           _ProfileTile(
             name: myName ?? '',
             onTap: () => context.push(AppRoutes.profileEdit),
+          ),
+          const _SectionHeader('ホームの日記帳の並べ方'),
+          DiaryBookLayoutPicker(
+            grid: diaryBookGrid,
+            onChanged: ref.read(diaryBookGridRepositoryProvider.notifier).save,
           ),
           const _SectionHeader('日記'),
           const _InfoTile(

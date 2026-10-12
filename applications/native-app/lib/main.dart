@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'firebase_options.dart';
+import 'infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'infrastructures/datasources/stores/post_diary_book_store.dart';
 import 'infrastructures/datasources/stores/shared_preferences_store.dart';
 import 'screens/pages/router/router.dart';
@@ -22,7 +23,7 @@ Future<void> main() async {
 
   final preferences = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {postDiaryBookIdsKey},
+      allowList: {postDiaryBookIdsKey, diaryBookGridKey},
     ),
   );
 

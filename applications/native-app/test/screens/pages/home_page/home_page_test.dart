@@ -6,8 +6,10 @@ import 'package:hooks_riverpod/misc.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_book_grid_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
@@ -85,6 +87,7 @@ Future<void> _pumpHomeWithRouter(
     ProviderScope(
       overrides: [
         postDiaryBookStoreProvider.overrideWithValue(FakePostDiaryBookStore()),
+        diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
         ..._overrides(_diaryBooks, notifications: notifications),
       ],
       child: MaterialApp.router(theme: buildLightTheme(), routerConfig: router),
@@ -113,22 +116,19 @@ void main() {
     expect(find.byTooltip('日記帳を追加'), findsNothing);
   });
 
-  testWidgets('リストとグリッドを切り替えられる', (tester) async {
+  testWidgets('設定に合わせてリストかグリッドで出す', (tester) async {
     await _pumpHome(tester, _diaryBooks);
 
     expect(find.byIcon(Icons.chevron_right), findsWidgets);
 
-    await tester.tap(find.byTooltip('表紙を大きく表示'));
+    // 設定画面で切り替えたときと同じく、保存した値を変える。
+    await ProviderScope.containerOf(tester.element(find.byType(HomePage)))
+        .read(diaryBookGridRepositoryProvider.notifier)
+        .save(true);
     await tester.pump();
 
-    expect(find.byTooltip('リストで表示'), findsOneWidget);
     expect(find.byIcon(Icons.chevron_right), findsNothing);
-
-    await tester.tap(find.byTooltip('リストで表示'));
-    await tester.pump();
-
-    expect(find.byTooltip('表紙を大きく表示'), findsOneWidget);
-    expect(find.byIcon(Icons.chevron_right), findsWidgets);
+    expect(find.text('5人'), findsOneWidget);
   });
 
   testWidgets('記録の通知をタップすると、その日記帳を開く', (tester) async {

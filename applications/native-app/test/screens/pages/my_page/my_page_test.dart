@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
@@ -13,12 +14,19 @@ import 'package:swap/screens/pages/welcome_page/welcome_page.dart';
 import 'package:swap/theme/app_theme.dart';
 
 import '../../../helpers/fake_repositories.dart';
+import '../../../helpers/fake_stores.dart';
 
 /// サインインした状態でルーターごとアプリを出し、ホームからマイページを開く。
-Future<void> _openMyPage(WidgetTester tester) async {
+Future<void> _openMyPage(
+  WidgetTester tester, {
+  FakeDiaryBookGridStore? gridStore,
+}) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        diaryBookGridStoreProvider.overrideWithValue(
+          gridStore ?? FakeDiaryBookGridStore(),
+        ),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
@@ -49,13 +57,25 @@ Future<void> _openMyPage(WidgetTester tester) async {
   await tester.tap(find.byTooltip('プロフィールと設定'));
   await tester.pumpAndSettle();
   expect(find.byType(MyPage), findsOneWidget);
-
-  await tester.scrollUntilVisible(find.text('ログアウト'), 200);
 }
 
 void main() {
+  testWidgets('日記帳の並べ方を選ぶと、保存する', (tester) async {
+    final gridStore = FakeDiaryBookGridStore();
+    await _openMyPage(tester, gridStore: gridStore);
+
+    await tester.tap(find.bySemanticsLabel('表紙'));
+    await tester.pumpAndSettle();
+    expect(gridStore.grid, isTrue);
+
+    await tester.tap(find.bySemanticsLabel('リスト'));
+    await tester.pumpAndSettle();
+    expect(gridStore.grid, isFalse);
+  });
+
   testWidgets('ログアウトを確かめると、ウェルカム画面に戻る', (tester) async {
     await _openMyPage(tester);
+    await tester.scrollUntilVisible(find.text('ログアウト'), 200);
 
     await tester.tap(find.text('ログアウト'));
     await tester.pumpAndSettle();
@@ -69,6 +89,7 @@ void main() {
 
   testWidgets('キャンセルすると、ログアウトせずにマイページに残る', (tester) async {
     await _openMyPage(tester);
+    await tester.scrollUntilVisible(find.text('ログアウト'), 200);
 
     await tester.tap(find.text('ログアウト'));
     await tester.pumpAndSettle();

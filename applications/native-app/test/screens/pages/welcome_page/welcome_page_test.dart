@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
@@ -13,6 +14,7 @@ import 'package:swap/screens/pages/welcome_page/welcome_page.dart';
 import 'package:swap/theme/app_theme.dart';
 
 import '../../../helpers/fake_repositories.dart';
+import '../../../helpers/fake_stores.dart';
 import '../../../helpers/pump_app.dart';
 
 /// ルーターごとアプリを出す。サインインしていない状態から始まる。
@@ -20,6 +22,7 @@ Future<void> _pumpRouterApp(WidgetTester tester, {Profile? profile}) {
   return tester.pumpWidget(
     ProviderScope(
       overrides: [
+        diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
         authenticationRepositoryProvider.overrideWith(
           FakeAuthenticationRepository.new,
         ),
