@@ -7,12 +7,13 @@ import '../../../domains/diary_book/diary_book_member.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
+import '../../components/confirm_sheet.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/invite_sheet.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
-import 'components/rename_dialog.dart';
+import 'components/rename_sheet.dart';
 import 'controller/diary_book_info_page_controller.dart';
 
 /// 罫線1本ぶんの高さ。どの行もこの高さで並べる。
@@ -53,7 +54,11 @@ class DiaryBookInfoPage extends ConsumerWidget {
     }
 
     Future<void> rename() async {
-      final name = await showRenameDialog(context, diaryBook.name);
+      final name = await showRenameSheet(
+        context,
+        diaryBook.name,
+        coverColor: diaryBook.coverColor,
+      );
       if (name == null || name == diaryBook.name) return;
       if (!await controller().rename(name)) {
         showMessage('名前を変えられませんでした。もう一度お試しください');
@@ -67,26 +72,14 @@ class DiaryBookInfoPage extends ConsumerWidget {
     }
 
     Future<void> regenerateInviteCode() async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('招待コードを作り直しますか？'),
-          content: Text(
+      final confirmed = await showConfirmSheet(
+        context,
+        title: '招待コードを作り直しますか？',
+        message:
             '今のコード（${diaryBook.inviteCode}）では参加できなくなります。参加しているメンバーはそのままです。',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('作り直す'),
-            ),
-          ],
-        ),
+        confirmLabel: '作り直す',
       );
-      if (confirmed != true) return;
+      if (!confirmed) return;
 
       if (!await controller().regenerateInviteCode()) {
         showMessage('招待コードを作り直せませんでした。もう一度お試しください');
@@ -96,29 +89,14 @@ class DiaryBookInfoPage extends ConsumerWidget {
     }
 
     Future<void> removeMember(DiaryBookMember member) async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('${member.displayName}さんを外しますか？'),
-          content: const Text(
-            'この日記帳の記録や日記が見られなくなります。また参加できないように、招待コードも作り直します。',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('外す'),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmSheet(
+        context,
+        title: '${member.displayName}さんを外しますか？',
+        message: 'この日記帳の記録や日記が見られなくなります。また参加できないように、招待コードも作り直します。',
+        confirmLabel: '外す',
+        destructive: true,
       );
-      if (confirmed != true) return;
+      if (!confirmed) return;
 
       if (!await controller().removeMember(member.userId)) {
         showMessage('メンバーを外せませんでした。もう一度お試しください');
@@ -128,27 +106,14 @@ class DiaryBookInfoPage extends ConsumerWidget {
     }
 
     Future<void> leave() async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('「${diaryBook.name}」から退出しますか？'),
-          content: const Text('この日記帳の記録や日記が見られなくなります。招待コードがあればまた参加できます。'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('退出'),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmSheet(
+        context,
+        title: '「${diaryBook.name}」から退出しますか？',
+        message: 'この日記帳の記録や日記が見られなくなります。招待コードがあればまた参加できます。',
+        confirmLabel: '退出する',
+        destructive: true,
       );
-      if (confirmed != true || !context.mounted) return;
+      if (!confirmed || !context.mounted) return;
 
       final router = GoRouter.of(context);
       if (!await controller().leave()) {

@@ -164,7 +164,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('入力内容を破棄しますか？'), findsOneWidget);
 
-    await tester.tap(find.text('破棄'));
+    await tester.tap(find.text('破棄する'));
     await tester.pumpAndSettle();
     expect(find.byType(DiaryEditorPage), findsNothing);
   });

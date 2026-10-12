@@ -8,6 +8,7 @@ import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
+import '../../components/confirm_sheet.dart';
 import '../../components/post_line.dart';
 import '../../components/ruled_lines.dart';
 import '../../components/user_avatar.dart';
@@ -128,27 +129,15 @@ class _DiaryPages extends HookConsumerWidget {
               .firstOrNull
               ?.name ??
           '日記帳';
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('日記を削除しますか？'),
-          content: Text('「$diaryBookName」からこの日記を削除します。この操作は取り消せません。'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('削除'),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmSheet(
+        context,
+        title: '日記を削除しますか？',
+        message: '「$diaryBookName」からこの日記を削除します。',
+        irreversible: true,
+        confirmLabel: '削除する',
+        destructive: true,
       );
-      if (confirmed != true || !context.mounted) return;
+      if (!confirmed || !context.mounted) return;
       final messenger = ScaffoldMessenger.of(context);
       final deleted = await onDelete(diary);
       messenger.hideCurrentSnackBar();

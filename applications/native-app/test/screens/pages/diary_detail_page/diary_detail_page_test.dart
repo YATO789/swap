@@ -175,7 +175,7 @@ void main() {
     await tester.tap(find.text('削除'));
     await tester.pumpAndSettle();
     expect(find.text('日記を削除しますか？'), findsOneWidget);
-    await tester.tap(find.widgetWithText(TextButton, '削除'));
+    await tester.tap(find.text('削除する'));
     await tester.pumpAndSettle();
 
     expect(find.byType(DiaryBookPage), findsOneWidget);

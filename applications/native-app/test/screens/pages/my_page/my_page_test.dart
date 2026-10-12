@@ -89,7 +89,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('ログアウトしますか？'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(TextButton, 'ログアウト'));
+    await tester.tap(find.widgetWithText(FilledButton, 'ログアウト'));
     await tester.pumpAndSettle();
 
     expect(find.byType(WelcomePage), findsOneWidget);

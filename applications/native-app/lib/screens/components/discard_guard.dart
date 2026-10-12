@@ -1,29 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'confirm_sheet.dart';
+
 /// 書きかけの内容を捨てて閉じてよいかを聞く。捨てるなら true。
-Future<bool> confirmDiscard(BuildContext context) async {
-  final discard = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('入力内容を破棄しますか？'),
-      content: const Text('保存していない内容は失われます。'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('編集を続ける'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.error,
-          ),
-          child: const Text('破棄'),
-        ),
-      ],
-    ),
-  );
-  return discard ?? false;
-}
+Future<bool> confirmDiscard(BuildContext context) => showConfirmSheet(
+  context,
+  title: '入力内容を破棄しますか？',
+  message: '保存していない内容は失われます。',
+  cancelLabel: '編集を続ける',
+  confirmLabel: '破棄する',
+  destructive: true,
+);
 
 /// 書きかけの内容があるときに、戻る操作で [confirmDiscard] を挟む。
 /// 閉じるボタンは `Navigator.maybePop` を呼ぶこと（`pop` だと確認を飛ばす）。

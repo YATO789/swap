@@ -136,7 +136,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), ' ゼミ ');
     await tester.pump();
-    await tester.tap(find.text('保存'));
+    await tester.tap(find.text('保存する'));
     await tester.pumpAndSettle();
 
     expect(find.text('ゼミ'), findsNWidgets(2));
@@ -191,7 +191,7 @@ void main() {
     await tester.scrollUntilVisible(find.text('日記帳を退出'), 100);
     await tester.tap(find.text('日記帳を退出'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('退出'));
+    await tester.tap(find.text('退出する'));
     await tester.pumpAndSettle();
 
     expect(find.byType(HomePage), findsOneWidget);

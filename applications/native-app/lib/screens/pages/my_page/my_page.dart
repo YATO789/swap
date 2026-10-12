@@ -8,9 +8,11 @@ import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/theme_mode_repository.dart';
 import '../../../theme/app_theme.dart';
+import '../../components/confirm_sheet.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
 import 'components/diary_book_layout_picker.dart';
+import 'components/theme_mode_sheet.dart';
 import 'controller/my_page_controller.dart';
 
 const _themeModeLabels = {
@@ -45,50 +47,22 @@ class MyPage extends HookConsumerWidget {
     void showNotReady() => showMessage('準備中です');
 
     Future<void> pickThemeMode() async {
-      final mode = await showDialog<ThemeMode>(
-        context: context,
-        builder: (context) => SimpleDialog(
-          title: const Text('テーマ'),
-          children: [
-            RadioGroup<ThemeMode>(
-              groupValue: themeMode,
-              onChanged: (mode) => Navigator.of(context).pop(mode),
-              child: Column(
-                children: [
-                  for (final MapEntry(key: mode, value: label)
-                      in _themeModeLabels.entries)
-                    RadioListTile<ThemeMode>(value: mode, title: Text(label)),
-                ],
-              ),
-            ),
-          ],
-        ),
+      final mode = await showThemeModeSheet(
+        context,
+        selected: themeMode,
+        labels: _themeModeLabels,
       );
       if (mode == null) return;
       await ref.read(themeModeRepositoryProvider.notifier).save(mode);
     }
 
     Future<void> signOut() async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('ログアウトしますか？'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('ログアウト'),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmSheet(
+        context,
+        title: 'ログアウトしますか？',
+        confirmLabel: 'ログアウト',
       );
-      if (confirmed != true || !context.mounted) return;
+      if (!confirmed || !context.mounted) return;
 
       // 成功したらルーターがウェルカム画面に切り替えるので、ここでは失敗だけ扱う。
       if (!await ref.read(myPageControllerProvider.notifier).signOut()) {
@@ -97,30 +71,17 @@ class MyPage extends HookConsumerWidget {
     }
 
     Future<void> deleteAccount() async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('アカウントを削除しますか？'),
-          content: const Text(
-            'プロフィール・記録・日記がすべて削除され、元に戻せません。'
+      final confirmed = await showConfirmSheet(
+        context,
+        title: 'アカウントを削除しますか？',
+        message:
+            'プロフィール・記録・日記がすべて削除されます。'
             '日記帳からも抜け、ほかに誰もいない日記帳は削除されます。',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('削除'),
-            ),
-          ],
-        ),
+        irreversible: true,
+        confirmLabel: '削除する',
+        destructive: true,
       );
-      if (confirmed != true || !context.mounted) return;
+      if (!confirmed || !context.mounted) return;
 
       // 成功したらルーターがウェルカム画面に切り替えるので、ここでは失敗だけ扱う。
       if (!await ref.read(myPageControllerProvider.notifier).deleteAccount()) {

@@ -3,10 +3,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
+import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/timeline_post.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
+import '../../../utils/format.dart';
+import '../../components/confirm_sheet.dart';
+import '../../components/diary_book_icon.dart';
 import '../../components/post_button.dart';
 import '../../components/post_sheet/post_sheet.dart';
 import '../router/router.dart';
@@ -60,19 +64,11 @@ class DiaryBookPage extends HookConsumerWidget {
       if (notifiedRemoval.value) return;
       notifiedRemoval.value = true;
 
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: Text('「${diaryBook.name}」は見られなくなりました'),
-          content: const Text('この日記帳の記録や日記は表示できません。'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('ホームに戻る'),
-            ),
-          ],
-        ),
+      await showNoticeSheet(
+        context,
+        title: '「${diaryBook.name}」は見られなくなりました',
+        message: 'この日記帳の記録や日記は表示できません。',
+        buttonLabel: 'ホームに戻る',
       );
       if (!context.mounted) return;
       final diaryBooks = ref.read(diaryBookRepositoryProvider.notifier);
@@ -113,30 +109,16 @@ class DiaryBookPage extends HookConsumerWidget {
     }
 
     Future<void> confirmDeletePost(TimelinePost post) async {
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('記録を削除しますか？'),
-          content: Text(
-            '「${diaryBook.name}」から「${post.message}」を削除します。'
-            'ほかの日記帳に出した分は残ります。この操作は取り消せません。',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('キャンセル'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: const Text('削除'),
-            ),
-          ],
-        ),
+      final confirmed = await showConfirmSheet(
+        context,
+        title: '記録を削除しますか？',
+        message: 'ほかの日記帳に出した分は残ります。',
+        preview: _PostPreview(diaryBook: diaryBook, post: post),
+        irreversible: true,
+        confirmLabel: '削除する',
+        destructive: true,
       );
-      if (confirmed != true || !context.mounted) return;
+      if (!confirmed || !context.mounted) return;
       final messenger = ScaffoldMessenger.of(context);
       final deleted = await controller().deletePost(post);
       messenger.hideCurrentSnackBar();
@@ -223,6 +205,57 @@ class _LoadError extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           TextButton(onPressed: onRetry, child: const Text('もう一度試す')),
+        ],
+      ),
+    );
+  }
+}
+
+/// 消す記録。どの日記帳のいつの記録かと、その本文を見せる。
+class _PostPreview extends StatelessWidget {
+  const _PostPreview({required this.diaryBook, required this.post});
+
+  final DiaryBook diaryBook;
+  final TimelinePost post;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return ConfirmPreview(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              DiaryBookIcon(
+                name: diaryBook.name,
+                coverColor: diaryBook.coverColor,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  diaryBook.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                ' · ${formatTime(post.postedAt)}',
+                style: TextStyle(fontSize: 12, color: colors.textSecondary),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            post.message,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          ),
         ],
       ),
     );
