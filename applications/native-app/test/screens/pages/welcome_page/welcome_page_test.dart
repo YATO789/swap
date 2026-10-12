@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/screens/pages/home_page/home_page.dart';
 import 'package:swap/screens/pages/onboarding_page/onboarding_page.dart';
@@ -21,6 +22,9 @@ Future<void> _pumpRouterApp(WidgetTester tester, {Profile? profile}) {
       overrides: [
         authenticationRepositoryProvider.overrideWith(
           FakeAuthenticationRepository.new,
+        ),
+        openedNotificationRepositoryProvider.overrideWithValue(
+          FakeOpenedNotificationRepository(),
         ),
         profileRepositoryProvider.overrideWith(
           () => FakeProfileRepository(profile: profile),

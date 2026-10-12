@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/misc.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/screens/pages/home_page/home_page.dart';
+import 'package:swap/screens/pages/router/router.dart';
+import 'package:swap/theme/app_theme.dart';
 
 import '../../../helpers/fake_repositories.dart';
+import '../../../helpers/fake_stores.dart';
 import '../../../helpers/pump_app.dart';
 
 const _diaryBooks = [
@@ -29,24 +37,58 @@ const _diaryBooks = [
   ),
 ];
 
+List<Override> _overrides(
+  List<DiaryBook> diaryBooks, {
+  FakeOpenedNotificationRepository? notifications,
+}) => [
+  authenticationRepositoryProvider.overrideWith(
+    () => FakeAuthenticationRepository(
+      initial: const Authentication(isLoginApp: true),
+    ),
+  ),
+  profileRepositoryProvider.overrideWith(
+    () => FakeProfileRepository(
+      profile: const Profile(id: 'me', displayName: '彩人'),
+    ),
+  ),
+  diaryBookRepositoryProvider.overrideWith(
+    () => FakeDiaryBookRepository(diaryBooks),
+  ),
+  openedNotificationRepositoryProvider.overrideWithValue(
+    notifications ?? FakeOpenedNotificationRepository(),
+  ),
+];
+
 Future<void> _pumpHome(WidgetTester tester, List<DiaryBook> diaryBooks) async {
-  await tester.pumpApp(
-    const HomePage(),
-    overrides: [
-      authenticationRepositoryProvider.overrideWith(
-        () => FakeAuthenticationRepository(
-          initial: const Authentication(isLoginApp: true),
-        ),
-      ),
-      profileRepositoryProvider.overrideWith(
-        () => FakeProfileRepository(
-          profile: const Profile(id: 'me', displayName: '彩人'),
-        ),
-      ),
-      diaryBookRepositoryProvider.overrideWith(
-        () => FakeDiaryBookRepository(diaryBooks),
+  await tester.pumpApp(const HomePage(), overrides: _overrides(diaryBooks));
+  await tester.pump();
+}
+
+/// 日記帳のページへ移れるように、ルーターの中にホームを置く。
+/// 日記帳のページは、開いた日記帳の id だけを出す。
+Future<void> _pumpHomeWithRouter(
+  WidgetTester tester,
+  FakeOpenedNotificationRepository notifications,
+) async {
+  final router = GoRouter(
+    routes: [
+      GoRoute(path: AppRoutes.home, builder: (_, _) => const HomePage()),
+      GoRoute(
+        path: AppRoutes.diaryBook,
+        builder: (_, state) =>
+            Scaffold(body: Text('日記帳 ${state.pathParameters['id']}')),
       ),
     ],
+  );
+  addTearDown(router.dispose);
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        postDiaryBookStoreProvider.overrideWithValue(FakePostDiaryBookStore()),
+        ..._overrides(_diaryBooks, notifications: notifications),
+      ],
+      child: MaterialApp.router(theme: buildLightTheme(), routerConfig: router),
+    ),
   );
   await tester.pump();
 }
@@ -87,5 +129,33 @@ void main() {
 
     expect(find.byTooltip('表紙を大きく表示'), findsOneWidget);
     expect(find.byIcon(Icons.chevron_right), findsWidgets);
+  });
+
+  testWidgets('記録の通知をタップすると、その日記帳を開く', (tester) async {
+    final notifications = FakeOpenedNotificationRepository();
+    await _pumpHomeWithRouter(tester, notifications);
+
+    notifications.diaryBookIds.add('company');
+    await tester.pumpAndSettle();
+
+    expect(find.text('日記帳 company'), findsOneWidget);
+  });
+
+  testWidgets('開いている日記帳の通知をタップしても、同じページを重ねない', (tester) async {
+    final notifications = FakeOpenedNotificationRepository();
+    await _pumpHomeWithRouter(tester, notifications);
+
+    notifications.diaryBookIds.add('company');
+    await tester.pumpAndSettle();
+    notifications.diaryBookIds.add('company');
+    await tester.pumpAndSettle();
+
+    // 戻るとホームに出る。
+    final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+    navigator.pop();
+    await tester.pumpAndSettle();
+
+    expect(find.text('日記帳 company'), findsNothing);
+    expect(find.text('大学'), findsOneWidget);
   });
 }

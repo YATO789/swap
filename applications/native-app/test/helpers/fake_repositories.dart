@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/authentication/authentication.dart';
@@ -11,6 +13,7 @@ import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
+import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
@@ -53,6 +56,14 @@ class FakeProfileRepository extends ProfileRepository {
     if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return null;
     return profile;
   }
+}
+
+/// Firebase につながず、[diaryBookIds] に流した日記帳の id を、タップされた通知として流す。
+class FakeOpenedNotificationRepository implements OpenedNotificationRepository {
+  final diaryBookIds = StreamController<String>.broadcast();
+
+  @override
+  Stream<String> openedDiaryBookIds() => diaryBookIds.stream;
 }
 
 /// 書いた記録を [posts] にためる。日記帳のタイムラインには [timelinePosts] を返し、

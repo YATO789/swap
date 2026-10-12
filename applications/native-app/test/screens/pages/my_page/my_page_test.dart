@@ -5,6 +5,7 @@ import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/screens/pages/my_page/my_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
@@ -18,6 +19,9 @@ Future<void> _openMyPage(WidgetTester tester) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        openedNotificationRepositoryProvider.overrideWithValue(
+          FakeOpenedNotificationRepository(),
+        ),
         authenticationRepositoryProvider.overrideWith(
           () => FakeAuthenticationRepository(
             initial: const Authentication(isLoginApp: true),

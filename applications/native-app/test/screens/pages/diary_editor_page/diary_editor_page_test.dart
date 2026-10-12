@@ -8,6 +8,7 @@ import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
@@ -48,6 +49,9 @@ Future<FakeDiaryRepository> _openHome(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        openedNotificationRepositoryProvider.overrideWithValue(
+          FakeOpenedNotificationRepository(),
+        ),
         authenticationRepositoryProvider.overrideWith(
           () => FakeAuthenticationRepository(
             initial: const Authentication(isLoginApp: true),

@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../infrastructures/repositories/opened_notification_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/push_token_repository.dart';
 import '../../../theme/app_theme.dart';
@@ -39,6 +40,22 @@ class HomePage extends HookConsumerWidget {
 
     void openDiaryBook(DiaryBook diaryBook) =>
         context.push(AppRoutes.diaryBookOf(diaryBook.id));
+
+    // 記録の通知をタップしたら、その日記帳を開く。ホームはサインインしている間ずっと
+    // 一番下にあるので、ほかのページを開いていても、その上に重ねる。
+    useEffect(() {
+      final subscription = ref
+          .read(openedNotificationRepositoryProvider)
+          .openedDiaryBookIds()
+          .listen((diaryBookId) {
+            if (!context.mounted) return;
+            final location = AppRoutes.diaryBookOf(diaryBookId);
+            // もうその日記帳を一番上に開いていれば、同じページを重ねない。
+            if (GoRouter.of(context).state.uri.path == location) return;
+            context.push(location);
+          });
+      return subscription.cancel;
+    }, const []);
 
     // 作ったらホームに戻り、そのまま友達を招待するシートを出す。
     Future<void> createDiaryBook() async {
