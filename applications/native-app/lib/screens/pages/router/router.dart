@@ -18,48 +18,6 @@ import '../welcome_page/welcome_page.dart';
 
 part '_generated/router.g.dart';
 
-/// 画面のパス。
-abstract final class AppRoutes {
-  static const home = '/';
-  static const welcome = '/welcome';
-  static const splash = '/splash';
-  static const onboarding = '/onboarding';
-  static const createDiaryBook = '/diary-books/new';
-  static const diaryBook = '/diary-books/:id';
-  static const diaryBookInfo = '/diary-books/:id/info';
-  static const diaryDetail = '/diary-books/:id/diaries/:date';
-  static const diaryEditor = '/diaries/write';
-  static const myPage = '/me';
-  static const profileEdit = '/me/profile';
-
-  /// [id] の日記帳のページ。
-  static String diaryBookOf(String id) => '/diary-books/$id';
-
-  /// [id] の日記帳の情報ページ。
-  static String diaryBookInfoOf(String id) => '/diary-books/$id/info';
-
-  /// [diaryBookId] の日記帳の [date] の日記を読むページ。最初は [authorId] の日記を開く。
-  static String diaryDetailOf(
-    String diaryBookId,
-    DateTime date, {
-    required String authorId,
-  }) => Uri(
-    path: '/diary-books/$diaryBookId/diaries/${_toDateParam(date)}',
-    queryParameters: {'author': authorId},
-  ).toString();
-
-  /// 自分の [date] の日記を書くページ。[diaryBookId] が null なら参加している日記帳すべてに書く。
-  static String diaryEditorOf(DateTime date, {String? diaryBookId}) => Uri(
-    path: diaryEditor,
-    queryParameters: {'date': _toDateParam(date), 'diaryBook': ?diaryBookId},
-  ).toString();
-
-  static String _toDateParam(DateTime date) =>
-      '${date.year.toString().padLeft(4, '0')}-'
-      '${date.month.toString().padLeft(2, '0')}-'
-      '${date.day.toString().padLeft(2, '0')}';
-}
-
 /// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
 ///
 /// - サインインしていない: ウェルカム画面
@@ -76,80 +34,32 @@ GoRouter router(Ref ref) {
     ..listen(authenticationRepositoryProvider, (_, _) => refresh.value++)
     ..listen(profileRepositoryProvider, (_, _) => refresh.value++);
 
+  final home = const HomeRoute().location;
+  final welcome = const WelcomeRoute().location;
+  final splash = const SplashRoute().location;
+  final onboarding = const OnboardingRoute().location;
+
   final router = GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: home,
     refreshListenable: refresh,
     redirect: (_, state) {
       String? goTo(String path) => state.matchedLocation == path ? null : path;
 
       if (!ref.read(authenticationRepositoryProvider).isLoginApp) {
-        return goTo(AppRoutes.welcome);
+        return goTo(welcome);
       }
       final profile = ref.read(profileRepositoryProvider);
-      if (profile.isLoading || profile.hasError) return goTo(AppRoutes.splash);
-      if (profile.value == null) return goTo(AppRoutes.onboarding);
+      if (profile.isLoading || profile.hasError) return goTo(splash);
+      if (profile.value == null) return goTo(onboarding);
 
-      return switch (state.matchedLocation) {
-        AppRoutes.welcome ||
-        AppRoutes.splash ||
-        AppRoutes.onboarding => AppRoutes.home,
-        _ => null,
-      };
+      final isEntrance = [
+        welcome,
+        splash,
+        onboarding,
+      ].contains(state.matchedLocation);
+      return isEntrance ? home : null;
     },
-    routes: [
-      GoRoute(path: AppRoutes.home, builder: (_, _) => const HomePage()),
-      GoRoute(path: AppRoutes.welcome, builder: (_, _) => const WelcomePage()),
-      GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashPage()),
-      GoRoute(
-        path: AppRoutes.onboarding,
-        builder: (_, _) => const OnboardingPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.createDiaryBook,
-        // 下から出てくるモーダルにして、キャンセルで閉じる。
-        pageBuilder: (_, state) => MaterialPage(
-          key: state.pageKey,
-          fullscreenDialog: true,
-          child: const CreateDiaryBookPage(),
-        ),
-      ),
-      // /diary-books/new に当たらないよう、日記帳を作るページより後に置く。
-      GoRoute(
-        path: AppRoutes.diaryBook,
-        builder: (_, state) =>
-            DiaryBookPage(diaryBookId: state.pathParameters['id']!),
-      ),
-      GoRoute(
-        path: AppRoutes.diaryBookInfo,
-        builder: (_, state) =>
-            DiaryBookInfoPage(diaryBookId: state.pathParameters['id']!),
-      ),
-      GoRoute(
-        path: AppRoutes.diaryDetail,
-        builder: (_, state) => DiaryDetailPage(
-          diaryBookId: state.pathParameters['id']!,
-          date: DateTime.parse(state.pathParameters['date']!),
-          initialAuthorId: state.uri.queryParameters['author'],
-        ),
-      ),
-      GoRoute(
-        path: AppRoutes.diaryEditor,
-        // 下から出てくるモーダルにして、閉じるボタンで閉じる。
-        pageBuilder: (_, state) => MaterialPage(
-          key: state.pageKey,
-          fullscreenDialog: true,
-          child: DiaryEditorPage(
-            date: DateTime.parse(state.uri.queryParameters['date']!),
-            diaryBookId: state.uri.queryParameters['diaryBook'],
-          ),
-        ),
-      ),
-      GoRoute(path: AppRoutes.myPage, builder: (_, _) => const MyPage()),
-      GoRoute(
-        path: AppRoutes.profileEdit,
-        builder: (_, _) => const ProfileEditPage(),
-      ),
-    ],
+    routes: $appRoutes,
   );
 
   ref.onDispose(() {
@@ -157,4 +67,146 @@ GoRouter router(Ref ref) {
     refresh.dispose();
   });
   return router;
+}
+
+/// 日付を URL に `2026-10-13` の形で載せる。
+String _encodeDate(DateTime date) =>
+    '${date.year.toString().padLeft(4, '0')}-'
+    '${date.month.toString().padLeft(2, '0')}-'
+    '${date.day.toString().padLeft(2, '0')}';
+
+DateTime _decodeDate(String value) => DateTime.parse(value);
+
+// $appRoutes はここに書いた順に並び、上から順に当てはめる。
+
+@TypedGoRoute<HomeRoute>(path: '/')
+class HomeRoute extends GoRouteData with $HomeRoute {
+  const HomeRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const HomePage();
+}
+
+@TypedGoRoute<WelcomeRoute>(path: '/welcome')
+class WelcomeRoute extends GoRouteData with $WelcomeRoute {
+  const WelcomeRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const WelcomePage();
+}
+
+@TypedGoRoute<SplashRoute>(path: '/splash')
+class SplashRoute extends GoRouteData with $SplashRoute {
+  const SplashRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const SplashPage();
+}
+
+@TypedGoRoute<OnboardingRoute>(path: '/onboarding')
+class OnboardingRoute extends GoRouteData with $OnboardingRoute {
+  const OnboardingRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const OnboardingPage();
+}
+
+/// 日記帳を作るページ。作った日記帳を返す。
+@TypedGoRoute<CreateDiaryBookRoute>(path: '/diary-books/new')
+class CreateDiaryBookRoute extends GoRouteData with $CreateDiaryBookRoute {
+  const CreateDiaryBookRoute();
+
+  // 下から出てくるモーダルにして、キャンセルで閉じる。
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) =>
+      MaterialPage(
+        key: state.pageKey,
+        fullscreenDialog: true,
+        child: const CreateDiaryBookPage(),
+      );
+}
+
+/// [id] の日記帳のページ。
+// /diary-books/new に当たらないよう、日記帳を作るページより後に置く。
+@TypedGoRoute<DiaryBookRoute>(path: '/diary-books/:id')
+class DiaryBookRoute extends GoRouteData with $DiaryBookRoute {
+  const DiaryBookRoute({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      DiaryBookPage(diaryBookId: id);
+}
+
+/// [id] の日記帳の情報ページ。
+@TypedGoRoute<DiaryBookInfoRoute>(path: '/diary-books/:id/info')
+class DiaryBookInfoRoute extends GoRouteData with $DiaryBookInfoRoute {
+  const DiaryBookInfoRoute({required this.id});
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      DiaryBookInfoPage(diaryBookId: id);
+}
+
+/// [id] の日記帳の [date] の日記を読むページ。最初は [author] の日記を開く。
+@TypedGoRoute<DiaryDetailRoute>(path: '/diary-books/:id/diaries/:date')
+class DiaryDetailRoute extends GoRouteData with $DiaryDetailRoute {
+  const DiaryDetailRoute({
+    required this.id,
+    @TypedQueryParameter(encoder: _encodeDate, decoder: _decodeDate)
+    required this.date,
+    required this.author,
+  });
+
+  final String id;
+  final DateTime date;
+  final String? author;
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      DiaryDetailPage(diaryBookId: id, date: date, initialAuthorId: author);
+}
+
+/// 自分の [date] の日記を書くページ。[diaryBook] が null なら参加している日記帳すべてに書く。
+@TypedGoRoute<DiaryEditorRoute>(path: '/diaries/write')
+class DiaryEditorRoute extends GoRouteData with $DiaryEditorRoute {
+  const DiaryEditorRoute({
+    @TypedQueryParameter(encoder: _encodeDate, decoder: _decodeDate)
+    required this.date,
+    this.diaryBook,
+  });
+
+  final DateTime date;
+  final String? diaryBook;
+
+  // 下から出てくるモーダルにして、閉じるボタンで閉じる。
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) =>
+      MaterialPage(
+        key: state.pageKey,
+        fullscreenDialog: true,
+        child: DiaryEditorPage(date: date, diaryBookId: diaryBook),
+      );
+}
+
+@TypedGoRoute<MyPageRoute>(path: '/me')
+class MyPageRoute extends GoRouteData with $MyPageRoute {
+  const MyPageRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const MyPage();
+}
+
+@TypedGoRoute<ProfileEditRoute>(path: '/me/profile')
+class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
+  const ProfileEditRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ProfileEditPage();
 }

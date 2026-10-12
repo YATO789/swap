@@ -57,7 +57,6 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
-      // 設定でテーマを変えたら、すぐ全体に反映する。
       themeMode: ref.watch(themeModeRepositoryProvider),
       routerConfig: ref.watch(routerProvider),
     );

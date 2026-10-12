@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
@@ -113,9 +112,10 @@ class _DiaryPages extends HookConsumerWidget {
     }
 
     Future<void> edit() async {
-      await context.push(
-        AppRoutes.diaryEditorOf(diary.date, diaryBookId: diaryBookId),
-      );
+      await DiaryEditorRoute(
+        date: diary.date,
+        diaryBook: diaryBookId,
+      ).push<void>(context);
       await onRefresh();
     }
 

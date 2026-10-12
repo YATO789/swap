@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
@@ -77,7 +76,7 @@ class DiaryBookPage extends HookConsumerWidget {
       );
       if (!context.mounted) return;
       final diaryBooks = ref.read(diaryBookRepositoryProvider.notifier);
-      GoRouter.of(context).go(AppRoutes.home);
+      const HomeRoute().go(context);
       diaryBooks.forget(diaryBookId);
     });
 
@@ -97,20 +96,19 @@ class DiaryBookPage extends HookConsumerWidget {
 
     // 日記を読んだり書いたりしたページから戻ったら、編集や削除を映すため読み直す。
     Future<void> openDiary(Diary diary) async {
-      await context.push(
-        AppRoutes.diaryDetailOf(
-          diaryBookId,
-          diary.date,
-          authorId: diary.authorId,
-        ),
-      );
+      await DiaryDetailRoute(
+        id: diaryBookId,
+        date: diary.date,
+        author: diary.authorId,
+      ).push<void>(context);
       await controller().refresh();
     }
 
     Future<void> writeDiary(Diary diary) async {
-      await context.push(
-        AppRoutes.diaryEditorOf(diary.date, diaryBookId: diaryBookId),
-      );
+      await DiaryEditorRoute(
+        date: diary.date,
+        diaryBook: diaryBookId,
+      ).push<void>(context);
       await controller().refresh();
     }
 
@@ -150,7 +148,7 @@ class DiaryBookPage extends HookConsumerWidget {
     }
 
     // 名前や表紙を変えても、日記帳の一覧から読んでいるのでそのまま映る。
-    void openInfo() => context.push(AppRoutes.diaryBookInfoOf(diaryBookId));
+    void openInfo() => DiaryBookInfoRoute(id: diaryBookId).push<void>(context);
 
     return Scaffold(
       appBar: AppBar(

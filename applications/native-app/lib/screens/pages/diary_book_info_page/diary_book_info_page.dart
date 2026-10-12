@@ -156,7 +156,7 @@ class DiaryBookInfoPage extends ConsumerWidget {
         return;
       }
       // 日記帳のページも開けなくなるので、ホームまで戻る。
-      router.go(AppRoutes.home);
+      router.go(const HomeRoute().location);
       showMessage('「${diaryBook.name}」から退出しました');
     }
 

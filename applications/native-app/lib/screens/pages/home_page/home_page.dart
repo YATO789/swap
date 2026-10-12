@@ -39,7 +39,7 @@ class HomePage extends HookConsumerWidget {
     ref.listen(pushTokenRepositoryProvider, (_, _) {});
 
     void openDiaryBook(DiaryBook diaryBook) =>
-        context.push(AppRoutes.diaryBookOf(diaryBook.id));
+        DiaryBookRoute(id: diaryBook.id).push<void>(context);
 
     // 記録の通知をタップしたら、その日記帳を開く。ホームはサインインしている間ずっと
     // 一番下にあるので、ほかのページを開いていても、その上に重ねる。
@@ -49,18 +49,18 @@ class HomePage extends HookConsumerWidget {
           .openedDiaryBookIds()
           .listen((diaryBookId) {
             if (!context.mounted) return;
-            final location = AppRoutes.diaryBookOf(diaryBookId);
+            final route = DiaryBookRoute(id: diaryBookId);
             // もうその日記帳を一番上に開いていれば、同じページを重ねない。
-            if (GoRouter.of(context).state.uri.path == location) return;
-            context.push(location);
+            if (GoRouter.of(context).state.uri.path == route.location) return;
+            route.push<void>(context);
           });
       return subscription.cancel;
     }, const []);
 
     // 作ったらホームに戻り、そのまま友達を招待するシートを出す。
     Future<void> createDiaryBook() async {
-      final diaryBook = await context.push<DiaryBook>(
-        AppRoutes.createDiaryBook,
+      final diaryBook = await const CreateDiaryBookRoute().push<DiaryBook>(
+        context,
       );
       if (diaryBook == null || !context.mounted) return;
       await showInviteSheet(context, diaryBook, justCreated: true);
@@ -124,7 +124,7 @@ class HomePage extends HookConsumerWidget {
               icon: const Icon(Icons.menu_book_outlined),
             ),
           IconButton(
-            onPressed: () => context.push(AppRoutes.myPage),
+            onPressed: () => const MyPageRoute().push<void>(context),
             tooltip: 'プロフィールと設定',
             icon: UserAvatar(name: myName ?? '', filled: true, size: 30),
           ),

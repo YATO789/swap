@@ -14,7 +14,6 @@ import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/screens/pages/home_page/home_page.dart';
-import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/theme/app_theme.dart';
 
 import '../../../helpers/fake_repositories.dart';
@@ -75,9 +74,9 @@ Future<void> _pumpHomeWithRouter(
 ) async {
   final router = GoRouter(
     routes: [
-      GoRoute(path: AppRoutes.home, builder: (_, _) => const HomePage()),
+      GoRoute(path: '/', builder: (_, _) => const HomePage()),
       GoRoute(
-        path: AppRoutes.diaryBook,
+        path: '/diary-books/:id',
         builder: (_, state) =>
             Scaffold(body: Text('日記帳 ${state.pathParameters['id']}')),
       ),

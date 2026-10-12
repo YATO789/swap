@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../domains/diary/diary.dart';
 import '../../domains/diary_book/diary_book.dart';
@@ -38,9 +37,10 @@ class PostButton extends StatelessWidget {
   }
 
   Future<void> _openDiaryEditor(BuildContext context, DateTime date) async {
-    await context.push(
-      AppRoutes.diaryEditorOf(date, diaryBookId: diaryBook?.id),
-    );
+    await DiaryEditorRoute(
+      date: date,
+      diaryBook: diaryBook?.id,
+    ).push<void>(context);
     onDiaryClosed?.call();
   }
 
