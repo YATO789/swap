@@ -178,6 +178,13 @@ ThemeData _buildTheme(Brightness brightness, AppColors colors) {
     ),
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
+      // 文字は白にするので、ダークモードでも背景は暗いままにする。
+      backgroundColor: brightness == Brightness.light
+          ? colors.textPrimary
+          : const Color(0xFF2A2A2A),
+      contentTextStyle: base.textTheme.bodyMedium?.copyWith(
+        color: Colors.white,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
     bottomSheetTheme: BottomSheetThemeData(
