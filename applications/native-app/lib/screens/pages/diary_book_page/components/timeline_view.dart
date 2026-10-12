@@ -9,6 +9,7 @@ import '../../../../domains/post/timeline_post.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 import '../../../components/user_avatar.dart';
+import 'delete_post_picker_sheet.dart';
 import 'diary_section.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
@@ -25,6 +26,7 @@ class TimelineView extends HookWidget {
     required this.onRecord,
     required this.onOpenDiary,
     required this.onWriteDiary,
+    required this.onDeletePost,
   });
 
   final DateTime date;
@@ -44,6 +46,9 @@ class TimelineView extends HookWidget {
   final VoidCallback onRecord;
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
+
+  /// 自分の記録を長押ししたとき。
+  final ValueChanged<TimelinePost> onDeletePost;
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +123,7 @@ class TimelineView extends HookWidget {
                   members: members,
                   myId: myId,
                   onRecord: onRecord,
+                  onDeletePost: onDeletePost,
                   posts: [
                     for (final hour in hours)
                       if (hour.hour == currentHour) ...hour.posts,
@@ -145,6 +151,7 @@ class TimelineView extends HookWidget {
                   hour: otherHours[index],
                   myId: myId,
                   nameOf: nameOf,
+                  onDeletePost: onDeletePost,
                 ),
                 separatorBuilder: (context, index) => const Divider(),
               ),
@@ -193,11 +200,13 @@ class _HourSection extends StatelessWidget {
     required this.hour,
     required this.myId,
     required this.nameOf,
+    required this.onDeletePost,
   });
 
   final _TimelineHour hour;
   final String? myId;
   final String Function(String userId) nameOf;
+  final ValueChanged<TimelinePost> onDeletePost;
 
   @override
   Widget build(BuildContext context) {
@@ -215,6 +224,7 @@ class _HourSection extends StatelessWidget {
                 post: post,
                 name: nameOf(post.authorId),
                 isMine: post.authorId == myId,
+                onDelete: () => onDeletePost(post),
               ),
             ),
         ],
@@ -248,6 +258,7 @@ class _CurrentHourSection extends StatelessWidget {
     required this.members,
     required this.myId,
     required this.onRecord,
+    required this.onDeletePost,
     required this.posts,
   });
 
@@ -255,6 +266,7 @@ class _CurrentHourSection extends StatelessWidget {
   final List<DiaryBookMember> members;
   final String? myId;
   final VoidCallback onRecord;
+  final ValueChanged<TimelinePost> onDeletePost;
 
   /// 今の時間の記録（古い順）。
   final List<TimelinePost> posts;
@@ -280,6 +292,7 @@ class _CurrentHourSection extends StatelessWidget {
                 name: member.displayName,
                 isMe: member.userId == myId,
                 onRecord: onRecord,
+                onDeletePost: onDeletePost,
                 posts: [
                   // 新しい記録が上に来るように逆順にする。
                   for (final post in posts.reversed)
@@ -300,12 +313,14 @@ class _MemberCard extends StatelessWidget {
     required this.name,
     required this.isMe,
     required this.onRecord,
+    required this.onDeletePost,
     required this.posts,
   });
 
   final String name;
   final bool isMe;
   final VoidCallback onRecord;
+  final ValueChanged<TimelinePost> onDeletePost;
   final List<TimelinePost> posts;
 
   @override
@@ -402,11 +417,26 @@ class _MemberCard extends StatelessWidget {
         ],
       ),
     );
-    if (!canRecord) return card;
+    if (canRecord) {
+      // 小さいボタンだけだと押しにくいので、カード全体を押せるようにする。
+      return InkWell(
+        onTap: onRecord,
+        borderRadius: BorderRadius.circular(12),
+        child: card,
+      );
+    }
+    if (!isMe || posts.isEmpty) return card;
 
-    // 小さいボタンだけだと押しにくいので、カード全体を押せるようにする。
+    // 自分の記録はカードの長押しで削除できる。複数あれば、どれを消すか選ばせる。
+    Future<void> deletePost() async {
+      final post = posts.length == 1
+          ? posts.single
+          : await showDeletePostPickerSheet(context, posts: posts);
+      if (post != null) onDeletePost(post);
+    }
+
     return InkWell(
-      onTap: onRecord,
+      onLongPress: deletePost,
       borderRadius: BorderRadius.circular(12),
       child: card,
     );
@@ -418,62 +448,69 @@ class _PostCard extends StatelessWidget {
     required this.post,
     required this.name,
     required this.isMine,
+    required this.onDelete,
   });
 
   final TimelinePost post;
   final String name;
   final bool isMine;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
 
     return MergeSemantics(
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: colors.border),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        // 記録が長くても、アイコンは左上に置いたままにする。
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            UserAvatar(name: name, filled: isMine),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
+      // 自分の記録は長押しで削除できる。
+      child: InkWell(
+        onLongPress: isMine ? onDelete : null,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: colors.border),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          // 記録が長くても、アイコンは左上に置いたままにする。
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              UserAvatar(name: name, filled: isMine),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            name,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        formatTime(post.postedAt),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: colors.textSecondary,
+                        const SizedBox(width: 6),
+                        Text(
+                          formatTime(post.postedAt),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colors.textSecondary,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(post.message, style: const TextStyle(fontSize: 15)),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(post.message, style: const TextStyle(fontSize: 15)),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

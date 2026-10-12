@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -63,6 +64,31 @@ class DiaryBookPageController extends _$DiaryBookPageController {
           ref.read(postRepositoryProvider).fetchInDiaryBook(diaryBookId, date),
     );
     state = result.whenData((posts) => current.copyWith(posts: posts));
+  }
+
+  /// 自分の [post] をこの日記帳から消し、タイムラインからも外す。消せたら true。
+  /// ほかの日記帳に出した分は残る。
+  Future<bool> deletePost(TimelinePost post) async {
+    try {
+      await ref
+          .read(postRepositoryProvider)
+          .removeFromDiaryBook(post.id, diaryBookId);
+    } catch (error, stackTrace) {
+      debugPrint('記録を消せませんでした: $error\n$stackTrace');
+      return false;
+    }
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(
+        current.copyWith(
+          posts: [
+            for (final other in current.posts)
+              if (other.id != post.id) other,
+          ],
+        ),
+      );
+    }
+    return true;
   }
 
   /// [month] の月で、日記がある日と記録がある日。カレンダーの印に使う。

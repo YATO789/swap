@@ -13,7 +13,7 @@ part of '../diary_book_page_controller.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$DiaryBookPageState {
+mixin _$DiaryBookPageState implements DiagnosticableTreeMixin {
 
 /// 日記帳に参加している人。参加した順。
  List<DiaryBookMember> get members;/// その日の日記。書いた時刻の新しい順。
@@ -26,6 +26,13 @@ mixin _$DiaryBookPageState {
 $DiaryBookPageStateCopyWith<DiaryBookPageState> get copyWith => _$DiaryBookPageStateCopyWithImpl<DiaryBookPageState>(this as DiaryBookPageState, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+  final _this = this as DiaryBookPageState;
+  properties
+    ..add(DiagnosticsProperty('type', 'DiaryBookPageState'))
+    ..add(DiagnosticsProperty('members', _this.members))..add(DiagnosticsProperty('diaries', _this.diaries))..add(DiagnosticsProperty('posts', _this.posts));
+}
 
 @override
 bool operator ==(Object other) {
@@ -41,7 +48,7 @@ int get hashCode {
 }
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   final _this = this as DiaryBookPageState;
   return 'DiaryBookPageState(members: ${_this.members}, diaries: ${_this.diaries}, posts: ${_this.posts})';
 }
@@ -216,7 +223,7 @@ return $default(_that.members,_that.diaries,_that.posts);case _:
 /// @nodoc
 
 
-class _DiaryBookPageState implements DiaryBookPageState {
+class _DiaryBookPageState with DiagnosticableTreeMixin implements DiaryBookPageState {
   const _DiaryBookPageState({required  List<DiaryBookMember> members, required  List<Diary> diaries, required  List<TimelinePost> posts}): _members = members,_diaries = diaries,_posts = posts;
   
 
@@ -255,6 +262,12 @@ class _DiaryBookPageState implements DiaryBookPageState {
 _$DiaryBookPageStateCopyWith<_DiaryBookPageState> get copyWith => __$DiaryBookPageStateCopyWithImpl<_DiaryBookPageState>(this, _$identity);
 
 
+@override
+void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    properties
+    ..add(DiagnosticsProperty('type', 'DiaryBookPageState'))
+    ..add(DiagnosticsProperty('members', members))..add(DiagnosticsProperty('diaries', diaries))..add(DiagnosticsProperty('posts', posts));
+}
 
 @override
 bool operator ==(Object other) {
@@ -268,7 +281,7 @@ int get hashCode {
 }
 
 @override
-String toString() {
+String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
     return 'DiaryBookPageState(members: $members, diaries: $diaries, posts: $posts)';
 }
 

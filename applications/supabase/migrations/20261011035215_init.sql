@@ -426,6 +426,29 @@ begin
 end;
 $$;
 
+-- 自分の記録を、ある日記帳から外す。ほかの日記帳に出した分は残す。
+-- どこにも出ていなくなったら記録も消す。抜けた日記帳の出し先は RLS で見えないので、definer で数える。
+create function public.remove_post_from_diary_book(p_post_id uuid, p_diary_book_id uuid)
+returns void
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  if not exists (
+    select 1 from public.posts
+    where id = p_post_id and author_id = (select auth.uid())
+  ) then
+    raise exception 'not your post';
+  end if;
+
+  delete from public.post_diary_books
+  where post_id = p_post_id and diary_book_id = p_diary_book_id;
+
+  if not exists (select 1 from public.post_diary_books where post_id = p_post_id) then
+    delete from public.posts where id = p_post_id;
+  end if;
+end;
+$$;
+
 -- 自分の日記を書く。もう書いていればタイトルと本文を書き換える（書いた時刻は変えない）。
 create function public.save_diary(
   p_diary_book_id uuid,

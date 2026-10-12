@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
+import '../../../domains/post/timeline_post.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../theme/app_theme.dart';
@@ -85,6 +86,41 @@ class DiaryBookPage extends HookConsumerWidget {
       await controller().refresh();
     }
 
+    Future<void> confirmDeletePost(TimelinePost post) async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('記録を削除しますか？'),
+          content: Text(
+            '「${diaryBook.name}」から「${post.message}」を削除します。'
+            'ほかの日記帳に出した分は残ります。この操作は取り消せません。',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('キャンセル'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('削除'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true || !context.mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final deleted = await controller().deletePost(post);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(deleted ? '記録を削除しました' : '記録を削除できませんでした。もう一度お試しください'),
+        ),
+      );
+    }
+
     // 名前や表紙を変えても、日記帳の一覧から読んでいるのでそのまま映る。
     void openInfo() => context.push(AppRoutes.diaryBookInfoOf(diaryBookId));
 
@@ -116,6 +152,7 @@ class DiaryBookPage extends HookConsumerWidget {
           onRecord: record,
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
+          onDeletePost: confirmDeletePost,
         ),
         AsyncError() => _LoadError(onRetry: () => controller().refresh()),
         _ => Center(

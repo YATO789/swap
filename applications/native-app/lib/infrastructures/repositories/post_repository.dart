@@ -22,6 +22,11 @@ class PostRepository {
     await _datasource.create(post);
   }
 
+  /// 自分の記録を [diaryBookId] の日記帳から外す。ほかの日記帳に出した分は残る。
+  Future<void> removeFromDiaryBook(String postId, String diaryBookId) {
+    return _datasource.removeFromDiaryBook(postId, diaryBookId);
+  }
+
   /// [diaryBookId] の日記帳に出された、日記の [date]（朝4時区切り）に当たる記録を古い順に返す。
   Future<List<TimelinePost>> fetchInDiaryBook(
     String diaryBookId,

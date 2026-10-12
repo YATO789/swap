@@ -27,6 +27,15 @@ class PostDatasource {
     );
   }
 
+  /// 自分の記録を [diaryBookId] の日記帳から外す。ほかの日記帳に出した分は残る。
+  /// どの日記帳にも出ていなくなったら、記録も消える。
+  Future<void> removeFromDiaryBook(String postId, String diaryBookId) async {
+    await _client.rpc<void>(
+      'remove_post_from_diary_book',
+      params: {'p_post_id': postId, 'p_diary_book_id': diaryBookId},
+    );
+  }
+
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録を古い順に返す。
   /// ブロックした人の記録は RLS で返らない。
   Future<List<TimelinePost>> fetchInDiaryBook(
