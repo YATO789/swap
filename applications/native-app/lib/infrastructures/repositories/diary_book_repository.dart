@@ -107,6 +107,12 @@ class DiaryBookRepository extends _$DiaryBookRepository {
   /// [diaryBookId] の日記帳から抜け、一覧から外す。
   Future<void> leave(String diaryBookId) async {
     await _datasource.leave(diaryBookId);
+    forget(diaryBookId);
+  }
+
+  /// [diaryBookId] の日記帳を一覧から外す。サーバーには何もしない。
+  /// ほかの人に外されて、もう読めないと分かったときに呼ぶ。
+  void forget(String diaryBookId) {
     final current = state.value;
     if (current == null) return ref.invalidateSelf();
     state = AsyncData([

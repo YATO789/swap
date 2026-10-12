@@ -29,10 +29,16 @@ abstract class DiaryBookPageState with _$DiaryBookPageState {
   }) = _DiaryBookPageState;
 }
 
+/// もうこの日記帳に入っていない（ほかの人に外された）ときに、読み込みが投げる。
+class RemovedFromDiaryBookException implements Exception {
+  const RemovedFromDiaryBookException();
+}
+
 /// カレンダーで印を付ける日。
 typedef MarkedDates = ({Set<DateTime> diaryDates, Set<DateTime> postDates});
 
 /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
+/// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。
 @riverpod
 class DiaryBookPageController extends _$DiaryBookPageController {
   @override
@@ -42,6 +48,9 @@ class DiaryBookPageController extends _$DiaryBookPageController {
       ref.read(diaryRepositoryProvider).fetchOn(diaryBookId, date),
       ref.read(postRepositoryProvider).fetchInDiaryBook(diaryBookId, date),
     ).wait;
+    // メンバーは参加している日記帳の分しか読めず、参加していれば自分は必ず入っている。
+    // 誰もいなければ、開いている間に外されて読めなくなっている。
+    if (members.isEmpty) throw const RemovedFromDiaryBookException();
     return DiaryBookPageState(members: members, diaries: diaries, posts: posts);
   }
 

@@ -37,10 +37,12 @@ const _members = [
 ];
 
 /// サインインした状態のホームから、大学の日記帳を開く。
+/// [members] を渡せば、開いたあとに書き換えてメンバーの変化を試せる。
 Future<void> _openDiaryBook(
   WidgetTester tester, {
   List<Diary> diaries = const [],
   List<TimelinePost> posts = const [],
+  Map<String, List<DiaryBookMember>>? members,
 }) async {
   // タイムラインが画面に収まるよう、縦長の画面にする。
   tester.view.physicalSize = const Size(1170, 2532);
@@ -65,10 +67,9 @@ Future<void> _openDiaryBook(
           ),
         ),
         diaryBookRepositoryProvider.overrideWith(
-          () => FakeDiaryBookRepository(
-            [_university],
-            members: {_university.id: _members},
-          ),
+          () => FakeDiaryBookRepository([
+            _university,
+          ], members: members ?? {_university.id: _members}),
         ),
         diaryRepositoryProvider.overrideWithValue(
           FakeDiaryRepository({_university.id: diaries}),
@@ -191,5 +192,28 @@ void main() {
     expect(find.text('昨日の記録'), findsOneWidget);
     // 今日ではないので、今の時間の欄は出ない。
     expect(find.text('まだ記録がありません'), findsNothing);
+  });
+
+  testWidgets('開いている間に外されたら、読み直したときに知らせてホームに戻る', (tester) async {
+    final members = {_university.id: _members};
+    await _openDiaryBook(tester, members: members);
+
+    // 外されると、RLS でメンバーが1人も読めなくなる。
+    members[_university.id] = [];
+    await tester.fling(
+      find.byType(Scrollable).first,
+      const Offset(0, 400),
+      1000,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('「大学」は見られなくなりました'), findsOneWidget);
+
+    await tester.tap(find.text('ホームに戻る'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DiaryBookPage), findsNothing);
+    expect(find.text('大学'), findsNothing);
+    expect(find.text('日記帳を作る'), findsOneWidget);
   });
 }

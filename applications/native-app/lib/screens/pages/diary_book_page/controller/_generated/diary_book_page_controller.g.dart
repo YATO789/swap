@@ -9,15 +9,18 @@ part of '../diary_book_page_controller.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
+/// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。
 
 @ProviderFor(DiaryBookPageController)
 final diaryBookPageControllerProvider = DiaryBookPageControllerFamily._();
 
 /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
+/// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。
 final class DiaryBookPageControllerProvider
     extends
         $AsyncNotifierProvider<DiaryBookPageController, DiaryBookPageState> {
   /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
+  /// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。
   DiaryBookPageControllerProvider._({
     required DiaryBookPageControllerFamily super.from,
     required (String, DateTime) super.argument,
@@ -56,9 +59,10 @@ final class DiaryBookPageControllerProvider
 }
 
 String _$diaryBookPageControllerHash() =>
-    r'9bca2cc869eb2fadc6ba620c38cc20273ad18d41';
+    r'5b268d375ad9c68368f85ebb8b47029e6bf2bc0d';
 
 /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
+/// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。
 
 final class DiaryBookPageControllerFamily extends $Family
     with
@@ -79,6 +83,7 @@ final class DiaryBookPageControllerFamily extends $Family
       );
 
   /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
+  /// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。
 
   DiaryBookPageControllerProvider call(String diaryBookId, DateTime date) =>
       DiaryBookPageControllerProvider._(
@@ -91,6 +96,7 @@ final class DiaryBookPageControllerFamily extends $Family
 }
 
 /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
+/// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。
 
 abstract class _$DiaryBookPageController
     extends $AsyncNotifier<DiaryBookPageState> {

@@ -28,6 +28,7 @@ class DiaryBookPage extends HookConsumerWidget {
     final colors = context.appColors;
     final today = diaryDateOf(DateTime.now());
     final date = useState(today);
+    final notifiedRemoval = useRef(false);
 
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
     final diaryBook = diaryBooksState.value
@@ -52,6 +53,33 @@ class DiaryBookPage extends HookConsumerWidget {
     final provider = diaryBookPageControllerProvider(diaryBookId, date.value);
     final pageState = ref.watch(provider);
     DiaryBookPageController controller() => ref.read(provider.notifier);
+
+    // 開いている間に外されたら、もう見られないことを知らせてホームに戻る。読み直すたびに出さないよう1回だけ。
+    // 外されたと分かると気まずいので、外されたとは書かない。
+    ref.listen(provider, (_, next) async {
+      if (next.error is! RemovedFromDiaryBookException) return;
+      if (notifiedRemoval.value) return;
+      notifiedRemoval.value = true;
+
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Text('「${diaryBook.name}」は見られなくなりました'),
+          content: const Text('この日記帳の記録や日記は表示できません。'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('ホームに戻る'),
+            ),
+          ],
+        ),
+      );
+      if (!context.mounted) return;
+      final diaryBooks = ref.read(diaryBookRepositoryProvider.notifier);
+      GoRouter.of(context).go(AppRoutes.home);
+      diaryBooks.forget(diaryBookId);
+    });
 
     Future<void> record() async {
       final posted = await showPostSheet(context, diaryBook: diaryBook);
@@ -153,6 +181,13 @@ class DiaryBookPage extends HookConsumerWidget {
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
           onDeletePost: confirmDeletePost,
+        ),
+        // 知らせるダイアログの後ろには、もう読めないことだけを出す。
+        AsyncError(error: RemovedFromDiaryBookException()) => Center(
+          child: Text(
+            'この日記帳は表示できません',
+            style: TextStyle(color: colors.textSecondary),
+          ),
         ),
         AsyncError() => _LoadError(onRetry: () => controller().refresh()),
         _ => Center(
