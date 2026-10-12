@@ -26,7 +26,7 @@ abstract class DiaryBookInfoPageState with _$DiaryBookInfoPageState {
 }
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
-/// 名前や表紙の色を変えたり、日記帳から抜けたりする。
+/// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
 @riverpod
 class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
   DiaryBookRepository get _diaryBookRepository =>
@@ -70,6 +70,31 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
       '表紙の色を変えられませんでした',
       () => _diaryBookRepository.setCoverColor(diaryBookId, coverColor),
     );
+  }
+
+  /// 招待コードを作り直す。作り直せたら true。
+  Future<bool> regenerateInviteCode() {
+    return _run(
+      '招待コードを作り直せませんでした',
+      () => _diaryBookRepository.regenerateInviteCode(diaryBookId),
+    );
+  }
+
+  /// [userId] の人を日記帳から外す。招待コードも作り直される。外せたら true。
+  Future<bool> removeMember(String userId) {
+    return _run('メンバーを外せませんでした', () async {
+      await _diaryBookRepository.removeMember(diaryBookId, userId);
+      final current = state.value;
+      if (current == null) return;
+      state = AsyncData(
+        current.copyWith(
+          members: [
+            for (final member in current.members)
+              if (member.userId != userId) member,
+          ],
+        ),
+      );
+    });
   }
 
   /// 日記帳から抜ける。抜けられたら true。

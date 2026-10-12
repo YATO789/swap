@@ -75,6 +75,28 @@ class DiaryBookRepository extends _$DiaryBookRepository {
     );
   }
 
+  /// [diaryBookId] の日記帳の招待コードを作り直し、一覧にも映す。
+  Future<void> regenerateInviteCode(String diaryBookId) async {
+    final inviteCode = await _datasource.regenerateInviteCode(diaryBookId);
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(inviteCode: inviteCode),
+    );
+  }
+
+  /// [diaryBookId] の日記帳から [userId] の人を外す。外した人がまた参加できないように、
+  /// 招待コードも作り直される。人数と新しいコードを一覧にも映す。
+  Future<void> removeMember(String diaryBookId, String userId) async {
+    final inviteCode = await _datasource.removeMember(diaryBookId, userId);
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(
+        inviteCode: inviteCode,
+        memberCount: diaryBook.memberCount - 1,
+      ),
+    );
+  }
+
   /// [diaryBookId] の日記帳から抜け、一覧から外す。
   Future<void> leave(String diaryBookId) async {
     await _datasource.leave(diaryBookId);

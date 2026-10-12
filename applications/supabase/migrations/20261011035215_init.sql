@@ -314,14 +314,27 @@ revoke update on public.posts, public.post_diary_books, public.diary_book_member
 
 -- アプリから呼ぶ関数 -----------------------------------------------------------
 
+-- 招待コードを1つ作る。かぶるかどうかは使う側で確かめる。
+create function public.new_invite_code() returns text
+language plpgsql volatile set search_path = ''
+as $$
+declare
+  v_chars constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  v_code text := '';
+begin
+  for i in 1..7 loop
+    v_code := v_code || substr(v_chars, 1 + floor(random() * length(v_chars))::int, 1);
+  end loop;
+  return v_code;
+end;
+$$;
+
 -- 日記帳を作って参加する。招待コードはかぶらないものを作る。
 create function public.create_diary_book(p_name text, p_cover_color bigint default null)
 returns public.diary_books
 language plpgsql security definer set search_path = ''
 as $$
 declare
-  v_chars constant text := 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-  v_code text;
   v_diary_book public.diary_books;
 begin
   if (select auth.uid()) is null then
@@ -329,13 +342,9 @@ begin
   end if;
 
   loop
-    v_code := '';
-    for i in 1..7 loop
-      v_code := v_code || substr(v_chars, 1 + floor(random() * length(v_chars))::int, 1);
-    end loop;
     begin
       insert into public.diary_books (name, cover_color, invite_code, created_by)
-      values (btrim(p_name), p_cover_color, v_code, (select auth.uid()))
+      values (btrim(p_name), p_cover_color, public.new_invite_code(), (select auth.uid()))
       returning * into v_diary_book;
       exit;
     exception when unique_violation then
@@ -404,6 +413,53 @@ begin
   values (v_id, (select auth.uid()))
   on conflict do nothing;
   return v_id;
+end;
+$$;
+
+-- 参加している日記帳の招待コードを作り直し、新しいコードを返す。前のコードでは参加できなくなる。
+-- 招待コードはアプリから書き換えさせていないので、security definer にする。
+create function public.regenerate_invite_code(p_diary_book_id uuid)
+returns text
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  v_code text;
+begin
+  if not public.is_member(p_diary_book_id) then
+    raise exception 'not a member';
+  end if;
+
+  loop
+    begin
+      update public.diary_books set invite_code = public.new_invite_code()
+      where id = p_diary_book_id
+      returning invite_code into v_code;
+      return v_code;
+    exception when unique_violation then
+      -- 招待コードがかぶったら作り直す。
+    end;
+  end loop;
+end;
+$$;
+
+-- 参加している日記帳から、ほかのメンバーを外し、新しい招待コードを返す。
+-- 前のコードのままだと外した人がまた参加できるので、招待コードも作り直す。
+-- 自分が抜けるときは diary_book_members を直接消す。
+create function public.remove_diary_book_member(p_diary_book_id uuid, p_user_id uuid)
+returns text
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  if p_user_id = (select auth.uid()) then
+    raise exception 'cannot remove yourself';
+  end if;
+  if not public.is_member(p_diary_book_id) then
+    raise exception 'not a member';
+  end if;
+
+  delete from public.diary_book_members
+  where diary_book_id = p_diary_book_id and user_id = p_user_id;
+  return public.regenerate_invite_code(p_diary_book_id);
 end;
 $$;
 

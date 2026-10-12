@@ -28,6 +28,7 @@ const _university = DiaryBook(
   icon: '大',
   inviteCode: 'Uni4823',
   memberCount: 3,
+  createdBy: 'mio',
 );
 
 const _members = [
@@ -37,7 +38,8 @@ const _members = [
 ];
 
 /// サインインした状態のホームから大学の日記帳を開き、情報ページを開く。
-Future<void> _openInfo(WidgetTester tester) async {
+/// [createdByMe] なら、自分が大学の日記帳を作ったことにする。
+Future<void> _openInfo(WidgetTester tester, {bool createdByMe = false}) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
@@ -62,7 +64,12 @@ Future<void> _openInfo(WidgetTester tester) async {
         ),
         diaryBookRepositoryProvider.overrideWith(
           () => FakeDiaryBookRepository(
-            [_university],
+            [
+              if (createdByMe)
+                _university.copyWith(createdBy: 'me')
+              else
+                _university,
+            ],
             members: {_university.id: _members},
           ),
         ),
@@ -141,6 +148,46 @@ void main() {
     await tester.pageBack();
     await tester.pumpAndSettle();
     expect(find.text('ゼミ'), findsOneWidget);
+  });
+
+  testWidgets('招待コードを作り直すと、新しいコードが出る', (tester) async {
+    await _openInfo(tester);
+
+    await tester.scrollUntilVisible(find.text('招待コードを作り直す'), 100);
+    await tester.tap(find.text('招待コードを作り直す'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('作り直す'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Uni4823'), findsNothing);
+    expect(find.text('Re23456'), findsOneWidget);
+    expect(find.text('招待コードを作り直しました'), findsOneWidget);
+  });
+
+  testWidgets('作った人がほかのメンバーを外すと、一覧から消えて招待コードも変わる', (tester) async {
+    await _openInfo(tester, createdByMe: true);
+
+    // 自分の行にはメニューがない。
+    expect(find.byTooltip('彩人さんのメニュー'), findsNothing);
+
+    await tester.tap(find.byTooltip('健太さんのメニュー'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('この日記帳から外す'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('外す'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('健太さんを外しました'), findsOneWidget);
+    expect(find.text('健太'), findsNothing);
+    expect(find.bySemanticsLabel(RegExp('書く人 2')), findsOneWidget);
+    expect(find.text('Re23456'), findsOneWidget);
+  });
+
+  testWidgets('作った人でなければ、メンバーを外すメニューは出ない', (tester) async {
+    await _openInfo(tester);
+
+    expect(find.byTooltip('美緒さんのメニュー'), findsNothing);
+    expect(find.byTooltip('健太さんのメニュー'), findsNothing);
   });
 
   testWidgets('退出するとホームに戻り、一覧から日記帳が消える', (tester) async {

@@ -20,7 +20,7 @@ const _lineHeight = 56.0;
 
 /// 日記帳の情報。日記帳を開いた最初のページのように、題名・記録の数・書く人を
 /// 罫線の上にまとめて記す。名前や表紙の色はここで書き換えられ、
-/// 友達の招待と日記帳からの退出もここから行う。
+/// 友達の招待・招待コードの作り直し・メンバーを外すこと・日記帳からの退出もここから行う。
 class DiaryBookInfoPage extends ConsumerWidget {
   const DiaryBookInfoPage({super.key, required this.diaryBookId});
 
@@ -37,6 +37,9 @@ class DiaryBookInfoPage extends ConsumerWidget {
 
     // 退出した直後はホームに戻る途中なので何も出さない。
     if (diaryBook == null) return const Scaffold();
+
+    // メンバーを外せるのは日記帳を作った人だけ。作った人が抜けていれば誰も外せない。
+    final canRemoveMembers = myId != null && diaryBook.createdBy == myId;
 
     final provider = diaryBookInfoPageControllerProvider(diaryBookId);
     final pageState = ref.watch(provider);
@@ -61,6 +64,67 @@ class DiaryBookInfoPage extends ConsumerWidget {
       if (!await controller().setCoverColor(color?.toARGB32())) {
         showMessage('表紙の色を変えられませんでした。もう一度お試しください');
       }
+    }
+
+    Future<void> regenerateInviteCode() async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('招待コードを作り直しますか？'),
+          content: Text(
+            '今のコード（${diaryBook.inviteCode}）では参加できなくなります。参加しているメンバーはそのままです。',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('キャンセル'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('作り直す'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+
+      if (!await controller().regenerateInviteCode()) {
+        showMessage('招待コードを作り直せませんでした。もう一度お試しください');
+        return;
+      }
+      showMessage('招待コードを作り直しました');
+    }
+
+    Future<void> removeMember(DiaryBookMember member) async {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('${member.displayName}さんを外しますか？'),
+          content: const Text(
+            'この日記帳の記録や日記が見られなくなります。また参加できないように、招待コードも作り直します。',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('キャンセル'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: const Text('外す'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+
+      if (!await controller().removeMember(member.userId)) {
+        showMessage('メンバーを外せませんでした。もう一度お試しください');
+        return;
+      }
+      showMessage('${member.displayName}さんを外しました');
     }
 
     Future<void> leave() async {
@@ -147,10 +211,24 @@ class DiaryBookInfoPage extends ConsumerWidget {
                   number: index + 1,
                   member: member,
                   isMe: member.userId == myId,
+                  onRemove: canRemoveMembers
+                      ? () => removeMember(member)
+                      : null,
                 ),
               _InviteLine(
                 inviteCode: diaryBook.inviteCode,
                 onTap: () => showInviteSheet(context, diaryBook),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: regenerateInviteCode,
+                  style: TextButton.styleFrom(
+                    foregroundColor: colors.textSecondary,
+                    textStyle: const TextStyle(fontSize: 13),
+                  ),
+                  child: const Text('招待コードを作り直す'),
+                ),
               ),
               const SizedBox(height: 40),
               TextButton(
@@ -373,17 +451,25 @@ class _TapLine extends StatelessWidget {
   }
 }
 
+/// メンバーの行のメニューでできること。
+enum _MemberAction { remove }
+
 /// メンバー1人の行。番号と名前を、署名のように罫線の上に記す。
+/// [onRemove] があれば、自分以外の行に日記帳から外すメニューを添える。
 class _MemberLine extends StatelessWidget {
   const _MemberLine({
     required this.number,
     required this.member,
     required this.isMe,
+    required this.onRemove,
   });
 
   final int number;
   final DiaryBookMember member;
   final bool isMe;
+
+  /// この人を日記帳から外す。外せないなら null。
+  final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -415,6 +501,29 @@ class _MemberLine extends StatelessWidget {
             Text(
               'あなた',
               style: TextStyle(fontSize: 12, color: colors.textSecondary),
+            )
+          else if (onRemove case final onRemove?)
+            PopupMenuButton<_MemberAction>(
+              tooltip: '${member.displayName}さんのメニュー',
+              icon: Icon(
+                Icons.more_horiz,
+                size: 20,
+                color: colors.textSecondary,
+              ),
+              onSelected: (action) => switch (action) {
+                _MemberAction.remove => onRemove(),
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: _MemberAction.remove,
+                  child: Text(
+                    'この日記帳から外す',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ),
+              ],
             ),
         ],
       ),

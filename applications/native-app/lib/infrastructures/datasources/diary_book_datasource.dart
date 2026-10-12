@@ -22,7 +22,8 @@ class DiaryBookDatasource {
     final rows = await _client
         .from('diary_books')
         .select(
-          'id, name, icon, cover_color, invite_code, diary_book_members(count)',
+          'id, name, icon, cover_color, invite_code, created_by, '
+          'diary_book_members(count)',
         )
         .order('created_at');
     return rows.map((row) {
@@ -98,6 +99,22 @@ class DiaryBookDatasource {
         .eq('id', diaryBookId);
   }
 
+  /// [diaryBookId] の日記帳の招待コードを作り直し、新しいコードを返す。
+  Future<String> regenerateInviteCode(String diaryBookId) {
+    return _client.rpc<String>(
+      'regenerate_invite_code',
+      params: {'p_diary_book_id': diaryBookId},
+    );
+  }
+
+  /// [diaryBookId] の日記帳から [userId] の人を外し、作り直した招待コードを返す。
+  Future<String> removeMember(String diaryBookId, String userId) {
+    return _client.rpc<String>(
+      'remove_diary_book_member',
+      params: {'p_diary_book_id': diaryBookId, 'p_user_id': userId},
+    );
+  }
+
   /// [diaryBookId] の日記帳から自分が抜ける。
   Future<void> leave(String diaryBookId) async {
     await _client
@@ -114,6 +131,7 @@ class DiaryBookDatasource {
       icon: row['icon'] as String,
       inviteCode: row['invite_code'] as String,
       memberCount: memberCount,
+      createdBy: row['created_by'] as String?,
       coverColor: row['cover_color'] as int?,
     );
   }

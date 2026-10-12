@@ -16,6 +16,9 @@ abstract class DiaryBook with _$DiaryBook {
     required String inviteCode,
     required int memberCount,
 
+    /// 日記帳を作った人の id。メンバーを外せるのはこの人だけ。アカウントを消していれば null。
+    String? createdBy,
+
     /// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
     int? coverColor,
   }) = _DiaryBook;

@@ -313,6 +313,25 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
   }
 
   @override
+  Future<void> regenerateInviteCode(String diaryBookId) async {
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(inviteCode: 'Re23456'),
+    );
+  }
+
+  @override
+  Future<void> removeMember(String diaryBookId, String userId) async {
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(
+        inviteCode: 'Re23456',
+        memberCount: diaryBook.memberCount - 1,
+      ),
+    );
+  }
+
+  @override
   Future<void> leave(String diaryBookId) async {
     state = AsyncData([
       for (final diaryBook in [...?state.value])
