@@ -22,7 +22,7 @@ class DiaryBookDatasource {
     final rows = await _client
         .from('diary_books')
         .select(
-          'id, name, icon, cover_color, invite_code, created_by, '
+          'id, name, cover_color, invite_code, created_by, '
           'diary_book_members(count)',
         )
         .order('created_at');
@@ -54,7 +54,6 @@ class DiaryBookDatasource {
     return InvitedDiaryBook(
       id: row['id'] as String,
       name: row['name'] as String,
-      icon: row['icon'] as String,
       memberNames: (row['member_names'] as List<dynamic>).cast<String>(),
       alreadyJoined: row['already_joined'] as bool,
       coverColor: row['cover_color'] as int?,
@@ -128,7 +127,6 @@ class DiaryBookDatasource {
     return DiaryBook(
       id: row['id'] as String,
       name: row['name'] as String,
-      icon: row['icon'] as String,
       inviteCode: row['invite_code'] as String,
       memberCount: memberCount,
       createdBy: row['created_by'] as String?,

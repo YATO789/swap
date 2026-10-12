@@ -13,7 +13,6 @@ import '../../../helpers/pump_app.dart';
 const _university = DiaryBook(
   id: 'university',
   name: '大学',
-  icon: '大',
   inviteCode: 'UNI482',
   memberCount: 5,
 );
@@ -21,7 +20,6 @@ const _university = DiaryBook(
 const _family = DiaryBook(
   id: 'family',
   name: '家族',
-  icon: '家',
   inviteCode: 'FAM482',
   memberCount: 3,
 );

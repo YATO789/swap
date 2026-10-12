@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
@@ -267,7 +266,6 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
     return InvitedDiaryBook(
       id: diaryBook.id,
       name: diaryBook.name,
-      icon: diaryBook.icon,
       memberNames: [
         for (final member in members[diaryBook.id] ?? const <DiaryBookMember>[])
           member.displayName,
@@ -299,11 +297,7 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
 
   @override
   Future<void> rename(String diaryBookId, String name) async {
-    _replace(
-      diaryBookId,
-      (diaryBook) =>
-          diaryBook.copyWith(name: name, icon: name.characters.first),
-    );
+    _replace(diaryBookId, (diaryBook) => diaryBook.copyWith(name: name));
   }
 
   @override
@@ -353,7 +347,6 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
     final diaryBook = DiaryBook(
       id: 'created',
       name: name,
-      icon: name.characters.first,
       inviteCode: 'New2345',
       memberCount: 1,
       coverColor: coverColor,

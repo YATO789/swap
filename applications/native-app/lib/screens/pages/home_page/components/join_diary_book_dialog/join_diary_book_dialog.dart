@@ -204,7 +204,7 @@ class _DiaryBookPreview extends StatelessWidget {
       child: Column(
         children: [
           DiaryBookIcon(
-            label: diaryBook.icon,
+            name: diaryBook.name,
             coverColor: diaryBook.coverColor,
             size: 48,
           ),

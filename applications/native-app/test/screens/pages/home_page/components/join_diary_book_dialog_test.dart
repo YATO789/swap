@@ -23,7 +23,6 @@ import '../../../../helpers/fake_stores.dart';
 const _university = DiaryBook(
   id: 'university',
   name: '大学',
-  icon: '大',
   inviteCode: 'Uni4829',
   memberCount: 2,
 );
@@ -31,7 +30,6 @@ const _university = DiaryBook(
 const _family = DiaryBook(
   id: 'family',
   name: '家族',
-  icon: '家',
   inviteCode: 'Fam2345',
   memberCount: 1,
 );
@@ -39,7 +37,6 @@ const _family = DiaryBook(
 const _club = DiaryBook(
   id: 'club',
   name: 'サークル',
-  icon: 'サ',
   inviteCode: 'Clb6789',
   memberCount: maxDiaryBookMembers,
 );

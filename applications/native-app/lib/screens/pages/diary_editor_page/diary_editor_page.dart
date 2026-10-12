@@ -433,7 +433,7 @@ class _DiaryBookSelector extends StatelessWidget {
                 )
               else
                 DiaryBookIcon(
-                  label: diaryBook!.icon,
+                  name: diaryBook!.name,
                   coverColor: diaryBook.coverColor,
                   size: 14,
                 ),

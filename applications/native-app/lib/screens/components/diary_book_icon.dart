@@ -11,16 +11,17 @@ Color coverInkColor(Color cover) => cover.computeLuminance() > 0.38
     ? const Color(0xFF1D1D1F)
     : Colors.white;
 
-/// 日記帳のアイコン。表紙の色の小さな本に、1文字を [coverInkColor] で入れて出す。
+/// 日記帳のアイコン。表紙の色の小さな本に、名前の1文字目を [coverInkColor] で入れて出す。
 class DiaryBookIcon extends StatelessWidget {
   const DiaryBookIcon({
     super.key,
-    required this.label,
+    required this.name,
     this.coverColor,
     this.size = 48,
   });
 
-  final String label;
+  /// 日記帳の名前。1文字目（絵文字なども見た目の1文字）を表紙に入れる。
+  final String name;
 
   /// 表紙の色（0xAARRGGBB）。null なら [defaultCoverColor]。
   final int? coverColor;
@@ -78,7 +79,7 @@ class DiaryBookIcon extends StatelessWidget {
                 padding: EdgeInsets.only(left: spineWidth),
                 child: Center(
                   child: Text(
-                    label,
+                    name.trim().characters.firstOrNull ?? '',
                     // 文字サイズ設定で本からはみ出さないようにする。
                     textScaler: TextScaler.noScaling,
                     style: TextStyle(

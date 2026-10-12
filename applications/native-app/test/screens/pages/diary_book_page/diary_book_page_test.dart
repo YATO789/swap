@@ -25,7 +25,6 @@ import '../../../helpers/fake_stores.dart';
 const _university = DiaryBook(
   id: 'university',
   name: '大学',
-  icon: '大',
   inviteCode: 'UNI482',
   memberCount: 3,
 );

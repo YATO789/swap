@@ -24,7 +24,6 @@ const _diaryBooks = [
   DiaryBook(
     id: 'university',
     name: '大学',
-    icon: '大',
     inviteCode: 'UNI482',
     memberCount: 5,
     coverColor: 0xFF2F3E5C,
@@ -32,7 +31,6 @@ const _diaryBooks = [
   DiaryBook(
     id: 'company',
     name: '会社',
-    icon: '社',
     inviteCode: 'WRK731',
     memberCount: 8,
   ),
@@ -140,7 +138,7 @@ void main() {
     await tester.pump();
 
     repository.refreshed = [
-      _diaryBooks.first.copyWith(name: 'ゼミ', icon: 'ゼ', memberCount: 6),
+      _diaryBooks.first.copyWith(name: 'ゼミ', memberCount: 6),
       _diaryBooks.last,
     ];
     await tester.fling(find.text('大学'), const Offset(0, 400), 1000);

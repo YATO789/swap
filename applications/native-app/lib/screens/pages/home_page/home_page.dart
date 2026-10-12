@@ -244,7 +244,7 @@ class _DiaryBookList extends StatelessWidget {
         for (final diaryBook in diaryBooks)
           _ListTile(
             leading: DiaryBookIcon(
-              label: diaryBook.icon,
+              name: diaryBook.name,
               coverColor: diaryBook.coverColor,
             ),
             title: diaryBook.name,

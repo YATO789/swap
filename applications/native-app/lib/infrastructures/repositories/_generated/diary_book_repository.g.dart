@@ -43,7 +43,7 @@ final class DiaryBookRepositoryProvider
 }
 
 String _$diaryBookRepositoryHash() =>
-    r'14a6ed07fc73960dc0734b91c339c602468bc2ec';
+    r'9fff5dfaabaf6586e6f43d7e69d2dc5ef1b46ef6';
 
 /// 自分が参加している日記帳の一覧を持つ。サインインしていなければ空。
 ///

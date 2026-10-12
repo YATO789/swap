@@ -99,7 +99,7 @@ class _DiaryBookPickerSheet extends StatelessWidget {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: DiaryBookIcon(
-                        label: diaryBook.icon,
+                        name: diaryBook.name,
                         coverColor: diaryBook.coverColor,
                         size: 36,
                       ),

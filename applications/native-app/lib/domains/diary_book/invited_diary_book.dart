@@ -11,9 +11,6 @@ abstract class InvitedDiaryBook with _$InvitedDiaryBook {
     required String id,
     required String name,
 
-    /// アイコンに表示する1文字。
-    required String icon,
-
     /// 参加している人の表示名。参加した順。
     required List<String> memberNames,
 

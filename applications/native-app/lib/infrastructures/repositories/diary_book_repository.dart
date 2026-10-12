@@ -63,14 +63,7 @@ class DiaryBookRepository extends _$DiaryBookRepository {
   /// [diaryBookId] の日記帳の名前を [name] にし、一覧にも映す。
   Future<void> rename(String diaryBookId, String name) async {
     await _datasource.rename(diaryBookId, name);
-    // アイコンは DB が名前の1文字目から作るので、同じように作る。
-    _replace(
-      diaryBookId,
-      (diaryBook) => diaryBook.copyWith(
-        name: name,
-        icon: String.fromCharCodes(name.runes.take(1)),
-      ),
-    );
+    _replace(diaryBookId, (diaryBook) => diaryBook.copyWith(name: name));
   }
 
   /// [diaryBookId] の日記帳の表紙の色を [coverColor] にし、一覧にも映す。
