@@ -541,7 +541,7 @@ create table public.push_tokens (
 );
 create index on public.push_tokens (user_id);
 
--- 読み書きは register_push_token からだけ。送るのは service role の Edge Function。
+-- 読み書きは register_push_token と unregister_push_token からだけ。送るのは service role の Edge Function。
 alter table public.push_tokens enable row level security;
 
 -- 端末のトークンを自分の送り先にする。前に別の人が使っていたトークンなら持ち主を替える。
@@ -562,6 +562,18 @@ $$;
 
 revoke execute on function public.register_push_token(text) from public, anon;
 grant execute on function public.register_push_token(text) to authenticated;
+
+-- 端末のトークンを自分の送り先から外す。サインアウトする前に呼ぶ。
+-- もう別の人の送り先になっていたら、その人の行は残す。
+create function public.unregister_push_token(p_token text) returns void
+language sql security definer set search_path = ''
+as $$
+  delete from public.push_tokens
+  where token = p_token and user_id = (select auth.uid());
+$$;
+
+revoke execute on function public.unregister_push_token(text) from public, anon;
+grant execute on function public.unregister_push_token(text) to authenticated;
 
 -- 記録の通知 --------------------------------------------------------------------
 

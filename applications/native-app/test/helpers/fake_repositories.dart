@@ -16,6 +16,7 @@ import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/infrastructures/repositories/push_token_repository.dart';
 
 /// Supabase につながず、サインインすると少し待ってからサインイン済みになる。
 class FakeAuthenticationRepository extends AuthenticationRepository {
@@ -42,6 +43,21 @@ class FakeAuthenticationRepository extends AuthenticationRepository {
   @override
   Future<void> signOut() async {
     state = const Authentication();
+  }
+}
+
+/// Firebase につながず、送り先から外したときにサインインしていたかを [unregisteredWhileSignedIn] にためる。
+class FakePushTokenRepository extends PushTokenRepository {
+  final unregisteredWhileSignedIn = <bool>[];
+
+  @override
+  Future<void> build() async {}
+
+  @override
+  Future<void> unregister() async {
+    unregisteredWhileSignedIn.add(
+      ref.read(authenticationRepositoryProvider).isLoginApp,
+    );
   }
 }
 
@@ -90,6 +106,11 @@ class FakePostRepository implements PostRepository {
         ),
       );
     }
+  }
+
+  @override
+  Future<void> removeFromDiaryBook(String postId, String diaryBookId) async {
+    timelinePosts[diaryBookId]?.removeWhere((post) => post.id == postId);
   }
 
   @override

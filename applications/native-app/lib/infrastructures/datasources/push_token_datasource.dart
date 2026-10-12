@@ -53,6 +53,14 @@ class PushTokenDatasource {
     );
   }
 
+  /// [token] を自分の送り先から外す。
+  Future<void> unregister(String token) async {
+    await _client.rpc<void>(
+      'unregister_push_token',
+      params: {'p_token': token},
+    );
+  }
+
   /// この端末の FCM トークンを無効にする。古いトークンには送っても届かなくなる。
   Future<void> deleteToken() async {
     await _messaging.deleteToken();

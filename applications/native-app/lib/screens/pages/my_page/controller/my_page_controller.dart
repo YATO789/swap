@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../infrastructures/repositories/authentication_repository.dart';
+import '../../../../usecases/sign_out_usecase.dart';
 
 part '_generated/my_page_controller.g.dart';
 
@@ -13,7 +14,7 @@ class MyPageController extends _$MyPageController {
 
   /// ログアウトし、成功したかを返す。失敗したときは状態にエラーが入る。
   Future<bool> signOut() => _run(
-    ref.read(authenticationRepositoryProvider.notifier).signOut,
+    ref.read(signOutUseCaseProvider).call,
     failureLog: 'ログアウトできませんでした',
   );
 

@@ -4,10 +4,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
+import 'package:swap/infrastructures/datasources/stores/theme_mode_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/infrastructures/repositories/push_token_repository.dart';
 import 'package:swap/screens/pages/my_page/my_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/screens/pages/welcome_page/welcome_page.dart';
@@ -20,6 +22,7 @@ import '../../../helpers/fake_stores.dart';
 Future<void> _openMyPage(
   WidgetTester tester, {
   FakeDiaryBookGridStore? gridStore,
+  FakePushTokenRepository? pushTokenRepository,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -27,6 +30,7 @@ Future<void> _openMyPage(
         diaryBookGridStoreProvider.overrideWithValue(
           gridStore ?? FakeDiaryBookGridStore(),
         ),
+        themeModeStoreProvider.overrideWithValue(FakeThemeModeStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
@@ -39,6 +43,9 @@ Future<void> _openMyPage(
           () => FakeProfileRepository(
             profile: const Profile(id: 'me', displayName: '彩人'),
           ),
+        ),
+        pushTokenRepositoryProvider.overrideWith(
+          () => pushTokenRepository ?? FakePushTokenRepository(),
         ),
         diaryBookRepositoryProvider.overrideWith(
           () => FakeDiaryBookRepository(const []),
@@ -73,8 +80,9 @@ void main() {
     expect(gridStore.grid, isFalse);
   });
 
-  testWidgets('ログアウトを確かめると、ウェルカム画面に戻る', (tester) async {
-    await _openMyPage(tester);
+  testWidgets('ログアウトを確かめると、通知の送り先から外してウェルカム画面に戻る', (tester) async {
+    final pushTokenRepository = FakePushTokenRepository();
+    await _openMyPage(tester, pushTokenRepository: pushTokenRepository);
     await tester.scrollUntilVisible(find.text('ログアウト'), 200);
 
     await tester.tap(find.text('ログアウト'));
@@ -85,6 +93,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(WelcomePage), findsOneWidget);
+    // サーバーに頼むにはサインインしている必要があるので、サインアウトより先に外す。
+    expect(pushTokenRepository.unregisteredWhileSignedIn, [true]);
   });
 
   testWidgets('キャンセルすると、ログアウトせずにマイページに残る', (tester) async {

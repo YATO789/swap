@@ -10,7 +10,8 @@ part '_generated/push_token_repository.g.dart';
 /// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
 ///
 /// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
-/// サインアウトしたらトークンを無効にして、前のアカウントの通知が届かないようにする。
+/// サインアウトの前に [unregister] で送り先から外し、サインアウトしたらトークンも無効にして、
+/// 前のアカウントの通知が届かないようにする。
 /// サインイン状態を追い続けるので、一度読んだら破棄しない。
 @Riverpod(keepAlive: true)
 class PushTokenRepository extends _$PushTokenRepository {
@@ -32,6 +33,12 @@ class PushTokenRepository extends _$PushTokenRepository {
     await _datasource.requestPermission();
     final token = await _datasource.fetchToken();
     if (token != null) await _register(token);
+  }
+
+  /// この端末を自分の送り先から外す。サーバーに聞く必要があるので、サインアウトする前に呼ぶ。
+  Future<void> unregister() async {
+    final token = await _datasource.fetchToken();
+    if (token != null) await _datasource.unregister(token);
   }
 
   Future<void> _register(String token) async {
