@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../join_diary_book_dialog_controller.dart';
+part of '../join_diary_book_sheet_controller.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -8,33 +8,33 @@ part of '../join_diary_book_dialog_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 招待コードで参加するダイアログの、確認と参加の処理を受け持つ。状態は処理の進み具合。
+/// 招待コードで参加するシートの、確認と参加の処理を受け持つ。状態は処理の進み具合。
 
-@ProviderFor(JoinDiaryBookDialogController)
-final joinDiaryBookDialogControllerProvider =
-    JoinDiaryBookDialogControllerProvider._();
+@ProviderFor(JoinDiaryBookSheetController)
+final joinDiaryBookSheetControllerProvider =
+    JoinDiaryBookSheetControllerProvider._();
 
-/// 招待コードで参加するダイアログの、確認と参加の処理を受け持つ。状態は処理の進み具合。
-final class JoinDiaryBookDialogControllerProvider
-    extends $NotifierProvider<JoinDiaryBookDialogController, AsyncValue<void>> {
-  /// 招待コードで参加するダイアログの、確認と参加の処理を受け持つ。状態は処理の進み具合。
-  JoinDiaryBookDialogControllerProvider._()
+/// 招待コードで参加するシートの、確認と参加の処理を受け持つ。状態は処理の進み具合。
+final class JoinDiaryBookSheetControllerProvider
+    extends $NotifierProvider<JoinDiaryBookSheetController, AsyncValue<void>> {
+  /// 招待コードで参加するシートの、確認と参加の処理を受け持つ。状態は処理の進み具合。
+  JoinDiaryBookSheetControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'joinDiaryBookDialogControllerProvider',
+        name: r'joinDiaryBookSheetControllerProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$joinDiaryBookDialogControllerHash();
+  String debugGetCreateSourceHash() => _$joinDiaryBookSheetControllerHash();
 
   @$internal
   @override
-  JoinDiaryBookDialogController create() => JoinDiaryBookDialogController();
+  JoinDiaryBookSheetController create() => JoinDiaryBookSheetController();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(AsyncValue<void> value) {
@@ -45,12 +45,12 @@ final class JoinDiaryBookDialogControllerProvider
   }
 }
 
-String _$joinDiaryBookDialogControllerHash() =>
-    r'abf24f56ebe68c70fe33f21bb13113a40063c21d';
+String _$joinDiaryBookSheetControllerHash() =>
+    r'aaba88d54a3c29eaf95839c286fb01261255d2f7';
 
-/// 招待コードで参加するダイアログの、確認と参加の処理を受け持つ。状態は処理の進み具合。
+/// 招待コードで参加するシートの、確認と参加の処理を受け持つ。状態は処理の進み具合。
 
-abstract class _$JoinDiaryBookDialogController
+abstract class _$JoinDiaryBookSheetController
     extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();
   @$mustCallSuper

@@ -5,11 +5,11 @@ import '../../../../../../domains/diary_book/diary_book.dart';
 import '../../../../../../domains/diary_book/invited_diary_book.dart';
 import '../../../../../../infrastructures/repositories/diary_book_repository.dart';
 
-part '_generated/join_diary_book_dialog_controller.g.dart';
+part '_generated/join_diary_book_sheet_controller.g.dart';
 
-/// 招待コードで参加するダイアログの、確認と参加の処理を受け持つ。状態は処理の進み具合。
+/// 招待コードで参加するシートの、確認と参加の処理を受け持つ。状態は処理の進み具合。
 @riverpod
-class JoinDiaryBookDialogController extends _$JoinDiaryBookDialogController {
+class JoinDiaryBookSheetController extends _$JoinDiaryBookSheetController {
   @override
   AsyncValue<void> build() => const AsyncData(null);
 

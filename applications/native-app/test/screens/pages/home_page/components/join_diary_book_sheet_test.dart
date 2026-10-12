@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
@@ -41,8 +42,8 @@ const _club = DiaryBook(
   memberCount: maxDiaryBookMembers,
 );
 
-/// サインインした状態でホームを開き、招待コードで参加するダイアログを開く。
-Future<void> _openJoinDialog(
+/// サインインした状態でホームを開き、招待コードで参加するシートを開く。
+Future<void> _openJoinSheet(
   WidgetTester tester, {
   List<DiaryBook> joined = const [],
 }) async {
@@ -106,12 +107,12 @@ Future<void> _openJoinDialog(
 
 void main() {
   testWidgets('コードを確かめて日記帳を見てから参加すると、その日記帳が開く', (tester) async {
-    await _openJoinDialog(tester);
-    expect(find.byType(AlertDialog), findsOneWidget);
-    expect(find.text('PINコード'), findsOneWidget);
+    await _openJoinSheet(tester);
+    expect(find.byType(BottomSheet), findsOneWidget);
+    expect(find.text('招待コードで参加'), findsWidgets);
 
-    final confirm = find.widgetWithText(TextButton, '確認する');
-    expect(tester.widget<TextButton>(confirm).onPressed, isNull);
+    final confirm = find.widgetWithText(FilledButton, '確認する');
+    expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
 
     // 英数字以外は入らない。
     await tester.enterText(find.byType(TextField), 'Uni-4829');
@@ -120,10 +121,12 @@ void main() {
 
     await tester.tap(confirm);
     await tester.pumpAndSettle();
-    expect(find.text('大学'), findsOneWidget);
+    // 名前は表紙と見出しの2か所に出る。
+    expect(find.text('大学'), findsWidgets);
     expect(find.text('2人のメンバー'), findsOneWidget);
+    expect(find.text('あと6人まで参加できます'), findsOneWidget);
 
-    await tester.tap(find.text('参加する'));
+    await tester.tap(find.text('この日記帳に参加する'));
     await tester.pumpAndSettle();
 
     expect(find.byType(DiaryBookPage), findsOneWidget);
@@ -131,7 +134,7 @@ void main() {
   });
 
   testWidgets('大文字と小文字が違えば、合うコードはない', (tester) async {
-    await _openJoinDialog(tester);
+    await _openJoinSheet(tester);
 
     await tester.enterText(find.byType(TextField), 'UNI4829');
     await tester.pump();
@@ -147,7 +150,7 @@ void main() {
   });
 
   testWidgets('招待メッセージを丸ごと貼り付けると、コードだけが入る', (tester) async {
-    await _openJoinDialog(tester);
+    await _openJoinSheet(tester);
 
     await tester.enterText(find.byType(TextField), inviteMessage(_university));
     await tester.pump();
@@ -155,20 +158,41 @@ void main() {
 
     await tester.tap(find.text('確認する'));
     await tester.pumpAndSettle();
-    expect(find.text('大学'), findsOneWidget);
+    // 名前は表紙と見出しの2か所に出る。
+    expect(find.text('大学'), findsWidgets);
   });
 
-  testWidgets('キャンセルで閉じる', (tester) async {
-    await _openJoinDialog(tester);
+  testWidgets('シートの外をタップすると閉じる', (tester) async {
+    await _openJoinSheet(tester);
 
-    await tester.tap(find.text('キャンセル'));
+    await tester.tapAt(const Offset(10, 10));
     await tester.pumpAndSettle();
 
-    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(BottomSheet), findsNothing);
+  });
+
+  testWidgets('コピーした招待メッセージを、貼り付けボタンで入れられる', (tester) async {
+    await _openJoinSheet(tester);
+
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async => call.method == 'Clipboard.getData'
+          ? {'text': inviteMessage(_university)}
+          : null,
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+    await tester.tap(find.text('貼り付け'));
+    await tester.pump();
+    expect(find.text('Uni4829'), findsOneWidget);
   });
 
   testWidgets('満員の日記帳には参加できない', (tester) async {
-    await _openJoinDialog(tester);
+    await _openJoinSheet(tester);
 
     await tester.enterText(find.byType(TextField), 'Clb6789');
     await tester.pump();
@@ -176,12 +200,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('この日記帳は満員です（8人まで）'), findsOneWidget);
-    final join = find.widgetWithText(TextButton, '参加する');
-    expect(tester.widget<TextButton>(join).onPressed, isNull);
+    final join = find.widgetWithText(FilledButton, 'この日記帳に参加する');
+    expect(tester.widget<FilledButton>(join).onPressed, isNull);
   });
 
   testWidgets('満員の日記帳でも、もう参加していれば開ける', (tester) async {
-    await _openJoinDialog(tester, joined: const [_club]);
+    await _openJoinSheet(tester, joined: const [_club]);
 
     await tester.enterText(find.byType(TextField), 'Clb6789');
     await tester.pump();
@@ -196,7 +220,7 @@ void main() {
   });
 
   testWidgets('もう参加している日記帳なら、参加せずに開ける', (tester) async {
-    await _openJoinDialog(tester, joined: const [_university]);
+    await _openJoinSheet(tester, joined: const [_university]);
 
     await tester.enterText(find.byType(TextField), 'Uni4829');
     await tester.pump();

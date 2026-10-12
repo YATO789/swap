@@ -13,7 +13,7 @@ import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_sheet.dart';
 import 'components/empty_diary_books.dart';
 import '../../components/invite_sheet.dart';
-import 'components/join_diary_book_dialog/join_diary_book_dialog.dart';
+import 'components/join_diary_book_sheet/join_diary_book_sheet.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
@@ -65,7 +65,7 @@ class HomePage extends HookConsumerWidget {
     }
 
     Future<void> joinDiaryBook() async {
-      final diaryBook = await showJoinDiaryBookDialog(context);
+      final diaryBook = await showJoinDiaryBookSheet(context);
       if (diaryBook == null || !context.mounted) return;
       openDiaryBook(diaryBook);
     }
