@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'diary_book_icon.dart';
 
-/// 日記帳の表紙。名前があれば表紙の上のほうに白で入れる。
+/// 日記帳の表紙。名前があれば表紙の上のほうに [coverInkColor] で入れる。
 class DiaryCover extends StatelessWidget {
   const DiaryCover({
     super.key,
@@ -22,6 +22,7 @@ class DiaryCover extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final coverColor = color ?? defaultCoverColor(context);
     final length = name.runes.length;
     // 長い名前でも表紙に収まるよう、文字数で大きさを変える。
     // 幅 168 のときの大きさを基準に、表紙の大きさに合わせて伸ばす。
@@ -34,7 +35,7 @@ class DiaryCover extends StatelessWidget {
       width: width,
       height: width * 4 / 3,
       decoration: BoxDecoration(
-        color: color ?? defaultCoverColor(context),
+        color: coverColor,
         borderRadius: BorderRadius.horizontal(
           left: const Radius.circular(2),
           right: Radius.circular(6 * k),
@@ -82,7 +83,7 @@ class DiaryCover extends StatelessWidget {
                   fontSize: fontSize,
                   fontWeight: FontWeight.w700,
                   height: 1.3,
-                  color: Colors.white,
+                  color: coverInkColor(coverColor),
                 ),
                 child: Text(
                   name,

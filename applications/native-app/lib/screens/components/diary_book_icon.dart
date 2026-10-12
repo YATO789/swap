@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 Color defaultCoverColor(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark
     ? const Color(0xFF3A3A3A)
-    : const Color(0xFFCFCFCF);
+    : const Color(0xFFECECEF);
 
-/// 日記帳のアイコン。表紙の色の小さな本に、1文字を白で入れて出す。
+/// 表紙 [cover] の上に載せる文字の色。明るい表紙には黒、暗い表紙には白を使う。
+Color coverInkColor(Color cover) => cover.computeLuminance() > 0.38
+    ? const Color(0xFF1D1D1F)
+    : Colors.white;
+
+/// 日記帳のアイコン。表紙の色の小さな本に、1文字を [coverInkColor] で入れて出す。
 class DiaryBookIcon extends StatelessWidget {
   const DiaryBookIcon({
     super.key,
@@ -25,7 +30,10 @@ class DiaryBookIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = coverColor;
+    final coverColor = this.coverColor;
+    final color = coverColor == null
+        ? defaultCoverColor(context)
+        : Color(coverColor);
     final width = size * 3 / 4;
     final spineWidth = size * 0.1;
 
@@ -38,7 +46,7 @@ class DiaryBookIcon extends StatelessWidget {
           width: width,
           height: size,
           decoration: BoxDecoration(
-            color: color == null ? defaultCoverColor(context) : Color(color),
+            color: color,
             borderRadius: BorderRadius.horizontal(
               left: Radius.circular(size * 0.03),
               right: Radius.circular(size * 0.08),
@@ -76,7 +84,7 @@ class DiaryBookIcon extends StatelessWidget {
                     style: TextStyle(
                       fontSize: size * 0.34,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: coverInkColor(color),
                     ),
                   ),
                 ),

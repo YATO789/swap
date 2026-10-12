@@ -25,6 +25,6 @@ void main() {
 
     await tester.tap(circles.at(1));
     expect(called, isTrue);
-    expect(selected, initialCoverColor);
+    expect(selected, coverColors[1]);
   });
 }

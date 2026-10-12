@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import 'diary_book_icon.dart';
 
-/// 新しく日記帳を作るときに最初から選んでおく表紙の色（黒）。
-const initialCoverColor = Color(0xFF2B2B2B);
+/// 新しく日記帳を作るときに最初から選んでおく表紙の色（ミント）。
+const initialCoverColor = Color(0xFF9EE6C4);
 
 /// 選べる表紙の色。先頭の null は決まったグレー。
-/// どれも白い文字が読めるくらいの濃さにしてある。
+/// 黒のほかは明るいパステルにしてあり、表紙の文字は [coverInkColor] で黒になる。
 const coverColors = <Color?>[
   null,
+  Color(0xFF2A2A2E),
+  Color(0xFFA8C8FF),
   initialCoverColor,
-  Color(0xFF2F3E5C),
-  Color(0xFF3F5E4A),
-  Color(0xFFA9533F),
-  Color(0xFFB98A2E),
-  Color(0xFFB9707C),
+  Color(0xFFFFB4A8),
+  Color(0xFFFFE07A),
+  Color(0xFFD9C2FF),
 ];
 
 /// 表紙の色を選ぶ丸の並び。選んでいる色は外側に輪を付ける。
