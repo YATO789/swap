@@ -83,16 +83,16 @@ class _PostSheet extends HookConsumerWidget {
           .read(postSheetControllerProvider.notifier)
           .submit(Post(message: message, diaryBookIds: selectedIds));
       if (!context.mounted) return;
+      final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
       if (!ok) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(content: Text('記録できませんでした。もう一度お試しください')),
-          );
+        messenger.showSnackBar(
+          const SnackBar(content: Text('記録できませんでした。もう一度お試しください')),
+        );
         return;
       }
       // 書けたので、書きかけの確認（DiscardGuard）を通さずに閉じる。
       Navigator.of(context).pop(true);
+      messenger.showSnackBar(const SnackBar(content: Text('記録しました')));
     }
 
     return DiscardGuard(

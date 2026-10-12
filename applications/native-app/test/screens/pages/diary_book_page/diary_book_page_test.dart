@@ -160,6 +160,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('カフェで勉強中'), findsOneWidget);
+    expect(find.text('記録しました'), findsOneWidget);
   });
 
   testWidgets('カレンダーでほかの日を選ぶと、その日を表示する', (tester) async {
