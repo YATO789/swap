@@ -118,7 +118,6 @@ class MyPage extends HookConsumerWidget {
             value: '朝$diaryDayStartHour:00',
           ),
           const _SectionHeader('その他'),
-          _LinkTile(title: 'ヘルプ', onTap: showNotReady),
           _LinkTile(title: '利用規約', onTap: showNotReady),
           _LinkTile(title: 'プライバシーポリシー', onTap: showNotReady),
           _InfoTile(title: 'バージョン', value: appVersion),
