@@ -6,3 +6,6 @@
 .env.keys
 .env.local
 .env.*.local
+
+# Edge Function の秘密。functions/.env.example を見る。
+functions/.env

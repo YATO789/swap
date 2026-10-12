@@ -539,3 +539,54 @@ $$;
 
 revoke execute on function public.register_push_token(text) from public, anon;
 grant execute on function public.register_push_token(text) to authenticated;
+
+-- 記録の通知 --------------------------------------------------------------------
+
+-- 記録を書いたら、同じ日記帳の人に Edge Function（notify-post）からプッシュ通知を送る。
+-- pg_net のリクエストはコミットしてから送られるので、Edge Function からは
+-- create_post で一緒に入れた post_diary_books も見える。書き込みが失敗すれば送られない。
+create extension if not exists pg_net with schema extensions;
+
+-- 通知を送った記録。同じ記録で二度送らないように、Edge Function が送る前にここへ入れる。
+-- Edge Function は誰でも呼べるので、同じ記録の id で何度呼ばれても送るのは一度だけにする。
+create table public.post_notifications (
+  post_id uuid primary key references public.posts (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+-- 読み書きは service role の Edge Function からだけ。
+alter table public.post_notifications enable row level security;
+
+-- Edge Function の URL（末尾の /functions/v1 まで）は Vault の functions_url に入れておく。
+-- 環境ごとに違うので migration には書かない。ローカルは seed.sql で入れる。本番は SQL Editor で
+--   select vault.create_secret('https://<project-ref>.supabase.co/functions/v1', 'functions_url');
+-- を一度流す。入っていなければ通知は送らず、記録は書ける。
+-- Vault はアプリから読めないので、security definer にする。
+create function public.notify_post() returns trigger
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  v_url text;
+begin
+  select decrypted_secret into v_url
+  from vault.decrypted_secrets
+  where name = 'functions_url';
+  if v_url is null then
+    return null;
+  end if;
+
+  perform net.http_post(
+    url := v_url || '/notify-post',
+    body := jsonb_build_object('post_id', new.id),
+    headers := '{"Content-Type": "application/json"}'::jsonb
+  );
+  return null;
+end;
+$$;
+
+-- トリガー専用なので、アプリからは呼ばせない。
+revoke execute on function public.notify_post() from public, anon, authenticated;
+
+create trigger notify_post
+after insert on public.posts
+for each row execute function public.notify_post();
