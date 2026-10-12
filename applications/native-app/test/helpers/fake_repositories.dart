@@ -255,6 +255,18 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
   /// 招待コードで参加できる日記帳。参加しているものも含めてよい。
   final List<DiaryBook> invitable;
 
+  /// 読み直したときに返す一覧。ほかの人が変えたことにする。null なら [diaryBooks]。
+  List<DiaryBook>? refreshed;
+
+  /// true なら読み直しに失敗する。
+  bool failsToRefresh = false;
+
+  @override
+  Future<void> refresh() async {
+    if (failsToRefresh) throw Exception('読み直しに失敗');
+    state = AsyncData(refreshed ?? diaryBooks);
+  }
+
   DiaryBook? _byCode(String code) =>
       invitable.where((diaryBook) => diaryBook.inviteCode == code).firstOrNull;
 

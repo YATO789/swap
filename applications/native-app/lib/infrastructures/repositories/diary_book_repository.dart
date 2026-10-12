@@ -20,6 +20,13 @@ class DiaryBookRepository extends _$DiaryBookRepository {
     return _datasource.fetchJoined();
   }
 
+  /// 一覧を読み直す。ほかの人が変えた名前や表紙、人数も映る。
+  /// 読み直している間も今の一覧を出したままにし、失敗したら一覧はそのままで投げる。
+  Future<void> refresh() async {
+    if (!ref.read(authenticationRepositoryProvider).isLoginApp) return;
+    state = AsyncData(await _datasource.fetchJoined());
+  }
+
   /// 日記帳を作って一覧の最後に足し、作った日記帳を返す。
   Future<DiaryBook> create(String name, {int? coverColor}) async {
     final diaryBook = await _datasource.create(name, coverColor: coverColor);

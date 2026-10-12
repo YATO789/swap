@@ -42,6 +42,7 @@ const _diaryBooks = [
 List<Override> _overrides(
   List<DiaryBook> diaryBooks, {
   FakeOpenedNotificationRepository? notifications,
+  FakeDiaryBookRepository? diaryBookRepository,
 }) => [
   authenticationRepositoryProvider.overrideWith(
     () => FakeAuthenticationRepository(
@@ -54,7 +55,7 @@ List<Override> _overrides(
     ),
   ),
   diaryBookRepositoryProvider.overrideWith(
-    () => FakeDiaryBookRepository(diaryBooks),
+    () => diaryBookRepository ?? FakeDiaryBookRepository(diaryBooks),
   ),
   openedNotificationRepositoryProvider.overrideWithValue(
     notifications ?? FakeOpenedNotificationRepository(),
@@ -129,6 +130,42 @@ void main() {
 
     expect(find.byIcon(Icons.chevron_right), findsNothing);
     expect(find.text('5人'), findsOneWidget);
+  });
+
+  testWidgets('引っ張ると、ほかの人が変えた名前や表紙を読み直す', (tester) async {
+    final repository = FakeDiaryBookRepository(_diaryBooks);
+    await tester.pumpApp(
+      const HomePage(),
+      overrides: _overrides(_diaryBooks, diaryBookRepository: repository),
+    );
+    await tester.pump();
+
+    repository.refreshed = [
+      _diaryBooks.first.copyWith(name: 'ゼミ', icon: 'ゼ', memberCount: 6),
+      _diaryBooks.last,
+    ];
+    await tester.fling(find.text('大学'), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+
+    expect(find.text('大学'), findsNothing);
+    expect(find.text('ゼミ'), findsOneWidget);
+    expect(find.text('6人'), findsOneWidget);
+  });
+
+  testWidgets('読み直せなければ、一覧はそのままで知らせる', (tester) async {
+    final repository = FakeDiaryBookRepository(_diaryBooks)
+      ..failsToRefresh = true;
+    await tester.pumpApp(
+      const HomePage(),
+      overrides: _overrides(_diaryBooks, diaryBookRepository: repository),
+    );
+    await tester.pump();
+
+    await tester.fling(find.text('大学'), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+
+    expect(find.text('大学'), findsOneWidget);
+    expect(find.text('日記帳を読み込めませんでした。もう一度お試しください'), findsOneWidget);
   });
 
   testWidgets('記録の通知をタップすると、その日記帳を開く', (tester) async {

@@ -72,6 +72,21 @@ class HomePage extends HookConsumerWidget {
       openDiaryBook(diaryBook);
     }
 
+    // 引っ張って一覧を読み直す。ほかの人が変えた名前や表紙を映す。
+    Future<void> refresh() async {
+      try {
+        await ref.read(diaryBookRepositoryProvider.notifier).refresh();
+      } catch (error, stackTrace) {
+        debugPrint('日記帳を読み直せませんでした: $error\n$stackTrace');
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(content: Text('日記帳を読み込めませんでした。もう一度お試しください')),
+          );
+      }
+    }
+
     Future<void> addDiaryBook() async {
       final action = await showAddDiaryBookSheet(context);
       if (!context.mounted) return;
@@ -121,13 +136,11 @@ class HomePage extends HookConsumerWidget {
           onCreate: createDiaryBook,
           onJoin: joinDiaryBook,
         ),
-        AsyncValue(hasValue: true) when grid => _DiaryBookGrid(
-          diaryBooks: diaryBooks,
-          onTap: openDiaryBook,
-        ),
-        AsyncValue(hasValue: true) => _DiaryBookList(
-          diaryBooks: diaryBooks,
-          onTap: openDiaryBook,
+        AsyncValue(hasValue: true) => RefreshIndicator(
+          onRefresh: refresh,
+          child: grid
+              ? _DiaryBookGrid(diaryBooks: diaryBooks, onTap: openDiaryBook)
+              : _DiaryBookList(diaryBooks: diaryBooks, onTap: openDiaryBook),
         ),
         AsyncError() => Center(
           child: Column(
@@ -224,6 +237,8 @@ class _DiaryBookList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      // 日記帳が少なくて画面に収まっても、引っ張って読み直せるようにする。
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(top: 8, bottom: 24),
       children: [
         for (final diaryBook in diaryBooks)
@@ -266,6 +281,8 @@ class _DiaryBookGrid extends StatelessWidget {
             (constraints.maxWidth - _padding * 2 - _crossSpacing) / 2;
 
         return GridView.builder(
+          // 日記帳が少なくて画面に収まっても、引っ張って読み直せるようにする。
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(_padding, 16, _padding, 40),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
