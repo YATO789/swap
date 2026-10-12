@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+
+import '../../../../theme/app_theme.dart';
+
+/// オンボーディングの2ページ目。どんな通知が届くかを見本で見せて、許可をお願いする。
+class NotificationStep extends StatelessWidget {
+  const NotificationStep({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return ListView(
+      children: [
+        const Text(
+          '通知をオンにしよう',
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '日記帳のメンバーが記録を書くと、お知らせが届きます。',
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.6,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 32),
+        const _NotificationSample(
+          title: 'はるか',
+          body: '駅前の新しいカフェに来てみた☕',
+          time: 'たった今',
+        ),
+        const SizedBox(height: 12),
+        const _NotificationSample(
+          title: 'そうた',
+          body: 'やっとレポート終わった！',
+          time: '5分前',
+        ),
+        const SizedBox(height: 32),
+        Text(
+          '通知はあとから端末の設定で変えられます。',
+          style: TextStyle(
+            fontSize: 13,
+            height: 1.6,
+            color: colors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 端末に届く通知の見本。送られる通知と同じく、題名に書いた人の名前、本文に記録を出す。
+class _NotificationSample extends StatelessWidget {
+  const _NotificationSample({
+    required this.title,
+    required this.body,
+    required this.time,
+  });
+
+  final String title;
+  final String body;
+  final String time;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.border),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: Image.asset(
+              'assets/icons/app_icon_mint.png',
+              width: 38,
+              height: 38,
+              excludeFromSemantics: true,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      time,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(body, style: const TextStyle(fontSize: 14, height: 1.4)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

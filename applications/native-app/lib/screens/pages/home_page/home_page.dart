@@ -32,10 +32,10 @@ class HomePage extends HookConsumerWidget {
 
     final colors = context.appColors;
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
-    // 読み込み中や失敗したときは、日記帳がないときと同じく切り替えや投稿を出さない。
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
-    // 通知の許可は、オンボーディングを終えてホームに来たときに聞く。結果は画面に出さない。
+    // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
+    // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
     ref.listen(pushTokenRepositoryProvider, (_, _) {});
 
     void openDiaryBook(DiaryBook diaryBook) =>
