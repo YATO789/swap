@@ -7,11 +7,18 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../../domains/diary/diary.dart';
 import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../../infrastructures/repositories/theme_mode_repository.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
 import 'components/diary_book_layout_picker.dart';
 import 'controller/my_page_controller.dart';
+
+const _themeModeLabels = {
+  ThemeMode.system: '端末の設定',
+  ThemeMode.light: 'ライト',
+  ThemeMode.dark: 'ダーク',
+};
 
 /// ホームの AppBar 右のアイコンから開く、プロフィールとその他の設定のページ。
 class MyPage extends HookConsumerWidget {
@@ -21,6 +28,7 @@ class MyPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
     final diaryBookGrid = ref.watch(diaryBookGridRepositoryProvider);
+    final themeMode = ref.watch(themeModeRepositoryProvider);
 
     // pubspec.yaml の version（ビルド番号を除く）。読み込むまでは空にしておく。
     final packageInfo = useFuture(useMemoized(PackageInfo.fromPlatform));
@@ -36,6 +44,30 @@ class MyPage extends HookConsumerWidget {
     }
 
     void showNotReady() => showMessage('準備中です');
+
+    Future<void> pickThemeMode() async {
+      final mode = await showDialog<ThemeMode>(
+        context: context,
+        builder: (context) => SimpleDialog(
+          title: const Text('テーマ'),
+          children: [
+            RadioGroup<ThemeMode>(
+              groupValue: themeMode,
+              onChanged: (mode) => Navigator.of(context).pop(mode),
+              child: Column(
+                children: [
+                  for (final MapEntry(key: mode, value: label)
+                      in _themeModeLabels.entries)
+                    RadioListTile<ThemeMode>(value: mode, title: Text(label)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+      if (mode == null) return;
+      await ref.read(themeModeRepositoryProvider.notifier).save(mode);
+    }
 
     Future<void> signOut() async {
       final confirmed = await showDialog<bool>(
@@ -110,6 +142,19 @@ class MyPage extends HookConsumerWidget {
           DiaryBookLayoutPicker(
             grid: diaryBookGrid,
             onChanged: ref.read(diaryBookGridRepositoryProvider.notifier).save,
+          ),
+          const _SectionHeader('表示'),
+          ListTile(
+            contentPadding: _tilePadding,
+            title: const Text('テーマ', style: _titleStyle),
+            trailing: Text(
+              _themeModeLabels[themeMode]!,
+              style: TextStyle(
+                fontSize: 15,
+                color: context.appColors.textSecondary,
+              ),
+            ),
+            onTap: pickThemeMode,
           ),
           const _SectionHeader('日記'),
           const _InfoTile(

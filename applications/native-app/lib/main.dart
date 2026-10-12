@@ -8,6 +8,8 @@ import 'firebase_options.dart';
 import 'infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'infrastructures/datasources/stores/post_diary_book_store.dart';
 import 'infrastructures/datasources/stores/shared_preferences_store.dart';
+import 'infrastructures/datasources/stores/theme_mode_store.dart';
+import 'infrastructures/repositories/theme_mode_repository.dart';
 import 'screens/pages/router/router.dart';
 import 'theme/app_theme.dart';
 
@@ -23,7 +25,7 @@ Future<void> main() async {
 
   final preferences = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {postDiaryBookIdsKey, diaryBookGridKey},
+      allowList: {postDiaryBookIdsKey, diaryBookGridKey, themeModeKey},
     ),
   );
 
@@ -44,6 +46,8 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
+      // 設定でテーマを変えたら、すぐ全体に反映する。
+      themeMode: ref.watch(themeModeRepositoryProvider),
       routerConfig: ref.watch(routerProvider),
     );
   }
