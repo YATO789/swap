@@ -43,7 +43,8 @@ class PostDatasource {
         .eq('post_diary_books.diary_book_id', diaryBookId)
         .gte('posted_at', from.toUtc().toIso8601String())
         .lt('posted_at', to.toUtc().toIso8601String())
-        .order('posted_at');
+        // Dart の order は既定が降順なので、古い順を明示する。
+        .order('posted_at', ascending: true);
     return rows.map(_toTimelinePost).toList();
   }
 

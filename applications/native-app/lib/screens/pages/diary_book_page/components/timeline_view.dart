@@ -281,7 +281,8 @@ class _CurrentHourSection extends StatelessWidget {
                 isMe: member.userId == myId,
                 onRecord: onRecord,
                 posts: [
-                  for (final post in posts)
+                  // 新しい記録が上に来るように逆順にする。
+                  for (final post in posts.reversed)
                     if (post.authorId == member.userId) post,
                 ],
               ),
