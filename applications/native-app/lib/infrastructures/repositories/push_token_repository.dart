@@ -20,11 +20,13 @@ class PushTokenRepository extends _$PushTokenRepository {
   Future<void> build() async {
     if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return;
 
-    final subscription = _datasource.onTokenRefresh.listen(_register);
+    // onDispose の中では ref を使えないので、先に取り出しておく。
+    final datasource = _datasource;
+    final subscription = datasource.onTokenRefresh.listen(_register);
     ref.onDispose(() {
       subscription.cancel();
       // サインアウトしてサインイン状態が変わったときにここに来る。
-      unawaited(_datasource.deleteToken().catchError(_logFailure));
+      unawaited(datasource.deleteToken().catchError(_logFailure));
     });
 
     await _datasource.requestPermission();
