@@ -65,22 +65,14 @@ class WelcomePage extends HookConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.menu_book_outlined,
-                      size: 56,
-                      color: colors.textPrimary,
+                    Image.asset(
+                      'assets/icons/swap_title.png',
+                      height: 64,
+                      semanticLabel: 'Swap!',
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Swap!',
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     Text(
-                      '日記帳で「今なにしてる」と\n1日の日記を共有しよう',
+                      '交換日記みたいに、みんなで\n1日の日記を共有しよう',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,

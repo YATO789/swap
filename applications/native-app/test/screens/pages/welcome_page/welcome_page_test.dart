@@ -50,7 +50,10 @@ void main() {
   testWidgets('アプリ名とサインインボタンが出る', (tester) async {
     await tester.pumpApp(const WelcomePage());
 
-    expect(find.text('Swap!'), findsOneWidget);
+    expect(
+      find.image(const AssetImage('assets/icons/swap_title.png')),
+      findsOneWidget,
+    );
     expect(find.text('Appleでサインイン'), findsOneWidget);
   });
 
