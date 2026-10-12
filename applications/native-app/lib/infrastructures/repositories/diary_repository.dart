@@ -29,11 +29,6 @@ class DiaryRepository {
     );
   }
 
-  /// [diaryBookId] の日記帳に書かれた日記の数。
-  Future<int> countIn(String diaryBookId) {
-    return _datasource.countIn(diaryBookId);
-  }
-
   /// 自分が [date] に書いた日記を、日記帳の id ごとに返す。
   Future<Map<String, Diary>> fetchMineOn(DateTime date) {
     return _datasource.fetchMineOn(date);

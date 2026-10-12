@@ -53,11 +53,6 @@ class PostRepository {
     );
   }
 
-  /// [diaryBookId] の日記帳に出された記録の数。
-  Future<int> countInDiaryBook(String diaryBookId) {
-    return _datasource.countInDiaryBook(diaryBookId);
-  }
-
   /// [diaryBookId] の日記帳に、[month] の月の間で記録が出された日（朝4時区切り）。
   Future<Set<DateTime>> fetchDatesInDiaryBook(
     String diaryBookId,

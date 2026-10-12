@@ -140,11 +140,6 @@ class FakePostRepository implements PostRepository {
   }
 
   @override
-  Future<int> countInDiaryBook(String diaryBookId) async {
-    return timelinePosts[diaryBookId]?.length ?? 0;
-  }
-
-  @override
   Future<Set<DateTime>> fetchDatesInDiaryBook(
     String diaryBookId,
     DateTime month,
@@ -225,11 +220,6 @@ class FakeDiaryRepository implements DiaryRepository {
     for (final list in diaries.values) {
       list.removeWhere((diary) => diary.id == diaryId);
     }
-  }
-
-  @override
-  Future<int> countIn(String diaryBookId) async {
-    return diaries[diaryBookId]?.length ?? 0;
   }
 
   @override

@@ -18,7 +18,7 @@ import 'controller/diary_book_info_page_controller.dart';
 /// 罫線1本ぶんの高さ。どの行もこの高さで並べる。
 const _lineHeight = 56.0;
 
-/// 日記帳の情報。日記帳を開いた最初のページのように、題名・記録の数・書く人を
+/// 日記帳の情報。日記帳を開いた最初のページのように、題名・書く人を
 /// 罫線の上にまとめて記す。名前や表紙の色はここで書き換えられ、
 /// 友達の招待・招待コードの作り直し・メンバーを外すこと・日記帳からの退出もここから行う。
 class DiaryBookInfoPage extends ConsumerWidget {
@@ -174,14 +174,6 @@ class DiaryBookInfoPage extends ConsumerWidget {
             ),
             children: [
               _Header(diaryBook: diaryBook, onRename: rename),
-              const SizedBox(height: 28),
-              _Stats(
-                stats: [
-                  ('書く人', value.members.length),
-                  ('記録', value.postCount),
-                  ('日記', value.diaryCount),
-                ],
-              ),
               const _SectionLabel('表紙'),
               _TapLine(
                 label: '名前',
@@ -313,51 +305,6 @@ class _Header extends StatelessWidget {
               ? defaultCoverColor(context)
               : Color(coverColor),
         ),
-      ],
-    );
-  }
-}
-
-/// 書く人・記録・日記の数を横に並べる。
-class _Stats extends StatelessWidget {
-  const _Stats({required this.stats});
-
-  final List<(String, int)> stats;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return Row(
-      children: [
-        for (final (label, count) in stats)
-          Expanded(
-            child: Semantics(
-              label: '$label $count',
-              excludeSemantics: true,
-              child: Column(
-                children: [
-                  Text(
-                    '$count',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      fontFeatures: [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12,
-                      letterSpacing: 1,
-                      color: colors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
       ],
     );
   }

@@ -4,8 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../domains/diary_book/diary_book_member.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
-import '../../../../infrastructures/repositories/diary_repository.dart';
-import '../../../../infrastructures/repositories/post_repository.dart';
 
 part '_generated/diary_book_info_page_controller.freezed.dart';
 part '_generated/diary_book_info_page_controller.g.dart';
@@ -16,16 +14,10 @@ abstract class DiaryBookInfoPageState with _$DiaryBookInfoPageState {
   const factory DiaryBookInfoPageState({
     /// 日記帳に参加している人。参加した順。
     required List<DiaryBookMember> members,
-
-    /// 日記帳に出された記録の数。
-    required int postCount,
-
-    /// 日記帳に書かれた日記の数。
-    required int diaryCount,
   }) = _DiaryBookInfoPageState;
 }
 
-/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
+/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
 /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
 @riverpod
 class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
@@ -34,16 +26,8 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
 
   @override
   Future<DiaryBookInfoPageState> build(String diaryBookId) async {
-    final (members, postCount, diaryCount) = await (
-      _diaryBookRepository.fetchMembers(diaryBookId),
-      ref.read(postRepositoryProvider).countInDiaryBook(diaryBookId),
-      ref.read(diaryRepositoryProvider).countIn(diaryBookId),
-    ).wait;
-    return DiaryBookInfoPageState(
-      members: members,
-      postCount: postCount,
-      diaryCount: diaryCount,
-    );
+    final members = await _diaryBookRepository.fetchMembers(diaryBookId);
+    return DiaryBookInfoPageState(members: members);
   }
 
   /// 全部読み直す。読み直している間も、今の内容を出したままにする。

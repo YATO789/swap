@@ -117,13 +117,10 @@ Future<void> _openInfo(WidgetTester tester, {bool createdByMe = false}) async {
 }
 
 void main() {
-  testWidgets('日記帳のページから情報ページを開くと、数とメンバーと招待コードが出る', (tester) async {
+  testWidgets('日記帳のページから情報ページを開くと、メンバーと招待コードが出る', (tester) async {
     await _openInfo(tester);
 
     expect(find.byType(DiaryBookInfoPage), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('書く人 3')), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('記録 2')), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('日記 1')), findsOneWidget);
     // 自分が先頭に来る。
     expect(
       tester.getTopLeft(find.text('彩人')).dy,
@@ -179,7 +176,6 @@ void main() {
 
     expect(find.text('健太さんを外しました'), findsOneWidget);
     expect(find.text('健太'), findsNothing);
-    expect(find.bySemanticsLabel(RegExp('書く人 2')), findsOneWidget);
     expect(find.text('Re23456'), findsOneWidget);
   });
 

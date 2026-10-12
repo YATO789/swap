@@ -8,14 +8,14 @@ part of '../diary_book_info_page_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
+/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
 /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
 
 @ProviderFor(DiaryBookInfoPageController)
 final diaryBookInfoPageControllerProvider =
     DiaryBookInfoPageControllerFamily._();
 
-/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
+/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
 /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
 final class DiaryBookInfoPageControllerProvider
     extends
@@ -23,7 +23,7 @@ final class DiaryBookInfoPageControllerProvider
           DiaryBookInfoPageController,
           DiaryBookInfoPageState
         > {
-  /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
+  /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
   /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
   DiaryBookInfoPageControllerProvider._({
     required DiaryBookInfoPageControllerFamily super.from,
@@ -63,9 +63,9 @@ final class DiaryBookInfoPageControllerProvider
 }
 
 String _$diaryBookInfoPageControllerHash() =>
-    r'c07d1aac4157b0399354d928f1cbc4311eb4a1ec';
+    r'02144b0faf134911ef6545f8abbd14b0266d1bad';
 
-/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
+/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
 /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
 
 final class DiaryBookInfoPageControllerFamily extends $Family
@@ -86,7 +86,7 @@ final class DiaryBookInfoPageControllerFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
+  /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
   /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
 
   DiaryBookInfoPageControllerProvider call(String diaryBookId) =>
@@ -96,7 +96,7 @@ final class DiaryBookInfoPageControllerFamily extends $Family
   String toString() => r'diaryBookInfoPageControllerProvider';
 }
 
-/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーと記録・日記の数を読み、
+/// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
 /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
 
 abstract class _$DiaryBookInfoPageController

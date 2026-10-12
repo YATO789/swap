@@ -16,9 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$DiaryBookInfoPageState implements DiagnosticableTreeMixin {
 
 /// 日記帳に参加している人。参加した順。
- List<DiaryBookMember> get members;/// 日記帳に出された記録の数。
- int get postCount;/// 日記帳に書かれた日記の数。
- int get diaryCount;
+ List<DiaryBookMember> get members;
 /// Create a copy of DiaryBookInfoPageState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,26 +29,26 @@ void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   final _this = this as DiaryBookInfoPageState;
   properties
     ..add(DiagnosticsProperty('type', 'DiaryBookInfoPageState'))
-    ..add(DiagnosticsProperty('members', _this.members))..add(DiagnosticsProperty('postCount', _this.postCount))..add(DiagnosticsProperty('diaryCount', _this.diaryCount));
+    ..add(DiagnosticsProperty('members', _this.members));
 }
 
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryBookInfoPageState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBookInfoPageState&&const DeepCollectionEquality().equals(other.members, _this.members)&&(identical(other.postCount, _this.postCount) || other.postCount == _this.postCount)&&(identical(other.diaryCount, _this.diaryCount) || other.diaryCount == _this.diaryCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBookInfoPageState&&const DeepCollectionEquality().equals(other.members, _this.members));
 }
 
 
 @override
 int get hashCode {
   final _this = this as DiaryBookInfoPageState;
-  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.members),_this.postCount,_this.diaryCount);
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.members));
 }
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   final _this = this as DiaryBookInfoPageState;
-  return 'DiaryBookInfoPageState(members: ${_this.members}, postCount: ${_this.postCount}, diaryCount: ${_this.diaryCount})';
+  return 'DiaryBookInfoPageState(members: ${_this.members})';
 }
 
 
@@ -61,7 +59,7 @@ abstract mixin class $DiaryBookInfoPageStateCopyWith<$Res>  {
   factory $DiaryBookInfoPageStateCopyWith(DiaryBookInfoPageState value, $Res Function(DiaryBookInfoPageState) _then) = _$DiaryBookInfoPageStateCopyWithImpl;
 @useResult
 $Res call({
- List<DiaryBookMember> members, int postCount, int diaryCount
+ List<DiaryBookMember> members
 });
 
 
@@ -78,12 +76,10 @@ class _$DiaryBookInfoPageStateCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBookInfoPageState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? members = null,Object? postCount = null,Object? diaryCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? members = null,}) {
   return _then(DiaryBookInfoPageState(
 members: null == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
-as List<DiaryBookMember>,postCount: null == postCount ? _self.postCount : postCount // ignore: cast_nullable_to_non_nullable
-as int,diaryCount: null == diaryCount ? _self.diaryCount : diaryCount // ignore: cast_nullable_to_non_nullable
-as int,
+as List<DiaryBookMember>,
   ));
 }
 
@@ -168,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<DiaryBookMember> members,  int postCount,  int diaryCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<DiaryBookMember> members)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryBookInfoPageState() when $default != null:
-return $default(_that.members,_that.postCount,_that.diaryCount);case _:
+return $default(_that.members);case _:
   return orElse();
 
 }
@@ -189,10 +185,10 @@ return $default(_that.members,_that.postCount,_that.diaryCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<DiaryBookMember> members,  int postCount,  int diaryCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<DiaryBookMember> members)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBookInfoPageState():
-return $default(_that.members,_that.postCount,_that.diaryCount);case _:
+return $default(_that.members);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +205,10 @@ return $default(_that.members,_that.postCount,_that.diaryCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<DiaryBookMember> members,  int postCount,  int diaryCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<DiaryBookMember> members)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBookInfoPageState() when $default != null:
-return $default(_that.members,_that.postCount,_that.diaryCount);case _:
+return $default(_that.members);case _:
   return null;
 
 }
@@ -224,7 +220,7 @@ return $default(_that.members,_that.postCount,_that.diaryCount);case _:
 
 
 class _DiaryBookInfoPageState with DiagnosticableTreeMixin implements DiaryBookInfoPageState {
-  const _DiaryBookInfoPageState({required  List<DiaryBookMember> members, required this.postCount, required this.diaryCount}): _members = members;
+  const _DiaryBookInfoPageState({required  List<DiaryBookMember> members}): _members = members;
   
 
 /// 日記帳に参加している人。参加した順。
@@ -236,10 +232,6 @@ class _DiaryBookInfoPageState with DiagnosticableTreeMixin implements DiaryBookI
   return EqualUnmodifiableListView(_members);
 }
 
-/// 日記帳に出された記録の数。
-@override final  int postCount;
-/// 日記帳に書かれた日記の数。
-@override final  int diaryCount;
 
 /// Create a copy of DiaryBookInfoPageState
 /// with the given fields replaced by the non-null parameter values.
@@ -252,23 +244,23 @@ _$DiaryBookInfoPageStateCopyWith<_DiaryBookInfoPageState> get copyWith => __$Dia
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
     ..add(DiagnosticsProperty('type', 'DiaryBookInfoPageState'))
-    ..add(DiagnosticsProperty('members', members))..add(DiagnosticsProperty('postCount', postCount))..add(DiagnosticsProperty('diaryCount', diaryCount));
+    ..add(DiagnosticsProperty('members', members));
 }
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBookInfoPageState&&const DeepCollectionEquality().equals(other.members, _members)&&(identical(other.postCount, postCount) || other.postCount == postCount)&&(identical(other.diaryCount, diaryCount) || other.diaryCount == diaryCount));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBookInfoPageState&&const DeepCollectionEquality().equals(other.members, _members));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_members),postCount,diaryCount);
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_members));
 }
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-    return 'DiaryBookInfoPageState(members: $members, postCount: $postCount, diaryCount: $diaryCount)';
+    return 'DiaryBookInfoPageState(members: $members)';
 }
 
 
@@ -279,7 +271,7 @@ abstract mixin class _$DiaryBookInfoPageStateCopyWith<$Res> implements $DiaryBoo
   factory _$DiaryBookInfoPageStateCopyWith(_DiaryBookInfoPageState value, $Res Function(_DiaryBookInfoPageState) _then) = __$DiaryBookInfoPageStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<DiaryBookMember> members, int postCount, int diaryCount
+ List<DiaryBookMember> members
 });
 
 
@@ -296,12 +288,10 @@ class __$DiaryBookInfoPageStateCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBookInfoPageState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? members = null,Object? postCount = null,Object? diaryCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? members = null,}) {
   return _then(_DiaryBookInfoPageState(
 members: null == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
-as List<DiaryBookMember>,postCount: null == postCount ? _self.postCount : postCount // ignore: cast_nullable_to_non_nullable
-as int,diaryCount: null == diaryCount ? _self.diaryCount : diaryCount // ignore: cast_nullable_to_non_nullable
-as int,
+as List<DiaryBookMember>,
   ));
 }
 
