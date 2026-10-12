@@ -38,6 +38,20 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // dev と prod で Firebase プロジェクトを分ける。google-services.json は src/<flavor>/ に置く。
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            manifestPlaceholders["appName"] = "Swap! Dev"
+        }
+        create("prod") {
+            dimension = "environment"
+            manifestPlaceholders["appName"] = "Swap!"
+        }
+    }
 }
 
 kotlin {

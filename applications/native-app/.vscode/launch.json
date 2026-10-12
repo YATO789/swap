@@ -10,6 +10,7 @@
             "request": "launch",
             "type": "dart",
             "toolArgs": [
+                "--flavor=dev",
                 "--dart-define=SUPABASE_URL=http://127.0.0.1:54321",
                 "--dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
             ]
@@ -20,23 +21,26 @@
             "request": "launch",
             "type": "dart",
             "toolArgs": [
+                "--flavor=dev",
                 "--dart-define=SUPABASE_URL=http://10.0.2.2:54321",
                 "--dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
             ]
         },
         {
-            "name": "native-app (profile mode)",
+            "name": "Production-iOS",
             "program": "lib/main.dart",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "release",
+            "toolArgs": ["--flavor=prod"]
         },
         {
-            "name": "native-app (release mode)",
+            "name": "Production-Android",
             "program": "lib/main.dart",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "toolArgs": ["--flavor=prod"]
         }
     ]
 }

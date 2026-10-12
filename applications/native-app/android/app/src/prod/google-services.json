@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "967716218227",
+    "project_id": "swap-prod-23067",
+    "storage_bucket": "swap-prod-23067.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967716218227:android:a2b878b46e9e4f9231d106",
+        "android_client_info": {
+          "package_name": "com.yato.swap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLUURzxpglNACMmrIv-SkPAkH-LaFul_g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
