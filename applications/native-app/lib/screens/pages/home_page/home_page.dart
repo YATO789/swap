@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -13,9 +11,9 @@ import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/push_token_repository.dart';
 import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_sheet.dart';
+import 'components/empty_diary_books.dart';
 import '../../components/invite_sheet.dart';
 import 'components/join_diary_book_dialog/join_diary_book_dialog.dart';
-import '../../components/cover_color_picker.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
@@ -132,7 +130,7 @@ class HomePage extends HookConsumerWidget {
         ],
       ),
       body: switch (diaryBooksState) {
-        AsyncValue(hasValue: true) when diaryBooks.isEmpty => _EmptyDiaryBooks(
+        AsyncValue(hasValue: true) when diaryBooks.isEmpty => EmptyDiaryBooks(
           onCreate: createDiaryBook,
           onJoin: joinDiaryBook,
         ),
@@ -164,66 +162,6 @@ class HomePage extends HookConsumerWidget {
       },
       // 日記帳に1冊も入っていないうちは、書いても見せる相手がいないので出さない。
       bottomNavigationBar: diaryBooks.isEmpty ? null : const PostButton(),
-    );
-  }
-}
-
-/// 日記帳に1冊も入っていないときの案内。真ん中に本を置き、
-/// その下からその場で作るか参加できるようにする。
-class _EmptyDiaryBooks extends StatelessWidget {
-  const _EmptyDiaryBooks({required this.onCreate, required this.onJoin});
-
-  final VoidCallback onCreate;
-  final VoidCallback onJoin;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return LayoutBuilder(
-      builder: (context, constraints) => SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: ConstrainedBox(
-          // 画面が十分に高ければ真ん中に寄せ、低ければスクロールさせる。
-          constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                // 無地だと寂しいので、表紙にアプリの名前を入れておく。
-                child: DiaryCover(
-                  name: 'Swap!',
-                  color: initialCoverColor,
-                  width: min(constraints.maxWidth * 0.5, 200),
-                ),
-              ),
-              const SizedBox(height: 40),
-              Text(
-                '友達と日記帳を作るか、\n招待コードで参加しましょう',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  height: 1.6,
-                  color: colors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 24),
-              OutlinedButton.icon(
-                onPressed: onCreate,
-                icon: const Icon(Icons.add_circle_outline),
-                label: const Text('日記帳を作る'),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: onJoin,
-                icon: const Icon(Icons.key_outlined),
-                label: const Text('招待コードで参加'),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

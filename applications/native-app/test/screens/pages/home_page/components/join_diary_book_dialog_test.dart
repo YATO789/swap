@@ -92,7 +92,9 @@ Future<void> _openJoinDialog(
   );
   await tester.pumpAndSettle();
   if (joined.isEmpty) {
-    // 日記帳がないうちは、画面の真ん中のボタンから参加する。
+    // 日記帳がないうちは、画面の下のボタンから参加する。
+    // テストの画面は低いので、ボタンが見えるまでスクロールする。
+    await tester.ensureVisible(find.text('招待コードで参加'));
     await tester.tap(find.text('招待コードで参加'));
   } else {
     await tester.tap(find.byTooltip('日記帳を追加'));
