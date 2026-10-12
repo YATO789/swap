@@ -454,3 +454,88 @@ $$;
 -- 関数はログインした人だけが呼べるようにする。
 revoke execute on all functions in schema public from public, anon;
 grant execute on all functions in schema public to authenticated;
+
+-- トリガー ----------------------------------------------------------------------
+
+-- 最後の1人が抜けて誰もいなくなった日記帳を消す。日記・本文・記録の出し先も一緒に消える。
+-- 残しておくと、招待コードを知っている人が参加して前のメンバーの日記を読めてしまう。
+-- 抜けた本人はもう RLS で日記帳を消せないので、security definer にする。
+create function public.delete_empty_diary_book() returns trigger
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  -- 最後の2人が同時に抜けると、お互いに相手がまだいると見て、どちらも消さないことがある。
+  -- 日記帳の行を先に押さえ、後から来た方が先の退出を見てから数えるようにする。
+  perform 1 from public.diary_books where id = old.diary_book_id for update;
+
+  delete from public.diary_books b
+  where b.id = old.diary_book_id
+    and not exists (
+      select 1 from public.diary_book_members m
+      where m.diary_book_id = old.diary_book_id
+    );
+  return null;
+end;
+$$;
+
+-- トリガー専用なので、アプリからは呼ばせない。
+revoke execute on function public.delete_empty_diary_book() from public, anon, authenticated;
+
+create trigger delete_empty_diary_book
+after delete on public.diary_book_members
+for each row execute function public.delete_empty_diary_book();
+
+-- アカウント削除 ----------------------------------------------------------------
+
+-- 自分のアカウントを消す（App Store ガイドライン 5.1.1(v)）。
+-- auth.users を消すと、プロフィール・参加・記録・日記・ブロックが on delete cascade で消え、
+-- 誰もいなくなった日記帳も delete_empty_diary_book トリガーで消える。通報は送った人だけ空になる。
+-- auth.users はアプリから触れないので、security definer にする。
+create function public.delete_account() returns void
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  if (select auth.uid()) is null then
+    raise exception 'not signed in';
+  end if;
+
+  delete from auth.users where id = (select auth.uid());
+end;
+$$;
+
+revoke execute on function public.delete_account() from public, anon;
+grant execute on function public.delete_account() to authenticated;
+
+-- プッシュ通知 ------------------------------------------------------------------
+
+-- プッシュ通知の送り先。端末の FCM トークンと、その端末でサインインしている人。
+-- 1人が複数の端末を持てるので、トークンを主キーにする。
+-- 同じ端末で別のアカウントに入り直すと、同じトークンの持ち主が替わる。
+create table public.push_tokens (
+  token text primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  updated_at timestamptz not null default now()
+);
+create index on public.push_tokens (user_id);
+
+-- 読み書きは register_push_token からだけ。送るのは service role の Edge Function。
+alter table public.push_tokens enable row level security;
+
+-- 端末のトークンを自分の送り先にする。前に別の人が使っていたトークンなら持ち主を替える。
+-- 他の人の行を書き換えるので、security definer にする。
+create function public.register_push_token(p_token text) returns void
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  if (select auth.uid()) is null then
+    raise exception 'not signed in';
+  end if;
+
+  insert into public.push_tokens (token, user_id)
+  values (p_token, (select auth.uid()))
+  on conflict (token) do update set user_id = excluded.user_id, updated_at = now();
+end;
+$$;
+
+revoke execute on function public.register_push_token(text) from public, anon;
+grant execute on function public.register_push_token(text) to authenticated;
