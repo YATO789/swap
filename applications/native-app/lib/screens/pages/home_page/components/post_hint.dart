@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../theme/app_theme.dart';
 
 /// ホームの書き込みバー（PostButton）に重ねる、鉛筆で書き込んだような説明。
-/// ペンを丸で囲んで「日記はここ！」、入力欄の上に括弧をかけて「いまをひとことシェア」と書く。
+/// ペンを丸で囲んで「日記はここ！」、入力欄の上に「いまをひとことシェア」と書いて矢印で指す。
 /// バーと同じ大きさに置き、はみ出してバーの上の余白に描く。タップは下に通す。
 /// 文字は Yomogi を使う文字だけに絞って入れているので、文言を変えたら
 /// assets/fonts/Yomogi-Hint.ttf も作り直す。
@@ -69,6 +69,7 @@ Rect _inputRect(Size size) => Rect.fromLTRB(
 );
 
 /// 鉛筆で引いた線。少しずらして2回なぞり、濃さにむらを出す。
+/// 文字より目立たないよう、文字より薄く引く。
 void _drawPencilLine(Canvas canvas, Path path, Color color) {
   final paint = Paint()
     ..style = PaintingStyle.stroke
@@ -77,13 +78,13 @@ void _drawPencilLine(Canvas canvas, Path path, Color color) {
   canvas.drawPath(
     path,
     paint
-      ..color = color.withValues(alpha: 0.55)
+      ..color = color.withValues(alpha: 0.33)
       ..strokeWidth = 1.7,
   );
   canvas.drawPath(
     path.shift(const Offset(0.6, 0.4)),
     paint
-      ..color = color.withValues(alpha: 0.4)
+      ..color = color.withValues(alpha: 0.24)
       ..strokeWidth = 1.1,
   );
 }
@@ -120,7 +121,7 @@ void _drawPencilText(
   painter.dispose();
 }
 
-/// 入力欄の上に括弧をかけ、その上に「いまをひとことシェア」と書く。
+/// 入力欄の上に「いまをひとことシェア」と書き、その右端から入力欄へ矢印を下ろす。
 class _PostHintPainter extends CustomPainter {
   const _PostHintPainter(this.color);
 
@@ -129,38 +130,40 @@ class _PostHintPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final input = _inputRect(size);
-    final top = input.top - 8;
-    final bracket = Path()
-      ..moveTo(input.left + 2, top)
+    Offset p(double dx, double dy) => input.topLeft + Offset(dx, dy);
+
+    _drawPencilText(canvas, 'いまをひとことシェア', p(18, -26), color, fontSize: 16);
+
+    // 文字の右から少しふくらませて、入力欄の上の縁へ下ろす。
+    final control = p(213, -20);
+    final tip = p(208, -3);
+    final shaft = Path()
+      ..moveTo(p(184, -33).dx, p(184, -33).dy)
       ..cubicTo(
-        input.left + 2,
-        top - 6,
-        input.left + 6,
-        top - 8,
-        input.left + 14,
-        top - 8,
-      )
-      ..lineTo(input.right - 14, top - 9)
-      ..cubicTo(
-        input.right - 6,
-        top - 9,
-        input.right - 4,
-        top - 6,
-        input.right - 4,
-        top,
+        p(204, -37).dx,
+        p(204, -37).dy,
+        control.dx,
+        control.dy,
+        tip.dx,
+        tip.dy,
       );
-    _drawPencilLine(canvas, bracket, color);
-    _drawPencilText(
-      canvas,
-      'いまをひとことシェア',
-      Offset(input.left + 18, top - 18),
-      color,
-      fontSize: 16,
-    );
+    _drawPencilLine(canvas, shaft, color);
+
+    // 矢じり。線の向きから左右に開いた短い線を引く。
+    final direction = (tip - control).direction;
+    final head = Path();
+    for (final spread in const [-0.5, 0.5]) {
+      final back = Offset.fromDirection(direction + math.pi + spread, 8);
+      head
+        ..moveTo(tip.dx + back.dx, tip.dy + back.dy)
+        ..lineTo(tip.dx, tip.dy);
+    }
+    _drawPencilLine(canvas, head, color);
   }
 
   @override
-  bool shouldRepaint(_PostHintPainter oldDelegate) => color != oldDelegate.color;
+  bool shouldRepaint(_PostHintPainter oldDelegate) =>
+      color != oldDelegate.color;
 }
 
 /// ペンをぐるっと丸で囲み、左上に「日記はここ！」と書いて線でつなぐ。
@@ -173,7 +176,7 @@ class _DiaryHintPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final c = _penRect(size).center;
     // ペンの中心からの位置。一筆で囲み、書き終わりを少し重ねる。
-    Offset p(double dx, double dy) => c + Offset(dx, dy) * 1.05;
+    Offset p(double dx, double dy) => c + Offset(dx, dy) * 0.95;
     Path curve(List<Offset> points) {
       final path = Path()..moveTo(points[0].dx, points[0].dy);
       for (var i = 1; i < points.length; i += 3) {
@@ -191,10 +194,19 @@ class _DiaryHintPainter extends CustomPainter {
 
     final circle = curve([
       p(29, -11),
-      p(39, 14), p(20, 39), p(-1, 37),
-      p(-26, 35), p(-32, 6), p(-22, -13),
-      p(-11, -33), p(22, -33), p(34, -14),
-      p(37, -7), p(36, -2), p(33, 3),
+      p(39, 14),
+      p(20, 39),
+      p(-1, 37),
+      // 左上はボタンの角に近いので、角にかからないよう外へふくらませる。
+      p(-30, 33),
+      p(-36, 6),
+      p(-29, -17),
+      p(-24, -38),
+      p(22, -36),
+      p(34, -14),
+      p(37, -7),
+      p(36, -2),
+      p(33, 3),
     ]);
     _drawPencilLine(canvas, circle, color);
 
