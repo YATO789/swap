@@ -1,6 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:swap/infrastructures/datasources/opened_notification_datasource.dart';
+import 'package:swap/infrastructures/datasources/firebase/opened_notification_datasource.dart';
 
 part '_generated/opened_notification_repository.g.dart';
 

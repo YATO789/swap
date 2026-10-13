@@ -55,4 +55,4 @@ final class PushTokenDatasourceProvider
 }
 
 String _$pushTokenDatasourceHash() =>
-    r'eb4db042289f347cf7dce45eb779a1c324ad67ae';
+    r'7d2ce5390a7635792e2d91d6843f773a53590ab1';

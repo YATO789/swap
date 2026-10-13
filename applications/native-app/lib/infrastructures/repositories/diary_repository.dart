@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary/diary.dart';
-import 'package:swap/infrastructures/datasources/diary_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary_datasource.dart';
 
 part '_generated/diary_repository.g.dart';
 

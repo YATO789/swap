@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/post/timeline_post.dart';
-import 'package:swap/infrastructures/datasources/post_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/post_datasource.dart';
 
 part '_generated/post_repository.g.dart';
 

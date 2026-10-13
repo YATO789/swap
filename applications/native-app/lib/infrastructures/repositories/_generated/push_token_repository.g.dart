@@ -52,7 +52,7 @@ final class PushTokenRepositoryProvider
 }
 
 String _$pushTokenRepositoryHash() =>
-    r'dab8dc18e5098b83396d8ed7ec1a1a91fa52be81';
+    r'bab5b8ef232d53cfb43a9e2f7866cdb0bcb682cf';
 
 /// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
 ///

@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/authentication/authentication.dart';
-import 'package:swap/infrastructures/datasources/authentication_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/authentication_datasource.dart';
 
 part '_generated/authentication_repository.g.dart';
 

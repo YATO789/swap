@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:swap/infrastructures/datasources/push_token_datasource.dart';
+import 'package:swap/infrastructures/datasources/firebase/messaging_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/push_token_datasource.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 
 part '_generated/push_token_repository.g.dart';
@@ -15,35 +16,36 @@ part '_generated/push_token_repository.g.dart';
 /// サインイン状態を追い続けるので、一度読んだら破棄しない。
 @Riverpod(keepAlive: true)
 class PushTokenRepository extends _$PushTokenRepository {
-  PushTokenDatasource get _datasource => ref.read(pushTokenDatasourceProvider);
+  MessagingDatasource get _messaging => ref.read(messagingDatasourceProvider);
+  PushTokenDatasource get _pushTokens => ref.read(pushTokenDatasourceProvider);
 
   @override
   Future<void> build() async {
     if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return;
 
     // onDispose の中では ref を使えないので、先に取り出しておく。
-    final datasource = _datasource;
-    final subscription = datasource.onTokenRefresh.listen(_register);
+    final messaging = _messaging;
+    final subscription = messaging.onTokenRefresh.listen(_register);
     ref.onDispose(() {
       subscription.cancel();
       // サインアウトしてサインイン状態が変わったときにここに来る。
-      unawaited(datasource.deleteToken().catchError(_logFailure));
+      unawaited(messaging.deleteToken().catchError(_logFailure));
     });
 
-    await _datasource.requestPermission();
-    final token = await _datasource.fetchToken();
+    await _messaging.requestPermission();
+    final token = await _messaging.fetchToken();
     if (token != null) await _register(token);
   }
 
   /// この端末を自分の送り先から外す。サーバーに聞く必要があるので、サインアウトする前に呼ぶ。
   Future<void> unregister() async {
-    final token = await _datasource.fetchToken();
-    if (token != null) await _datasource.unregister(token);
+    final token = await _messaging.fetchToken();
+    if (token != null) await _pushTokens.unregister(token);
   }
 
   Future<void> _register(String token) async {
     try {
-      await _datasource.register(token);
+      await _pushTokens.register(token);
     } on Object catch (e, stackTrace) {
       _logFailure(e, stackTrace);
     }

@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/profile/profile.dart';
-import 'package:swap/infrastructures/datasources/profile_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/profile_datasource.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 
 part '_generated/profile_repository.g.dart';
