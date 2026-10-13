@@ -3,6 +3,7 @@
 //
 // JWT なしで呼べるので、受け取るのは記録の id だけにして、中身は service role で DB から読む。
 // 同じ id で何度呼ばれても、post_notifications に入れられた最初の1回だけ送る。
+// 途中で失敗して1台にも送れなかったときは印を外すので、もう一度呼べば送り直せる。
 //
 // 環境変数 FIREBASE_SERVICE_ACCOUNT に、Firebase コンソールの「プロジェクトの設定 > サービス アカウント」で
 // 作った秘密鍵の JSON を1行にして（jq -c .）入れておく。
@@ -36,6 +37,27 @@ Deno.serve(async (req) => {
   if (claimError) return new Response(claimError.message, { status: 404 });
   if (claimed.length === 0) return new Response("already sent");
 
+  // 1台にも送れなかったときは印を外して、同じ id でもう一度呼べば送り直せるようにする。
+  try {
+    const { sent, failed } = await notify(postId);
+    if (sent === 0 && failed > 0) await unclaim(postId);
+    return new Response(`sent to ${sent}`);
+  } catch (e) {
+    await unclaim(postId);
+    throw e;
+  }
+});
+
+async function unclaim(postId: string) {
+  const { error } = await supabase
+    .from("post_notifications")
+    .delete()
+    .eq("post_id", postId);
+  if (error) console.error(`送った印を外せませんでした: ${error.message}`);
+}
+
+/** 記録を同じ日記帳の人の端末に送り、送れた台数と送れなかった台数を返す。 */
+async function notify(postId: string) {
   const { data: post, error: postError } = await supabase
     .from("posts")
     .select("message, author_id, profiles(display_name)")
@@ -45,7 +67,7 @@ Deno.serve(async (req) => {
 
   const recipients = await findRecipients(postId, post.author_id);
   const tokens = await findTokens([...recipients.keys()]);
-  if (tokens.length === 0) return new Response("no recipients");
+  if (tokens.length === 0) return { sent: 0, failed: 0 };
 
   // .env から読むと private_key の \n が本物の改行になり、そのままでは JSON として読めない。
   // JSON は1行で入れているので、改行は private_key の中にしかない。
@@ -76,8 +98,11 @@ Deno.serve(async (req) => {
     await supabase.from("push_tokens").delete().in("token", staleTokens);
   }
 
-  return new Response(`sent to ${results.filter((r) => r === "sent").length}`);
-});
+  return {
+    sent: results.filter((r) => r === "sent").length,
+    failed: results.filter((r) => r === "failed").length,
+  };
+}
 
 /**
  * 記録が出ている日記帳のメンバーのうち、通知を送る人。
