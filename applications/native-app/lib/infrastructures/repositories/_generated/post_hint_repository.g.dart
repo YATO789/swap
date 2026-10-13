@@ -8,21 +8,15 @@ part of '../post_hint_repository.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// ホームの書き込みバーに添える手書きの説明のうち、どれを出すか。
-/// 使い方が分かれば要らないので、記録したら入力欄の説明を、
-/// 日記を書くページを開いたらペンの説明を、それぞれ消す。
+/// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
 
 @ProviderFor(PostHintRepository)
 final postHintRepositoryProvider = PostHintRepositoryProvider._();
 
-/// ホームの書き込みバーに添える手書きの説明のうち、どれを出すか。
-/// 使い方が分かれば要らないので、記録したら入力欄の説明を、
-/// 日記を書くページを開いたらペンの説明を、それぞれ消す。
+/// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
 final class PostHintRepositoryProvider
-    extends $NotifierProvider<PostHintRepository, ({bool diary, bool post})> {
-  /// ホームの書き込みバーに添える手書きの説明のうち、どれを出すか。
-  /// 使い方が分かれば要らないので、記録したら入力欄の説明を、
-  /// 日記を書くページを開いたらペンの説明を、それぞれ消す。
+    extends $NotifierProvider<PostHintRepository, bool> {
+  /// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
   PostHintRepositoryProvider._()
     : super(
         from: null,
@@ -42,34 +36,30 @@ final class PostHintRepositoryProvider
   PostHintRepository create() => PostHintRepository();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(({bool diary, bool post}) value) {
+  Override overrideWithValue(bool value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<({bool diary, bool post})>(value),
+      providerOverride: $SyncValueProvider<bool>(value),
     );
   }
 }
 
 String _$postHintRepositoryHash() =>
-    r'add2a7a37af9b5ea2c8babe7d624a2b3c6d4f90a';
+    r'86b480075174ecdccdf9505dc5d1ec7c3facdf7e';
 
-/// ホームの書き込みバーに添える手書きの説明のうち、どれを出すか。
-/// 使い方が分かれば要らないので、記録したら入力欄の説明を、
-/// 日記を書くページを開いたらペンの説明を、それぞれ消す。
+/// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
 
-abstract class _$PostHintRepository
-    extends $Notifier<({bool diary, bool post})> {
-  ({bool diary, bool post}) build();
+abstract class _$PostHintRepository extends $Notifier<bool> {
+  bool build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref =
-        this.ref as $Ref<({bool diary, bool post}), ({bool diary, bool post})>;
+    final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<({bool diary, bool post}), ({bool diary, bool post})>,
-              ({bool diary, bool post}),
+              AnyNotifier<bool, bool>,
+              bool,
               Object?,
               Object?
             >;

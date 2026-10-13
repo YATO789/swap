@@ -34,7 +34,7 @@ class HomePage extends HookConsumerWidget {
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
-    final postHint = ref.watch(postHintRepositoryProvider);
+    final showPostHint = ref.watch(postHintRepositoryProvider);
     // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
     ref.listen(pushTokenRepositoryProvider, (_, _) {});
@@ -164,24 +164,14 @@ class HomePage extends HookConsumerWidget {
         ),
       },
       // 日記帳に1冊も入っていないうちは、書いても見せる相手がいないので出さない。
-      // 使い始めのうちは、入力欄とペンに手書きの説明を重ねる。
+      // 入力欄とペンに手書きの説明を重ねる。設定画面で消せる。
       bottomNavigationBar: diaryBooks.isEmpty
           ? null
           : Stack(
               clipBehavior: Clip.none,
               children: [
-                PostButton(
-                  onPosted: ref.read(postHintRepositoryProvider.notifier).posted,
-                  onDiaryClosed: ref
-                      .read(postHintRepositoryProvider.notifier)
-                      .diaryOpened,
-                ),
-                Positioned.fill(
-                  child: PostHint(
-                    showPost: postHint.post,
-                    showDiary: postHint.diary,
-                  ),
-                ),
+                const PostButton(),
+                Positioned.fill(child: PostHint(visible: showPostHint)),
               ],
             ),
     );

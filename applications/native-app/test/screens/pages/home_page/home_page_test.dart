@@ -7,6 +7,7 @@ import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
+import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
 import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_grid_repository.dart';
@@ -28,12 +29,7 @@ const _diaryBooks = [
     memberCount: 5,
     coverColor: 0xFF2F3E5C,
   ),
-  DiaryBook(
-    id: 'company',
-    name: '会社',
-    inviteCode: 'WRK731',
-    memberCount: 8,
-  ),
+  DiaryBook(id: 'company', name: '会社', inviteCode: 'WRK731', memberCount: 8),
 ];
 
 List<Override> _overrides(
@@ -86,6 +82,7 @@ Future<void> _pumpHomeWithRouter(
       overrides: [
         postDiaryBookStoreProvider.overrideWithValue(FakePostDiaryBookStore()),
         diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
+        postHintStoreProvider.overrideWithValue(FakePostHintStore()),
         ..._overrides(_diaryBooks, notifications: notifications),
       ],
       child: MaterialApp.router(theme: buildLightTheme(), routerConfig: router),

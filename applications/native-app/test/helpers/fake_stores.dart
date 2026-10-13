@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
+import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
 import 'package:swap/infrastructures/datasources/stores/theme_mode_store.dart';
 
 /// 端末に保存せず、選んだ日記帳をメモリに覚えておく。
@@ -28,6 +29,21 @@ class FakeDiaryBookGridStore implements DiaryBookGridStore {
   @override
   Future<void> save(bool grid) async {
     this.grid = grid;
+  }
+}
+
+/// 端末に保存せず、書き込みバーの説明を出すかをメモリに覚えておく。
+class FakePostHintStore implements PostHintStore {
+  FakePostHintStore({this.visible = true});
+
+  bool visible;
+
+  @override
+  bool read() => visible;
+
+  @override
+  Future<void> save(bool visible) async {
+    this.visible = visible;
   }
 }
 

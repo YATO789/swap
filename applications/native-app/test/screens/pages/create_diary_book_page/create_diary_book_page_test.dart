@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
+import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
@@ -37,6 +38,7 @@ Future<void> _pumpHome(
     ProviderScope(
       overrides: [
         diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
+        postHintStoreProvider.overrideWithValue(FakePostHintStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),

@@ -39,8 +39,7 @@ Future<void> main() async {
         postDiaryBookIdsKey,
         diaryBookGridKey,
         themeModeKey,
-        postHintPostedKey,
-        postHintDiaryOpenedKey,
+        postHintVisibleKey,
       },
     ),
   );

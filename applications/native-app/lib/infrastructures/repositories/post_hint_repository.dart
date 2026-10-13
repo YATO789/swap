@@ -3,28 +3,17 @@ import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
 
 part '_generated/post_hint_repository.g.dart';
 
-/// ホームの書き込みバーに添える手書きの説明のうち、どれを出すか。
-/// 使い方が分かれば要らないので、記録したら入力欄の説明を、
-/// 日記を書くページを開いたらペンの説明を、それぞれ消す。
+/// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
 @Riverpod(keepAlive: true)
 class PostHintRepository extends _$PostHintRepository {
   PostHintStore get _store => ref.read(postHintStoreProvider);
 
   @override
-  ({bool post, bool diary}) build() =>
-      (post: !_store.readPosted(), diary: !_store.readDiaryOpened());
+  bool build() => _store.read();
 
-  /// 記録したので、入力欄の説明を消す。
-  Future<void> posted() async {
-    if (!state.post) return;
-    state = (post: false, diary: state.diary);
-    await _store.savePosted();
-  }
-
-  /// 日記を書くページを開いたので、ペンの説明を消す。
-  Future<void> diaryOpened() async {
-    if (!state.diary) return;
-    state = (post: state.post, diary: false);
-    await _store.saveDiaryOpened();
+  /// 説明を出すかを [visible] にして保存する。
+  Future<void> save(bool visible) async {
+    state = visible;
+    await _store.save(visible);
   }
 }

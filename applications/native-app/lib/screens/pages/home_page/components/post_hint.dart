@@ -10,15 +10,10 @@ import '../../../../theme/app_theme.dart';
 /// 文字は Yomogi を使う文字だけに絞って入れているので、文言を変えたら
 /// assets/fonts/Yomogi-Hint.ttf も作り直す。
 class PostHint extends StatelessWidget {
-  const PostHint({super.key, required this.showPost, required this.showDiary});
+  const PostHint({super.key, required this.visible});
 
-  /// 入力欄の説明を出すか。
-  final bool showPost;
-
-  /// ペンの説明を出すか。
-  final bool showDiary;
-
-  static const _duration = Duration(milliseconds: 300);
+  /// 説明を出すか。
+  final bool visible;
 
   @override
   Widget build(BuildContext context) {
@@ -26,21 +21,17 @@ class PostHint extends StatelessWidget {
 
     return IgnorePointer(
       child: ExcludeSemantics(
-        child: Stack(
-          fit: StackFit.expand,
-          clipBehavior: Clip.none,
-          children: [
-            AnimatedOpacity(
-              opacity: showPost ? 1 : 0,
-              duration: _duration,
-              child: CustomPaint(painter: _PostHintPainter(color)),
-            ),
-            AnimatedOpacity(
-              opacity: showDiary ? 1 : 0,
-              duration: _duration,
-              child: CustomPaint(painter: _DiaryHintPainter(color)),
-            ),
-          ],
+        child: AnimatedOpacity(
+          opacity: visible ? 1 : 0,
+          duration: const Duration(milliseconds: 300),
+          child: Stack(
+            fit: StackFit.expand,
+            clipBehavior: Clip.none,
+            children: [
+              CustomPaint(painter: _PostHintPainter(color)),
+              CustomPaint(painter: _DiaryHintPainter(color)),
+            ],
+          ),
         ),
       ),
     );

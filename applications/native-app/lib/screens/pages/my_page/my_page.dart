@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../domains/diary/diary.dart';
 import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
+import '../../../infrastructures/repositories/post_hint_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/theme_mode_repository.dart';
 import '../../../theme/app_theme.dart';
@@ -30,6 +31,7 @@ class MyPage extends HookConsumerWidget {
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
     final diaryBookGrid = ref.watch(diaryBookGridRepositoryProvider);
     final themeMode = ref.watch(themeModeRepositoryProvider);
+    final showPostHint = ref.watch(postHintRepositoryProvider);
 
     // pubspec.yaml の version（ビルド番号を除く）。読み込むまでは空にしておく。
     final packageInfo = useFuture(useMemoized(PackageInfo.fromPlatform));
@@ -115,6 +117,19 @@ class MyPage extends HookConsumerWidget {
               ),
             ),
             onTap: pickThemeMode,
+          ),
+          SwitchListTile(
+            contentPadding: _tilePadding,
+            title: const Text('書き込みバーの説明', style: _titleStyle),
+            subtitle: Text(
+              'ホームの入力欄とペンに、手書きの説明を添えます',
+              style: TextStyle(
+                fontSize: 12,
+                color: context.appColors.textSecondary,
+              ),
+            ),
+            value: showPostHint,
+            onChanged: ref.read(postHintRepositoryProvider.notifier).save,
           ),
           const _SectionHeader('日記'),
           const _InfoTile(

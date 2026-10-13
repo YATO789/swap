@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
+import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
 import 'package:swap/infrastructures/datasources/stores/theme_mode_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
@@ -22,6 +23,7 @@ import '../../../helpers/fake_stores.dart';
 Future<void> _openMyPage(
   WidgetTester tester, {
   FakeDiaryBookGridStore? gridStore,
+  FakePostHintStore? postHintStore,
   FakePushTokenRepository? pushTokenRepository,
 }) async {
   await tester.pumpWidget(
@@ -29,6 +31,9 @@ Future<void> _openMyPage(
       overrides: [
         diaryBookGridStoreProvider.overrideWithValue(
           gridStore ?? FakeDiaryBookGridStore(),
+        ),
+        postHintStoreProvider.overrideWithValue(
+          postHintStore ?? FakePostHintStore(),
         ),
         themeModeStoreProvider.overrideWithValue(FakeThemeModeStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
@@ -78,6 +83,21 @@ void main() {
     await tester.tap(find.bySemanticsLabel('リスト'));
     await tester.pumpAndSettle();
     expect(gridStore.grid, isFalse);
+  });
+
+  testWidgets('書き込みバーの説明のスイッチを切り替えると、保存する', (tester) async {
+    final postHintStore = FakePostHintStore();
+    await _openMyPage(tester, postHintStore: postHintStore);
+    final hintSwitch = find.widgetWithText(SwitchListTile, '書き込みバーの説明');
+    await tester.scrollUntilVisible(hintSwitch, 200);
+
+    await tester.tap(hintSwitch);
+    await tester.pumpAndSettle();
+    expect(postHintStore.visible, isFalse);
+
+    await tester.tap(hintSwitch);
+    await tester.pumpAndSettle();
+    expect(postHintStore.visible, isTrue);
   });
 
   testWidgets('ログアウトを確かめると、通知の送り先から外してウェルカム画面に戻る', (tester) async {
