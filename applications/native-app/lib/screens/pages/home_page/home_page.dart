@@ -39,6 +39,17 @@ class HomePage extends HookConsumerWidget {
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
     ref.listen(pushTokenRepositoryProvider, (_, _) {});
 
+    // アプリを開いたら、通知の未読数を 0 に戻す。ホームはサインインしている間ずっと一番下にある。
+    void resetUnreadCount() =>
+        ref.read(pushTokenRepositoryProvider.notifier).resetUnreadCount();
+    useEffect(() {
+      resetUnreadCount();
+      return null;
+    }, const []);
+    useOnAppLifecycleStateChange((_, state) {
+      if (state == AppLifecycleState.resumed) resetUnreadCount();
+    });
+
     void openDiaryBook(DiaryBook diaryBook) =>
         DiaryBookRoute(id: diaryBook.id).push<void>(context);
 

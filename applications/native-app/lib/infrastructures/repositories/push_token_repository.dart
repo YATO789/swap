@@ -43,6 +43,17 @@ class PushTokenRepository extends _$PushTokenRepository {
     if (token != null) await _pushTokens.unregister(token);
   }
 
+  /// アプリを開いたら呼び、この端末の未読数を 0 に戻す。アイコンのバッジは iOS 側（SceneDelegate）で消す。
+  Future<void> resetUnreadCount() async {
+    if (!ref.read(authenticationRepositoryProvider).isLoginApp) return;
+    try {
+      final token = await _messaging.fetchToken();
+      if (token != null) await _pushTokens.resetUnreadCount(token);
+    } on Object catch (e, stackTrace) {
+      _logFailure(e, stackTrace);
+    }
+  }
+
   Future<void> _register(String token) async {
     try {
       await _pushTokens.register(token);

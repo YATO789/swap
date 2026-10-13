@@ -29,4 +29,12 @@ class PushTokenDatasource {
       params: {'p_token': token},
     );
   }
+
+  /// [token] の端末の未読数を 0 に戻す。次の通知のバッジは 1 から数え直す。
+  Future<void> resetUnreadCount(String token) async {
+    await _client.rpc<void>(
+      'reset_push_unread_count',
+      params: {'p_token': token},
+    );
+  }
 }

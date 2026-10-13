@@ -75,6 +75,7 @@ async function notify(postId: string) {
     Deno.env.get("FIREBASE_SERVICE_ACCOUNT")!.replaceAll("\n", "\\n"),
   );
   const accessToken = await fetchAccessToken(serviceAccount);
+  const unreadCounts = await incrementUnreadCounts(tokens.map((t) => t.token));
   const results = await Promise.all(
     tokens.map(({ token, user_id: userId }) =>
       send(serviceAccount.project_id, accessToken, {
@@ -85,7 +86,11 @@ async function notify(postId: string) {
         },
         // 通知を開いたときに、その記録が出ている日記帳へ移れるようにする。
         data: { post_id: postId, diary_book_id: recipients.get(userId)! },
-        apns: { payload: { aps: { sound: "default" } } },
+        apns: {
+          payload: {
+            aps: { sound: "default", badge: unreadCounts.get(token) ?? 1 },
+          },
+        },
       })
     ),
   );
@@ -149,6 +154,20 @@ async function findTokens(userIds: string[]) {
     .in("user_id", userIds);
   if (error) throw error;
   return data;
+}
+
+/** 端末ごとの未読数を1つ増やし、バッジに出す数を返す。 */
+async function incrementUnreadCounts(tokens: string[]) {
+  const { data, error } = await supabase.rpc("increment_push_unread_counts", {
+    p_tokens: tokens,
+  });
+  if (error) throw error;
+  return new Map<string, number>(
+    data.map((r: { token: string; unread_count: number }) => [
+      r.token,
+      r.unread_count,
+    ]),
+  );
 }
 
 async function fetchAccessToken(serviceAccount: ServiceAccount) {
