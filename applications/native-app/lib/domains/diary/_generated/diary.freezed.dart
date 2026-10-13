@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Diary {
 
- String get id; String get authorId; DateTime get date; DateTime get writtenAt;/// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
+ String get id; String get authorId;/// どの日の日記か（年月日のみ）。朝4時区切りなので、深夜に書いたものは前日になる。
+ DateTime get date;/// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
+ DateTime get writtenAt;/// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
  String? get title; String? get body;
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
@@ -223,7 +225,9 @@ class _Diary extends Diary {
 
 @override final  String id;
 @override final  String authorId;
+/// どの日の日記か（年月日のみ）。朝4時区切りなので、深夜に書いたものは前日になる。
 @override final  DateTime date;
+/// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
 @override final  DateTime writtenAt;
 /// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
 @override final  String? title;

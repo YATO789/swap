@@ -10,7 +10,9 @@ abstract class Diary with _$Diary {
   const factory Diary({
     required String id,
     required String authorId,
+    /// どの日の日記か（年月日のみ）。朝4時区切りなので、深夜に書いたものは前日になる。
     required DateTime date,
+    /// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
     required DateTime writtenAt,
 
     /// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
