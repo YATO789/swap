@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,6 +10,7 @@ import 'firebase_options_dev.dart' as dev;
 import 'firebase_options_prod.dart' as prod;
 import 'infrastructures/datasources/stores/diary_book_grid_store.dart';
 import 'infrastructures/datasources/stores/post_diary_book_store.dart';
+import 'infrastructures/datasources/stores/post_hint_store.dart';
 import 'infrastructures/datasources/stores/shared_preferences_store.dart';
 import 'infrastructures/datasources/stores/theme_mode_store.dart';
 import 'infrastructures/repositories/theme_mode_repository.dart';
@@ -17,6 +19,12 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 同梱したフォントのライセンスを、ライセンスの一覧に載せる。
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('assets/fonts/Yomogi-OFL.txt');
+    yield LicenseEntryWithLineBreaks(['Yomogi'], license);
+  });
 
   await Firebase.initializeApp(options: _firebaseOptions());
 
@@ -27,7 +35,13 @@ Future<void> main() async {
 
   final preferences = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {postDiaryBookIdsKey, diaryBookGridKey, themeModeKey},
+      allowList: {
+        postDiaryBookIdsKey,
+        diaryBookGridKey,
+        themeModeKey,
+        postHintPostedKey,
+        postHintDiaryOpenedKey,
+      },
     ),
   );
 

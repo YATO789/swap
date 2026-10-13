@@ -87,6 +87,14 @@ flutter:
   assets:
     - assets/icons/swap_title.png
     - assets/icons/app_icon_mint.png
+    - assets/fonts/Yomogi-OFL.txt
+
+  # ホームの書き込みバーに添える手書きの説明に使う。使う文字だけに絞ってある。
+  # 文言を変えたら pyftsubset Yomogi-Regular.ttf --text=<文字> で作り直す。
+  fonts:
+    - family: YomogiHint
+      fonts:
+        - asset: assets/fonts/Yomogi-Hint.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

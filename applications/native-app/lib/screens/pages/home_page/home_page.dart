@@ -7,6 +7,7 @@ import '../../../domains/diary_book/diary_book.dart';
 import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/opened_notification_repository.dart';
+import '../../../infrastructures/repositories/post_hint_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/push_token_repository.dart';
 import '../../../theme/app_theme.dart';
@@ -14,6 +15,7 @@ import 'components/add_diary_book_sheet.dart';
 import 'components/empty_diary_books.dart';
 import '../../components/invite_sheet.dart';
 import 'components/join_diary_book_sheet/join_diary_book_sheet.dart';
+import 'components/post_hint.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
@@ -32,6 +34,7 @@ class HomePage extends HookConsumerWidget {
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
+    final postHint = ref.watch(postHintRepositoryProvider);
     // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
     ref.listen(pushTokenRepositoryProvider, (_, _) {});
@@ -161,7 +164,26 @@ class HomePage extends HookConsumerWidget {
         ),
       },
       // 日記帳に1冊も入っていないうちは、書いても見せる相手がいないので出さない。
-      bottomNavigationBar: diaryBooks.isEmpty ? null : const PostButton(),
+      // 使い始めのうちは、入力欄とペンに手書きの説明を重ねる。
+      bottomNavigationBar: diaryBooks.isEmpty
+          ? null
+          : Stack(
+              clipBehavior: Clip.none,
+              children: [
+                PostButton(
+                  onPosted: ref.read(postHintRepositoryProvider.notifier).posted,
+                  onDiaryClosed: ref
+                      .read(postHintRepositoryProvider.notifier)
+                      .diaryOpened,
+                ),
+                Positioned.fill(
+                  child: PostHint(
+                    showPost: postHint.post,
+                    showDiary: postHint.diary,
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }
