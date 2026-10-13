@@ -10,11 +10,7 @@ abstract class Diary with _$Diary {
   const factory Diary({
     required String id,
     required String authorId,
-
-    /// 日記の日付（年月日のみ）。
     required DateTime date,
-
-    /// 最初に書いた時刻。編集しても変わらない。
     required DateTime writtenAt,
 
     /// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。

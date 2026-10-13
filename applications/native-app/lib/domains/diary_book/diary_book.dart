@@ -8,15 +8,10 @@ abstract class DiaryBook with _$DiaryBook {
   const factory DiaryBook({
     required String id,
     required String name,
-
-    /// 友達をこの日記帳に招待するためのコード。受け取った人が入力すると参加できる。
     required String inviteCode,
     required int memberCount,
-
     /// 日記帳を作った人の id。メンバーを外せるのはこの人だけ。アカウントを消していれば null。
     String? createdBy,
-
-    /// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
     int? coverColor,
   }) = _DiaryBook;
 }

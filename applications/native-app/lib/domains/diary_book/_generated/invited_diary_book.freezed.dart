@@ -15,10 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$InvitedDiaryBook {
 
- String get id; String get name;/// 参加している人の表示名。参加した順。
- List<String> get memberNames;/// 自分がもう参加しているか。
- bool get alreadyJoined;/// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
- int? get coverColor;
+ String get id; String get name; List<String> get memberNames;/// 自分がもう参加しているか。
+ bool get alreadyJoined; int? get coverColor;
 /// Create a copy of InvitedDiaryBook
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -224,9 +222,7 @@ class _InvitedDiaryBook extends InvitedDiaryBook {
 
 @override final  String id;
 @override final  String name;
-/// 参加している人の表示名。参加した順。
  final  List<String> _memberNames;
-/// 参加している人の表示名。参加した順。
 @override List<String> get memberNames {
   if (_memberNames is EqualUnmodifiableListView) return _memberNames;
   // ignore: implicit_dynamic_type
@@ -235,7 +231,6 @@ class _InvitedDiaryBook extends InvitedDiaryBook {
 
 /// 自分がもう参加しているか。
 @override final  bool alreadyJoined;
-/// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
 @override final  int? coverColor;
 
 /// Create a copy of InvitedDiaryBook

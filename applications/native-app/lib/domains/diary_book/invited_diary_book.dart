@@ -10,14 +10,9 @@ abstract class InvitedDiaryBook with _$InvitedDiaryBook {
   const factory InvitedDiaryBook({
     required String id,
     required String name,
-
-    /// 参加している人の表示名。参加した順。
     required List<String> memberNames,
-
     /// 自分がもう参加しているか。
     required bool alreadyJoined,
-
-    /// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
     int? coverColor,
   }) = _InvitedDiaryBook;
 

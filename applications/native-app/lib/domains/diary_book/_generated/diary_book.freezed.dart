@@ -15,10 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DiaryBook {
 
- String get id; String get name;/// 友達をこの日記帳に招待するためのコード。受け取った人が入力すると参加できる。
- String get inviteCode; int get memberCount;/// 日記帳を作った人の id。メンバーを外せるのはこの人だけ。アカウントを消していれば null。
- String? get createdBy;/// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
- int? get coverColor;
+ String get id; String get name; String get inviteCode; int get memberCount;/// 日記帳を作った人の id。メンバーを外せるのはこの人だけ。アカウントを消していれば null。
+ String? get createdBy; int? get coverColor;
 /// Create a copy of DiaryBook
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -225,12 +223,10 @@ class _DiaryBook implements DiaryBook {
 
 @override final  String id;
 @override final  String name;
-/// 友達をこの日記帳に招待するためのコード。受け取った人が入力すると参加できる。
 @override final  String inviteCode;
 @override final  int memberCount;
 /// 日記帳を作った人の id。メンバーを外せるのはこの人だけ。アカウントを消していれば null。
 @override final  String? createdBy;
-/// 日記帳の表紙の色（0xAARRGGBB）。null なら決まったグレーにする。
 @override final  int? coverColor;
 
 /// Create a copy of DiaryBook
