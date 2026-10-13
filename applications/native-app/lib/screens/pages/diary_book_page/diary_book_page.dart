@@ -29,8 +29,16 @@ class DiaryBookPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final today = diaryDateOf(DateTime.now());
-    final date = useState(today);
+    // 開いたまま朝4時を過ぎても今日が変わるよう、読み直したときとアプリに戻ったときに今日を確かめ直す。
+    final todayState = useState(diaryDateOf(DateTime.now()));
+    final today = todayState.value;
+    void catchUpToday() => todayState.value = diaryDateOf(DateTime.now());
+    useOnAppLifecycleStateChange((_, state) {
+      if (state == AppLifecycleState.resumed) catchUpToday();
+    });
+    // カレンダーで選んだ日。null なら今日を見ていて、日付が変わったら新しい今日に移る。
+    final pickedDate = useState<DateTime?>(null);
+    final date = pickedDate.value ?? today;
     final notifiedRemoval = useRef(false);
 
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
@@ -53,7 +61,7 @@ class DiaryBookPage extends HookConsumerWidget {
       );
     }
 
-    final provider = diaryBookPageControllerProvider(diaryBookId, date.value);
+    final provider = diaryBookPageControllerProvider(diaryBookId, date);
     final pageState = ref.watch(provider);
     DiaryBookPageController controller() => ref.read(provider.notifier);
 
@@ -84,10 +92,18 @@ class DiaryBookPage extends HookConsumerWidget {
     Future<void> pickDate() async {
       final picked = await showTimelineCalendar(
         context,
-        date: date.value,
+        date: date,
         fetchMarkedDates: controller().fetchMarkedDates,
       );
-      if (picked != null) date.value = picked;
+      if (picked == null) return;
+      pickedDate.value = picked == today ? null : picked;
+    }
+
+    // 引っ張って読み直したとき、今日を見ていて日付が変わっていれば、新しい今日を読む。
+    Future<void> refresh() async {
+      catchUpToday();
+      if (pickedDate.value == null && todayState.value != today) return;
+      await controller().refresh();
     }
 
     // 日記を読んだり書いたりしたページから戻ったら、編集や削除を映すため読み直す。
@@ -134,7 +150,7 @@ class DiaryBookPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: DatedTitle(title: diaryBook.name, date: date.value),
+        title: DatedTitle(title: diaryBook.name, date: date),
         actions: [
           IconButton(
             onPressed: pickDate,
@@ -151,12 +167,12 @@ class DiaryBookPage extends HookConsumerWidget {
       ),
       body: switch (pageState) {
         AsyncValue(:final value?, hasError: false) => TimelineView(
-          date: date.value,
+          date: date,
           myId: myId,
           members: value.members,
           diaries: value.diaries,
           posts: value.posts,
-          onRefresh: () => controller().refresh(),
+          onRefresh: refresh,
           onRecord: record,
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
@@ -178,8 +194,8 @@ class DiaryBookPage extends HookConsumerWidget {
       // 見ている日が今日か昨日なら、日記はその日のものを書く。
       bottomNavigationBar: PostButton(
         diaryBook: diaryBook,
-        diaryDate: isEditableDiaryDate(date.value, today: today)
-            ? date.value
+        diaryDate: isEditableDiaryDate(date, today: today)
+            ? date
             : null,
         onPosted: () => controller().reloadPosts(),
         onDiaryClosed: () => controller().refresh(),
