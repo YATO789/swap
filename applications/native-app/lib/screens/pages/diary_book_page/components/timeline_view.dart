@@ -357,7 +357,7 @@ class _MemberCard extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        if (posts.isEmpty && !isMe) ...[
+                        if (posts.isEmpty) ...[
                           const SizedBox(height: 2),
                           Text(
                             'まだ記録がありません',

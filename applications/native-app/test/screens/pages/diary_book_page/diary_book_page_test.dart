@@ -148,7 +148,8 @@ void main() {
     // 今日を見ているので、今の時間の欄にメンバー全員が出る。
     expect(find.text('美緒'), findsOneWidget);
     expect(find.text('健太'), findsOneWidget);
-    expect(find.text('まだ記録がありません'), findsNWidgets(2));
+    // 自分もまだ記録していなければ、ほかの人と同じく「まだ記録がありません」と出す。
+    expect(find.text('まだ記録がありません'), findsNWidgets(3));
 
     await tester.tap(find.widgetWithText(FilledButton, '記録'));
     await tester.pumpAndSettle();
