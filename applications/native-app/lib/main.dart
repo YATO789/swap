@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,7 +17,9 @@ import 'screens/pages/router/router.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  // 最初の画面が中身を出せるまで、起動直後の画面を出したままにする。消すのは MyApp。
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
 
   // 同梱したフォントのライセンスを、ライセンスの一覧に載せる。
   LicenseRegistry.addLicense(() async* {
@@ -53,11 +57,21 @@ FirebaseOptions _firebaseOptions() {
   };
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends HookConsumerWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      final subscription = ref.listenManual(firstScreenReadyProvider, (
+        _,
+        ready,
+      ) {
+        if (ready) FlutterNativeSplash.remove();
+      }, fireImmediately: true);
+      return subscription.close;
+    }, const []);
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),

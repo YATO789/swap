@@ -440,3 +440,61 @@ final class RouterProvider
 }
 
 String _$routerHash() => r'5dc359df1029565959ce9abbab78bc4149b610c0';
+
+/// 起動直後の画面を消して、最初の画面を見せてよいか。
+///
+/// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
+/// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
+/// 読めなかったときは、やり直すボタンを見せるために消す。
+
+@ProviderFor(firstScreenReady)
+final firstScreenReadyProvider = FirstScreenReadyProvider._();
+
+/// 起動直後の画面を消して、最初の画面を見せてよいか。
+///
+/// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
+/// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
+/// 読めなかったときは、やり直すボタンを見せるために消す。
+
+final class FirstScreenReadyProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  /// 起動直後の画面を消して、最初の画面を見せてよいか。
+  ///
+  /// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
+  /// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
+  /// 読めなかったときは、やり直すボタンを見せるために消す。
+  FirstScreenReadyProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'firstScreenReadyProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$firstScreenReadyHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return firstScreenReady(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$firstScreenReadyHash() => r'803e753abced2051b6e57b3cd36a1fb493d87302';

@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
 import '../create_diary_book_page/create_diary_book_page.dart';
@@ -78,6 +79,24 @@ GoRouter router(Ref ref) {
     refresh.dispose();
   });
   return router;
+}
+
+/// 起動直後の画面を消して、最初の画面を見せてよいか。
+///
+/// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
+/// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
+/// 読めなかったときは、やり直すボタンを見せるために消す。
+@riverpod
+bool firstScreenReady(Ref ref) {
+  if (ref.watch(appUpdateRepositoryProvider).value == AppUpdate.required) {
+    return true;
+  }
+  if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return true;
+  final profile = ref.watch(profileRepositoryProvider);
+  if (profile.hasError) return true;
+  if (profile.isLoading) return false;
+  if (profile.value == null) return true;
+  return !ref.watch(diaryBookRepositoryProvider).isLoading;
 }
 
 /// 日付を URL に `2026-10-13` の形で載せる。

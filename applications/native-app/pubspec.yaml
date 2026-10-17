@@ -51,6 +51,7 @@ dependencies:
   firebase_messaging: ^16.7.0
   url_launcher: ^6.3.3
   firebase_remote_config: ^6.7.0
+  flutter_native_splash: ^2.4.8
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +78,21 @@ flutter_launcher_icons:
   # アダプティブアイコンは中央しか見えないので、縮めた前景を地色に載せる。
   adaptive_icon_background: "#38D9A9"
   adaptive_icon_foreground: assets/icons/app_icon_mint_foreground.png
+
+# `fvm dart run flutter_native_splash:create` で起動直後の画面を作り直す。
+# 背景はアプリのテーマの surface にそろえ、ダークモードで白く光らないようにする。
+flutter_native_splash:
+  color: "#FFFFFF"
+  color_dark: "#121212"
+  image: assets/icons/swap_title.png
+  image_dark: assets/icons/swap_title.png
+  # Android 12 以降は画像を丸く切り抜くので、横長のタイトルではなく丸に収まるアイコンの前景を使う。
+  android_12:
+    color: "#FFFFFF"
+    color_dark: "#121212"
+    image: assets/icons/app_icon_mint_foreground.png
+    image_dark: assets/icons/app_icon_mint_foreground.png
+  fullscreen: false
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
