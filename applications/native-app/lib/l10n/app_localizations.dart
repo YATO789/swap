@@ -596,6 +596,12 @@ abstract class AppLocalizations {
   /// **'タイトルなし'**
   String get diarySectionUntitled;
 
+  /// No description provided for @diarySectionAuthor.
+  ///
+  /// In ja, this message translates to:
+  /// **'{name} の日記'**
+  String diarySectionAuthor(String name);
+
   /// No description provided for @diarySectionLockedPast.
   ///
   /// In ja, this message translates to:

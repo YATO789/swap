@@ -78,16 +78,6 @@ class DiarySection extends StatelessWidget {
   }
 }
 
-const _previewFontSize = 15.0;
-const _previewLineHeight = 1.5;
-
-/// タイトルも本文も1行の高さをぴったり同じにして、カードの高さを揃える。
-const _previewStrut = StrutStyle(
-  fontSize: _previewFontSize,
-  height: _previewLineHeight,
-  forceStrutHeight: true,
-);
-
 /// 日記の冒頭を表示するカード。タップで全文を開く。
 class _DiaryCard extends StatelessWidget {
   const _DiaryCard({
@@ -108,6 +98,7 @@ class _DiaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final title = diary.title ?? '';
+    final body = diary.body ?? '';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -115,70 +106,44 @@ class _DiaryCard extends StatelessWidget {
         color: colors.surface,
         shape: RoundedRectangleBorder(
           side: BorderSide(color: colors.border),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                UserAvatar(name: name, filled: isMine, color: avatarColor),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _CardHeader(name: name, writtenAt: diary.writtenAt),
-                      const SizedBox(height: 4),
-                      // 冒頭だけ見せて、続きはタップした詳細で読む。
-                      // タイトル1行と本文1行にして、本文が短くてもカードの高さを2行ぶんに揃える。
-                      // タイトルがなければ「タイトルなし」を灰色で出して見た目を揃える。
-                      // 行の高さは端数が丸められるので、決め打ちの高さにはせず最低限の高さにする。
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight:
-                              MediaQuery.textScalerOf(context)
-                                  .scale(_previewFontSize) *
-                              _previewLineHeight *
-                              2,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title.isNotEmpty
-                                  ? title
-                                  : context.l10n.diarySectionUntitled,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              strutStyle: _previewStrut,
-                              style: TextStyle(
-                                fontSize: _previewFontSize,
-                                height: _previewLineHeight,
-                                fontWeight: FontWeight.w700,
-                                color: title.isNotEmpty
-                                    ? null
-                                    : colors.disabled,
-                              ),
-                            ),
-                            Text(
-                              diary.body ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              strutStyle: _previewStrut,
-                              style: const TextStyle(
-                                fontSize: _previewFontSize,
-                                height: _previewLineHeight,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                _CardHeader(
+                  name: name,
+                  avatarColor: avatarColor,
+                  isMine: isMine,
+                ),
+                const SizedBox(height: 10),
+                // 冒頭だけ見せて、続きはタップした詳細で読む。
+                // タイトルがなければ「タイトルなし」を灰色で出して見た目を揃える。
+                Text(
+                  title.isNotEmpty ? title : context.l10n.diarySectionUntitled,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: title.isNotEmpty ? null : colors.disabled,
+                  ),
+                ),
+                // 本文は1行だけ。本文がなくても1行ぶんの高さを取り、カードの高さを揃える。
+                const SizedBox(height: 6),
+                Text(
+                  body,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.6,
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
@@ -190,7 +155,7 @@ class _DiaryCard extends StatelessWidget {
   }
 }
 
-/// まだ読めない日記。名前と書いた時刻だけを出し、本文は伏せる。
+/// まだ読めない日記。誰の日記かだけを出し、本文は伏せる。
 /// タップすると、読めるようにするための日記の画面を開く。
 /// [onTap] が null なら、その日の日記はもう書けないので読めないことだけを伝える。
 class _LockedDiaryCard extends StatelessWidget {
@@ -232,60 +197,55 @@ class _LockedDiaryCard extends StatelessWidget {
           color: colors.surface,
           shape: RoundedRectangleBorder(
             side: BorderSide(color: colors.border),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  UserAvatar(name: name, filled: false, color: avatarColor),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _CardHeader(name: name, writtenAt: diary.writtenAt),
-                        const SizedBox(height: 8),
-                        // 本文の代わりに、伏せてあることが分かる帯を出す。
-                        const _PlaceholderBar(widthFactor: 1),
-                        const SizedBox(height: 6),
-                        const _PlaceholderBar(widthFactor: 0.6),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.lock_outline,
-                              size: 14,
-                              color: colors.textSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                hint,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: colors.textSecondary,
-                                ),
-                              ),
-                            ),
-                            if (canWrite) ...[
-                              Text(
-                                context.l10n.commonWriteDiary,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const Icon(Icons.chevron_right, size: 16),
-                            ],
-                          ],
+                  _CardHeader(
+                    name: name,
+                    avatarColor: avatarColor,
+                    isMine: false,
+                  ),
+                  const SizedBox(height: 12),
+                  // 本文の代わりに、伏せてあることが分かる帯を出す。
+                  const _PlaceholderBar(widthFactor: 1),
+                  const SizedBox(height: 6),
+                  const _PlaceholderBar(widthFactor: 0.6),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.lock_outline,
+                        size: 14,
+                        color: colors.textSecondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          hint,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colors.textSecondary,
+                          ),
                         ),
+                      ),
+                      if (canWrite) ...[
+                        Text(
+                          context.l10n.commonWriteDiary,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, size: 16),
                       ],
-                    ),
+                    ],
                   ),
                 ],
               ),
@@ -297,30 +257,33 @@ class _LockedDiaryCard extends StatelessWidget {
   }
 }
 
-/// カード上部の「名前 ・ 22:14」の行。
+/// カード上部の「（アイコン） 名前 の日記」の行。
 class _CardHeader extends StatelessWidget {
-  const _CardHeader({required this.name, required this.writtenAt});
+  const _CardHeader({
+    required this.name,
+    required this.avatarColor,
+    required this.isMine,
+  });
 
   final String name;
-  final DateTime writtenAt;
+  final int? avatarColor;
+  final bool isMine;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        UserAvatar(name: name, filled: isMine, color: avatarColor, size: 24),
+        const SizedBox(width: 8),
         Flexible(
           child: Text(
-            name,
+            context.l10n.diarySectionAuthor(name),
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          formatTime(writtenAt),
-          style: TextStyle(
-            fontSize: 12,
-            color: context.appColors.textSecondary,
+            style: TextStyle(
+              fontSize: 13,
+              color: context.appColors.textSecondary,
+            ),
           ),
         ),
       ],

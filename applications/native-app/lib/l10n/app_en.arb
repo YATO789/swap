@@ -83,6 +83,7 @@
   "timelineNoPostsYet": "No posts yet",
   "deletePostPickerTitle": "Choose a post to delete",
   "diarySectionUntitled": "Untitled",
+  "diarySectionAuthor": "{name}'s diary",
   "diarySectionLockedPast": "You can't read this because you didn't write a diary that day",
   "diarySectionLockedToday": "Write today's diary in this diary book to read it",
   "diarySectionLockedYesterday": "Write yesterday's diary in this diary book to read it",
