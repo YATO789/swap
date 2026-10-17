@@ -14,9 +14,6 @@ create table public.profiles (
 create table public.diary_books (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 1 and 15),
-  -- アイコンは名前の最初の1文字。アプリの runes.take(1) と同じくコードポイント単位。
-  icon text generated always as (left(name, 1)) stored,
-  -- 表紙の色（0xAARRGGBB）。int4 に収まらないので bigint。null なら決まったグレー。
   cover_color bigint check (cover_color between 0 and 4294967295),
   -- 大文字と小文字を区別する。読み間違えやすい 0/O/o・1/I/l は使わない。
   invite_code text not null unique check (invite_code ~ '^[A-HJ-NP-Za-kmnp-z2-9]{7}$'),
@@ -24,6 +21,7 @@ create table public.diary_books (
   created_at timestamptz not null default now()
 );
 
+-- 誰がどの日記に入っているか
 create table public.diary_book_members (
   diary_book_id uuid not null references public.diary_books (id) on delete cascade,
   user_id uuid not null references public.profiles (id) on delete cascade,
@@ -50,6 +48,7 @@ create index on public.post_diary_books (diary_book_id);
 
 -- 日記。日記帳と日付ごとに1人1つ。
 -- 本文は diary_contents に分ける。ロック中でも「誰が何時に書いたか」は見せ、本文だけ伏せるため。
+-- 見せる情報と隠す情報を別の表に分け、それぞれの行に別のポリシーをかけている。
 create table public.diaries (
   id uuid primary key default gen_random_uuid(),
   diary_book_id uuid not null references public.diary_books (id) on delete cascade,
@@ -69,28 +68,10 @@ create table public.diary_contents (
   body text not null check (char_length(body) between 1 and 1000)
 );
 
--- ブロック。ブロックした人の記録と日記は見えなくなる（App Store ガイドライン 1.2）。
-create table public.blocks (
-  blocker_id uuid not null default auth.uid() references public.profiles (id) on delete cascade,
-  blocked_id uuid not null references public.profiles (id) on delete cascade,
-  created_at timestamptz not null default now(),
-  primary key (blocker_id, blocked_id),
-  check (blocker_id <> blocked_id)
-);
-
--- 通報。運営が Supabase の管理画面で見る。アプリからは書くだけ。
-create table public.reports (
-  id uuid primary key default gen_random_uuid(),
-  reporter_id uuid default auth.uid() references public.profiles (id) on delete set null,
-  target_type text not null check (target_type in ('post', 'diary', 'user')),
-  target_id uuid not null,
-  reason text not null default '' check (char_length(reason) <= 500),
-  created_at timestamptz not null default now()
-);
-
 -- RLS から使う判定 -------------------------------------------------------------
 -- 同じテーブルを読むポリシーは無限に再帰するので、security definer の関数に切り出す。
 
+-- 指定した日記帳のメンバーかどうか
 create function public.is_member(p_diary_book_id uuid) returns boolean
 language sql stable security definer set search_path = ''
 as $$
@@ -112,15 +93,6 @@ as $$
   );
 $$;
 
-create function public.is_blocked(p_user_id uuid) returns boolean
-language sql stable security definer set search_path = ''
-as $$
-  select exists (
-    select 1 from public.blocks
-    where blocker_id = (select auth.uid()) and blocked_id = p_user_id
-  );
-$$;
-
 -- 記録が、自分の入っている日記帳のどれかに出ているか。
 create function public.is_post_visible(p_post_id uuid) returns boolean
 language sql stable security definer set search_path = ''
@@ -131,7 +103,7 @@ as $$
   );
 $$;
 
--- 自分もその日記帳にその日の日記を書いたか。他の人の日記の本文を読めるかはこれで決まる。
+-- 自分もその日記帳にその日の日記を書いたか。他の人の日記の本文を読めるかはこれで決める。
 create function public.wrote_diary_on(p_diary_book_id uuid, p_date date) returns boolean
 language sql stable security definer set search_path = ''
 as $$
@@ -161,8 +133,6 @@ alter table public.posts enable row level security;
 alter table public.post_diary_books enable row level security;
 alter table public.diaries enable row level security;
 alter table public.diary_contents enable row level security;
-alter table public.blocks enable row level security;
-alter table public.reports enable row level security;
 
 create policy "同じ日記帳の人のプロフィールを読める" on public.profiles
 for select to authenticated
@@ -197,7 +167,7 @@ create policy "自分の記録と、日記帳に出ている記録を読める" 
 for select to authenticated
 using (
   author_id = (select auth.uid())
-  or (public.is_post_visible(id) and not public.is_blocked(author_id))
+  or public.is_post_visible(id)
 );
 
 create policy "自分の記録を書ける" on public.posts
@@ -224,10 +194,7 @@ with check (
 
 create policy "参加している日記帳の日記を読める" on public.diaries
 for select to authenticated
-using (
-  public.is_member(diary_book_id)
-  and (author_id = (select auth.uid()) or not public.is_blocked(author_id))
-);
+using (public.is_member(diary_book_id));
 
 create policy "今日か昨日の自分の日記を書ける" on public.diaries
 for insert to authenticated
@@ -245,7 +212,7 @@ create policy "自分の日記を消せる" on public.diaries
 for delete to authenticated
 using (author_id = (select auth.uid()));
 
--- diaries の select ポリシーも効くので、参加していない日記帳やブロックした人の本文は読めない。
+-- diaries の select ポリシーも効くので、参加していない日記帳の本文は読めない。
 create policy "自分も書いた日の日記の本文を読める" on public.diary_contents
 for select to authenticated
 using (
@@ -281,22 +248,6 @@ using (
   )
 );
 
-create policy "自分のブロックを読める" on public.blocks
-for select to authenticated
-using (blocker_id = (select auth.uid()));
-
-create policy "ブロックできる" on public.blocks
-for insert to authenticated
-with check (blocker_id = (select auth.uid()));
-
-create policy "ブロックを外せる" on public.blocks
-for delete to authenticated
-using (blocker_id = (select auth.uid()));
-
-create policy "通報できる" on public.reports
-for insert to authenticated
-with check (reporter_id = (select auth.uid()));
-
 -- 変えてよい列だけ更新を許す ----------------------------------------------------
 -- 招待コード・作者・日付・書いた時刻は、ポリシーを通っても書き換えさせない。
 
@@ -329,7 +280,7 @@ begin
 end;
 $$;
 
--- 日記帳を作って参加する。招待コードはかぶらないものを作る。
+-- 制作者が日記帳を作って参加する。招待コードはかぶらないものを作る。
 create function public.create_diary_book(p_name text, p_cover_color bigint default null)
 returns public.diary_books
 language plpgsql security definer set search_path = ''
@@ -363,7 +314,6 @@ create function public.find_diary_book_by_code(p_code text)
 returns table (
   id uuid,
   name text,
-  icon text,
   cover_color bigint,
   member_names text[],
   already_joined boolean
@@ -373,7 +323,6 @@ as $$
   select
     b.id,
     b.name,
-    b.icon,
     b.cover_color,
     array(
       select p.display_name
@@ -392,6 +341,7 @@ as $$
 $$;
 
 -- 招待コードで日記帳に参加する。コードが違えば null。もう参加していれば何もせずその id を返す。
+-- 1冊に入れるのは8人まで。アプリの maxDiaryBookMembers と合わせる。
 create function public.join_diary_book(p_code text)
 returns uuid
 language plpgsql security definer set search_path = ''
@@ -403,10 +353,21 @@ begin
     raise exception 'not signed in';
   end if;
 
+  -- 同時に参加して8人を超えないように、日記帳の行を押さえてから数える。
   select id into v_id from public.diary_books
-  where invite_code = btrim(p_code);
+  where invite_code = btrim(p_code)
+  for update;
   if v_id is null then
     return null;
+  end if;
+
+  if not exists (
+    select 1 from public.diary_book_members
+    where diary_book_id = v_id and user_id = (select auth.uid())
+  ) and (
+    select count(*) from public.diary_book_members where diary_book_id = v_id
+  ) >= 8 then
+    raise exception 'diary book is full';
   end if;
 
   insert into public.diary_book_members (diary_book_id, user_id)
@@ -574,8 +535,8 @@ for each row execute function public.delete_empty_diary_book();
 -- アカウント削除 ----------------------------------------------------------------
 
 -- 自分のアカウントを消す（App Store ガイドライン 5.1.1(v)）。
--- auth.users を消すと、プロフィール・参加・記録・日記・ブロックが on delete cascade で消え、
--- 誰もいなくなった日記帳も delete_empty_diary_book トリガーで消える。通報は送った人だけ空になる。
+-- auth.users を消すと、プロフィール・参加・記録・日記が on delete cascade で消え、
+-- 誰もいなくなった日記帳も delete_empty_diary_book トリガーで消える。
 -- auth.users はアプリから触れないので、security definer にする。
 create function public.delete_account() returns void
 language plpgsql security definer set search_path = ''
@@ -600,7 +561,10 @@ grant execute on function public.delete_account() to authenticated;
 create table public.push_tokens (
   token text primary key,
   user_id uuid not null references auth.users (id) on delete cascade,
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  -- アプリのバッジに出す、まだ見ていない通知の数。端末ごとに数える。
+  -- 通知を送るたびに Edge Function（notify-post）が増やし、アプリを開いたら 0 に戻す。
+  unread_count integer not null default 0
 );
 create index on public.push_tokens (user_id);
 
@@ -608,6 +572,7 @@ create index on public.push_tokens (user_id);
 alter table public.push_tokens enable row level security;
 
 -- 端末のトークンを自分の送り先にする。前に別の人が使っていたトークンなら持ち主を替える。
+-- 持ち主が替わったら、前の人の未読数は引き継がない。
 -- 他の人の行を書き換えるので、security definer にする。
 create function public.register_push_token(p_token text) returns void
 language plpgsql security definer set search_path = ''
@@ -619,7 +584,13 @@ begin
 
   insert into public.push_tokens (token, user_id)
   values (p_token, (select auth.uid()))
-  on conflict (token) do update set user_id = excluded.user_id, updated_at = now();
+  on conflict (token) do update set
+    user_id = excluded.user_id,
+    updated_at = now(),
+    unread_count = case
+      when public.push_tokens.user_id = excluded.user_id then public.push_tokens.unread_count
+      else 0
+    end;
 end;
 $$;
 
@@ -637,6 +608,33 @@ $$;
 
 revoke execute on function public.unregister_push_token(text) from public, anon;
 grant execute on function public.unregister_push_token(text) to authenticated;
+
+-- 送る前に、送り先の端末の未読数を1つずつ増やし、増やしたあとの数を返す。
+create function public.increment_push_unread_counts(p_tokens text[])
+returns table (token text, unread_count integer)
+language sql security definer set search_path = ''
+as $$
+  update public.push_tokens t
+  set unread_count = t.unread_count + 1
+  where t.token = any (p_tokens)
+  returning t.token, t.unread_count;
+$$;
+
+-- 送るのは service role の Edge Function だけ。
+revoke execute on function public.increment_push_unread_counts(text[]) from public, anon, authenticated;
+grant execute on function public.increment_push_unread_counts(text[]) to service_role;
+
+-- アプリを開いたら、この端末の未読数を 0 に戻す。
+create function public.reset_push_unread_count(p_token text) returns void
+language sql security definer set search_path = ''
+as $$
+  update public.push_tokens
+  set unread_count = 0
+  where token = p_token and user_id = (select auth.uid());
+$$;
+
+revoke execute on function public.reset_push_unread_count(text) from public, anon;
+grant execute on function public.reset_push_unread_count(text) to authenticated;
 
 -- 記録の通知 --------------------------------------------------------------------
 

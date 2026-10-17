@@ -37,7 +37,6 @@ class PostDatasource {
   }
 
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録を古い順に返す。
-  /// ブロックした人の記録は RLS で返らない。
   Future<List<TimelinePost>> fetchInDiaryBook(
     String diaryBookId, {
     required DateTime from,

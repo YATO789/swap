@@ -62,7 +62,12 @@ async function notify(postId: string) {
     .from("posts")
     .select("message, author_id, profiles(display_name)")
     .eq("id", postId)
-    .single();
+    // DB の型を生成していないと、多対一の profiles も配列として型が付くので、実際の形を書く。
+    .single<{
+      message: string;
+      author_id: string;
+      profiles: { display_name: string };
+    }>();
   if (postError) throw postError;
 
   const recipients = await findRecipients(postId, post.author_id);
@@ -81,7 +86,7 @@ async function notify(postId: string) {
       send(serviceAccount.project_id, accessToken, {
         token,
         notification: {
-          title: post.profiles?.display_name ?? "",
+          title: post.profiles.display_name,
           body: post.message,
         },
         // 通知を開いたときに、その記録が出ている日記帳へ移れるようにする。
@@ -111,7 +116,7 @@ async function notify(postId: string) {
 
 /**
  * 記録が出ている日記帳のメンバーのうち、通知を送る人。
- * 書いた本人と、書いた人をブロックしている人には送らない。
+ * 書いた本人には送らない。
  * 値は、その人も入っている日記帳のうちの1つ。
  */
 async function findRecipients(
@@ -131,16 +136,9 @@ async function findRecipients(
     .neq("user_id", authorId);
   if (membersError) throw membersError;
 
-  const { data: blocks, error: blocksError } = await supabase
-    .from("blocks")
-    .select("blocker_id")
-    .eq("blocked_id", authorId);
-  if (blocksError) throw blocksError;
-  const blockers = new Set(blocks.map((b) => b.blocker_id));
-
   const recipients = new Map<string, string>();
   for (const { user_id: userId, diary_book_id: diaryBookId } of members) {
-    if (blockers.has(userId) || recipients.has(userId)) continue;
+    if (recipients.has(userId)) continue;
     recipients.set(userId, diaryBookId);
   }
   return recipients;
