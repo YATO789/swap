@@ -340,13 +340,10 @@ class _MemberCard extends StatelessWidget {
     final colors = context.appColors;
     final canRecord = posts.isEmpty && isMe;
 
+    // 記録は枠で囲まず、アイコンの色で誰のものかを見せる。枠は日記のカードだけに付ける。
     final card = Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: colors.border),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: MergeSemantics(
         // 記録が何行あっても、アイコンは左上に置いたままにする。
         child: Row(
@@ -455,13 +452,10 @@ class _PostCard extends StatelessWidget {
       child: InkWell(
         onLongPress: isMine ? onDelete : null,
         borderRadius: BorderRadius.circular(12),
+        // 記録は枠で囲まず、アイコンの色で誰のものかを見せる。枠は日記のカードだけに付ける。
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            border: Border.all(color: colors.border),
-            borderRadius: BorderRadius.circular(12),
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           // 記録が長くても、アイコンは左上に置いたままにする。
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
