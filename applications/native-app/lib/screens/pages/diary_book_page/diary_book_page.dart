@@ -16,6 +16,7 @@ import '../../components/post_button.dart';
 import '../../components/post_sheet/post_sheet.dart';
 import '../router/router.dart';
 import 'components/dated_title.dart';
+import 'components/page_turn_view.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
 import 'controller/diary_book_page_controller.dart';
@@ -63,7 +64,6 @@ class DiaryBookPage extends HookConsumerWidget {
     }
 
     final provider = diaryBookPageControllerProvider(diaryBookId, date);
-    final pageState = ref.watch(provider);
     DiaryBookPageController controller() => ref.read(provider.notifier);
 
     // 開いている間に外されたら、もう見られないことを知らせてホームに戻る。読み直すたびに出さないよう1回だけ。
@@ -99,6 +99,10 @@ class DiaryBookPage extends HookConsumerWidget {
       if (picked == null) return;
       pickedDate.value = picked == today ? null : picked;
     }
+
+    // ページをめくって、ほかの日に移ったとき。
+    void turnTo(DateTime turned) =>
+        pickedDate.value = turned == today ? null : turned;
 
     // 引っ張って読み直したとき、今日を見ていて日付が変わっていれば、新しい今日を読む。
     Future<void> refresh() async {
@@ -171,31 +175,23 @@ class DiaryBookPage extends HookConsumerWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: switch (pageState) {
-        AsyncValue(:final value?, hasError: false) => TimelineView(
-          date: date,
+      // 右にスワイプすると前の日、左にスワイプすると次の日へページをめくる。今日より先には進まない。
+      // めくっている間だけ隣の日も出す。触れるのは見ている日だけなので、操作は見ている日に向ける。
+      body: PageTurnView(
+        date: date,
+        latest: today,
+        onChanged: turnTo,
+        builder: (day) => _DayTimeline(
+          diaryBookId: diaryBookId,
+          date: day,
           myId: myId,
-          members: value.members,
-          diaries: value.diaries,
-          posts: value.posts,
           onRefresh: refresh,
           onRecord: record,
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
           onDeletePost: confirmDeletePost,
         ),
-        // 知らせるダイアログの後ろには、もう読めないことだけを出す。
-        AsyncError(error: RemovedFromDiaryBookException()) => Center(
-          child: Text(
-            context.l10n.commonDiaryBookUnavailable,
-            style: TextStyle(color: colors.textSecondary),
-          ),
-        ),
-        AsyncError() => _LoadError(onRetry: () => controller().refresh()),
-        _ => Center(
-          child: CircularProgressIndicator(color: colors.textSecondary),
-        ),
-      },
+      ),
       // 開いている日記帳に、そのまま記録を書けるようにする。
       // 見ている日が今日か昨日なら、日記はその日のものを書く。
       bottomNavigationBar: PostButton(
@@ -205,6 +201,63 @@ class DiaryBookPage extends HookConsumerWidget {
         onDiaryClosed: () => controller().refresh(),
       ),
     );
+  }
+}
+
+/// [date] の1日ぶんのページ。その日の日記と記録を読んで出す。
+class _DayTimeline extends ConsumerWidget {
+  const _DayTimeline({
+    required this.diaryBookId,
+    required this.date,
+    required this.myId,
+    required this.onRefresh,
+    required this.onRecord,
+    required this.onOpenDiary,
+    required this.onWriteDiary,
+    required this.onDeletePost,
+  });
+
+  final String diaryBookId;
+  final DateTime date;
+  final String? myId;
+  final Future<void> Function() onRefresh;
+  final VoidCallback onRecord;
+  final ValueChanged<Diary> onOpenDiary;
+  final ValueChanged<Diary> onWriteDiary;
+  final ValueChanged<TimelinePost> onDeletePost;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.appColors;
+    final provider = diaryBookPageControllerProvider(diaryBookId, date);
+
+    return switch (ref.watch(provider)) {
+      AsyncValue(:final value?, hasError: false) => TimelineView(
+        date: date,
+        myId: myId,
+        members: value.members,
+        diaries: value.diaries,
+        posts: value.posts,
+        onRefresh: onRefresh,
+        onRecord: onRecord,
+        onOpenDiary: onOpenDiary,
+        onWriteDiary: onWriteDiary,
+        onDeletePost: onDeletePost,
+      ),
+      // 知らせるダイアログの後ろには、もう読めないことだけを出す。
+      AsyncError(error: RemovedFromDiaryBookException()) => Center(
+        child: Text(
+          context.l10n.commonDiaryBookUnavailable,
+          style: TextStyle(color: colors.textSecondary),
+        ),
+      ),
+      AsyncError() => _LoadError(
+        onRetry: () => ref.read(provider.notifier).refresh(),
+      ),
+      _ => Center(
+        child: CircularProgressIndicator(color: colors.textSecondary),
+      ),
+    };
   }
 }
 

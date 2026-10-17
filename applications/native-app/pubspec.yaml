@@ -114,6 +114,10 @@ flutter:
     - assets/icons/app_icon_mint.png
     - assets/fonts/Yomogi-OFL.txt
 
+  # 日記帳のページをめくるとき、ページを紙のように丸めて描く。
+  shaders:
+    - shaders/page_curl.frag
+
   # ホームの書き込みバーに添える手書きの説明に使う。日本語の文言の文字と ASCII だけに絞ってある。
   # 日本語の文言を変えたら
   # pyftsubset Yomogi-Regular.ttf --text=<日本語の文言の文字> --unicodes=U+0020-007E,U+2019

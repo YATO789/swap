@@ -175,13 +175,10 @@ class DiaryBookRoute extends GoRouteData with $DiaryBookRoute {
 
   final String id;
 
-  // 端からだけでなく、画面のどこからでも右にスワイプして戻れるようにする。
+  // 画面の中ほどの左右スワイプは日付の移動に使うので、戻るのは画面の端からだけにする。
   @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) =>
-      SwipeablePage(
-        key: state.pageKey,
-        builder: (_) => DiaryBookPage(diaryBookId: id),
-      );
+  Widget build(BuildContext context, GoRouterState state) =>
+      DiaryBookPage(diaryBookId: id);
 }
 
 /// [id] の日記帳の情報ページ。
