@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:swipeable_page_route/swipeable_page_route.dart';
 import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
@@ -174,9 +175,13 @@ class DiaryBookRoute extends GoRouteData with $DiaryBookRoute {
 
   final String id;
 
+  // 端からだけでなく、画面のどこからでも右にスワイプして戻れるようにする。
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      DiaryBookPage(diaryBookId: id);
+  Page<void> buildPage(BuildContext context, GoRouterState state) =>
+      SwipeablePage(
+        key: state.pageKey,
+        builder: (_) => DiaryBookPage(diaryBookId: id),
+      );
 }
 
 /// [id] の日記帳の情報ページ。

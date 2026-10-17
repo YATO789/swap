@@ -52,6 +52,7 @@ dependencies:
   url_launcher: ^6.3.3
   firebase_remote_config: ^6.7.0
   flutter_native_splash: ^2.4.8
+  swipeable_page_route: ^0.4.8
 
 dev_dependencies:
   flutter_test:
