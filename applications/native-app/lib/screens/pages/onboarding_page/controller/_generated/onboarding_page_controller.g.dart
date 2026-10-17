@@ -45,7 +45,7 @@ final class OnboardingPageControllerProvider
 }
 
 String _$onboardingPageControllerHash() =>
-    r'7f7c43ccc4fe9ceece6b528a3ff7f1dc1f75051c';
+    r'808610024c26d03ffed923a76d915bfdf5f375dc';
 
 /// オンボーディング画面の保存処理を受け持つ。状態は保存の進み具合。
 

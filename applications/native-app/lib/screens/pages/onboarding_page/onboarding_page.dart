@@ -27,6 +27,9 @@ class OnboardingPage extends HookConsumerWidget {
     /// 名前の保存中か。ボタンを押せなくして、処理中の表示を出す。
     final saving = ref.watch(onboardingPageControllerProvider).isLoading;
 
+    /// 「あとで」で始めたか。処理中の表示を押したほうのボタンに出す。
+    final skipsNotification = useState(false);
+
     void next() {
       if (name.isEmpty) return;
       FocusScope.of(context).unfocus();
@@ -34,11 +37,12 @@ class OnboardingPage extends HookConsumerWidget {
     }
 
     // 保存できたらルーターがホームに切り替えるので、ここでは失敗だけ扱う。
-    Future<void> start() async {
+    Future<void> start({required bool requestsNotification}) async {
       if (saving) return;
+      skipsNotification.value = !requestsNotification;
       final succeeded = await ref
           .read(onboardingPageControllerProvider.notifier)
-          .start(name);
+          .start(name, requestsNotification: requestsNotification);
       if (!context.mounted || succeeded) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -112,11 +116,13 @@ class OnboardingPage extends HookConsumerWidget {
                           ],
                         ),
                 ),
-                if (showsNotificationStep.value)
+                if (showsNotificationStep.value) ...[
                   // 許可を聞いて保存している間は二度押しできないようにして、待っていることを見せる。
                   FilledButton(
-                    onPressed: saving ? null : start,
-                    child: saving
+                    onPressed: saving
+                        ? null
+                        : () => start(requestsNotification: true),
+                    child: saving && !skipsNotification.value
                         ? SizedBox.square(
                             dimension: 20,
                             child: CircularProgressIndicator(
@@ -125,8 +131,24 @@ class OnboardingPage extends HookConsumerWidget {
                             ),
                           )
                         : const Text('通知を許可する'),
-                  )
-                else
+                  ),
+                  const SizedBox(height: 8),
+                  // 許可を聞かずに名前だけ保存して始める。通知はあとから端末の設定でオンにできる。
+                  TextButton(
+                    onPressed: saving
+                        ? null
+                        : () => start(requestsNotification: false),
+                    child: saving && skipsNotification.value
+                        ? SizedBox.square(
+                            dimension: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colors.textSecondary,
+                            ),
+                          )
+                        : const Text('あとで'),
+                  ),
+                ] else
                   FilledButton(
                     onPressed: name.isEmpty ? null : next,
                     child: const Text('次へ'),

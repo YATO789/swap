@@ -12,13 +12,13 @@ class OnboardingPageController extends _$OnboardingPageController {
   @override
   AsyncValue<void> build() => const AsyncData(null);
 
-  /// 通知の許可を聞いてから表示名を保存し、保存できたかを返す。
-  /// 失敗したときは状態にエラーが入る。
+  /// 表示名を保存し、保存できたかを返す。失敗したときは状態にエラーが入る。
+  /// [requestsNotification] が true なら、保存する前に通知の許可を聞く。
   ///
   /// 名前を保存するとルーターがホームへ切り替えるので、許可は先に聞いておく。
-  Future<bool> start(String name) async {
+  Future<bool> start(String name, {required bool requestsNotification}) async {
     state = const AsyncLoading();
-    await _requestNotificationPermission();
+    if (requestsNotification) await _requestNotificationPermission();
     state = await AsyncValue.guard(
       () => ref.read(profileRepositoryProvider.notifier).saveDisplayName(name),
     );
