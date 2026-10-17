@@ -8,11 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'firebase_options_dev.dart' as dev;
 import 'firebase_options_prod.dart' as prod;
-import 'infrastructures/datasources/stores/diary_book_grid_store.dart';
-import 'infrastructures/datasources/stores/post_diary_book_store.dart';
-import 'infrastructures/datasources/stores/post_hint_store.dart';
-import 'infrastructures/datasources/stores/shared_preferences_store.dart';
-import 'infrastructures/datasources/stores/theme_mode_store.dart';
+import 'infrastructures/datasources/stores/preferences_store.dart';
 import 'infrastructures/repositories/theme_mode_repository.dart';
 import 'screens/pages/router/router.dart';
 import 'theme/app_theme.dart';
@@ -35,12 +31,7 @@ Future<void> main() async {
 
   final preferences = await SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {
-        postDiaryBookIdsKey,
-        diaryBookGridKey,
-        themeModeKey,
-        postHintVisibleKey,
-      },
+      allowList: PreferencesStore.keys,
     ),
   );
 

@@ -48,7 +48,7 @@ final class DiaryBookGridRepositoryProvider
 }
 
 String _$diaryBookGridRepositoryHash() =>
-    r'5e290f536ecd8c17352be9791c2a5a19dec3eb78';
+    r'c5bcd2baabd4c7af3eeed5244c8e378352375efe';
 
 /// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
 /// 設定画面で切り替える。

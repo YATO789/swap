@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+part '_generated/preferences_store.g.dart';
+
+const diaryBookGridKey = 'diary_book_grid';
+const postDiaryBookIdsKey = 'post_diary_book_ids';
+const postHintVisibleKey = 'post_hint_visible';
+const themeModeKey = 'theme_mode';
+
+/// 端末に保存する値の読み書きに使う SharedPreferences。
+/// 読み込みを待ってから使いたいので、main で作ったものに差し替える。
+@Riverpod(keepAlive: true)
+SharedPreferencesWithCache sharedPreferences(Ref ref) {
+  throw UnimplementedError('main で sharedPreferencesProvider を差し替えてください');
+}
+
+@riverpod
+PreferencesStore preferencesStore(Ref ref) {
+  return PreferencesStore(ref.read(sharedPreferencesProvider));
+}
+
+/// アプリを終了しても覚えておきたい設定を、端末に読み書きする。
+class PreferencesStore {
+  const PreferencesStore(this._preferences);
+
+  /// 読み書きするキー。SharedPreferencesWithCache の allowList に渡す。
+  static const keys = {
+    diaryBookGridKey,
+    postDiaryBookIdsKey,
+    postHintVisibleKey,
+    themeModeKey,
+  };
+
+  final SharedPreferencesWithCache _preferences;
+
+  /// ホームの日記帳の一覧を表紙のグリッドで出すか。まだ選んだことがなければリスト。
+  bool readDiaryBookGrid() {
+    return _preferences.getBool(diaryBookGridKey) ?? false;
+  }
+
+  Future<void> saveDiaryBookGrid(bool grid) {
+    return _preferences.setBool(diaryBookGridKey, grid);
+  }
+
+  /// 投稿シートで前に選んだ共有先の日記帳の id。まだ選んだことがなければ空。
+  Set<String> readPostDiaryBookIds() {
+    return {...?_preferences.getStringList(postDiaryBookIdsKey)};
+  }
+
+  Future<void> savePostDiaryBookIds(Set<String> diaryBookIds) {
+    return _preferences.setStringList(postDiaryBookIdsKey, [...diaryBookIds]);
+  }
+
+  /// ホームの書き込みバーに手書きの説明を出すか。まだ切り替えたことがなければ出す。
+  bool readPostHintVisible() {
+    return _preferences.getBool(postHintVisibleKey) ?? true;
+  }
+
+  Future<void> savePostHintVisible(bool visible) {
+    return _preferences.setBool(postHintVisibleKey, visible);
+  }
+
+  /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。
+  /// まだ選んだことがなければ端末の設定に合わせる。
+  ThemeMode readThemeMode() {
+    final saved = _preferences.getString(themeModeKey);
+    return ThemeMode.values.asNameMap()[saved] ?? ThemeMode.system;
+  }
+
+  Future<void> saveThemeMode(ThemeMode mode) {
+    return _preferences.setString(themeModeKey, mode.name);
+  }
+}

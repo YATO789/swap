@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
-import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
-import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
+import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/screens/pages/create_diary_book_page/create_diary_book_page.dart';
@@ -37,8 +36,7 @@ Future<void> _pumpHome(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
-        postHintStoreProvider.overrideWithValue(FakePostHintStore()),
+        preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),

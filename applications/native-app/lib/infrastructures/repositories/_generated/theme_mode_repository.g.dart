@@ -45,7 +45,7 @@ final class ThemeModeRepositoryProvider
 }
 
 String _$themeModeRepositoryHash() =>
-    r'ab03b3b164110c24317e3602b616a6cee015b222';
+    r'a1e59b07f9e47015df7d54ce1b64d689bf739846';
 
 /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。設定画面で切り替える。
 

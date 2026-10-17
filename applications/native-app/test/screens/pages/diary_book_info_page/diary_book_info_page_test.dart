@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
-import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/post/timeline_post.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
@@ -53,8 +52,7 @@ Future<void> _openInfo(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
-        postHintStoreProvider.overrideWithValue(FakePostHintStore()),
+        preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),

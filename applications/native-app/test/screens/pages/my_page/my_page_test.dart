@@ -3,9 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/profile/profile.dart';
-import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
-import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
-import 'package:swap/infrastructures/datasources/stores/theme_mode_store.dart';
+import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
@@ -22,20 +20,15 @@ import '../../../helpers/fake_stores.dart';
 /// サインインした状態でルーターごとアプリを出し、ホームからマイページを開く。
 Future<void> _openMyPage(
   WidgetTester tester, {
-  FakeDiaryBookGridStore? gridStore,
-  FakePostHintStore? postHintStore,
+  FakePreferencesStore? preferencesStore,
   FakePushTokenRepository? pushTokenRepository,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        diaryBookGridStoreProvider.overrideWithValue(
-          gridStore ?? FakeDiaryBookGridStore(),
+        preferencesStoreProvider.overrideWithValue(
+          preferencesStore ?? FakePreferencesStore(),
         ),
-        postHintStoreProvider.overrideWithValue(
-          postHintStore ?? FakePostHintStore(),
-        ),
-        themeModeStoreProvider.overrideWithValue(FakeThemeModeStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
@@ -73,31 +66,31 @@ Future<void> _openMyPage(
 
 void main() {
   testWidgets('日記帳の並べ方を選ぶと、保存する', (tester) async {
-    final gridStore = FakeDiaryBookGridStore();
-    await _openMyPage(tester, gridStore: gridStore);
+    final preferencesStore = FakePreferencesStore();
+    await _openMyPage(tester, preferencesStore: preferencesStore);
 
     await tester.tap(find.bySemanticsLabel('表紙'));
     await tester.pumpAndSettle();
-    expect(gridStore.grid, isTrue);
+    expect(preferencesStore.diaryBookGrid, isTrue);
 
     await tester.tap(find.bySemanticsLabel('リスト'));
     await tester.pumpAndSettle();
-    expect(gridStore.grid, isFalse);
+    expect(preferencesStore.diaryBookGrid, isFalse);
   });
 
   testWidgets('書き込みバーの説明のスイッチを切り替えると、保存する', (tester) async {
-    final postHintStore = FakePostHintStore();
-    await _openMyPage(tester, postHintStore: postHintStore);
+    final preferencesStore = FakePreferencesStore();
+    await _openMyPage(tester, preferencesStore: preferencesStore);
     final hintSwitch = find.widgetWithText(SwitchListTile, '書き込みバーの説明');
     await tester.scrollUntilVisible(hintSwitch, 200);
 
     await tester.tap(hintSwitch);
     await tester.pumpAndSettle();
-    expect(postHintStore.visible, isFalse);
+    expect(preferencesStore.postHintVisible, isFalse);
 
     await tester.tap(hintSwitch);
     await tester.pumpAndSettle();
-    expect(postHintStore.visible, isTrue);
+    expect(preferencesStore.postHintVisible, isTrue);
   });
 
   testWidgets('ログアウトを確かめると、通知の送り先から外してウェルカム画面に戻る', (tester) async {

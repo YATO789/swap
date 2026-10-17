@@ -6,9 +6,7 @@ import 'package:hooks_riverpod/misc.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
-import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
-import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
-import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
+import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_grid_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
@@ -80,9 +78,7 @@ Future<void> _pumpHomeWithRouter(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        postDiaryBookStoreProvider.overrideWithValue(FakePostDiaryBookStore()),
-        diaryBookGridStoreProvider.overrideWithValue(FakeDiaryBookGridStore()),
-        postHintStoreProvider.overrideWithValue(FakePostHintStore()),
+        preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
         ..._overrides(_diaryBooks, notifications: notifications),
       ],
       child: MaterialApp.router(theme: buildLightTheme(), routerConfig: router),

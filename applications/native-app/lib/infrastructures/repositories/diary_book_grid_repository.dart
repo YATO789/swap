@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
+import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 
 part '_generated/diary_book_grid_repository.g.dart';
 
@@ -7,14 +7,14 @@ part '_generated/diary_book_grid_repository.g.dart';
 /// 設定画面で切り替える。
 @Riverpod(keepAlive: true)
 class DiaryBookGridRepository extends _$DiaryBookGridRepository {
-  DiaryBookGridStore get _store => ref.read(diaryBookGridStoreProvider);
+  PreferencesStore get _store => ref.read(preferencesStoreProvider);
 
   @override
-  bool build() => _store.read();
+  bool build() => _store.readDiaryBookGrid();
 
   /// グリッドで出すかを [grid] にして保存する。
   Future<void> save(bool grid) async {
     state = grid;
-    await _store.save(grid);
+    await _store.saveDiaryBookGrid(grid);
   }
 }

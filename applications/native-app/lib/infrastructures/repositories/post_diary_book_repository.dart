@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
+import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 
 part '_generated/post_diary_book_repository.g.dart';
 
@@ -7,14 +7,14 @@ part '_generated/post_diary_book_repository.g.dart';
 /// 抜けた日記帳の id が残っていることもあるので、使う側で参加している日記帳と突き合わせる。
 @Riverpod(keepAlive: true)
 class PostDiaryBookRepository extends _$PostDiaryBookRepository {
-  PostDiaryBookStore get _store => ref.read(postDiaryBookStoreProvider);
+  PreferencesStore get _store => ref.read(preferencesStoreProvider);
 
   @override
-  Set<String> build() => _store.read();
+  Set<String> build() => _store.readPostDiaryBookIds();
 
   /// 選んだ日記帳を [diaryBookIds] にして保存する。
   Future<void> save(Set<String> diaryBookIds) async {
     state = diaryBookIds;
-    await _store.save(diaryBookIds);
+    await _store.savePostDiaryBookIds(diaryBookIds);
   }
 }

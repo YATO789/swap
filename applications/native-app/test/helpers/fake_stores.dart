@@ -1,63 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:swap/infrastructures/datasources/stores/diary_book_grid_store.dart';
-import 'package:swap/infrastructures/datasources/stores/post_diary_book_store.dart';
-import 'package:swap/infrastructures/datasources/stores/post_hint_store.dart';
-import 'package:swap/infrastructures/datasources/stores/theme_mode_store.dart';
+import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 
-/// 端末に保存せず、選んだ日記帳をメモリに覚えておく。
-class FakePostDiaryBookStore implements PostDiaryBookStore {
-  Set<String> _diaryBookIds = {};
+/// 端末に保存せず、設定をメモリに覚えておく。
+class FakePreferencesStore implements PreferencesStore {
+  FakePreferencesStore({
+    this.diaryBookGrid = false,
+    Set<String>? postDiaryBookIds,
+    this.postHintVisible = true,
+    this.themeMode = ThemeMode.system,
+  }) : postDiaryBookIds = postDiaryBookIds ?? {};
+
+  bool diaryBookGrid;
+  Set<String> postDiaryBookIds;
+  bool postHintVisible;
+  ThemeMode themeMode;
 
   @override
-  Set<String> read() => _diaryBookIds;
+  bool readDiaryBookGrid() => diaryBookGrid;
 
   @override
-  Future<void> save(Set<String> diaryBookIds) async {
-    _diaryBookIds = diaryBookIds;
+  Future<void> saveDiaryBookGrid(bool grid) async {
+    diaryBookGrid = grid;
   }
-}
-
-/// 端末に保存せず、日記帳をグリッドで出すかをメモリに覚えておく。
-class FakeDiaryBookGridStore implements DiaryBookGridStore {
-  FakeDiaryBookGridStore({this.grid = false});
-
-  bool grid;
 
   @override
-  bool read() => grid;
+  Set<String> readPostDiaryBookIds() => postDiaryBookIds;
 
   @override
-  Future<void> save(bool grid) async {
-    this.grid = grid;
+  Future<void> savePostDiaryBookIds(Set<String> diaryBookIds) async {
+    postDiaryBookIds = diaryBookIds;
   }
-}
-
-/// 端末に保存せず、書き込みバーの説明を出すかをメモリに覚えておく。
-class FakePostHintStore implements PostHintStore {
-  FakePostHintStore({this.visible = true});
-
-  bool visible;
 
   @override
-  bool read() => visible;
+  bool readPostHintVisible() => postHintVisible;
 
   @override
-  Future<void> save(bool visible) async {
-    this.visible = visible;
+  Future<void> savePostHintVisible(bool visible) async {
+    postHintVisible = visible;
   }
-}
-
-/// 端末に保存せず、選んだテーマをメモリに覚えておく。
-class FakeThemeModeStore implements ThemeModeStore {
-  FakeThemeModeStore({this.mode = ThemeMode.system});
-
-  ThemeMode mode;
 
   @override
-  ThemeMode read() => mode;
+  ThemeMode readThemeMode() => themeMode;
 
   @override
-  Future<void> save(ThemeMode mode) async {
-    this.mode = mode;
+  Future<void> saveThemeMode(ThemeMode mode) async {
+    themeMode = mode;
   }
 }

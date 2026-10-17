@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../shared_preferences_store.dart';
+part of '../preferences_store.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -62,3 +62,49 @@ final class SharedPreferencesProvider
 }
 
 String _$sharedPreferencesHash() => r'ae032927fde7a566240bb7019bb2728720c45c5f';
+
+@ProviderFor(preferencesStore)
+final preferencesStoreProvider = PreferencesStoreProvider._();
+
+final class PreferencesStoreProvider
+    extends
+        $FunctionalProvider<
+          PreferencesStore,
+          PreferencesStore,
+          PreferencesStore
+        >
+    with $Provider<PreferencesStore> {
+  PreferencesStoreProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'preferencesStoreProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$preferencesStoreHash();
+
+  @$internal
+  @override
+  $ProviderElement<PreferencesStore> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  PreferencesStore create(Ref ref) {
+    return preferencesStore(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PreferencesStore value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PreferencesStore>(value),
+    );
+  }
+}
+
+String _$preferencesStoreHash() => r'f0efe74560a979a1b7aee67d5ad37dc92958a8bb';
