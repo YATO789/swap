@@ -146,6 +146,12 @@ abstract class AppLocalizations {
   /// **'昨日'**
   String get commonYesterday;
 
+  /// No description provided for @commonAvatarColor.
+  ///
+  /// In ja, this message translates to:
+  /// **'アイコンの色'**
+  String get commonAvatarColor;
+
   /// No description provided for @commonName.
   ///
   /// In ja, this message translates to:
@@ -1363,12 +1369,6 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'名前を入力してください'**
   String get profileEditNameRequired;
-
-  /// No description provided for @profileEditAvatarColor.
-  ///
-  /// In ja, this message translates to:
-  /// **'アイコンの色'**
-  String get profileEditAvatarColor;
 
   /// No description provided for @welcomeSignInFailed.
   ///

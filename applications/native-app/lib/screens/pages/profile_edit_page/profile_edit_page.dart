@@ -7,17 +7,12 @@ import '../../../domains/profile/profile.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
-import '../../components/cover_color_picker.dart';
+import '../../components/avatar_color_picker.dart';
 import '../../components/discard_guard.dart';
 import '../../components/form_field.dart';
 import '../../components/user_avatar.dart';
 import 'controller/profile_edit_page_controller.dart';
 
-/// 選べるアイコンの色。表紙の色から、決まった塗りと見分けにくい黒を除いたもの。
-final _avatarColors = [
-  for (final color in coverColors)
-    if (color != coverBlackColor) color,
-];
 /// 表示名とアイコンの色を編集するページ。
 class ProfileEditPage extends HookConsumerWidget {
   const ProfileEditPage({super.key});
@@ -107,18 +102,11 @@ class ProfileEditPage extends HookConsumerWidget {
               errorText: name.isEmpty ? l10n.profileEditNameRequired : null,
             ),
             const SizedBox(height: 24),
-            FieldLabel(l10n.profileEditAvatarColor),
+            FieldLabel(l10n.commonAvatarColor),
             const SizedBox(height: 8),
-            CoverColorPicker(
-              alignment: WrapAlignment.start,
-              choices: _avatarColors,
-              // 色を選ばなければ、自分のアイコンはいつもの塗りつぶしになる。
-              defaultColor: colors.textPrimary,
-              label: l10n.profileEditAvatarColor,
-              selected: avatarColor.value == null
-                  ? null
-                  : Color(avatarColor.value!),
-              onSelected: (color) => avatarColor.value = color?.toARGB32(),
+            AvatarColorPicker(
+              selected: avatarColor.value,
+              onSelected: (color) => avatarColor.value = color,
             ),
           ],
         ),

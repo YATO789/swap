@@ -34,6 +34,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonYesterday => '昨日';
 
   @override
+  String get commonAvatarColor => 'アイコンの色';
+
+  @override
   String get commonName => '名前';
 
   @override
@@ -721,9 +724,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get profileEditNameRequired => '名前を入力してください';
-
-  @override
-  String get profileEditAvatarColor => 'アイコンの色';
 
   @override
   String get welcomeSignInFailed => 'サインインできませんでした。もう一度お試しください';

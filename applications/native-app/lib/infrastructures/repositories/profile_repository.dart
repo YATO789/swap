@@ -18,18 +18,13 @@ class ProfileRepository extends _$ProfileRepository {
     return _datasource.fetchMine();
   }
 
-  /// 表示名を保存する。
-  Future<void> saveDisplayName(String displayName) async {
-    state = AsyncData(await _datasource.saveMine(displayName));
-  }
-
-  /// 作ってあるプロフィールの表示名とアイコンの色を保存する。
+  /// 表示名とアイコンの色を保存する。まだプロフィールがなければ作る。
   Future<void> save({
     required String displayName,
     required int? avatarColor,
   }) async {
     state = AsyncData(
-      await _datasource.updateMine(
+      await _datasource.saveMine(
         displayName: displayName,
         avatarColor: avatarColor,
       ),

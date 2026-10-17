@@ -25,6 +25,7 @@ const coverColors = <Color?>[
   Color(0xFFD9C2FF),
   Color(0xFFFFB3D9),
 ];
+
 /// 表紙の色を選ぶ丸の並び。選んでいる色は外側に輪を付ける。
 /// アイコンの色のように表紙以外の色を選ぶときは、[choices]・[defaultColor]・[label] を変える。
 class CoverColorPicker extends StatelessWidget {

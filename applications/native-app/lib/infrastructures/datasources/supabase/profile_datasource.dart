@@ -25,26 +25,19 @@ class ProfileDatasource {
     return row == null ? null : _toProfile(row);
   }
 
-  /// 自分のプロフィールを作る。もうあれば表示名を書き換える。
-  Future<Profile> saveMine(String displayName) async {
-    final row = await _client
-        .from('profiles')
-        .upsert({'id': _userId, 'display_name': displayName})
-        .select(_columns)
-        .single();
-    return _toProfile(row);
-  }
-
-  /// 自分のプロフィールの表示名とアイコンの色を書き換える。
-  /// [avatarColor] が null なら決まった色に戻す。
-  Future<Profile> updateMine({
+  /// 自分のプロフィールを作る。もうあれば表示名とアイコンの色を書き換える。
+  /// [avatarColor] が null なら決まった色にする。
+  Future<Profile> saveMine({
     required String displayName,
     required int? avatarColor,
   }) async {
     final row = await _client
         .from('profiles')
-        .update({'display_name': displayName, 'avatar_color': avatarColor})
-        .eq('id', _userId)
+        .upsert({
+          'id': _userId,
+          'display_name': displayName,
+          'avatar_color': avatarColor,
+        })
         .select(_columns)
         .single();
     return _toProfile(row);

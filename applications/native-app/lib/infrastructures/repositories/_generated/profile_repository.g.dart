@@ -42,7 +42,7 @@ final class ProfileRepositoryProvider
   ProfileRepository create() => ProfileRepository();
 }
 
-String _$profileRepositoryHash() => r'9b6079d90072c8fcae095c8cca40619c008baa8e';
+String _$profileRepositoryHash() => r'2b89bc6450c8973ddc43d871070840eff33ace70';
 
 /// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
 ///

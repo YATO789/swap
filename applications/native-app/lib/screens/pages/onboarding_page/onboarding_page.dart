@@ -5,12 +5,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../domains/profile/profile.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
+import '../../components/avatar_color_picker.dart';
 import '../../components/form_field.dart';
 import '../../components/user_avatar.dart';
 import 'components/notification_step.dart';
 import 'controller/onboarding_page_controller.dart';
 
-/// サインインした直後に1回だけ出す初回設定。名前を決め、通知の許可を聞いてからホームへ進む。
+/// サインインした直後に1回だけ出す初回設定。名前とアイコンの色を決め、通知の許可を聞いてからホームへ進む。
 class OnboardingPage extends HookConsumerWidget {
   const OnboardingPage({super.key});
 
@@ -22,6 +23,7 @@ class OnboardingPage extends HookConsumerWidget {
     // 文字を打つたびに「次へ」ボタンとアバターを更新する。
     useListenable(nameController);
     final name = nameController.text.trim();
+    final avatarColor = useState<int?>(null);
 
     /// 通知のページを出しているか。名前は最後にまとめて保存するので、ここでは進んだことだけ覚える。
     final showsNotificationStep = useState(false);
@@ -44,7 +46,11 @@ class OnboardingPage extends HookConsumerWidget {
       skipsNotification.value = !requestsNotification;
       final succeeded = await ref
           .read(onboardingPageControllerProvider.notifier)
-          .start(name, requestsNotification: requestsNotification);
+          .start(
+            name,
+            avatarColor: avatarColor.value,
+            requestsNotification: requestsNotification,
+          );
       if (!context.mounted || succeeded) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -99,6 +105,7 @@ class OnboardingPage extends HookConsumerWidget {
                               child: UserAvatar(
                                 name: name,
                                 filled: true,
+                                color: avatarColor.value,
                                 size: 72,
                               ),
                             ),
@@ -112,6 +119,13 @@ class OnboardingPage extends HookConsumerWidget {
                               autofocus: true,
                               textInputAction: TextInputAction.next,
                               onSubmitted: (_) => next(),
+                            ),
+                            const SizedBox(height: 24),
+                            FieldLabel(l10n.commonAvatarColor),
+                            const SizedBox(height: 8),
+                            AvatarColorPicker(
+                              selected: avatarColor.value,
+                              onSelected: (color) => avatarColor.value = color,
                             ),
                           ],
                         ),

@@ -12,15 +12,21 @@ class OnboardingPageController extends _$OnboardingPageController {
   @override
   AsyncValue<void> build() => const AsyncData(null);
 
-  /// 表示名を保存し、保存できたかを返す。失敗したときは状態にエラーが入る。
+  /// 表示名とアイコンの色を保存し、保存できたかを返す。失敗したときは状態にエラーが入る。
   /// [requestsNotification] が true なら、保存する前に通知の許可を聞く。
   ///
   /// 名前を保存するとルーターがホームへ切り替えるので、許可は先に聞いておく。
-  Future<bool> start(String name, {required bool requestsNotification}) async {
+  Future<bool> start(
+    String name, {
+    required int? avatarColor,
+    required bool requestsNotification,
+  }) async {
     state = const AsyncLoading();
     if (requestsNotification) await _requestNotificationPermission();
     state = await AsyncValue.guard(
-      () => ref.read(profileRepositoryProvider.notifier).saveDisplayName(name),
+      () => ref
+          .read(profileRepositoryProvider.notifier)
+          .save(displayName: name, avatarColor: avatarColor),
     );
     if (state case AsyncError(:final error, :final stackTrace)) {
       debugPrint('名前を保存できませんでした: $error\n$stackTrace');
