@@ -231,6 +231,7 @@ class _DiaryBookList extends StatelessWidget {
             leading: DiaryBookIcon(
               name: diaryBook.name,
               coverColor: diaryBook.coverColor,
+              size: 60,
             ),
             title: diaryBook.name,
             subtitle: context.l10n.commonMemberCount(diaryBook.memberCount),
@@ -344,11 +345,11 @@ class _ListTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Row(
             children: [
               leading,
-              const SizedBox(width: 16),
+              const SizedBox(width: 18),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,15 +357,15 @@ class _ListTile extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        fontSize: 17,
+                        fontSize: 19,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         color: colors.textSecondary,
                       ),
                     ),
