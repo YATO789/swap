@@ -7,18 +7,24 @@ import 'diary_book_icon.dart';
 /// 新しく日記帳を作るときに最初から選んでおく表紙の色（ミント）。
 const initialCoverColor = Color(0xFF9EE6C4);
 
-/// 選べる表紙の色。先頭の null は決まったグレー。
+/// 表紙の色の黒。
+const coverBlackColor = Color(0xFF2A2A2E);
+
+/// 選べる表紙の色。先頭の null は決まったグレーで、黒のあとは色相の順。
 /// 黒のほかは明るいパステルにしてあり、表紙の文字は [coverInkColor] で黒になる。
 const coverColors = <Color?>[
   null,
-  Color(0xFF2A2A2E),
-  Color(0xFFA8C8FF),
-  initialCoverColor,
+  coverBlackColor,
   Color(0xFFFFB4A8),
+  Color(0xFFFFC98A),
   Color(0xFFFFE07A),
+  Color(0xFFC8E68C),
+  initialCoverColor,
+  Color(0xFF9EDCF0),
+  Color(0xFFA8C8FF),
   Color(0xFFD9C2FF),
+  Color(0xFFFFB3D9),
 ];
-
 /// 表紙の色を選ぶ丸の並び。選んでいる色は外側に輪を付ける。
 /// アイコンの色のように表紙以外の色を選ぶときは、[choices]・[defaultColor]・[label] を変える。
 class CoverColorPicker extends StatelessWidget {

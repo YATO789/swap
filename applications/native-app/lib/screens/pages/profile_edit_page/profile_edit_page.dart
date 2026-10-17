@@ -13,22 +13,11 @@ import '../../components/form_field.dart';
 import '../../components/user_avatar.dart';
 import 'controller/profile_edit_page_controller.dart';
 
-/// 選べるアイコンの色。先頭の null は決まった塗り。
-/// 表紙と同じ明るいパステルに、表紙にない色を足して色相の順に並べる。
-/// 黒は決まった塗りと見分けにくいので入れない。
-const _avatarColors = <Color?>[
-  null,
-  Color(0xFFFFB4A8),
-  Color(0xFFFFC98A),
-  Color(0xFFFFE07A),
-  Color(0xFFC8E68C),
-  Color(0xFF9EE6C4),
-  Color(0xFF9EDCF0),
-  Color(0xFFA8C8FF),
-  Color(0xFFD9C2FF),
-  Color(0xFFFFB3D9),
+/// 選べるアイコンの色。表紙の色から、決まった塗りと見分けにくい黒を除いたもの。
+final _avatarColors = [
+  for (final color in coverColors)
+    if (color != coverBlackColor) color,
 ];
-
 /// 表示名とアイコンの色を編集するページ。
 class ProfileEditPage extends HookConsumerWidget {
   const ProfileEditPage({super.key});
