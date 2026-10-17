@@ -191,9 +191,13 @@ class DiaryBookInfoRoute extends GoRouteData with $DiaryBookInfoRoute {
 
   final String id;
 
+  // 端からだけでなく、画面のどこからでも右にスワイプして戻れるようにする。
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      DiaryBookInfoPage(diaryBookId: id);
+  Page<void> buildPage(BuildContext context, GoRouterState state) =>
+      SwipeablePage(
+        key: state.pageKey,
+        builder: (_) => DiaryBookInfoPage(diaryBookId: id),
+      );
 }
 
 /// [id] の日記帳の [date] の日記を読むページ。最初は [author] の日記を開く。
@@ -241,8 +245,10 @@ class DiaryEditorRoute extends GoRouteData with $DiaryEditorRoute {
 class MyPageRoute extends GoRouteData with $MyPageRoute {
   const MyPageRoute();
 
+  // 端からだけでなく、画面のどこからでも右にスワイプして戻れるようにする。
   @override
-  Widget build(BuildContext context, GoRouterState state) => const MyPage();
+  Page<void> buildPage(BuildContext context, GoRouterState state) =>
+      SwipeablePage(key: state.pageKey, builder: (_) => const MyPage());
 }
 
 @TypedGoRoute<ProfileEditRoute>(path: '/me/profile')
