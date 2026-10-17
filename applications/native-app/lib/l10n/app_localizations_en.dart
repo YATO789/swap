@@ -309,9 +309,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get timelineNoPostsYet => 'No posts yet';
 
   @override
-  String get deletePostPickerTitle => 'Choose a post to delete';
-
-  @override
   String get diarySectionUntitled => 'Untitled';
 
   @override

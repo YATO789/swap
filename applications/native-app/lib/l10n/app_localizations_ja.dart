@@ -282,9 +282,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get timelineNoPostsYet => 'まだ記録がありません';
 
   @override
-  String get deletePostPickerTitle => '削除する記録を選んでください';
-
-  @override
   String get diarySectionUntitled => 'タイトルなし';
 
   @override

@@ -199,7 +199,6 @@
   "diaryBookPickDate": "日付を選ぶ",
   "diaryBookLoadFailed": "日記帳を読み込めませんでした",
   "timelineNoPostsYet": "まだ記録がありません",
-  "deletePostPickerTitle": "削除する記録を選んでください",
   "diarySectionUntitled": "タイトルなし",
   "diarySectionAuthor": "{name} の日記",
   "@diarySectionAuthor": {

@@ -81,7 +81,6 @@
   "diaryBookPickDate": "Pick a date",
   "diaryBookLoadFailed": "Couldn't load the diary book",
   "timelineNoPostsYet": "No posts yet",
-  "deletePostPickerTitle": "Choose a post to delete",
   "diarySectionUntitled": "Untitled",
   "diarySectionAuthor": "{name}'s diary",
   "diarySectionLockedPast": "You can't read this because you didn't write a diary that day",

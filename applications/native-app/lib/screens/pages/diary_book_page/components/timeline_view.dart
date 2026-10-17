@@ -10,11 +10,10 @@ import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 import '../../../components/user_avatar.dart';
-import 'delete_post_picker_sheet.dart';
 import 'diary_section.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
-/// 今日を表示しているときは、今の時間をメンバー一覧で出す。
+/// 今日を表示しているときは、今の時間にまだ記録していないメンバーを一番上に出す。
 class TimelineView extends HookWidget {
   const TimelineView({
     super.key,
@@ -81,14 +80,17 @@ class TimelineView extends HookWidget {
         membersById[userId]?.displayName ?? context.l10n.commonFormerMember;
     int? avatarColorOf(String userId) => membersById[userId]?.avatarColor;
 
-    final hours = _groupByHour(posts);
-    final currentHour = date == diaryDateOf(now.value) ? now.value.hour : null;
     // 新しい時間帯が上に来るように逆順で表示する。
-    final otherHours = hours
-        .where((hour) => hour.hour != currentHour)
-        .toList()
-        .reversed
-        .toList();
+    final hours = _groupByHour(posts).reversed.toList();
+    final currentHour = date == diaryDateOf(now.value) ? now.value.hour : null;
+    // 今の時間にまだ記録していないメンバー。記録した人は時間帯の欄に出す。
+    final postedIds = {
+      for (final post in posts)
+        if (post.postedAt.hour == currentHour) post.authorId,
+    };
+    final pendingMembers = currentHour == null
+        ? <DiaryBookMember>[]
+        : members.where((m) => !postedIds.contains(m.userId)).toList();
     const bottomPadding = 24.0;
 
     return RefreshIndicator(
@@ -111,36 +113,31 @@ class TimelineView extends HookWidget {
               ),
             ),
           ),
-          if (currentHour != null)
+          if (currentHour != null && pendingMembers.isNotEmpty)
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 24,
                 0,
                 24,
-                otherHours.isEmpty ? bottomPadding : 0,
+                hours.isEmpty ? bottomPadding : 0,
               ),
               sliver: SliverToBoxAdapter(
-                child: _CurrentHourSection(
+                child: _PendingMembersSection(
                   hour: currentHour,
-                  members: members,
+                  members: pendingMembers,
                   myId: myId,
                   onRecord: onRecord,
-                  onDeletePost: onDeletePost,
-                  posts: [
-                    for (final hour in hours)
-                      if (hour.hour == currentHour) ...hour.posts,
-                  ],
                 ),
               ),
             ),
-          if (otherHours.isEmpty) ...[
-            if (currentHour == null)
+          if (hours.isEmpty) ...[
+            if (pendingMembers.isEmpty)
               const SliverPadding(
                 padding: EdgeInsets.fromLTRB(24, 40, 24, bottomPadding),
                 sliver: SliverToBoxAdapter(child: _EmptyPosts()),
               ),
           ] else ...[
-            if (currentHour != null)
+            if (pendingMembers.isNotEmpty)
               const SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: 24),
                 sliver: SliverToBoxAdapter(child: Divider()),
@@ -148,9 +145,9 @@ class TimelineView extends HookWidget {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, bottomPadding),
               sliver: SliverList.separated(
-                itemCount: otherHours.length,
+                itemCount: hours.length,
                 itemBuilder: (context, index) => _HourSection(
-                  hour: otherHours[index],
+                  hour: hours[index],
                   myId: myId,
                   nameOf: nameOf,
                   avatarColorOf: avatarColorOf,
@@ -243,9 +240,12 @@ class _HourSection extends StatelessWidget {
 }
 
 class _HourHeader extends StatelessWidget {
-  const _HourHeader({required this.hour});
+  const _HourHeader({required this.hour, this.small = false});
 
   final int hour;
+
+  /// まだ記録していない人の欄では、時間を小さく出す。
+  final bool small;
 
   @override
   Widget build(BuildContext context) {
@@ -253,32 +253,32 @@ class _HourHeader extends StatelessWidget {
       header: true,
       child: Text(
         '${hour.toString().padLeft(2, '0')}:00',
-        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+        style: small
+            ? TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: context.appColors.textSecondary,
+              )
+            : const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
       ),
     );
   }
 }
 
-/// 今の時間の欄。記録の有無にかかわらずメンバー全員を出す。
+/// 今の時間にまだ記録していないメンバーの欄。記録すると、この欄から外れて時間帯の欄に出る。
 /// 自分が一番上で、あとは日記帳に参加した順。
-class _CurrentHourSection extends StatelessWidget {
-  const _CurrentHourSection({
+class _PendingMembersSection extends StatelessWidget {
+  const _PendingMembersSection({
     required this.hour,
     required this.members,
     required this.myId,
     required this.onRecord,
-    required this.onDeletePost,
-    required this.posts,
   });
 
   final int hour;
   final List<DiaryBookMember> members;
   final String? myId;
   final VoidCallback onRecord;
-  final ValueChanged<TimelinePost> onDeletePost;
-
-  /// 今の時間の記録（古い順）。
-  final List<TimelinePost> posts;
 
   @override
   Widget build(BuildContext context) {
@@ -292,22 +292,16 @@ class _CurrentHourSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HourHeader(hour: hour),
+          _HourHeader(hour: hour, small: true),
           const SizedBox(height: 10),
           for (final member in ordered)
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
-              child: _MemberCard(
+              child: _PendingMemberCard(
                 name: member.displayName,
                 avatarColor: member.avatarColor,
                 isMe: member.userId == myId,
                 onRecord: onRecord,
-                onDeletePost: onDeletePost,
-                posts: [
-                  // 新しい記録が上に来るように逆順にする。
-                  for (final post in posts.reversed)
-                    if (post.authorId == member.userId) post,
-                ],
               ),
             ),
         ],
@@ -316,36 +310,29 @@ class _CurrentHourSection extends StatelessWidget {
   }
 }
 
-/// 今の時間の欄の1人ぶん。自分がまだ記録していなければ、
-/// カードのどこを押しても投稿シートを開く。
-class _MemberCard extends StatelessWidget {
-  const _MemberCard({
+/// まだ記録していないメンバーの1人ぶん。自分なら、カードのどこを押しても投稿シートを開く。
+class _PendingMemberCard extends StatelessWidget {
+  const _PendingMemberCard({
     required this.name,
     required this.avatarColor,
     required this.isMe,
     required this.onRecord,
-    required this.onDeletePost,
-    required this.posts,
   });
 
   final String name;
   final int? avatarColor;
   final bool isMe;
   final VoidCallback onRecord;
-  final ValueChanged<TimelinePost> onDeletePost;
-  final List<TimelinePost> posts;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final canRecord = posts.isEmpty && isMe;
 
     // 記録は枠で囲まず、アイコンの色で誰のものかを見せる。枠は日記のカードだけに付ける。
     final card = Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: MergeSemantics(
-        // 記録が何行あっても、アイコンは左上に置いたままにする。
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -363,39 +350,11 @@ class _MemberCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  if (posts.isEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      context.l10n.timelineNoPostsYet,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
-                  for (final post in posts) ...[
-                    const SizedBox(height: 2),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          formatTime(post.postedAt),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: colors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            post.message,
-                            style: const TextStyle(fontSize: 15),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  const SizedBox(height: 2),
+                  Text(
+                    context.l10n.timelineNoPostsYet,
+                    style: TextStyle(fontSize: 14, color: colors.textSecondary),
+                  ),
                 ],
               ),
             ),
@@ -403,25 +362,10 @@ class _MemberCard extends StatelessWidget {
         ),
       ),
     );
-    if (canRecord) {
-      return InkWell(
-        onTap: onRecord,
-        borderRadius: BorderRadius.circular(12),
-        child: card,
-      );
-    }
-    if (!isMe || posts.isEmpty) return card;
-
-    // 自分の記録はカードの長押しで削除できる。複数あれば、どれを消すか選ばせる。
-    Future<void> deletePost() async {
-      final post = posts.length == 1
-          ? posts.single
-          : await showDeletePostPickerSheet(context, posts: posts);
-      if (post != null) onDeletePost(post);
-    }
+    if (!isMe) return card;
 
     return InkWell(
-      onLongPress: deletePost,
+      onTap: onRecord,
       borderRadius: BorderRadius.circular(12),
       child: card,
     );

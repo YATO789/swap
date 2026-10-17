@@ -584,12 +584,6 @@ abstract class AppLocalizations {
   /// **'まだ記録がありません'**
   String get timelineNoPostsYet;
 
-  /// No description provided for @deletePostPickerTitle.
-  ///
-  /// In ja, this message translates to:
-  /// **'削除する記録を選んでください'**
-  String get deletePostPickerTitle;
-
   /// No description provided for @diarySectionUntitled.
   ///
   /// In ja, this message translates to:
