@@ -5,7 +5,7 @@
   "commonRetry": "もう一度試す",
   "commonSave": "保存する",
   "commonDelete": "削除する",
-  "commonComingSoon": "準備中です",
+  "commonOpenLinkFailed": "ページを開けませんでした",
   "commonToday": "今日",
   "commonYesterday": "昨日",
   "commonName": "名前",

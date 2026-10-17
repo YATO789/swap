@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
+import '../../../utils/legal_pages.dart';
 import 'controller/welcome_page_controller.dart';
 
 /// ログインしていないときに最初に出す画面。Apple アカウントでサインインする。
@@ -26,13 +27,17 @@ class WelcomePage extends HookConsumerWidget {
         ..showSnackBar(SnackBar(content: Text(message)));
     }
 
-    void showComingSoon() => showSnackBar(l10n.commonComingSoon);
+    Future<void> openPage(Uri url) async {
+      if (!await openLegalPage(url) && context.mounted) {
+        showSnackBar(l10n.commonOpenLinkFailed);
+      }
+    }
 
     // 同意文の中の「利用規約」「プライバシーポリシー」を押せるようにする。
     final termsRecognizer = useMemoized(TapGestureRecognizer.new);
     final privacyRecognizer = useMemoized(TapGestureRecognizer.new);
-    termsRecognizer.onTap = showComingSoon;
-    privacyRecognizer.onTap = showComingSoon;
+    termsRecognizer.onTap = () => openPage(termsOfServiceUrl);
+    privacyRecognizer.onTap = () => openPage(privacyPolicyUrl);
     useEffect(
       () => () {
         termsRecognizer.dispose();

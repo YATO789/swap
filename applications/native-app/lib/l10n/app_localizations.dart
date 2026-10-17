@@ -128,11 +128,11 @@ abstract class AppLocalizations {
   /// **'削除する'**
   String get commonDelete;
 
-  /// No description provided for @commonComingSoon.
+  /// No description provided for @commonOpenLinkFailed.
   ///
   /// In ja, this message translates to:
-  /// **'準備中です'**
-  String get commonComingSoon;
+  /// **'ページを開けませんでした'**
+  String get commonOpenLinkFailed;
 
   /// No description provided for @commonToday.
   ///

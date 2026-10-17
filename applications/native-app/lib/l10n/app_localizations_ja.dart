@@ -25,7 +25,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonDelete => '削除する';
 
   @override
-  String get commonComingSoon => '準備中です';
+  String get commonOpenLinkFailed => 'ページを開けませんでした';
 
   @override
   String get commonToday => '今日';

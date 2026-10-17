@@ -5,7 +5,7 @@
   "commonRetry": "Try again",
   "commonSave": "Save",
   "commonDelete": "Delete",
-  "commonComingSoon": "Coming soon",
+  "commonOpenLinkFailed": "Couldn't open the page",
   "commonToday": "Today",
   "commonYesterday": "Yesterday",
   "commonName": "Name",

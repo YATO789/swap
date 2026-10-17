@@ -25,7 +25,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonDelete => 'Delete';
 
   @override
-  String get commonComingSoon => 'Coming soon';
+  String get commonOpenLinkFailed => 'Couldn\'t open the page';
 
   @override
   String get commonToday => 'Today';

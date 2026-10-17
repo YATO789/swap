@@ -10,6 +10,7 @@ import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/theme_mode_repository.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
+import '../../../utils/legal_pages.dart';
 import '../../components/confirm_sheet.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
@@ -42,7 +43,11 @@ class MyPage extends HookConsumerWidget {
         ..showSnackBar(SnackBar(content: Text(message)));
     }
 
-    void showNotReady() => showMessage(l10n.commonComingSoon);
+    Future<void> openPage(Uri url) async {
+      if (!await openLegalPage(url) && context.mounted) {
+        showMessage(l10n.commonOpenLinkFailed);
+      }
+    }
 
     Future<void> signOut() async {
       final confirmed = await showConfirmSheet(
@@ -126,8 +131,14 @@ class MyPage extends HookConsumerWidget {
             value: l10n.settingsDayStartValue(diaryDayStartHour),
           ),
           _SectionHeader(l10n.settingsOtherSection),
-          _LinkTile(title: l10n.commonTermsOfService, onTap: showNotReady),
-          _LinkTile(title: l10n.commonPrivacyPolicy, onTap: showNotReady),
+          _LinkTile(
+            title: l10n.commonTermsOfService,
+            onTap: () => openPage(termsOfServiceUrl),
+          ),
+          _LinkTile(
+            title: l10n.commonPrivacyPolicy,
+            onTap: () => openPage(privacyPolicyUrl),
+          ),
           _InfoTile(title: l10n.settingsVersion, value: appVersion),
           _SectionHeader(l10n.settingsAccountSection),
           ListTile(
