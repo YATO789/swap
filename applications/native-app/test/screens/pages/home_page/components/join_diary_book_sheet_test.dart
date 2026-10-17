@@ -43,6 +43,15 @@ const _club = DiaryBook(
   memberCount: maxDiaryBookMembers,
 );
 
+/// 作った人が上限を2人に下げていて、もう2人いる日記帳。
+const _pair = DiaryBook(
+  id: 'pair',
+  name: 'ふたり',
+  inviteCode: 'Pai2345',
+  memberCount: 2,
+  memberLimit: 2,
+);
+
 /// サインインした状態でホームを開き、招待コードで参加するシートを開く。
 Future<void> _openJoinSheet(
   WidgetTester tester, {
@@ -78,8 +87,12 @@ Future<void> _openJoinSheet(
                 for (var i = 0; i < maxDiaryBookMembers; i++)
                   DiaryBookMember(userId: 'member$i', displayName: 'メンバー$i'),
               ],
+              _pair.id: const [
+                DiaryBookMember(userId: 'mio', displayName: '美緒'),
+                DiaryBookMember(userId: 'ken', displayName: '健太'),
+              ],
             },
-            invitable: const [_university, _family, _club],
+            invitable: const [_university, _family, _club, _pair],
           ),
         ),
         diaryRepositoryProvider.overrideWithValue(FakeDiaryRepository()),
@@ -202,6 +215,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('この日記帳は満員です（8人まで）'), findsOneWidget);
+    final join = find.widgetWithText(FilledButton, 'この日記帳に参加する');
+    expect(tester.widget<FilledButton>(join).onPressed, isNull);
+  });
+
+  testWidgets('上限を下げた日記帳は、その人数で満員になる', (tester) async {
+    await _openJoinSheet(tester);
+
+    await tester.enterText(find.byType(TextField), 'Pai2345');
+    await tester.pump();
+    await tester.tap(find.text('確認する'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('この日記帳は満員です（2人まで）'), findsOneWidget);
     final join = find.widgetWithText(FilledButton, 'この日記帳に参加する');
     expect(tester.widget<FilledButton>(join).onPressed, isNull);
   });

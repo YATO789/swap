@@ -13,12 +13,14 @@ abstract class InvitedDiaryBook with _$InvitedDiaryBook {
     required List<String> memberNames,
     /// 自分がもう参加しているか。
     required bool alreadyJoined,
+
+    /// 参加できる人数の上限。
+    @Default(maxDiaryBookMembers) int memberLimit,
     int? coverColor,
   }) = _InvitedDiaryBook;
 
   const InvitedDiaryBook._();
 
   /// 人数が上限に達していて、新しく参加できないか。もう参加していれば開けるので false。
-  bool get isFull =>
-      !alreadyJoined && memberNames.length >= maxDiaryBookMembers;
+  bool get isFull => !alreadyJoined && memberNames.length >= memberLimit;
 }

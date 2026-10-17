@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DiaryBook {
 
- String get id; String get name; String get inviteCode; int get memberCount;/// 日記帳を作った人の id。メンバーを外せるのはこの人だけ。アカウントを消していれば null。
+ String get id; String get name; String get inviteCode; int get memberCount;/// 参加できる人数の上限。作った人が 1〜[maxDiaryBookMembers] 人で変えられる。
+ int get memberLimit;/// 日記帳を作った人の id。メンバーを外したり人数の上限を変えたりできるのはこの人だけ。
+/// アカウントを消していれば null。
  String? get createdBy; int? get coverColor;
 /// Create a copy of DiaryBook
 /// with the given fields replaced by the non-null parameter values.
@@ -28,20 +30,20 @@ $DiaryBookCopyWith<DiaryBook> get copyWith => _$DiaryBookCopyWithImpl<DiaryBook>
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryBook;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBook&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.inviteCode, _this.inviteCode) || other.inviteCode == _this.inviteCode)&&(identical(other.memberCount, _this.memberCount) || other.memberCount == _this.memberCount)&&(identical(other.createdBy, _this.createdBy) || other.createdBy == _this.createdBy)&&(identical(other.coverColor, _this.coverColor) || other.coverColor == _this.coverColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBook&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.inviteCode, _this.inviteCode) || other.inviteCode == _this.inviteCode)&&(identical(other.memberCount, _this.memberCount) || other.memberCount == _this.memberCount)&&(identical(other.memberLimit, _this.memberLimit) || other.memberLimit == _this.memberLimit)&&(identical(other.createdBy, _this.createdBy) || other.createdBy == _this.createdBy)&&(identical(other.coverColor, _this.coverColor) || other.coverColor == _this.coverColor));
 }
 
 
 @override
 int get hashCode {
   final _this = this as DiaryBook;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.inviteCode,_this.memberCount,_this.createdBy,_this.coverColor);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.inviteCode,_this.memberCount,_this.memberLimit,_this.createdBy,_this.coverColor);
 }
 
 @override
 String toString() {
   final _this = this as DiaryBook;
-  return 'DiaryBook(id: ${_this.id}, name: ${_this.name}, inviteCode: ${_this.inviteCode}, memberCount: ${_this.memberCount}, createdBy: ${_this.createdBy}, coverColor: ${_this.coverColor})';
+  return 'DiaryBook(id: ${_this.id}, name: ${_this.name}, inviteCode: ${_this.inviteCode}, memberCount: ${_this.memberCount}, memberLimit: ${_this.memberLimit}, createdBy: ${_this.createdBy}, coverColor: ${_this.coverColor})';
 }
 
 
@@ -52,7 +54,7 @@ abstract mixin class $DiaryBookCopyWith<$Res>  {
   factory $DiaryBookCopyWith(DiaryBook value, $Res Function(DiaryBook) _then) = _$DiaryBookCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String inviteCode, int memberCount, String? createdBy, int? coverColor
+ String id, String name, String inviteCode, int memberCount, int memberLimit, String? createdBy, int? coverColor
 });
 
 
@@ -69,12 +71,13 @@ class _$DiaryBookCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBook
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? inviteCode = null,Object? memberCount = null,Object? createdBy = freezed,Object? coverColor = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? inviteCode = null,Object? memberCount = null,Object? memberLimit = null,Object? createdBy = freezed,Object? coverColor = freezed,}) {
   return _then(DiaryBook(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,inviteCode: null == inviteCode ? _self.inviteCode : inviteCode // ignore: cast_nullable_to_non_nullable
 as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,memberLimit: null == memberLimit ? _self.memberLimit : memberLimit // ignore: cast_nullable_to_non_nullable
 as int,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
 as String?,coverColor: freezed == coverColor ? _self.coverColor : coverColor // ignore: cast_nullable_to_non_nullable
 as int?,
@@ -162,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String inviteCode,  int memberCount,  String? createdBy,  int? coverColor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String inviteCode,  int memberCount,  int memberLimit,  String? createdBy,  int? coverColor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryBook() when $default != null:
-return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.createdBy,_that.coverColor);case _:
+return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.memberLimit,_that.createdBy,_that.coverColor);case _:
   return orElse();
 
 }
@@ -183,10 +186,10 @@ return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.cre
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String inviteCode,  int memberCount,  String? createdBy,  int? coverColor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String inviteCode,  int memberCount,  int memberLimit,  String? createdBy,  int? coverColor)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBook():
-return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.createdBy,_that.coverColor);case _:
+return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.memberLimit,_that.createdBy,_that.coverColor);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +206,10 @@ return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.cre
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String inviteCode,  int memberCount,  String? createdBy,  int? coverColor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String inviteCode,  int memberCount,  int memberLimit,  String? createdBy,  int? coverColor)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBook() when $default != null:
-return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.createdBy,_that.coverColor);case _:
+return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.memberLimit,_that.createdBy,_that.coverColor);case _:
   return null;
 
 }
@@ -218,14 +221,17 @@ return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.cre
 
 
 class _DiaryBook implements DiaryBook {
-  const _DiaryBook({required this.id, required this.name, required this.inviteCode, required this.memberCount, this.createdBy, this.coverColor});
+  const _DiaryBook({required this.id, required this.name, required this.inviteCode, required this.memberCount, this.memberLimit = maxDiaryBookMembers, this.createdBy, this.coverColor});
   
 
 @override final  String id;
 @override final  String name;
 @override final  String inviteCode;
 @override final  int memberCount;
-/// 日記帳を作った人の id。メンバーを外せるのはこの人だけ。アカウントを消していれば null。
+/// 参加できる人数の上限。作った人が 1〜[maxDiaryBookMembers] 人で変えられる。
+@override@JsonKey() final  int memberLimit;
+/// 日記帳を作った人の id。メンバーを外したり人数の上限を変えたりできるのはこの人だけ。
+/// アカウントを消していれば null。
 @override final  String? createdBy;
 @override final  int? coverColor;
 
@@ -239,18 +245,18 @@ _$DiaryBookCopyWith<_DiaryBook> get copyWith => __$DiaryBookCopyWithImpl<_DiaryB
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBook&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.inviteCode, inviteCode) || other.inviteCode == inviteCode)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.coverColor, coverColor) || other.coverColor == coverColor));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBook&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.inviteCode, inviteCode) || other.inviteCode == inviteCode)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.memberLimit, memberLimit) || other.memberLimit == memberLimit)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.coverColor, coverColor) || other.coverColor == coverColor));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,inviteCode,memberCount,createdBy,coverColor);
+    return Object.hash(runtimeType,id,name,inviteCode,memberCount,memberLimit,createdBy,coverColor);
 }
 
 @override
 String toString() {
-    return 'DiaryBook(id: $id, name: $name, inviteCode: $inviteCode, memberCount: $memberCount, createdBy: $createdBy, coverColor: $coverColor)';
+    return 'DiaryBook(id: $id, name: $name, inviteCode: $inviteCode, memberCount: $memberCount, memberLimit: $memberLimit, createdBy: $createdBy, coverColor: $coverColor)';
 }
 
 
@@ -261,7 +267,7 @@ abstract mixin class _$DiaryBookCopyWith<$Res> implements $DiaryBookCopyWith<$Re
   factory _$DiaryBookCopyWith(_DiaryBook value, $Res Function(_DiaryBook) _then) = __$DiaryBookCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String inviteCode, int memberCount, String? createdBy, int? coverColor
+ String id, String name, String inviteCode, int memberCount, int memberLimit, String? createdBy, int? coverColor
 });
 
 
@@ -278,12 +284,13 @@ class __$DiaryBookCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBook
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? inviteCode = null,Object? memberCount = null,Object? createdBy = freezed,Object? coverColor = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? inviteCode = null,Object? memberCount = null,Object? memberLimit = null,Object? createdBy = freezed,Object? coverColor = freezed,}) {
   return _then(_DiaryBook(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,inviteCode: null == inviteCode ? _self.inviteCode : inviteCode // ignore: cast_nullable_to_non_nullable
 as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,memberLimit: null == memberLimit ? _self.memberLimit : memberLimit // ignore: cast_nullable_to_non_nullable
 as int,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
 as String?,coverColor: freezed == coverColor ? _self.coverColor : coverColor // ignore: cast_nullable_to_non_nullable
 as int?,

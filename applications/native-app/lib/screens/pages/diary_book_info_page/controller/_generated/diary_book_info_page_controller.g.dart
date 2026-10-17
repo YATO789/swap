@@ -9,14 +9,16 @@ part of '../diary_book_info_page_controller.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
+/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 日記帳から抜けたりする。
 
 @ProviderFor(DiaryBookInfoPageController)
 final diaryBookInfoPageControllerProvider =
     DiaryBookInfoPageControllerFamily._();
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
+/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 日記帳から抜けたりする。
 final class DiaryBookInfoPageControllerProvider
     extends
         $AsyncNotifierProvider<
@@ -24,7 +26,8 @@ final class DiaryBookInfoPageControllerProvider
           DiaryBookInfoPageState
         > {
   /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-  /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
+  /// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+  /// 日記帳から抜けたりする。
   DiaryBookInfoPageControllerProvider._({
     required DiaryBookInfoPageControllerFamily super.from,
     required String super.argument,
@@ -63,10 +66,11 @@ final class DiaryBookInfoPageControllerProvider
 }
 
 String _$diaryBookInfoPageControllerHash() =>
-    r'02144b0faf134911ef6545f8abbd14b0266d1bad';
+    r'c8d39e5dd083db3c22f142397e1742aba7a323ad';
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
+/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 日記帳から抜けたりする。
 
 final class DiaryBookInfoPageControllerFamily extends $Family
     with
@@ -87,7 +91,8 @@ final class DiaryBookInfoPageControllerFamily extends $Family
       );
 
   /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-  /// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
+  /// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+  /// 日記帳から抜けたりする。
 
   DiaryBookInfoPageControllerProvider call(String diaryBookId) =>
       DiaryBookInfoPageControllerProvider._(argument: diaryBookId, from: this);
@@ -97,7 +102,8 @@ final class DiaryBookInfoPageControllerFamily extends $Family
 }
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
+/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 日記帳から抜けたりする。
 
 abstract class _$DiaryBookInfoPageController
     extends $AsyncNotifier<DiaryBookInfoPageState> {

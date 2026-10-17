@@ -75,6 +75,15 @@ class DiaryBookRepository extends _$DiaryBookRepository {
     );
   }
 
+  /// [diaryBookId] の日記帳に参加できる人数の上限を [memberLimit] 人にし、一覧にも映す。
+  Future<void> setMemberLimit(String diaryBookId, int memberLimit) async {
+    await _datasource.setMemberLimit(diaryBookId, memberLimit);
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(memberLimit: memberLimit),
+    );
+  }
+
   /// [diaryBookId] の日記帳の招待コードを作り直し、一覧にも映す。
   Future<void> regenerateInviteCode(String diaryBookId) async {
     final inviteCode = await _datasource.regenerateInviteCode(diaryBookId);

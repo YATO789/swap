@@ -18,7 +18,8 @@ abstract class DiaryBookInfoPageState with _$DiaryBookInfoPageState {
 }
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色を変えたり、招待コードを作り直したり、メンバーを外したり、日記帳から抜けたりする。
+/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 日記帳から抜けたりする。
 @riverpod
 class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
   DiaryBookRepository get _diaryBookRepository =>
@@ -31,12 +32,14 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
   }
 
   /// 全部読み直す。読み直している間も、今の内容を出したままにする。
+  /// 人数の上限などほかの人が変えたことも映るよう、日記帳の一覧も読み直す。
   Future<void> refresh() async {
     ref.invalidateSelf();
     try {
-      await future;
+      await (future, _diaryBookRepository.refresh()).wait;
     } catch (_) {
-      // 失敗したことは状態に入り、画面に出る。
+      // メンバーを読めなかったことは状態に入り、画面に出る。
+      // 一覧を読めなかったときは、今の一覧を出したままにする。
     }
   }
 
@@ -53,6 +56,14 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
     return _run(
       '表紙の色を変えられませんでした',
       () => _diaryBookRepository.setCoverColor(diaryBookId, coverColor),
+    );
+  }
+
+  /// 参加できる人数の上限を [memberLimit] 人にする。変えられたら true。
+  Future<bool> setMemberLimit(int memberLimit) {
+    return _run(
+      '人数の上限を変えられませんでした',
+      () => _diaryBookRepository.setMemberLimit(diaryBookId, memberLimit),
     );
   }
 

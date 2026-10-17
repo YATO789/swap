@@ -272,6 +272,7 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
       ],
       alreadyJoined: [...?state.value]
           .any((joined) => joined.id == diaryBook.id),
+      memberLimit: diaryBook.memberLimit,
       coverColor: diaryBook.coverColor,
     );
   }
@@ -305,6 +306,14 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
     _replace(
       diaryBookId,
       (diaryBook) => diaryBook.copyWith(coverColor: coverColor),
+    );
+  }
+
+  @override
+  Future<void> setMemberLimit(String diaryBookId, int memberLimit) async {
+    _replace(
+      diaryBookId,
+      (diaryBook) => diaryBook.copyWith(memberLimit: memberLimit),
     );
   }
 

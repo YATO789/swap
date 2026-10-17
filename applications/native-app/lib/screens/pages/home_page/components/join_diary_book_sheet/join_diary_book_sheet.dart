@@ -356,8 +356,9 @@ class _FoundDiaryBook extends StatelessWidget {
     };
     final note = switch (diaryBook) {
       InvitedDiaryBook(alreadyJoined: true) => 'この日記帳にはもう参加しています',
-      InvitedDiaryBook(isFull: true) => 'この日記帳は満員です（$maxDiaryBookMembers人まで）',
-      _ => 'あと${maxDiaryBookMembers - memberCount}人まで参加できます',
+      InvitedDiaryBook(isFull: true) =>
+        'この日記帳は満員です（${diaryBook.memberLimit}人まで）',
+      _ => 'あと${diaryBook.memberLimit - memberCount}人まで参加できます',
     };
 
     return Column(

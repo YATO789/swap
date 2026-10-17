@@ -13,6 +13,7 @@ import '../../components/diary_book_icon.dart';
 import '../../components/invite_sheet.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
+import 'components/member_limit_sheet.dart';
 import 'components/rename_sheet.dart';
 import 'controller/diary_book_info_page_controller.dart';
 
@@ -20,7 +21,7 @@ import 'controller/diary_book_info_page_controller.dart';
 const _lineHeight = 56.0;
 
 /// 日記帳の情報。日記帳を開いた最初のページのように、題名・書く人を
-/// 罫線の上にまとめて記す。名前や表紙の色はここで書き換えられ、
+/// 罫線の上にまとめて記す。名前や表紙の色、人数の上限はここで書き換えられ、
 /// 友達の招待・招待コードの作り直し・メンバーを外すこと・日記帳からの退出もここから行う。
 class DiaryBookInfoPage extends ConsumerWidget {
   const DiaryBookInfoPage({super.key, required this.diaryBookId});
@@ -39,8 +40,9 @@ class DiaryBookInfoPage extends ConsumerWidget {
     // 退出した直後はホームに戻る途中なので何も出さない。
     if (diaryBook == null) return const Scaffold();
 
-    // メンバーを外せるのは日記帳を作った人だけ。作った人が抜けていれば誰も外せない。
-    final canRemoveMembers = myId != null && diaryBook.createdBy == myId;
+    // メンバーを外したり人数の上限を変えたりできるのは日記帳を作った人だけ。
+    // 作った人が抜けていれば誰もできない。
+    final isCreator = myId != null && diaryBook.createdBy == myId;
 
     final provider = diaryBookInfoPageControllerProvider(diaryBookId);
     final pageState = ref.watch(provider);
@@ -68,6 +70,19 @@ class DiaryBookInfoPage extends ConsumerWidget {
     Future<void> setCoverColor(Color? color) async {
       if (!await controller().setCoverColor(color?.toARGB32())) {
         showMessage('表紙の色を変えられませんでした。もう一度お試しください');
+      }
+    }
+
+    Future<void> setMemberLimit() async {
+      final memberLimit = await showMemberLimitSheet(
+        context,
+        memberLimit: diaryBook.memberLimit,
+        // 一覧の人数より、このページで読んだメンバーのほうが新しい。
+        memberCount: pageState.value?.members.length ?? diaryBook.memberCount,
+      );
+      if (memberLimit == null || memberLimit == diaryBook.memberLimit) return;
+      if (!await controller().setMemberLimit(memberLimit)) {
+        showMessage('人数の上限を変えられませんでした。もう一度お試しください');
       }
     }
 
@@ -159,6 +174,12 @@ class DiaryBookInfoPage extends ConsumerWidget {
                 ),
               ),
               const _SectionLabel('この日記を書く人'),
+              _TapLine(
+                label: '人数の上限',
+                semanticsLabel: '人数の上限を変える',
+                onTap: isCreator ? setMemberLimit : null,
+                trailing: Text('${diaryBook.memberLimit}人まで'),
+              ),
               // 自分を先頭に、あとは参加した順に並べる。
               for (final (index, member) in [
                 ...value.members.where((member) => member.userId == myId),
@@ -168,9 +189,7 @@ class DiaryBookInfoPage extends ConsumerWidget {
                   number: index + 1,
                   member: member,
                   isMe: member.userId == myId,
-                  onRemove: canRemoveMembers
-                      ? () => removeMember(member)
-                      : null,
+                  onRemove: isCreator ? () => removeMember(member) : null,
                 ),
               _InviteLine(
                 inviteCode: diaryBook.inviteCode,
@@ -317,6 +336,7 @@ class _RuledLine extends StatelessWidget {
 }
 
 /// 押すと書き換えられる1行。左に項目名、右に今の値を出す。
+/// [onTap] が null なら書き換えられないので、値だけを出す。
 class _TapLine extends StatelessWidget {
   const _TapLine({
     required this.label,
@@ -327,38 +347,41 @@ class _TapLine extends StatelessWidget {
 
   final String label;
   final String semanticsLabel;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Widget trailing;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final onTap = this.onTap;
+
+    final line = _RuledLine(
+      child: Row(
+        children: [
+          Text(label, style: const TextStyle(fontSize: 15)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: DefaultTextStyle.merge(
+              textAlign: TextAlign.right,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 15, color: colors.textSecondary),
+              child: trailing,
+            ),
+          ),
+          if (onTap != null) ...[
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right, size: 20, color: colors.textSecondary),
+          ],
+        ],
+      ),
+    );
+    if (onTap == null) return line;
 
     return Semantics(
       button: true,
       label: semanticsLabel,
-      child: InkWell(
-        onTap: onTap,
-        child: _RuledLine(
-          child: Row(
-            children: [
-              Text(label, style: const TextStyle(fontSize: 15)),
-              const SizedBox(width: 16),
-              Expanded(
-                child: DefaultTextStyle.merge(
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 15, color: colors.textSecondary),
-                  child: trailing,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Icon(Icons.chevron_right, size: 20, color: colors.textSecondary),
-            ],
-          ),
-        ),
-      ),
+      child: InkWell(onTap: onTap, child: line),
     );
   }
 }

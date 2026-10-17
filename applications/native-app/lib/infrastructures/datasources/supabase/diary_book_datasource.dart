@@ -22,7 +22,7 @@ class DiaryBookDatasource {
     final rows = await _client
         .from('diary_books')
         .select(
-          'id, name, cover_color, invite_code, created_by, '
+          'id, name, cover_color, invite_code, member_limit, created_by, '
           'diary_book_members(count)',
         )
         .order('created_at');
@@ -56,6 +56,7 @@ class DiaryBookDatasource {
       name: row['name'] as String,
       memberNames: (row['member_names'] as List<dynamic>).cast<String>(),
       alreadyJoined: row['already_joined'] as bool,
+      memberLimit: row['member_limit'] as int,
       coverColor: row['cover_color'] as int?,
     );
   }
@@ -98,6 +99,15 @@ class DiaryBookDatasource {
         .eq('id', diaryBookId);
   }
 
+  /// [diaryBookId] の日記帳に参加できる人数の上限を [memberLimit] 人にする。
+  /// 作った人しか変えられず、今の人数より少なくはできない。
+  Future<void> setMemberLimit(String diaryBookId, int memberLimit) async {
+    await _client.rpc<void>(
+      'set_diary_book_member_limit',
+      params: {'p_diary_book_id': diaryBookId, 'p_member_limit': memberLimit},
+    );
+  }
+
   /// [diaryBookId] の日記帳の招待コードを作り直し、新しいコードを返す。
   Future<String> regenerateInviteCode(String diaryBookId) {
     return _client.rpc<String>(
@@ -129,6 +139,7 @@ class DiaryBookDatasource {
       name: row['name'] as String,
       inviteCode: row['invite_code'] as String,
       memberCount: memberCount,
+      memberLimit: row['member_limit'] as int,
       createdBy: row['created_by'] as String?,
       coverColor: row['cover_color'] as int?,
     );

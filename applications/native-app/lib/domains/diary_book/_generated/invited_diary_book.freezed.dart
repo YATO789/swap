@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 mixin _$InvitedDiaryBook {
 
  String get id; String get name; List<String> get memberNames;/// 自分がもう参加しているか。
- bool get alreadyJoined; int? get coverColor;
+ bool get alreadyJoined;/// 参加できる人数の上限。
+ int get memberLimit; int? get coverColor;
 /// Create a copy of InvitedDiaryBook
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,20 +29,20 @@ $InvitedDiaryBookCopyWith<InvitedDiaryBook> get copyWith => _$InvitedDiaryBookCo
 @override
 bool operator ==(Object other) {
   final _this = this as InvitedDiaryBook;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvitedDiaryBook&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&const DeepCollectionEquality().equals(other.memberNames, _this.memberNames)&&(identical(other.alreadyJoined, _this.alreadyJoined) || other.alreadyJoined == _this.alreadyJoined)&&(identical(other.coverColor, _this.coverColor) || other.coverColor == _this.coverColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InvitedDiaryBook&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&const DeepCollectionEquality().equals(other.memberNames, _this.memberNames)&&(identical(other.alreadyJoined, _this.alreadyJoined) || other.alreadyJoined == _this.alreadyJoined)&&(identical(other.memberLimit, _this.memberLimit) || other.memberLimit == _this.memberLimit)&&(identical(other.coverColor, _this.coverColor) || other.coverColor == _this.coverColor));
 }
 
 
 @override
 int get hashCode {
   final _this = this as InvitedDiaryBook;
-  return Object.hash(runtimeType,_this.id,_this.name,const DeepCollectionEquality().hash(_this.memberNames),_this.alreadyJoined,_this.coverColor);
+  return Object.hash(runtimeType,_this.id,_this.name,const DeepCollectionEquality().hash(_this.memberNames),_this.alreadyJoined,_this.memberLimit,_this.coverColor);
 }
 
 @override
 String toString() {
   final _this = this as InvitedDiaryBook;
-  return 'InvitedDiaryBook(id: ${_this.id}, name: ${_this.name}, memberNames: ${_this.memberNames}, alreadyJoined: ${_this.alreadyJoined}, coverColor: ${_this.coverColor})';
+  return 'InvitedDiaryBook(id: ${_this.id}, name: ${_this.name}, memberNames: ${_this.memberNames}, alreadyJoined: ${_this.alreadyJoined}, memberLimit: ${_this.memberLimit}, coverColor: ${_this.coverColor})';
 }
 
 
@@ -52,7 +53,7 @@ abstract mixin class $InvitedDiaryBookCopyWith<$Res>  {
   factory $InvitedDiaryBookCopyWith(InvitedDiaryBook value, $Res Function(InvitedDiaryBook) _then) = _$InvitedDiaryBookCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, List<String> memberNames, bool alreadyJoined, int? coverColor
+ String id, String name, List<String> memberNames, bool alreadyJoined, int memberLimit, int? coverColor
 });
 
 
@@ -69,13 +70,14 @@ class _$InvitedDiaryBookCopyWithImpl<$Res>
 
 /// Create a copy of InvitedDiaryBook
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? memberNames = null,Object? alreadyJoined = null,Object? coverColor = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? memberNames = null,Object? alreadyJoined = null,Object? memberLimit = null,Object? coverColor = freezed,}) {
   return _then(InvitedDiaryBook(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,memberNames: null == memberNames ? _self.memberNames : memberNames // ignore: cast_nullable_to_non_nullable
 as List<String>,alreadyJoined: null == alreadyJoined ? _self.alreadyJoined : alreadyJoined // ignore: cast_nullable_to_non_nullable
-as bool,coverColor: freezed == coverColor ? _self.coverColor : coverColor // ignore: cast_nullable_to_non_nullable
+as bool,memberLimit: null == memberLimit ? _self.memberLimit : memberLimit // ignore: cast_nullable_to_non_nullable
+as int,coverColor: freezed == coverColor ? _self.coverColor : coverColor // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
@@ -161,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  List<String> memberNames,  bool alreadyJoined,  int? coverColor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  List<String> memberNames,  bool alreadyJoined,  int memberLimit,  int? coverColor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _InvitedDiaryBook() when $default != null:
-return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.coverColor);case _:
+return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.memberLimit,_that.coverColor);case _:
   return orElse();
 
 }
@@ -182,10 +184,10 @@ return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  List<String> memberNames,  bool alreadyJoined,  int? coverColor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  List<String> memberNames,  bool alreadyJoined,  int memberLimit,  int? coverColor)  $default,) {final _that = this;
 switch (_that) {
 case _InvitedDiaryBook():
-return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.coverColor);case _:
+return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.memberLimit,_that.coverColor);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +204,10 @@ return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  List<String> memberNames,  bool alreadyJoined,  int? coverColor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  List<String> memberNames,  bool alreadyJoined,  int memberLimit,  int? coverColor)?  $default,) {final _that = this;
 switch (_that) {
 case _InvitedDiaryBook() when $default != null:
-return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.coverColor);case _:
+return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.memberLimit,_that.coverColor);case _:
   return null;
 
 }
@@ -217,7 +219,7 @@ return $default(_that.id,_that.name,_that.memberNames,_that.alreadyJoined,_that.
 
 
 class _InvitedDiaryBook extends InvitedDiaryBook {
-  const _InvitedDiaryBook({required this.id, required this.name, required  List<String> memberNames, required this.alreadyJoined, this.coverColor}): _memberNames = memberNames,super._();
+  const _InvitedDiaryBook({required this.id, required this.name, required  List<String> memberNames, required this.alreadyJoined, this.memberLimit = maxDiaryBookMembers, this.coverColor}): _memberNames = memberNames,super._();
   
 
 @override final  String id;
@@ -231,6 +233,8 @@ class _InvitedDiaryBook extends InvitedDiaryBook {
 
 /// 自分がもう参加しているか。
 @override final  bool alreadyJoined;
+/// 参加できる人数の上限。
+@override@JsonKey() final  int memberLimit;
 @override final  int? coverColor;
 
 /// Create a copy of InvitedDiaryBook
@@ -243,18 +247,18 @@ _$InvitedDiaryBookCopyWith<_InvitedDiaryBook> get copyWith => __$InvitedDiaryBoo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvitedDiaryBook&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.memberNames, _memberNames)&&(identical(other.alreadyJoined, alreadyJoined) || other.alreadyJoined == alreadyJoined)&&(identical(other.coverColor, coverColor) || other.coverColor == coverColor));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvitedDiaryBook&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.memberNames, _memberNames)&&(identical(other.alreadyJoined, alreadyJoined) || other.alreadyJoined == alreadyJoined)&&(identical(other.memberLimit, memberLimit) || other.memberLimit == memberLimit)&&(identical(other.coverColor, coverColor) || other.coverColor == coverColor));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,const DeepCollectionEquality().hash(_memberNames),alreadyJoined,coverColor);
+    return Object.hash(runtimeType,id,name,const DeepCollectionEquality().hash(_memberNames),alreadyJoined,memberLimit,coverColor);
 }
 
 @override
 String toString() {
-    return 'InvitedDiaryBook(id: $id, name: $name, memberNames: $memberNames, alreadyJoined: $alreadyJoined, coverColor: $coverColor)';
+    return 'InvitedDiaryBook(id: $id, name: $name, memberNames: $memberNames, alreadyJoined: $alreadyJoined, memberLimit: $memberLimit, coverColor: $coverColor)';
 }
 
 
@@ -265,7 +269,7 @@ abstract mixin class _$InvitedDiaryBookCopyWith<$Res> implements $InvitedDiaryBo
   factory _$InvitedDiaryBookCopyWith(_InvitedDiaryBook value, $Res Function(_InvitedDiaryBook) _then) = __$InvitedDiaryBookCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, List<String> memberNames, bool alreadyJoined, int? coverColor
+ String id, String name, List<String> memberNames, bool alreadyJoined, int memberLimit, int? coverColor
 });
 
 
@@ -282,13 +286,14 @@ class __$InvitedDiaryBookCopyWithImpl<$Res>
 
 /// Create a copy of InvitedDiaryBook
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? memberNames = null,Object? alreadyJoined = null,Object? coverColor = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? memberNames = null,Object? alreadyJoined = null,Object? memberLimit = null,Object? coverColor = freezed,}) {
   return _then(_InvitedDiaryBook(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,memberNames: null == memberNames ? _self._memberNames : memberNames // ignore: cast_nullable_to_non_nullable
 as List<String>,alreadyJoined: null == alreadyJoined ? _self.alreadyJoined : alreadyJoined // ignore: cast_nullable_to_non_nullable
-as bool,coverColor: freezed == coverColor ? _self.coverColor : coverColor // ignore: cast_nullable_to_non_nullable
+as bool,memberLimit: null == memberLimit ? _self.memberLimit : memberLimit // ignore: cast_nullable_to_non_nullable
+as int,coverColor: freezed == coverColor ? _self.coverColor : coverColor // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }

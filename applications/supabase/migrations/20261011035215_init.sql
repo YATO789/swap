@@ -17,6 +17,8 @@ create table public.diary_books (
   cover_color bigint check (cover_color between 0 and 4294967295),
   -- 大文字と小文字を区別する。読み間違えやすい 0/O/o・1/I/l は使わない。
   invite_code text not null unique check (invite_code ~ '^[A-HJ-NP-Za-kmnp-z2-9]{7}$'),
+  -- 参加できる人数の上限。作った人が 1〜8 人で変えられる。アプリの maxDiaryBookMembers と合わせる。
+  member_limit smallint not null default 8 check (member_limit between 1 and 8),
   created_by uuid references public.profiles (id) on delete set null,
   created_at timestamptz not null default now()
 );
@@ -249,7 +251,7 @@ using (
 );
 
 -- 変えてよい列だけ更新を許す ----------------------------------------------------
--- 招待コード・作者・日付・書いた時刻は、ポリシーを通っても書き換えさせない。
+-- 招待コード・人数の上限・作者・日付・書いた時刻は、ポリシーを通っても書き換えさせない。
 
 revoke update on public.diary_books from anon, authenticated;
 grant update (name, cover_color) on public.diary_books to authenticated;
@@ -315,6 +317,7 @@ returns table (
   id uuid,
   name text,
   cover_color bigint,
+  member_limit smallint,
   member_names text[],
   already_joined boolean
 )
@@ -324,6 +327,7 @@ as $$
     b.id,
     b.name,
     b.cover_color,
+    b.member_limit,
     array(
       select p.display_name
       from public.diary_book_members m
@@ -341,20 +345,21 @@ as $$
 $$;
 
 -- 招待コードで日記帳に参加する。コードが違えば null。もう参加していれば何もせずその id を返す。
--- 1冊に入れるのは8人まで。アプリの maxDiaryBookMembers と合わせる。
+-- 入れるのは日記帳の member_limit 人まで。
 create function public.join_diary_book(p_code text)
 returns uuid
 language plpgsql security definer set search_path = ''
 as $$
 declare
   v_id uuid;
+  v_member_limit smallint;
 begin
   if (select auth.uid()) is null then
     raise exception 'not signed in';
   end if;
 
-  -- 同時に参加して8人を超えないように、日記帳の行を押さえてから数える。
-  select id into v_id from public.diary_books
+  -- 同時に参加したり上限を変えたりして上限を超えないように、日記帳の行を押さえてから数える。
+  select id, member_limit into v_id, v_member_limit from public.diary_books
   where invite_code = btrim(p_code)
   for update;
   if v_id is null then
@@ -366,7 +371,7 @@ begin
     where diary_book_id = v_id and user_id = (select auth.uid())
   ) and (
     select count(*) from public.diary_book_members where diary_book_id = v_id
-  ) >= 8 then
+  ) >= v_member_limit then
     raise exception 'diary book is full';
   end if;
 
@@ -428,6 +433,32 @@ begin
   delete from public.diary_book_members
   where diary_book_id = p_diary_book_id and user_id = p_user_id;
   return public.regenerate_invite_code(p_diary_book_id);
+end;
+$$;
+
+-- 日記帳に参加できる人数の上限を変える。変えられるのは日記帳を作った人だけ。
+-- 今の人数より少なくはできない。member_limit はアプリから書き換えさせていないので、security definer にする。
+create function public.set_diary_book_member_limit(p_diary_book_id uuid, p_member_limit smallint)
+returns void
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  -- 同時に参加されて上限を超えないように、日記帳の行を押さえてから数える。
+  perform 1 from public.diary_books
+  where id = p_diary_book_id and created_by = (select auth.uid())
+  for update;
+  if not found or not public.is_member(p_diary_book_id) then
+    raise exception 'not the creator';
+  end if;
+
+  if p_member_limit < (
+    select count(*) from public.diary_book_members where diary_book_id = p_diary_book_id
+  ) then
+    raise exception 'member limit is below member count';
+  end if;
+
+  update public.diary_books set member_limit = p_member_limit
+  where id = p_diary_book_id;
 end;
 $$;
 

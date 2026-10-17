@@ -39,7 +39,12 @@ const _members = [
 
 /// サインインした状態のホームから大学の日記帳を開き、情報ページを開く。
 /// [createdByMe] なら、自分が大学の日記帳を作ったことにする。
-Future<void> _openInfo(WidgetTester tester, {bool createdByMe = false}) async {
+/// [refreshed] は、読み直したときに返す日記帳の一覧。ほかの人が変えたことにする。
+Future<void> _openInfo(
+  WidgetTester tester, {
+  bool createdByMe = false,
+  List<DiaryBook>? refreshed,
+}) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
@@ -72,7 +77,7 @@ Future<void> _openInfo(WidgetTester tester, {bool createdByMe = false}) async {
                 _university,
             ],
             members: {_university.id: _members},
-          ),
+          )..refreshed = refreshed,
         ),
         diaryRepositoryProvider.overrideWithValue(
           FakeDiaryRepository({
@@ -185,6 +190,53 @@ void main() {
 
     expect(find.byTooltip('美緒さんのメニュー'), findsNothing);
     expect(find.byTooltip('健太さんのメニュー'), findsNothing);
+  });
+
+  testWidgets('作った人は人数の上限を変えられ、今の人数より少なくは選べない', (tester) async {
+    await _openInfo(tester, createdByMe: true);
+
+    expect(find.text('8人まで'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel(RegExp('^人数の上限を変える')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('8人まで・あと5人'), findsOneWidget);
+
+    // 3人いるので、2人は押しても選べない。
+    await tester.tap(find.bySemanticsLabel('2人'));
+    await tester.pump();
+    expect(find.text('8人まで・あと5人'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('3人'));
+    await tester.pump();
+    expect(find.text('3人まで・満員'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('5人'));
+    await tester.pump();
+    expect(find.text('5人まで・あと2人'), findsOneWidget);
+    await tester.tap(find.text('保存する'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('5人まで'), findsOneWidget);
+  });
+
+  testWidgets('引っぱって読み直すと、ほかの人が変えた人数の上限も映る', (tester) async {
+    await _openInfo(
+      tester,
+      refreshed: [_university.copyWith(memberLimit: 4)],
+    );
+    expect(find.text('8人まで'), findsOneWidget);
+
+    await tester.fling(find.text('表紙'), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+
+    expect(find.text('4人まで'), findsOneWidget);
+  });
+
+  testWidgets('作った人でなければ、人数の上限は見えるだけで変えられない', (tester) async {
+    await _openInfo(tester);
+
+    expect(find.text('8人まで'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('^人数の上限を変える')), findsNothing);
   });
 
   testWidgets('退出するとホームに戻り、一覧から日記帳が消える', (tester) async {
