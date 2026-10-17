@@ -8,12 +8,14 @@ class FakePreferencesStore implements PreferencesStore {
     Set<String>? postDiaryBookIds,
     this.postHintVisible = true,
     this.themeMode = ThemeMode.system,
+    this.updateSkippedAt,
   }) : postDiaryBookIds = postDiaryBookIds ?? {};
 
   bool diaryBookGrid;
   Set<String> postDiaryBookIds;
   bool postHintVisible;
   ThemeMode themeMode;
+  DateTime? updateSkippedAt;
 
   @override
   bool readDiaryBookGrid() => diaryBookGrid;
@@ -45,5 +47,13 @@ class FakePreferencesStore implements PreferencesStore {
   @override
   Future<void> saveThemeMode(ThemeMode mode) async {
     themeMode = mode;
+  }
+
+  @override
+  DateTime? readUpdateSkippedAt() => updateSkippedAt;
+
+  @override
+  Future<void> saveUpdateSkippedAt(DateTime skippedAt) async {
+    updateSkippedAt = skippedAt;
   }
 }

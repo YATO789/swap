@@ -219,5 +219,11 @@
   "welcomeAgreementPrefix": "By continuing, you agree to our\n",
   "welcomeAgreementConjunction": " and ",
   "welcomeAgreementSuffix": ".",
-  "splashLoadFailed": "Couldn't load"
+  "splashLoadFailed": "Couldn't load",
+  "updateRequiredTitle": "Please update the app",
+  "updateRequiredMessage": "A new version is available.\nYou need to update to keep using the app.",
+  "updateOptionalTitle": "A new version is available",
+  "updateOptionalMessage": "Update to get the latest features and improvements.",
+  "updateNow": "Update",
+  "updateLater": "Later"
 }

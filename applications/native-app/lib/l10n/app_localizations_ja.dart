@@ -748,4 +748,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get splashLoadFailed => '読み込めませんでした';
+
+  @override
+  String get updateRequiredTitle => 'アップデートしてください';
+
+  @override
+  String get updateRequiredMessage => '新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。';
+
+  @override
+  String get updateOptionalTitle => '新しいバージョンがあります';
+
+  @override
+  String get updateOptionalMessage => 'アップデートすると、新しい機能や改善を使えます。';
+
+  @override
+  String get updateNow => 'アップデート';
+
+  @override
+  String get updateLater => 'あとで';
 }

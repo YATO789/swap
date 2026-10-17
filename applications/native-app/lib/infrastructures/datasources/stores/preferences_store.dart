@@ -8,6 +8,7 @@ const diaryBookGridKey = 'diary_book_grid';
 const postDiaryBookIdsKey = 'post_diary_book_ids';
 const postHintVisibleKey = 'post_hint_visible';
 const themeModeKey = 'theme_mode';
+const updateSkippedAtKey = 'update_skipped_at';
 
 /// 端末に保存する値の読み書きに使う SharedPreferences。
 /// 読み込みを待ってから使いたいので、main で作ったものに差し替える。
@@ -31,6 +32,7 @@ class PreferencesStore {
     postDiaryBookIdsKey,
     postHintVisibleKey,
     themeModeKey,
+    updateSkippedAtKey,
   };
 
   final SharedPreferencesWithCache _preferences;
@@ -71,5 +73,18 @@ class PreferencesStore {
 
   Future<void> saveThemeMode(ThemeMode mode) {
     return _preferences.setString(themeModeKey, mode.name);
+  }
+
+  /// アップデートの案内で最後に「あとで」を押した日時。まだ押したことがなければ null。
+  DateTime? readUpdateSkippedAt() {
+    final saved = _preferences.getInt(updateSkippedAtKey);
+    return saved == null ? null : DateTime.fromMillisecondsSinceEpoch(saved);
+  }
+
+  Future<void> saveUpdateSkippedAt(DateTime skippedAt) {
+    return _preferences.setInt(
+      updateSkippedAtKey,
+      skippedAt.millisecondsSinceEpoch,
+    );
   }
 }

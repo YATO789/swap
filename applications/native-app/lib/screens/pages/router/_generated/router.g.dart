@@ -11,6 +11,7 @@ List<RouteBase> get $appRoutes => [
   $welcomeRoute,
   $splashRoute,
   $onboardingRoute,
+  $updateRoute,
   $createDiaryBookRoute,
   $diaryBookRoute,
   $diaryBookInfoRoute,
@@ -110,6 +111,32 @@ mixin $OnboardingRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/onboarding');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $updateRoute => GoRouteData.$route(
+  path: '/update',
+  hasOverriddenOnExit: false,
+  factory: $UpdateRoute._fromState,
+);
+
+mixin $UpdateRoute on GoRouteData {
+  static UpdateRoute _fromState(GoRouterState state) => const UpdateRoute();
+
+  @override
+  String get location => GoRouteData.$location('/update');
 
   @override
   void go(BuildContext context) => context.go(location);
@@ -344,8 +371,9 @@ mixin $ProfileEditRoute on GoRouteData {
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
+/// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
 ///
+/// - アップデートしないと使えない: アップデートの画面
 /// - サインインしていない: ウェルカム画面
 /// - プロフィールを読んでいる: スプラッシュ画面
 /// - プロフィールがまだない: オンボーディング画面
@@ -356,8 +384,9 @@ mixin $ProfileEditRoute on GoRouteData {
 @ProviderFor(router)
 final routerProvider = RouterProvider._();
 
-/// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
+/// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
 ///
+/// - アップデートしないと使えない: アップデートの画面
 /// - サインインしていない: ウェルカム画面
 /// - プロフィールを読んでいる: スプラッシュ画面
 /// - プロフィールがまだない: オンボーディング画面
@@ -368,8 +397,9 @@ final routerProvider = RouterProvider._();
 final class RouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  /// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
+  /// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
   ///
+  /// - アップデートしないと使えない: アップデートの画面
   /// - サインインしていない: ウェルカム画面
   /// - プロフィールを読んでいる: スプラッシュ画面
   /// - プロフィールがまだない: オンボーディング画面
@@ -409,4 +439,4 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'df9468d1795bc5e352fca88637023f5817b9577f';
+String _$routerHash() => r'5dc359df1029565959ce9abbab78bc4149b610c0';

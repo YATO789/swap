@@ -3,10 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
+import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
+import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_grid_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
@@ -35,7 +37,11 @@ List<Override> _overrides(
   List<DiaryBook> diaryBooks, {
   FakeOpenedNotificationRepository? notifications,
   FakeDiaryBookRepository? diaryBookRepository,
+  FakeAppUpdateRepository? appUpdateRepository,
 }) => [
+  appUpdateRepositoryProvider.overrideWith(
+    () => appUpdateRepository ?? FakeAppUpdateRepository(),
+  ),
   authenticationRepositoryProvider.overrideWith(
     () => FakeAuthenticationRepository(
       initial: const Authentication(isLoginApp: true),
@@ -127,6 +133,30 @@ void main() {
 
     expect(find.byIcon(Icons.chevron_right), findsNothing);
     expect(find.text('5人'), findsOneWidget);
+  });
+
+  testWidgets('新しいバージョンがあれば知らせ、あとでにすると覚えておく', (tester) async {
+    final repository = FakeAppUpdateRepository(AppUpdate.optional);
+    await tester.pumpApp(
+      const HomePage(),
+      overrides: _overrides(_diaryBooks, appUpdateRepository: repository),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('新しいバージョンがあります'), findsOneWidget);
+
+    await tester.tap(find.text('あとで'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('新しいバージョンがあります'), findsNothing);
+    expect(repository.skipped, isTrue);
+  });
+
+  testWidgets('アップデートしなくてよければ知らせない', (tester) async {
+    await _pumpHome(tester, _diaryBooks);
+    await tester.pumpAndSettle();
+
+    expect(find.text('新しいバージョンがあります'), findsNothing);
   });
 
   testWidgets('引っ張ると、ほかの人が変えた名前や表紙を読み直す', (tester) async {

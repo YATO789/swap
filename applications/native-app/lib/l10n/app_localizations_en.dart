@@ -837,4 +837,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get splashLoadFailed => 'Couldn\'t load';
+
+  @override
+  String get updateRequiredTitle => 'Please update the app';
+
+  @override
+  String get updateRequiredMessage =>
+      'A new version is available.\nYou need to update to keep using the app.';
+
+  @override
+  String get updateOptionalTitle => 'A new version is available';
+
+  @override
+  String get updateOptionalMessage =>
+      'Update to get the latest features and improvements.';
+
+  @override
+  String get updateNow => 'Update';
+
+  @override
+  String get updateLater => 'Later';
 }

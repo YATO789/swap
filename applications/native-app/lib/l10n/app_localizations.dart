@@ -1417,6 +1417,42 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'読み込めませんでした'**
   String get splashLoadFailed;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'アップデートしてください'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredMessage.
+  ///
+  /// In ja, this message translates to:
+  /// **'新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。'**
+  String get updateRequiredMessage;
+
+  /// No description provided for @updateOptionalTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'新しいバージョンがあります'**
+  String get updateOptionalTitle;
+
+  /// No description provided for @updateOptionalMessage.
+  ///
+  /// In ja, this message translates to:
+  /// **'アップデートすると、新しい機能や改善を使えます。'**
+  String get updateOptionalMessage;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In ja, this message translates to:
+  /// **'アップデート'**
+  String get updateNow;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In ja, this message translates to:
+  /// **'あとで'**
+  String get updateLater;
 }
 
 class _AppLocalizationsDelegate

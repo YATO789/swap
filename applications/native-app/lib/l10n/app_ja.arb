@@ -574,5 +574,11 @@
   "@welcomeAgreementSuffix": {
     "description": "同意文のうち、プライバシーポリシーのリンクの後"
   },
-  "splashLoadFailed": "読み込めませんでした"
+  "splashLoadFailed": "読み込めませんでした",
+  "updateRequiredTitle": "アップデートしてください",
+  "updateRequiredMessage": "新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。",
+  "updateOptionalTitle": "新しいバージョンがあります",
+  "updateOptionalMessage": "アップデートすると、新しい機能や改善を使えます。",
+  "updateNow": "アップデート",
+  "updateLater": "あとで"
 }

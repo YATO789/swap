@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
@@ -9,6 +10,7 @@ import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/post/timeline_post.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
@@ -16,6 +18,23 @@ import 'package:swap/infrastructures/repositories/opened_notification_repository
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/infrastructures/repositories/push_token_repository.dart';
+
+/// Remote Config を見ず、[initial] を返す。「あとで」を押すと [skipped] を true にする。
+class FakeAppUpdateRepository extends AppUpdateRepository {
+  FakeAppUpdateRepository([this.initial = AppUpdate.none]);
+
+  final AppUpdate initial;
+  var skipped = false;
+
+  @override
+  Future<AppUpdate> build() async => initial;
+
+  @override
+  Future<void> skip() async {
+    skipped = true;
+    state = const AsyncData(AppUpdate.none);
+  }
+}
 
 /// Supabase につながず、サインインすると少し待ってからサインイン済みになる。
 class FakeAuthenticationRepository extends AuthenticationRepository {

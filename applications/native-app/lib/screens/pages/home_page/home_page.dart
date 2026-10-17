@@ -3,7 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../domains/app_update/app_update.dart';
 import '../../../domains/diary_book/diary_book.dart';
+import '../../../infrastructures/repositories/app_update_repository.dart';
 import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/opened_notification_repository.dart';
@@ -17,6 +19,7 @@ import 'components/empty_diary_books.dart';
 import '../../components/invite_sheet.dart';
 import 'components/join_diary_book_sheet/join_diary_book_sheet.dart';
 import 'components/post_hint.dart';
+import 'components/update_sheet.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
@@ -51,6 +54,27 @@ class HomePage extends HookConsumerWidget {
     useOnAppLifecycleStateChange((_, state) {
       if (state == AppLifecycleState.resumed) resetUnreadCount();
     });
+
+    // 新しいバージョンがあれば、一度だけ知らせる。ホームを開く前に確かめ終わっていることもある。
+    // アップデートしないと使えないときは、ルーターがアップデートの画面に切り替える。
+    useEffect(() {
+      final subscription = ref.listenManual(appUpdateRepositoryProvider, (
+        previous,
+        next,
+      ) {
+        if (previous?.value == AppUpdate.optional ||
+            next.value != AppUpdate.optional) {
+          return;
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!context.mounted) return;
+          final updating = await showUpdateSheet(context);
+          if (updating || !context.mounted) return;
+          await ref.read(appUpdateRepositoryProvider.notifier).skip();
+        });
+      }, fireImmediately: true);
+      return subscription.close;
+    }, const []);
 
     void openDiaryBook(DiaryBook diaryBook) =>
         DiaryBookRoute(id: diaryBook.id).push<void>(context);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:swap/domains/app_update/app_update.dart';
+import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 
@@ -14,12 +16,14 @@ import '../my_page/my_page.dart';
 import '../onboarding_page/onboarding_page.dart';
 import '../profile_edit_page/profile_edit_page.dart';
 import '../splash_page/splash_page.dart';
+import '../update_page/update_page.dart';
 import '../welcome_page/welcome_page.dart';
 
 part '_generated/router.g.dart';
 
-/// アプリの画面遷移。サインイン状態とプロフィールの有無で出す画面を決める。
+/// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
 ///
+/// - アップデートしないと使えない: アップデートの画面
 /// - サインインしていない: ウェルカム画面
 /// - プロフィールを読んでいる: スプラッシュ画面
 /// - プロフィールがまだない: オンボーディング画面
@@ -31,6 +35,7 @@ GoRouter router(Ref ref) {
   // ルーターは作り直さず、状態が変わったことだけを伝える。値に意味はない。
   final refresh = ValueNotifier(0);
   ref
+    ..listen(appUpdateRepositoryProvider, (_, _) => refresh.value++)
     ..listen(authenticationRepositoryProvider, (_, _) => refresh.value++)
     ..listen(profileRepositoryProvider, (_, _) => refresh.value++);
 
@@ -38,6 +43,7 @@ GoRouter router(Ref ref) {
   final welcome = const WelcomeRoute().location;
   final splash = const SplashRoute().location;
   final onboarding = const OnboardingRoute().location;
+  final update = const UpdateRoute().location;
 
   final router = GoRouter(
     initialLocation: home,
@@ -45,6 +51,10 @@ GoRouter router(Ref ref) {
     redirect: (_, state) {
       String? goTo(String path) => state.matchedLocation == path ? null : path;
 
+      // 確かめている間や確かめられなかったときは、使えるままにする。
+      if (ref.read(appUpdateRepositoryProvider).value == AppUpdate.required) {
+        return goTo(update);
+      }
       if (!ref.read(authenticationRepositoryProvider).isLoginApp) {
         return goTo(welcome);
       }
@@ -56,6 +66,7 @@ GoRouter router(Ref ref) {
         welcome,
         splash,
         onboarding,
+        update,
       ].contains(state.matchedLocation);
       return isEntrance ? home : null;
     },
@@ -111,6 +122,14 @@ class OnboardingRoute extends GoRouteData with $OnboardingRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const OnboardingPage();
+}
+
+@TypedGoRoute<UpdateRoute>(path: '/update')
+class UpdateRoute extends GoRouteData with $UpdateRoute {
+  const UpdateRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) => const UpdatePage();
 }
 
 /// 日記帳を作るページ。作った日記帳を返す。
