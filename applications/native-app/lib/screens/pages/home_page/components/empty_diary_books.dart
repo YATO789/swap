@@ -134,8 +134,24 @@ class _StackedCovers extends StatelessWidget {
                 child: DiaryCover(color: _peach, width: backWidth),
               ),
             ),
-            // 無地だと寂しいので、表紙にアプリの名前を入れておく。
-            DiaryCover(name: 'Swap!', color: initialCoverColor, width: width),
+            // 無地だと寂しいので、表紙にアプリのロゴを入れておく。
+            // 位置は表紙の名前と同じく、背表紙を除いた上のほうの真ん中。
+            Stack(
+              children: [
+                DiaryCover(color: initialCoverColor, width: width),
+                Positioned(
+                  left: width * 28 / 168,
+                  right: width * 16 / 168,
+                  top: width * 40 / 168,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/icons/swap_title.png',
+                      width: width * 0.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
