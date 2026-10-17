@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary_book/diary_book.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/cover_color_picker.dart';
 import '../../components/diary_cover.dart';
@@ -42,7 +43,7 @@ class CreateDiaryBookPage extends HookConsumerWidget {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
-            const SnackBar(content: Text('日記帳を作れませんでした。もう一度お試しください')),
+            SnackBar(content: Text(context.l10n.createDiaryBookFailed)),
           );
         return;
       }
@@ -54,7 +55,7 @@ class CreateDiaryBookPage extends HookConsumerWidget {
       dirty: name.isNotEmpty,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('日記帳を作る'),
+          title: Text(context.l10n.commonCreateDiaryBook),
           leadingWidth: 112,
           // 閉じるときも DiscardGuard の確認を通す。
           leading: TextButton(
@@ -65,7 +66,11 @@ class CreateDiaryBookPage extends HookConsumerWidget {
                 fontWeight: FontWeight.w400,
               ),
             ),
-            child: const Text('キャンセル', maxLines: 1, softWrap: false),
+            child: Text(
+              context.l10n.commonCancel,
+              maxLines: 1,
+              softWrap: false,
+            ),
           ),
           actions: [
             TextButton(
@@ -78,7 +83,7 @@ class CreateDiaryBookPage extends HookConsumerWidget {
                         color: colors.textSecondary,
                       ),
                     )
-                  : const Text('作成'),
+                  : Text(context.l10n.createDiaryBookCreate),
             ),
             const SizedBox(width: 8),
           ],
@@ -121,7 +126,7 @@ class CreateDiaryBookPage extends HookConsumerWidget {
                 _NameField(controller: nameController, onSubmitted: create),
                 const SizedBox(height: 12),
                 Text(
-                  '名前の最初の1文字がアイコンになります',
+                  context.l10n.createDiaryBookIconHint,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: colors.textSecondary),
                 ),
@@ -154,7 +159,7 @@ class _NameField extends StatelessWidget {
       onSubmitted: (_) => onSubmitted(),
       style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
-        hintText: '日記帳の名前を入力',
+        hintText: context.l10n.commonDiaryBookNameHint,
         // 上限で止まるだけにして、文字数の表示は出さない。
         counterText: '',
         filled: true,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 
 /// [showAddDiaryBookSheet] で選んだこと。
@@ -18,6 +19,8 @@ class _AddDiaryBookSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return SafeArea(
       child: Padding(
         // 上はドラッグハンドルがあるので詰める。
@@ -27,14 +30,14 @@ class _AddDiaryBookSheet extends StatelessWidget {
           children: [
             _ActionTile(
               icon: Icons.add_circle_outline,
-              title: '日記帳を作る',
-              subtitle: '新しい日記帳を作って友達を招待します',
+              title: l10n.commonCreateDiaryBook,
+              subtitle: l10n.addDiaryBookCreateDescription,
               onTap: () => Navigator.of(context).pop(AddDiaryBookAction.create),
             ),
             _ActionTile(
               icon: Icons.key_outlined,
-              title: '招待コードで参加',
-              subtitle: '友達から届いたコードで日記帳に入ります',
+              title: l10n.commonJoinWithInviteCode,
+              subtitle: l10n.addDiaryBookJoinDescription,
               onTap: () => Navigator.of(context).pop(AddDiaryBookAction.join),
             ),
           ],

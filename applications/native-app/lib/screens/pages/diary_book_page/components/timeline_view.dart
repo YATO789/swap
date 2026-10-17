@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import '../../../../domains/diary/diary.dart';
 import '../../../../domains/diary_book/diary_book_member.dart';
 import '../../../../domains/post/timeline_post.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 import '../../../components/user_avatar.dart';
@@ -78,7 +79,8 @@ class TimelineView extends HookWidget {
       for (final member in members) member.userId: member.displayName,
     };
     // 日記帳を抜けた人の名前は読めない。
-    String nameOf(String userId) => names[userId] ?? '抜けたメンバー';
+    String nameOf(String userId) =>
+        names[userId] ?? context.l10n.commonFormerMember;
 
     final hours = _groupByHour(posts);
     final currentHour = date == diaryDateOf(now.value) ? now.value.hour : null;
@@ -189,7 +191,10 @@ class _EmptyPosts extends StatelessWidget {
       children: [
         Icon(Icons.schedule_outlined, size: 32, color: color),
         const SizedBox(height: 8),
-        Text('この日の記録はありません', style: TextStyle(fontSize: 14, color: color)),
+        Text(
+          context.l10n.commonNoPostsThisDay,
+          style: TextStyle(fontSize: 14, color: color),
+        ),
       ],
     );
   }
@@ -357,7 +362,7 @@ class _MemberCard extends StatelessWidget {
                   if (posts.isEmpty) ...[
                     const SizedBox(height: 2),
                     Text(
-                      'まだ記録がありません',
+                      context.l10n.timelineNoPostsYet,
                       style: TextStyle(
                         fontSize: 14,
                         color: colors.textSecondary,

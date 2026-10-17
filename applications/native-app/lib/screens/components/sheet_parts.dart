@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
 import '../../theme/app_theme.dart';
 
 /// 確認や入力に使うボトムシートの中身の枠。
@@ -67,14 +68,15 @@ class SheetMessage extends StatelessWidget {
 class SheetButtons extends StatelessWidget {
   const SheetButtons({
     super.key,
-    this.cancelLabel = 'キャンセル',
+    this.cancelLabel,
     required this.onCancel,
     required this.confirmLabel,
     required this.onConfirm,
     this.destructive = false,
   });
 
-  final String cancelLabel;
+  /// null なら「キャンセル」。
+  final String? cancelLabel;
   final VoidCallback onCancel;
   final String confirmLabel;
   final VoidCallback? onConfirm;
@@ -92,7 +94,7 @@ class SheetButtons extends StatelessWidget {
               shape: const StadiumBorder(),
               side: BorderSide(color: context.appColors.border, width: 1.5),
             ),
-            child: Text(cancelLabel),
+            child: Text(cancelLabel ?? context.l10n.commonCancel),
           ),
         ),
         const SizedBox(width: 10),

@@ -8,6 +8,7 @@ import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/post.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/post_diary_book_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../discard_guard.dart';
@@ -40,6 +41,7 @@ class _PostSheet extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final fixedDiaryBook = diaryBook;
     final diaryBooks =
         ref.watch(diaryBookRepositoryProvider).value ?? const <DiaryBook>[];
@@ -85,14 +87,12 @@ class _PostSheet extends HookConsumerWidget {
       if (!context.mounted) return;
       final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
       if (!ok) {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('記録できませんでした。もう一度お試しください')),
-        );
+        messenger.showSnackBar(SnackBar(content: Text(l10n.postSheetFailed)));
         return;
       }
       // 書けたので、書きかけの確認（DiscardGuard）を通さずに閉じる。
       Navigator.of(context).pop(true);
-      messenger.showSnackBar(const SnackBar(content: Text('記録しました')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.postSheetPosted)));
     }
 
     return DiscardGuard(
@@ -142,8 +142,8 @@ class _PostSheet extends HookConsumerWidget {
                           ),
                           // 行の高さいっぱいだと罫線をはみ出すので、文字の高さに合わせる。
                           cursorHeight: _fontSize * 1.4,
-                          decoration: const InputDecoration(
-                            hintText: '今なにしてる？',
+                          decoration: InputDecoration(
+                            hintText: l10n.commonWhatAreYouDoing,
                             border: InputBorder.none,
                             isDense: true,
                             contentPadding: EdgeInsets.zero,
@@ -168,12 +168,12 @@ class _PostSheet extends HookConsumerWidget {
                 if (fixedDiaryBook != null)
                   // 投稿先が決まっているときも、どこに出るかは見せておく。
                   Text(
-                    '${fixedDiaryBook.name}に記録します',
+                    l10n.postSheetPostingTo(fixedDiaryBook.name),
                     style: TextStyle(fontSize: 13, color: colors.textSecondary),
                   )
                 else if (diaryBooks.isNotEmpty) ...[
                   Text(
-                    '共有する日記帳',
+                    l10n.postSheetShareTo,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -205,7 +205,7 @@ class _PostSheet extends HookConsumerWidget {
                             color: colors.textSecondary,
                           ),
                         )
-                      : const Text('記録する'),
+                      : Text(l10n.commonPost),
                 ),
               ],
             ),

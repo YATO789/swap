@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../domains/diary_book/diary_book.dart';
+import '../../l10n/l10n.dart';
 import '../../theme/app_theme.dart';
 
 /// 友達に送る招待メッセージ。
-String inviteMessage(DiaryBook diaryBook) {
-  return 'Swap!で「${diaryBook.name}」に参加しよう！\n'
-      'アプリの「招待コードで参加」から、このコードを入力してね。\n'
-      '招待コード: ${diaryBook.inviteCode}';
+/// 参加するシートは最後に見つかったコードを使うので、どの言語でもコードを最後に置く。
+String inviteMessage(AppLocalizations l10n, DiaryBook diaryBook) {
+  return l10n.inviteSheetMessage(diaryBook.name, diaryBook.inviteCode);
 }
 
 /// [diaryBook] に友達を招待するシートを開く。招待コードと、それを送るためのコピーボタンを出す。
@@ -35,16 +35,20 @@ class _InviteSheet extends StatelessWidget {
   Future<void> _copy(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    await Clipboard.setData(ClipboardData(text: inviteMessage(diaryBook)));
+    final l10n = context.l10n;
+    await Clipboard.setData(
+      ClipboardData(text: inviteMessage(l10n, diaryBook)),
+    );
     navigator.pop();
     messenger
       ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('招待メッセージをコピーしました')));
+      ..showSnackBar(SnackBar(content: Text(l10n.inviteSheetCopied)));
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
 
     return SafeArea(
       child: Padding(
@@ -56,20 +60,22 @@ class _InviteSheet extends StatelessWidget {
           children: [
             Text(
               justCreated
-                  ? '「${diaryBook.name}」を作りました'
-                  : '「${diaryBook.name}」に招待',
+                  ? l10n.inviteSheetCreatedTitle(diaryBook.name)
+                  : l10n.inviteSheetTitle(diaryBook.name),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 4),
             Text(
               justCreated
-                  ? '友達を招待して、記録や日記を共有しましょう。招待コードを送ると、受け取った人がコードを入れて参加できます'
-                  : '招待コードを送ると、受け取った人がコードを入れて参加できます',
+                  ? l10n.inviteSheetCreatedDescription
+                  : l10n.inviteSheetDescription,
               style: TextStyle(fontSize: 13, color: colors.textSecondary),
             ),
             const SizedBox(height: 20),
             Semantics(
-              label: '招待コード ${diaryBook.inviteCode.split('').join(' ')}',
+              label: l10n.inviteSheetCodeSemantics(
+                diaryBook.inviteCode.split('').join(' '),
+              ),
               excludeSemantics: true,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -80,7 +86,7 @@ class _InviteSheet extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      '招待コード',
+                      l10n.commonInviteCode,
                       style: TextStyle(
                         fontSize: 12,
                         color: colors.textSecondary,
@@ -103,12 +109,14 @@ class _InviteSheet extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => _copy(context),
               icon: const Icon(Icons.copy_outlined, size: 20),
-              label: const Text('招待メッセージをコピー'),
+              label: Text(l10n.inviteSheetCopy),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(justCreated ? 'あとで招待する' : '閉じる'),
+              child: Text(
+                justCreated ? l10n.inviteSheetLater : l10n.commonClose,
+              ),
             ),
           ],
         ),

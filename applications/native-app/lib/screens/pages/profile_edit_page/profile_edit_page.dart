@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/profile/profile.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/discard_guard.dart';
 import '../../components/form_field.dart';
@@ -18,6 +19,7 @@ class ProfileEditPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final savedName =
         ref.watch(profileRepositoryProvider).value?.displayName ?? '';
     final nameController = useTextEditingController(text: savedName);
@@ -39,12 +41,12 @@ class ProfileEditPage extends HookConsumerWidget {
       messenger.hideCurrentSnackBar();
       if (!succeeded) {
         messenger.showSnackBar(
-          const SnackBar(content: Text('プロフィールを保存できませんでした。もう一度お試しください')),
+          SnackBar(content: Text(l10n.profileEditSaveFailed)),
         );
         return;
       }
       if (context.mounted) context.pop();
-      messenger.showSnackBar(const SnackBar(content: Text('プロフィールを保存しました')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.profileEditSaved)));
     }
 
     return DiscardGuard(
@@ -52,7 +54,7 @@ class ProfileEditPage extends HookConsumerWidget {
       dirty: isDirty && !saving,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('プロフィール'),
+          title: Text(l10n.profileEditTitle),
           actions: [
             // 保存中は二度押しできないようにして、待っていることを見せる。
             if (saving)
@@ -69,7 +71,7 @@ class ProfileEditPage extends HookConsumerWidget {
             else
               TextButton(
                 onPressed: name.isNotEmpty && isDirty ? save : null,
-                child: const Text('保存'),
+                child: Text(l10n.profileEditSave),
               ),
             const SizedBox(width: 8),
           ],
@@ -79,15 +81,15 @@ class ProfileEditPage extends HookConsumerWidget {
           children: [
             Center(child: UserAvatar(name: name, filled: true, size: 72)),
             const SizedBox(height: 24),
-            const FieldLabel('名前'),
+            FieldLabel(l10n.commonName),
             const SizedBox(height: 8),
             InputField(
               controller: nameController,
               maxLength: maxDisplayNameLength,
-              hintText: '名前を入力',
+              hintText: l10n.commonEnterName,
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => save(),
-              errorText: name.isEmpty ? '名前を入力してください' : null,
+              errorText: name.isEmpty ? l10n.profileEditNameRequired : null,
             ),
           ],
         ),

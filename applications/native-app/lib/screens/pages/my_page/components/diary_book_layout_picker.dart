@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 
 /// ホームの日記帳の並べ方を、リストと表紙のグリッドの見本を並べて選ばせる。
@@ -22,7 +23,7 @@ class DiaryBookLayoutPicker extends StatelessWidget {
         children: [
           Expanded(
             child: _Option(
-              label: 'リスト',
+              label: context.l10n.layoutList,
               selected: !grid,
               onTap: () => onChanged(false),
               preview: const _ListPreview(),
@@ -31,7 +32,7 @@ class DiaryBookLayoutPicker extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: _Option(
-              label: '表紙',
+              label: context.l10n.layoutCover,
               selected: grid,
               onTap: () => onChanged(true),
               preview: const _GridPreview(),
@@ -127,9 +128,7 @@ class _ListPreview extends StatelessWidget {
               // 日記帳のアイコンと同じく 3:4。
               _Block(width: 12, height: 16, color: colors.textSecondary),
               const SizedBox(width: 8),
-              Expanded(
-                child: _Block(height: 6, color: colors.placeholder),
-              ),
+              Expanded(child: _Block(height: 6, color: colors.placeholder)),
             ],
           ),
       ],

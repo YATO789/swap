@@ -7,6 +7,7 @@ import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/timeline_post.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
@@ -54,7 +55,7 @@ class DiaryBookPage extends HookConsumerWidget {
           child: diaryBooksState.isLoading
               ? CircularProgressIndicator(color: colors.textSecondary)
               : Text(
-                  'この日記帳は表示できません',
+                  context.l10n.commonDiaryBookUnavailable,
                   style: TextStyle(color: colors.textSecondary),
                 ),
         ),
@@ -74,9 +75,9 @@ class DiaryBookPage extends HookConsumerWidget {
 
       await showNoticeSheet(
         context,
-        title: '「${diaryBook.name}」は見られなくなりました',
-        message: 'この日記帳の記録や日記は表示できません。',
-        buttonLabel: 'ホームに戻る',
+        title: context.l10n.diaryBookNoLongerAvailableTitle(diaryBook.name),
+        message: context.l10n.diaryBookNoLongerAvailableMessage,
+        buttonLabel: context.l10n.diaryBookBackToHome,
       );
       if (!context.mounted) return;
       final diaryBooks = ref.read(diaryBookRepositoryProvider.notifier);
@@ -127,20 +128,25 @@ class DiaryBookPage extends HookConsumerWidget {
     Future<void> confirmDeletePost(TimelinePost post) async {
       final confirmed = await showConfirmSheet(
         context,
-        title: '記録を削除しますか？',
-        message: 'ほかの日記帳に出した分は残ります。',
+        title: context.l10n.diaryBookDeletePostTitle,
+        message: context.l10n.diaryBookDeletePostMessage,
         preview: _PostPreview(diaryBook: diaryBook, post: post),
         irreversible: true,
-        confirmLabel: '削除する',
+        confirmLabel: context.l10n.commonDelete,
         destructive: true,
       );
       if (!confirmed || !context.mounted) return;
       final messenger = ScaffoldMessenger.of(context);
+      final l10n = context.l10n;
       final deleted = await controller().deletePost(post);
       messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
         SnackBar(
-          content: Text(deleted ? '記録を削除しました' : '記録を削除できませんでした。もう一度お試しください'),
+          content: Text(
+            deleted
+                ? l10n.diaryBookPostDeleted
+                : l10n.diaryBookPostDeleteFailed,
+          ),
         ),
       );
     }
@@ -154,12 +160,12 @@ class DiaryBookPage extends HookConsumerWidget {
         actions: [
           IconButton(
             onPressed: pickDate,
-            tooltip: '日付を選ぶ',
+            tooltip: context.l10n.diaryBookPickDate,
             icon: const Icon(Icons.calendar_month_outlined),
           ),
           IconButton(
             onPressed: openInfo,
-            tooltip: '日記帳の情報',
+            tooltip: context.l10n.commonDiaryBookInfo,
             icon: const Icon(Icons.info_outline),
           ),
           const SizedBox(width: 8),
@@ -181,7 +187,7 @@ class DiaryBookPage extends HookConsumerWidget {
         // 知らせるダイアログの後ろには、もう読めないことだけを出す。
         AsyncError(error: RemovedFromDiaryBookException()) => Center(
           child: Text(
-            'この日記帳は表示できません',
+            context.l10n.commonDiaryBookUnavailable,
             style: TextStyle(color: colors.textSecondary),
           ),
         ),
@@ -194,9 +200,7 @@ class DiaryBookPage extends HookConsumerWidget {
       // 見ている日が今日か昨日なら、日記はその日のものを書く。
       bottomNavigationBar: PostButton(
         diaryBook: diaryBook,
-        diaryDate: isEditableDiaryDate(date, today: today)
-            ? date
-            : null,
+        diaryDate: isEditableDiaryDate(date, today: today) ? date : null,
         onPosted: () => controller().reloadPosts(),
         onDiaryClosed: () => controller().refresh(),
       ),
@@ -216,11 +220,11 @@ class _LoadError extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '日記帳を読み込めませんでした',
+            context.l10n.diaryBookLoadFailed,
             style: TextStyle(color: context.appColors.textSecondary),
           ),
           const SizedBox(height: 12),
-          TextButton(onPressed: onRetry, child: const Text('もう一度試す')),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.commonRetry)),
         ],
       ),
     );

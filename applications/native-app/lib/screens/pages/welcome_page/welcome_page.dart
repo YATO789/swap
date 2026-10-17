@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import 'controller/welcome_page_controller.dart';
 
@@ -14,6 +15,7 @@ class WelcomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final l10n = context.l10n;
 
     /// サインインの処理中か。ボタンを押せなくして、処理中の表示を出す。
     final signingIn = ref.watch(welcomePageControllerProvider).isLoading;
@@ -24,7 +26,7 @@ class WelcomePage extends HookConsumerWidget {
         ..showSnackBar(SnackBar(content: Text(message)));
     }
 
-    void showComingSoon() => showSnackBar('準備中です');
+    void showComingSoon() => showSnackBar(l10n.commonComingSoon);
 
     // 同意文の中の「利用規約」「プライバシーポリシー」を押せるようにする。
     final termsRecognizer = useMemoized(TapGestureRecognizer.new);
@@ -45,7 +47,7 @@ class WelcomePage extends HookConsumerWidget {
       final result = await run();
       // 成功したらルーターがホームに切り替える。やめたときは何も出さない。
       if (!context.mounted || result != SignInResult.failed) return;
-      showSnackBar('サインインできませんでした。もう一度お試しください');
+      showSnackBar(l10n.welcomeSignInFailed);
     }
 
     final linkStyle = TextStyle(
@@ -72,7 +74,7 @@ class WelcomePage extends HookConsumerWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      '交換日記みたいに、みんなで\n1日の日記を共有しよう',
+                      l10n.welcomeTagline,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,
@@ -97,7 +99,11 @@ class WelcomePage extends HookConsumerWidget {
                         ),
                       )
                     : const Icon(Icons.apple, size: 24),
-                label: Text(signingIn ? 'サインイン中…' : 'Appleでサインイン'),
+                label: Text(
+                  signingIn
+                      ? l10n.welcomeSigningIn
+                      : l10n.welcomeSignInWithApple,
+                ),
               ),
               // Apple ID を入れていないシミュレータでも試せるように、開発中だけ出す。
               if (kDebugMode)
@@ -105,25 +111,25 @@ class WelcomePage extends HookConsumerWidget {
                   onPressed: signingIn
                       ? null
                       : () => signIn(controller.signInAnonymously),
-                  child: const Text('匿名で試す（開発用）'),
+                  child: Text(l10n.welcomeTryAnonymously),
                 ),
               const SizedBox(height: 16),
               Text.rich(
                 TextSpan(
                   children: [
-                    const TextSpan(text: '続けると、'),
+                    TextSpan(text: l10n.welcomeAgreementPrefix),
                     TextSpan(
-                      text: '利用規約',
+                      text: l10n.commonTermsOfService,
                       style: linkStyle,
                       recognizer: termsRecognizer,
                     ),
-                    const TextSpan(text: 'と'),
+                    TextSpan(text: l10n.welcomeAgreementConjunction),
                     TextSpan(
-                      text: 'プライバシーポリシー',
+                      text: l10n.commonPrivacyPolicy,
                       style: linkStyle,
                       recognizer: privacyRecognizer,
                     ),
-                    const TextSpan(text: 'に\n同意したことになります'),
+                    TextSpan(text: l10n.welcomeAgreementSuffix),
                   ],
                 ),
                 textAlign: TextAlign.center,

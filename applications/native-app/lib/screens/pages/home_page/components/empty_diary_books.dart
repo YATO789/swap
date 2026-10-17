@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../components/cover_color_picker.dart';
 import '../../../components/diary_cover.dart';
@@ -21,6 +22,7 @@ class EmptyDiaryBooks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
 
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
@@ -40,10 +42,10 @@ class EmptyDiaryBooks extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const Text(
-                  '最初の日記帳を\nつくろう',
+                Text(
+                  l10n.emptyDiaryBooksTitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 26,
                     height: 1.4,
                     fontWeight: FontWeight.w800,
@@ -51,7 +53,7 @@ class EmptyDiaryBooks extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '1冊のノートを友達とまわして、\n毎日のできごとを交換しよう。',
+                  l10n.emptyDiaryBooksMessage,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -68,7 +70,7 @@ class EmptyDiaryBooks extends StatelessWidget {
                     shape: const StadiumBorder(),
                   ),
                   icon: const Icon(Icons.add),
-                  label: const Text('日記帳を作る'),
+                  label: Text(l10n.commonCreateDiaryBook),
                 ),
                 const SizedBox(height: 6),
                 TextButton(
@@ -76,9 +78,9 @@ class EmptyDiaryBooks extends StatelessWidget {
                   style: TextButton.styleFrom(
                     minimumSize: const Size.fromHeight(48),
                   ),
-                  child: const Text(
-                    '招待コードで参加',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.commonJoinWithInviteCode,
+                    style: const TextStyle(
                       decoration: TextDecoration.underline,
                       decorationThickness: 1.5,
                     ),

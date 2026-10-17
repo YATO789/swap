@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../../../domains/diary/diary.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
+import '../../../../utils/format.dart';
 import '../controller/diary_book_page_controller.dart';
-
-const _weekdays = ['日', '月', '火', '水', '木', '金', '土'];
 
 /// 月のカレンダーをボトムシートで開き、選ばれた日付（年月日のみ）を返す。
 /// [fetchMarkedDates] で読んだ、日記がある日・投稿だけある日に印を付ける。
@@ -36,6 +36,8 @@ class _CalendarSheet extends HookWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final today = diaryDateOf(DateTime.now());
+    // 端末の言語の曜日。日曜から始まるので、下の日曜始まりの列とそのまま揃う。
+    final weekdays = MaterialLocalizations.of(context).narrowWeekdays;
     final month = useState(DateTime(selected.year, selected.month));
     final isCurrentMonth =
         month.value.year == today.year && month.value.month == today.month;
@@ -66,12 +68,12 @@ class _CalendarSheet extends HookWidget {
               children: [
                 IconButton(
                   onPressed: () => moveMonth(-1),
-                  tooltip: '前の月',
+                  tooltip: context.l10n.calendarPreviousMonth,
                   icon: const Icon(Icons.chevron_left),
                 ),
                 Expanded(
                   child: Text(
-                    '${month.value.year}年${month.value.month}月',
+                    formatYearMonth(context, month.value),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 17,
@@ -82,7 +84,7 @@ class _CalendarSheet extends HookWidget {
                 IconButton(
                   // 先の月には記録がないので進めない。
                   onPressed: isCurrentMonth ? null : () => moveMonth(1),
-                  tooltip: '次の月',
+                  tooltip: context.l10n.calendarNextMonth,
                   icon: const Icon(Icons.chevron_right),
                 ),
               ],
@@ -90,7 +92,7 @@ class _CalendarSheet extends HookWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                for (final (i, label) in _weekdays.indexed)
+                for (final (i, label) in weekdays.indexed)
                   Expanded(
                     child: Text(
                       label,
@@ -179,11 +181,11 @@ class _DayCell extends StatelessWidget {
         ? scheme.onPrimary
         : colors.textPrimary;
     final label = [
-      '${date.month}月${date.day}日',
-      if (isToday) '今日',
-      if (hasDiary) '日記あり',
-      if (hasPost) '記録あり',
-    ].join('、');
+      formatMonthDay(context, date),
+      if (isToday) context.l10n.commonToday,
+      if (hasDiary) context.l10n.calendarHasDiary,
+      if (hasPost) context.l10n.calendarHasPost,
+    ].join(context.l10n.calendarLabelSeparator);
 
     return Semantics(
       button: enabled,
@@ -272,11 +274,11 @@ class _Legend extends StatelessWidget {
         children: [
           const _MarkDot(filled: true),
           const SizedBox(width: 4),
-          Text('日記あり', style: style),
+          Text(context.l10n.calendarHasDiary, style: style),
           const SizedBox(width: 16),
           const _MarkDot(filled: false),
           const SizedBox(width: 4),
-          Text('記録あり', style: style),
+          Text(context.l10n.calendarHasPost, style: style),
         ],
       ),
     );

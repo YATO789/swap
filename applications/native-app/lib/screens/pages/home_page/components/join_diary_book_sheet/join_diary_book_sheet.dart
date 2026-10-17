@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../../domains/diary_book/diary_book.dart';
 import '../../../../../domains/diary_book/invited_diary_book.dart';
+import '../../../../../l10n/l10n.dart';
 import '../../../../../theme/app_theme.dart';
 import '../../../../components/diary_cover.dart';
 import '../../../../components/user_avatar.dart';
@@ -34,6 +35,7 @@ class _JoinDiaryBookSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final codeController = useTextEditingController();
     useListenable(codeController);
     final code = codeController.text;
@@ -58,12 +60,12 @@ class _JoinDiaryBookSheet extends HookConsumerWidget {
       final diaryBook = await controller.check(code);
       if (!context.mounted) return;
       if (ref.read(joinDiaryBookSheetControllerProvider).hasError) {
-        failure.value = (code: code, message: '確認できませんでした。もう一度お試しください');
+        failure.value = (code: code, message: l10n.joinSheetCheckFailed);
         return;
       }
       checked.value = (code: code, found: diaryBook);
       if (diaryBook == null) {
-        failure.value = (code: code, message: '招待コードが見つかりません');
+        failure.value = (code: code, message: l10n.joinSheetCodeNotFound);
       }
     }
 
@@ -73,7 +75,7 @@ class _JoinDiaryBookSheet extends HookConsumerWidget {
       final diaryBook = await controller.join(code);
       if (!context.mounted) return;
       if (diaryBook == null) {
-        failure.value = (code: code, message: '参加できませんでした。もう一度お試しください');
+        failure.value = (code: code, message: l10n.joinSheetJoinFailed);
         return;
       }
       Navigator.of(context).pop(diaryBook);
@@ -144,19 +146,20 @@ class _CodeInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final errorColor = Theme.of(context).colorScheme.error;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          '招待コードで参加',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+        Text(
+          l10n.commonJoinWithInviteCode,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 6),
         Text(
-          '友達から届いた$inviteCodeLength文字のコードを入れてください',
+          l10n.joinSheetDescription(inviteCodeLength),
           style: TextStyle(
             fontSize: 13,
             height: 1.6,
@@ -192,12 +195,12 @@ class _CodeInput extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.content_paste, size: 16),
-              label: const Text('貼り付け'),
+              label: Text(l10n.joinSheetPaste),
             ),
           ],
         ),
         const SizedBox(height: 20),
-        _PillButton(label: '確認する', busy: busy, onPressed: onCheck),
+        _PillButton(label: l10n.joinSheetCheck, busy: busy, onPressed: onCheck),
       ],
     );
   }
@@ -249,7 +252,7 @@ class _CodeBoxes extends HookWidget {
             ),
             Positioned.fill(
               child: Semantics(
-                label: '招待コード',
+                label: context.l10n.commonInviteCode,
                 child: TextField(
                   controller: controller,
                   focusNode: focusNode,
@@ -347,18 +350,20 @@ class _FoundDiaryBook extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final memberCount = diaryBook.memberNames.length;
 
     final (label, onPressed) = switch (diaryBook) {
-      InvitedDiaryBook(alreadyJoined: true) => ('日記帳を開く', onJoin),
-      InvitedDiaryBook(isFull: true) => ('この日記帳に参加する', null),
-      _ => ('この日記帳に参加する', onJoin),
+      InvitedDiaryBook(alreadyJoined: true) => (l10n.joinSheetOpen, onJoin),
+      InvitedDiaryBook(isFull: true) => (l10n.joinSheetJoin, null),
+      _ => (l10n.joinSheetJoin, onJoin),
     };
     final note = switch (diaryBook) {
-      InvitedDiaryBook(alreadyJoined: true) => 'この日記帳にはもう参加しています',
-      InvitedDiaryBook(isFull: true) =>
-        'この日記帳は満員です（${diaryBook.memberLimit}人まで）',
-      _ => 'あと${diaryBook.memberLimit - memberCount}人まで参加できます',
+      InvitedDiaryBook(alreadyJoined: true) => l10n.joinSheetAlreadyJoined,
+      InvitedDiaryBook(isFull: true) => l10n.joinSheetFull(
+        diaryBook.memberLimit,
+      ),
+      _ => l10n.joinSheetSpotsLeft(diaryBook.memberLimit - memberCount),
     };
 
     return Column(
@@ -426,7 +431,7 @@ class _Members extends StatelessWidget {
           UserAvatar(name: name, filled: false, size: 30),
         if (rest > 0) Text('+$rest', style: secondary),
         const SizedBox(width: 6),
-        Text('${names.length}人のメンバー', style: secondary),
+        Text(context.l10n.joinSheetMemberCount(names.length), style: secondary),
       ],
     );
   }

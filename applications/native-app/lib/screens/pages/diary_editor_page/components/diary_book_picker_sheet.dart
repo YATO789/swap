@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../../domains/diary_book/diary_book.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../components/diary_book_icon.dart';
 
 /// 「すべての日記帳」を選んだときに [showDiaryBookPicker] が返す値。
 const allDiaryBooks = '*';
-
-const allDiaryBooksLabel = 'すべての日記帳';
 
 /// [diaryBooks] から1冊選ぶシートを開く。選んだ日記帳の id を返し、閉じたら null を返す。
 /// [selectedId] の日記帳には印を付ける。[statusOf] を渡すと、名前の下に添える。
@@ -81,7 +80,7 @@ class _DiaryBookPickerSheet extends StatelessWidget {
                         width: 36,
                         child: Icon(Icons.library_books_outlined, size: 28),
                       ),
-                      title: const Text(allDiaryBooksLabel),
+                      title: Text(context.l10n.diaryBookPickerAll),
                       subtitle: Text(
                         allStatus,
                         style: TextStyle(

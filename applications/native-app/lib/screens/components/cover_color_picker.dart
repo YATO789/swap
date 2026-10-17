@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
 import '../../theme/app_theme.dart';
 import 'diary_book_icon.dart';
 
@@ -44,7 +45,7 @@ class CoverColorPicker extends StatelessWidget {
           Semantics(
             button: true,
             selected: color == selected,
-            label: '表紙の色',
+            label: context.l10n.coverColorLabel,
             child: GestureDetector(
               onTap: () => onSelected(color),
               behavior: HitTestBehavior.opaque,

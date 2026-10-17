@@ -12,6 +12,7 @@ import 'package:swap/infrastructures/repositories/diary_book_grid_repository.dar
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/l10n/l10n.dart';
 import 'package:swap/screens/pages/home_page/home_page.dart';
 import 'package:swap/theme/app_theme.dart';
 
@@ -81,7 +82,13 @@ Future<void> _pumpHomeWithRouter(
         preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
         ..._overrides(_diaryBooks, notifications: notifications),
       ],
-      child: MaterialApp.router(theme: buildLightTheme(), routerConfig: router),
+      child: MaterialApp.router(
+        locale: const Locale('ja'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: buildLightTheme(),
+        routerConfig: router,
+      ),
     ),
   );
   await tester.pump();

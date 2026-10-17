@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../domains/diary/diary.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 import '../../../components/user_avatar.dart';
@@ -140,7 +141,9 @@ class _DiaryCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              title.isNotEmpty ? title : 'タイトルなし',
+                              title.isNotEmpty
+                                  ? title
+                                  : context.l10n.diarySectionUntitled,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               strutStyle: _previewStrut,
@@ -199,16 +202,20 @@ class _LockedDiaryCard extends StatelessWidget {
     final colors = context.appColors;
     final canWrite = onTap != null;
     final hint = !canWrite
-        ? 'この日に日記を書いていないので読めません'
+        ? context.l10n.diarySectionLockedPast
         : diary.date == today
-        ? 'この日記帳に今日の日記を書くと読めます'
-        : 'この日記帳に昨日の日記を書くと読めます';
+        ? context.l10n.diarySectionLockedToday
+        : context.l10n.diarySectionLockedYesterday;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Semantics(
         button: canWrite,
-        label: '$nameの日記（${formatTime(diary.writtenAt)}）。まだ読めません。$hint',
+        label: context.l10n.diarySectionLockedSemantics(
+          name,
+          formatTime(diary.writtenAt),
+          hint,
+        ),
         excludeSemantics: true,
         child: Material(
           color: colors.surface,
@@ -255,9 +262,9 @@ class _LockedDiaryCard extends StatelessWidget {
                               ),
                             ),
                             if (canWrite) ...[
-                              const Text(
-                                '日記を書く',
-                                style: TextStyle(
+                              Text(
+                                context.l10n.commonWriteDiary,
+                                style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                 ),

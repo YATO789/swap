@@ -8,6 +8,7 @@ import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
 import '../../../infrastructures/repositories/post_hint_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/theme_mode_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/confirm_sheet.dart';
 import '../../components/user_avatar.dart';
@@ -33,6 +34,7 @@ class MyPage extends HookConsumerWidget {
 
     /// ログアウトかアカウント削除の処理中か。二度押しできないようにする。
     final busy = ref.watch(myPageControllerProvider).isLoading;
+    final l10n = context.l10n;
 
     void showMessage(String message) {
       ScaffoldMessenger.of(context)
@@ -40,43 +42,41 @@ class MyPage extends HookConsumerWidget {
         ..showSnackBar(SnackBar(content: Text(message)));
     }
 
-    void showNotReady() => showMessage('準備中です');
+    void showNotReady() => showMessage(l10n.commonComingSoon);
 
     Future<void> signOut() async {
       final confirmed = await showConfirmSheet(
         context,
-        title: 'ログアウトしますか？',
-        confirmLabel: 'ログアウト',
+        title: l10n.settingsSignOutConfirmTitle,
+        confirmLabel: l10n.settingsSignOut,
       );
       if (!confirmed || !context.mounted) return;
 
       // 成功したらルーターがウェルカム画面に切り替えるので、ここでは失敗だけ扱う。
       if (!await ref.read(myPageControllerProvider.notifier).signOut()) {
-        showMessage('ログアウトできませんでした。もう一度お試しください');
+        showMessage(l10n.settingsSignOutFailed);
       }
     }
 
     Future<void> deleteAccount() async {
       final confirmed = await showConfirmSheet(
         context,
-        title: 'アカウントを削除しますか？',
-        message:
-            'プロフィール・記録・日記がすべて削除されます。'
-            '日記帳からも抜け、ほかに誰もいない日記帳は削除されます。',
+        title: l10n.settingsDeleteAccountConfirmTitle,
+        message: l10n.settingsDeleteAccountConfirmMessage,
         irreversible: true,
-        confirmLabel: '削除する',
+        confirmLabel: l10n.commonDelete,
         destructive: true,
       );
       if (!confirmed || !context.mounted) return;
 
       // 成功したらルーターがウェルカム画面に切り替えるので、ここでは失敗だけ扱う。
       if (!await ref.read(myPageControllerProvider.notifier).deleteAccount()) {
-        showMessage('アカウントを削除できませんでした。もう一度お試しください');
+        showMessage(l10n.settingsDeleteAccountFailed);
       }
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('設定')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListView(
         padding: const EdgeInsets.only(top: 8, bottom: 32),
         children: [
@@ -84,18 +84,18 @@ class MyPage extends HookConsumerWidget {
             name: myName ?? '',
             onTap: () => const ProfileEditRoute().push<void>(context),
           ),
-          const _SectionHeader('ホームの日記帳の並べ方'),
+          _SectionHeader(l10n.settingsHomeLayoutSection),
           DiaryBookLayoutPicker(
             grid: diaryBookGrid,
             onChanged: ref.read(diaryBookGridRepositoryProvider.notifier).save,
           ),
-          const _SectionHeader('表示'),
+          _SectionHeader(l10n.settingsDisplaySection),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('テーマ', style: _titleStyle),
+                Text(l10n.settingsTheme, style: _titleStyle),
                 const SizedBox(height: 10),
                 ThemeModePicker(
                   selected: themeMode,
@@ -108,9 +108,9 @@ class MyPage extends HookConsumerWidget {
           ),
           SwitchListTile(
             contentPadding: _tilePadding,
-            title: const Text('書き込みバーの説明', style: _titleStyle),
+            title: Text(l10n.settingsPostHint, style: _titleStyle),
             subtitle: Text(
-              'ホームの入力欄とペンに、手書きの説明を添えます',
+              l10n.settingsPostHintDescription,
               style: TextStyle(
                 fontSize: 12,
                 color: context.appColors.textSecondary,
@@ -119,27 +119,27 @@ class MyPage extends HookConsumerWidget {
             value: showPostHint,
             onChanged: ref.read(postHintRepositoryProvider.notifier).save,
           ),
-          const _SectionHeader('日記'),
-          const _InfoTile(
-            title: '日付の切り替わり',
-            subtitle: 'これより前に書いた記録や日記は前日の分になります',
-            value: '朝$diaryDayStartHour:00',
+          _SectionHeader(l10n.settingsDiarySection),
+          _InfoTile(
+            title: l10n.settingsDayStart,
+            subtitle: l10n.settingsDayStartDescription,
+            value: l10n.settingsDayStartValue(diaryDayStartHour),
           ),
-          const _SectionHeader('その他'),
-          _LinkTile(title: '利用規約', onTap: showNotReady),
-          _LinkTile(title: 'プライバシーポリシー', onTap: showNotReady),
-          _InfoTile(title: 'バージョン', value: appVersion),
-          const _SectionHeader('アカウント'),
+          _SectionHeader(l10n.settingsOtherSection),
+          _LinkTile(title: l10n.commonTermsOfService, onTap: showNotReady),
+          _LinkTile(title: l10n.commonPrivacyPolicy, onTap: showNotReady),
+          _InfoTile(title: l10n.settingsVersion, value: appVersion),
+          _SectionHeader(l10n.settingsAccountSection),
           ListTile(
             contentPadding: _tilePadding,
-            title: const Text('ログアウト', style: _titleStyle),
+            title: Text(l10n.settingsSignOut, style: _titleStyle),
             enabled: !busy,
             onTap: signOut,
           ),
           ListTile(
             contentPadding: _tilePadding,
             title: Text(
-              'アカウントを削除',
+              l10n.settingsDeleteAccount,
               style: _titleStyle.copyWith(
                 color: Theme.of(context).colorScheme.error,
               ),
@@ -165,7 +165,7 @@ class _ProfileTile extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: '$name、プロフィールを編集',
+      label: context.l10n.settingsProfileTileSemantics(name),
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -188,7 +188,7 @@ class _ProfileTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'プロフィールを編集',
+                      context.l10n.settingsEditProfile,
                       style: TextStyle(
                         fontSize: 13,
                         color: colors.textSecondary,

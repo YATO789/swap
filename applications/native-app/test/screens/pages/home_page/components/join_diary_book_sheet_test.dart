@@ -13,6 +13,7 @@ import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/l10n/l10n.dart';
 import 'package:swap/screens/components/invite_sheet.dart';
 import 'package:swap/screens/pages/diary_book_page/diary_book_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
@@ -98,6 +99,9 @@ Future<void> _openJoinSheet(
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: buildLightTheme(),
           routerConfig: ref.watch(routerProvider),
         ),
@@ -165,7 +169,10 @@ void main() {
   testWidgets('招待メッセージを丸ごと貼り付けると、コードだけが入る', (tester) async {
     await _openJoinSheet(tester);
 
-    await tester.enterText(find.byType(TextField), inviteMessage(_university));
+    await tester.enterText(
+      find.byType(TextField),
+      inviteMessage(lookupAppLocalizations(const Locale('ja')), _university),
+    );
     await tester.pump();
     expect(find.text('Uni4829'), findsOneWidget);
 
@@ -190,7 +197,12 @@ void main() {
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
       (call) async => call.method == 'Clipboard.getData'
-          ? {'text': inviteMessage(_university)}
+          ? {
+              'text': inviteMessage(
+                lookupAppLocalizations(const Locale('ja')),
+                _university,
+              ),
+            }
           : null,
     );
     addTearDown(

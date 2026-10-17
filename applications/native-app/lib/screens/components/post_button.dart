@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../domains/diary/diary.dart';
 import '../../domains/diary_book/diary_book.dart';
+import '../../l10n/l10n.dart';
 import '../../theme/app_theme.dart';
 import '../pages/router/router.dart';
 import 'post_sheet/post_sheet.dart';
@@ -47,6 +48,7 @@ class PostButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final today = diaryDateOf(DateTime.now());
     final date = diaryDate ?? today;
 
@@ -59,7 +61,7 @@ class PostButton extends StatelessWidget {
             Expanded(
               child: Semantics(
                 button: true,
-                label: '記録する',
+                label: l10n.commonPost,
                 excludeSemantics: true,
                 // 角丸の四角に薄いグレーを敷いただけの、枠もアイコンもない入力欄の見た目。
                 child: Material(
@@ -73,7 +75,7 @@ class PostButton extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '今なにしてる？',
+                        l10n.commonWhatAreYouDoing,
                         style: TextStyle(
                           fontSize: 17,
                           color: colors.textSecondary,
@@ -87,7 +89,9 @@ class PostButton extends StatelessWidget {
             const SizedBox(width: 8),
             IconButton.filled(
               onPressed: () => _openDiaryEditor(context, date),
-              tooltip: date == today ? '今日の日記を書く' : '昨日の日記を書く',
+              tooltip: date == today
+                  ? l10n.postButtonWriteToday
+                  : l10n.postButtonWriteYesterday,
               style: IconButton.styleFrom(
                 fixedSize: const Size(48, 48),
                 backgroundColor: colors.textPrimary,

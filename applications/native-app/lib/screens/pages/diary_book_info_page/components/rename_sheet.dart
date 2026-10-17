@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../../../domains/diary_book/diary_book.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../components/diary_book_icon.dart';
 import '../../../components/sheet_parts.dart';
@@ -40,7 +41,7 @@ class _RenameSheet extends HookWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SheetTitle('日記帳の名前'),
+          SheetTitle(context.l10n.renameTitle),
           const SizedBox(height: 18),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,8 +60,8 @@ class _RenameSheet extends HookWidget {
                     fontWeight: FontWeight.w700,
                   ),
                   decoration: InputDecoration(
-                    hintText: '日記帳の名前を入力',
-                    helperText: '最初の1文字がアイコンになります',
+                    hintText: context.l10n.commonDiaryBookNameHint,
+                    helperText: context.l10n.renameIconHelper,
                     helperStyle: TextStyle(
                       fontSize: 12,
                       color: context.appColors.textSecondary,
@@ -76,7 +77,7 @@ class _RenameSheet extends HookWidget {
           const SizedBox(height: 16),
           SheetButtons(
             onCancel: () => Navigator.of(context).pop(),
-            confirmLabel: '保存する',
+            confirmLabel: context.l10n.commonSave,
             onConfirm: canSubmit ? submit : null,
           ),
         ],

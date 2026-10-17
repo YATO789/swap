@@ -14,6 +14,7 @@ import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/l10n/l10n.dart';
 import 'package:swap/screens/pages/diary_book_page/diary_book_page.dart';
 import 'package:swap/screens/pages/diary_detail_page/diary_detail_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
@@ -80,6 +81,9 @@ Future<FakeDiaryRepository> _openDiaryBook(
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: buildLightTheme(),
           routerConfig: ref.watch(routerProvider),
         ),

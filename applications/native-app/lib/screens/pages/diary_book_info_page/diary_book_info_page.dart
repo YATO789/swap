@@ -6,6 +6,7 @@ import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/diary_book/diary_book_member.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/confirm_sheet.dart';
 import '../../components/cover_color_picker.dart';
@@ -31,6 +32,7 @@ class DiaryBookInfoPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
     final diaryBook = diaryBooksState.value
         ?.where((diaryBook) => diaryBook.id == diaryBookId)
@@ -63,13 +65,13 @@ class DiaryBookInfoPage extends ConsumerWidget {
       );
       if (name == null || name == diaryBook.name) return;
       if (!await controller().rename(name)) {
-        showMessage('名前を変えられませんでした。もう一度お試しください');
+        showMessage(l10n.infoRenameFailed);
       }
     }
 
     Future<void> setCoverColor(Color? color) async {
       if (!await controller().setCoverColor(color?.toARGB32())) {
-        showMessage('表紙の色を変えられませんでした。もう一度お試しください');
+        showMessage(l10n.infoCoverColorFailed);
       }
     }
 
@@ -82,66 +84,65 @@ class DiaryBookInfoPage extends ConsumerWidget {
       );
       if (memberLimit == null || memberLimit == diaryBook.memberLimit) return;
       if (!await controller().setMemberLimit(memberLimit)) {
-        showMessage('人数の上限を変えられませんでした。もう一度お試しください');
+        showMessage(l10n.infoMemberLimitFailed);
       }
     }
 
     Future<void> regenerateInviteCode() async {
       final confirmed = await showConfirmSheet(
         context,
-        title: '招待コードを作り直しますか？',
-        message:
-            '今のコード（${diaryBook.inviteCode}）では参加できなくなります。参加しているメンバーはそのままです。',
-        confirmLabel: '作り直す',
+        title: l10n.infoRegenerateInviteCodeTitle,
+        message: l10n.infoRegenerateInviteCodeMessage(diaryBook.inviteCode),
+        confirmLabel: l10n.infoRegenerateInviteCodeConfirm,
       );
       if (!confirmed) return;
 
       if (!await controller().regenerateInviteCode()) {
-        showMessage('招待コードを作り直せませんでした。もう一度お試しください');
+        showMessage(l10n.infoRegenerateInviteCodeFailed);
         return;
       }
-      showMessage('招待コードを作り直しました');
+      showMessage(l10n.infoInviteCodeRegenerated);
     }
 
     Future<void> removeMember(DiaryBookMember member) async {
       final confirmed = await showConfirmSheet(
         context,
-        title: '${member.displayName}さんを外しますか？',
-        message: 'この日記帳の記録や日記が見られなくなります。また参加できないように、招待コードも作り直します。',
-        confirmLabel: '外す',
+        title: l10n.infoRemoveMemberTitle(member.displayName),
+        message: l10n.infoRemoveMemberMessage,
+        confirmLabel: l10n.infoRemoveMemberConfirm,
         destructive: true,
       );
       if (!confirmed) return;
 
       if (!await controller().removeMember(member.userId)) {
-        showMessage('メンバーを外せませんでした。もう一度お試しください');
+        showMessage(l10n.infoRemoveMemberFailed);
         return;
       }
-      showMessage('${member.displayName}さんを外しました');
+      showMessage(l10n.infoMemberRemoved(member.displayName));
     }
 
     Future<void> leave() async {
       final confirmed = await showConfirmSheet(
         context,
-        title: '「${diaryBook.name}」から退出しますか？',
-        message: 'この日記帳の記録や日記が見られなくなります。招待コードがあればまた参加できます。',
-        confirmLabel: '退出する',
+        title: l10n.infoLeaveTitle(diaryBook.name),
+        message: l10n.infoLeaveMessage,
+        confirmLabel: l10n.infoLeaveConfirm,
         destructive: true,
       );
       if (!confirmed || !context.mounted) return;
 
       final router = GoRouter.of(context);
       if (!await controller().leave()) {
-        showMessage('日記帳から退出できませんでした。もう一度お試しください');
+        showMessage(l10n.infoLeaveFailed);
         return;
       }
       // 日記帳のページも開けなくなるので、ホームまで戻る。
       router.go(const HomeRoute().location);
-      showMessage('「${diaryBook.name}」から退出しました');
+      showMessage(l10n.infoLeft(diaryBook.name));
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('日記帳の情報')),
+      appBar: AppBar(title: Text(l10n.commonDiaryBookInfo)),
       body: switch (pageState) {
         AsyncValue(:final value?, hasError: false) => RefreshIndicator(
           onRefresh: () => controller().refresh(),
@@ -154,10 +155,10 @@ class DiaryBookInfoPage extends ConsumerWidget {
             ),
             children: [
               _Header(diaryBook: diaryBook, onRename: rename),
-              const _SectionLabel('表紙'),
+              _SectionLabel(l10n.infoCoverSection),
               _TapLine(
-                label: '名前',
-                semanticsLabel: '名前を変える',
+                label: l10n.commonName,
+                semanticsLabel: l10n.infoRename,
                 onTap: rename,
                 trailing: Text(diaryBook.name),
               ),
@@ -173,12 +174,14 @@ class DiaryBookInfoPage extends ConsumerWidget {
                   ),
                 ),
               ),
-              const _SectionLabel('この日記を書く人'),
+              _SectionLabel(l10n.infoMembersSection),
               _TapLine(
-                label: '人数の上限',
-                semanticsLabel: '人数の上限を変える',
+                label: l10n.infoMemberLimit,
+                semanticsLabel: l10n.infoChangeMemberLimit,
                 onTap: isCreator ? setMemberLimit : null,
-                trailing: Text('${diaryBook.memberLimit}人まで'),
+                trailing: Text(
+                  l10n.infoMemberLimitValue(diaryBook.memberLimit),
+                ),
               ),
               // 自分を先頭に、あとは参加した順に並べる。
               for (final (index, member) in [
@@ -203,7 +206,7 @@ class DiaryBookInfoPage extends ConsumerWidget {
                     foregroundColor: colors.textSecondary,
                     textStyle: const TextStyle(fontSize: 13),
                   ),
-                  child: const Text('招待コードを作り直す'),
+                  child: Text(l10n.infoRegenerateInviteCode),
                 ),
               ),
               const SizedBox(height: 40),
@@ -216,7 +219,7 @@ class DiaryBookInfoPage extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                child: const Text('日記帳を退出'),
+                child: Text(l10n.infoLeaveDiaryBook),
               ),
             ],
           ),
@@ -246,7 +249,7 @@ class _Header extends StatelessWidget {
       children: [
         Semantics(
           button: true,
-          label: '${diaryBook.name}、名前を変える',
+          label: context.l10n.infoRenameSemantics(diaryBook.name),
           excludeSemantics: true,
           child: InkWell(
             onTap: onRename,
@@ -434,12 +437,12 @@ class _MemberLine extends StatelessWidget {
           ),
           if (isMe)
             Text(
-              'あなた',
+              context.l10n.infoYou,
               style: TextStyle(fontSize: 12, color: colors.textSecondary),
             )
           else if (onRemove case final onRemove?)
             PopupMenuButton<_MemberAction>(
-              tooltip: '${member.displayName}さんのメニュー',
+              tooltip: context.l10n.infoMemberMenu(member.displayName),
               icon: Icon(
                 Icons.more_horiz,
                 size: 20,
@@ -452,7 +455,7 @@ class _MemberLine extends StatelessWidget {
                 PopupMenuItem(
                   value: _MemberAction.remove,
                   child: Text(
-                    'この日記帳から外す',
+                    context.l10n.infoRemoveFromDiaryBook,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
                     ),
@@ -479,7 +482,7 @@ class _InviteLine extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: '友達を招待、招待コード ${inviteCode.split('').join(' ')}',
+      label: context.l10n.infoInviteSemantics(inviteCode.split('').join(' ')),
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -491,7 +494,7 @@ class _InviteLine extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '友達を招待する',
+                  context.l10n.infoInviteFriends,
                   style: TextStyle(fontSize: 15, color: colors.textSecondary),
                 ),
               ),
@@ -523,11 +526,11 @@ class _LoadError extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '日記帳の情報を読み込めませんでした',
+            context.l10n.infoLoadFailed,
             style: TextStyle(color: context.appColors.textSecondary),
           ),
           const SizedBox(height: 12),
-          TextButton(onPressed: onRetry, child: const Text('もう一度試す')),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.commonRetry)),
         ],
       ),
     );

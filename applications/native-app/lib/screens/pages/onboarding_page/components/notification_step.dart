@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 
 /// オンボーディングの2ページ目。どんな通知が届くかを見本で見せて、許可をお願いする。
@@ -9,16 +10,17 @@ class NotificationStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
 
     return ListView(
       children: [
-        const Text(
-          '通知をオンにしよう',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
+        Text(
+          l10n.notificationStepTitle,
+          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 8),
         Text(
-          '日記帳のメンバーが記録を書くと、お知らせが届きます。',
+          l10n.notificationStepDescription,
           style: TextStyle(
             fontSize: 14,
             height: 1.6,
@@ -26,20 +28,20 @@ class NotificationStep extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-        const _NotificationSample(
-          title: 'はるか',
-          body: '駅前の新しいカフェに来てみた☕',
-          time: 'たった今',
+        _NotificationSample(
+          title: l10n.notificationStepSample1Name,
+          body: l10n.notificationStepSample1Body,
+          time: l10n.notificationStepSample1Time,
         ),
         const SizedBox(height: 12),
-        const _NotificationSample(
-          title: 'そうた',
-          body: 'やっとレポート終わった！',
-          time: '5分前',
+        _NotificationSample(
+          title: l10n.notificationStepSample2Name,
+          body: l10n.notificationStepSample2Body,
+          time: l10n.notificationStepSample2Time,
         ),
         const SizedBox(height: 32),
         Text(
-          '通知はあとから端末の設定で変えられます。',
+          l10n.notificationStepFootnote,
           style: TextStyle(
             fontSize: 13,
             height: 1.6,

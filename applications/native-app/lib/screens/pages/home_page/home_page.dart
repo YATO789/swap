@@ -10,6 +10,7 @@ import '../../../infrastructures/repositories/opened_notification_repository.dar
 import '../../../infrastructures/repositories/post_hint_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../infrastructures/repositories/push_token_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_sheet.dart';
 import 'components/empty_diary_books.dart';
@@ -31,6 +32,7 @@ class HomePage extends HookConsumerWidget {
     final grid = ref.watch(diaryBookGridRepositoryProvider);
 
     final colors = context.appColors;
+    final l10n = context.l10n;
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
     final myName = ref.watch(profileRepositoryProvider).value?.displayName;
@@ -93,9 +95,7 @@ class HomePage extends HookConsumerWidget {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(content: Text('日記帳を読み込めませんでした。もう一度お試しください')),
-          );
+          ..showSnackBar(SnackBar(content: Text(l10n.homeRefreshFailed)));
       }
     }
 
@@ -132,12 +132,12 @@ class HomePage extends HookConsumerWidget {
           if (diaryBooks.isNotEmpty)
             IconButton(
               onPressed: addDiaryBook,
-              tooltip: '日記帳を追加',
+              tooltip: l10n.homeAddDiaryBook,
               icon: const Icon(Icons.add),
             ),
           IconButton(
             onPressed: () => const MyPageRoute().push<void>(context),
-            tooltip: 'プロフィールと設定',
+            tooltip: l10n.homeProfileAndSettings,
             icon: UserAvatar(name: myName ?? '', filled: true, size: 30),
           ),
           const SizedBox(width: 8),
@@ -159,13 +159,13 @@ class HomePage extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '日記帳を読み込めませんでした',
+                l10n.homeLoadFailed,
                 style: TextStyle(color: colors.textSecondary),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () => ref.invalidate(diaryBookRepositoryProvider),
-                child: const Text('もう一度試す'),
+                child: Text(l10n.commonRetry),
               ),
             ],
           ),
@@ -209,7 +209,7 @@ class _DiaryBookList extends StatelessWidget {
               coverColor: diaryBook.coverColor,
             ),
             title: diaryBook.name,
-            subtitle: '${diaryBook.memberCount}人',
+            subtitle: context.l10n.commonMemberCount(diaryBook.memberCount),
             onTap: () => onTap(diaryBook),
           ),
       ],
@@ -235,6 +235,7 @@ class _DiaryBookGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -254,11 +255,11 @@ class _DiaryBookGrid extends StatelessWidget {
           itemCount: diaryBooks.length,
           itemBuilder: (context, index) {
             final diaryBook = diaryBooks[index];
-            final memberCount = '${diaryBook.memberCount}人';
+            final memberCount = l10n.commonMemberCount(diaryBook.memberCount);
 
             return Semantics(
               button: true,
-              label: '${diaryBook.name}、$memberCount',
+              label: l10n.homeDiaryBookSemantics(diaryBook.name, memberCount),
               excludeSemantics: true,
               child: GestureDetector(
                 onTap: () => onTap(diaryBook),
@@ -314,7 +315,7 @@ class _ListTile extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: '$title、$subtitle',
+      label: context.l10n.homeDiaryBookSemantics(title, subtitle),
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,

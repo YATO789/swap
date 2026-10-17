@@ -7,7 +7,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../domains/diary/diary.dart';
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
+import '../../../utils/format.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/discard_guard.dart';
 import '../../components/post_line.dart';
@@ -55,10 +57,12 @@ class DiaryEditorPage extends HookConsumerWidget {
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () => Navigator.of(context).maybePop(),
-          tooltip: '閉じる',
+          tooltip: context.l10n.commonClose,
           icon: const Icon(Icons.close),
         ),
-        title: Text('${date.month}月${date.day}日の日記'),
+        title: Text(
+          context.l10n.commonDiaryOfDate(formatMonthDay(context, date)),
+        ),
       ),
       body: body,
     );
@@ -84,7 +88,7 @@ class DiaryEditorPage extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '日記を読み込めませんでした',
+                context.l10n.editorLoadFailed,
                 style: TextStyle(color: colors.textSecondary),
               ),
               const SizedBox(height: 12),
@@ -95,7 +99,7 @@ class DiaryEditorPage extends HookConsumerWidget {
                   }
                   ref.read(provider.notifier).refresh();
                 },
-                child: const Text('もう一度試す'),
+                child: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -143,12 +147,15 @@ class _DiaryEditor extends HookWidget {
     for (final id in targetIds) ?state.diaries[id],
   ];
 
-  /// 書いている日記の日。今日か昨日。
-  String get _dayLabel => date == diaryDateOf(DateTime.now()) ? '今日' : '昨日';
+  /// 書いている日記の日。今日なら 'today'、昨日なら 'yesterday'。
+  /// 文言の中で「今日」「昨日」を選び分けるのに使う。
+  String get _day =>
+      date == diaryDateOf(DateTime.now()) ? 'today' : 'yesterday';
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
 
     /// 書く日記帳。null ならすべての日記帳。
     final diaryBookId = useState(initialDiaryBookId);
@@ -201,13 +208,13 @@ class _DiaryEditor extends HookWidget {
       final writtenCount = _writtenIn(_targetIdsOf(null)).length;
       final picked = await showDiaryBookPicker(
         context,
-        title: '日記を書く日記帳',
+        title: l10n.editorPickerTitle,
         diaryBooks: diaryBooks,
         selectedId: diaryBookId.value ?? allDiaryBooks,
-        allStatus: '$_dayLabelの日記: ${diaryBooks.length}冊中$writtenCount冊に書いた',
+        allStatus: l10n.editorAllStatus(_day, diaryBooks.length, writtenCount),
         statusOf: (diaryBook) => state.diaries.containsKey(diaryBook.id)
-            ? '$_dayLabelの日記: 書いた'
-            : '$_dayLabelの日記: まだ',
+            ? l10n.editorStatusWritten(_day)
+            : l10n.editorStatusNotYet(_day),
       );
       if (picked == null || !context.mounted) return;
       final id = picked == allDiaryBooks ? null : picked;
@@ -231,13 +238,11 @@ class _DiaryEditor extends HookWidget {
       submitting.value = false;
       final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
       if (!ok) {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('日記を書けませんでした。もう一度お試しください')),
-        );
+        messenger.showSnackBar(SnackBar(content: Text(l10n.editorSaveFailed)));
         return;
       }
       messenger.showSnackBar(
-        SnackBar(content: Text(isNew ? '日記を投稿しました' : '日記を更新しました')),
+        SnackBar(content: Text(isNew ? l10n.editorPosted : l10n.editorUpdated)),
       );
       // 書けたので、書きかけの確認（DiscardGuard）を通さずに閉じる。
       Navigator.of(context).pop();
@@ -251,10 +256,10 @@ class _DiaryEditor extends HookWidget {
           leading: IconButton(
             // 書きかけなら確認を挟むので maybePop にする。
             onPressed: () => Navigator.of(context).maybePop(),
-            tooltip: '閉じる',
+            tooltip: l10n.commonClose,
             icon: const Icon(Icons.close),
           ),
-          title: Text('${date.month}月${date.day}日の日記'),
+          title: Text(l10n.commonDiaryOfDate(formatMonthDay(context, date))),
           actions: [
             TextButton(
               onPressed: canSubmit ? submit : null,
@@ -266,7 +271,9 @@ class _DiaryEditor extends HookWidget {
                         color: colors.textSecondary,
                       ),
                     )
-                  : Text(existing == null ? '投稿' : '更新'),
+                  : Text(
+                      existing == null ? l10n.editorPost : l10n.editorUpdate,
+                    ),
             ),
             const SizedBox(width: 8),
           ],
@@ -292,7 +299,7 @@ class _DiaryEditor extends HookWidget {
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
           children: [
             Text(
-              '$_dayLabelの記録',
+              l10n.editorDayPosts(_day),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -302,7 +309,7 @@ class _DiaryEditor extends HookWidget {
             const SizedBox(height: 8),
             if (state.posts.isEmpty)
               Text(
-                'この日の記録はありません',
+                l10n.commonNoPostsThisDay,
                 style: TextStyle(fontSize: 14, color: colors.textSecondary),
               )
             else
@@ -317,8 +324,8 @@ class _DiaryEditor extends HookWidget {
               maxLength: maxDiaryTitleLength,
               textInputAction: TextInputAction.next,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-              decoration: const InputDecoration(
-                hintText: 'タイトル',
+              decoration: InputDecoration(
+                hintText: l10n.editorTitleHint,
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
@@ -360,7 +367,7 @@ class _DiaryEditor extends HookWidget {
                     // 行の高さいっぱいだと罫線をはみ出すので、文字の高さに合わせる。
                     cursorHeight: _bodyFontSize * 1.4,
                     decoration: InputDecoration(
-                      hintText: '$_dayLabelはどんな一日だった？',
+                      hintText: l10n.editorBodyHint(_day),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
@@ -408,14 +415,14 @@ class _DiaryBookSelector extends StatelessWidget {
         : null;
     final isAll = id == null && diaryBooks.length > 1;
     if (diaryBook == null && !isAll) {
-      return Text('日記帳を作ると書けます', style: style);
+      return Text(context.l10n.editorNoDiaryBook, style: style);
     }
-    final name = isAll ? allDiaryBooksLabel : diaryBook!.name;
+    final name = isAll ? context.l10n.diaryBookPickerAll : diaryBook!.name;
 
     return Semantics(
       button: onTap != null,
-      label: '日記を書く日記帳: $name',
-      hint: onTap == null ? null : '日記帳を選び直す',
+      label: context.l10n.editorDiaryBookSemantics(name),
+      hint: onTap == null ? null : context.l10n.editorChangeDiaryBook,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,

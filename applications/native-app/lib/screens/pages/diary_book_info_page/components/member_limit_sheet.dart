@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../../../domains/diary_book/diary_book.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../components/sheet_parts.dart';
 
@@ -32,6 +33,7 @@ class _MemberLimitSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final selected = useState(memberLimit);
     final left = selected.value - memberCount;
 
@@ -40,7 +42,7 @@ class _MemberLimitSheet extends HookWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SheetTitle('人数の上限'),
+          SheetTitle(l10n.memberLimitTitle),
           const SizedBox(height: 18),
           _MemberLimitBar(
             selected: selected.value,
@@ -53,14 +55,14 @@ class _MemberLimitSheet extends HookWidget {
               // 選べない人数があるときだけ、なぜ選べないかを添える。
               if (memberCount > 1)
                 Text(
-                  '今の人数より少なくはできません',
+                  l10n.memberLimitCannotGoBelow,
                   style: TextStyle(fontSize: 12, color: colors.textSecondary),
                 ),
               const Spacer(),
               Text(
                 left == 0
-                    ? '${selected.value}人まで・満員'
-                    : '${selected.value}人まで・あと$left人',
+                    ? l10n.memberLimitFull(selected.value)
+                    : l10n.memberLimitLeft(selected.value, left),
                 style: TextStyle(fontSize: 12, color: colors.textSecondary),
               ),
             ],
@@ -68,7 +70,7 @@ class _MemberLimitSheet extends HookWidget {
           const SizedBox(height: 24),
           SheetButtons(
             onCancel: () => Navigator.of(context).pop(),
-            confirmLabel: '保存する',
+            confirmLabel: l10n.commonSave,
             onConfirm: () => Navigator.of(context).pop(selected.value),
           ),
         ],
@@ -141,7 +143,7 @@ class _Segment extends StatelessWidget {
     final colors = context.appColors;
 
     return Semantics(
-      label: '$count人',
+      label: context.l10n.commonMemberCount(count),
       inMutuallyExclusiveGroup: true,
       checked: selected,
       enabled: enabled,

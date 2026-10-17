@@ -9,6 +9,7 @@ import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/infrastructures/repositories/push_token_repository.dart';
+import 'package:swap/l10n/l10n.dart';
 import 'package:swap/screens/pages/my_page/my_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
 import 'package:swap/screens/pages/welcome_page/welcome_page.dart';
@@ -51,6 +52,9 @@ Future<void> _openMyPage(
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: buildLightTheme(),
           routerConfig: ref.watch(routerProvider),
         ),

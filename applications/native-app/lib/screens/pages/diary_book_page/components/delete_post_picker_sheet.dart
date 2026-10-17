@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../domains/post/timeline_post.dart';
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 
@@ -32,11 +33,14 @@ class _DeletePostPickerSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(24, 0, 24, 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
               child: Text(
-                '削除する記録を選んでください',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                context.l10n.deletePostPickerTitle,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             for (final post in posts)

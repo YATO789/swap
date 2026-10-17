@@ -14,6 +14,7 @@ import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/l10n/l10n.dart';
 import 'package:swap/screens/pages/diary_book_info_page/diary_book_info_page.dart';
 import 'package:swap/screens/pages/home_page/home_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
@@ -107,6 +108,9 @@ Future<void> _openInfo(
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: buildLightTheme(),
           routerConfig: ref.watch(routerProvider),
         ),
@@ -146,7 +150,7 @@ void main() {
 
     expect(find.text('ゼミ'), findsNWidgets(2));
 
-    await tester.pageBack();
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('ゼミ'), findsOneWidget);
   });
@@ -218,10 +222,7 @@ void main() {
   });
 
   testWidgets('引っぱって読み直すと、ほかの人が変えた人数の上限も映る', (tester) async {
-    await _openInfo(
-      tester,
-      refreshed: [_university.copyWith(memberLimit: 4)],
-    );
+    await _openInfo(tester, refreshed: [_university.copyWith(memberLimit: 4)]);
     expect(find.text('8人まで'), findsOneWidget);
 
     await tester.fling(find.text('表紙'), const Offset(0, 400), 1000);

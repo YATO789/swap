@@ -7,6 +7,7 @@ import 'package:swap/infrastructures/repositories/authentication_repository.dart
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/l10n/l10n.dart';
 import 'package:swap/screens/pages/home_page/home_page.dart';
 import 'package:swap/screens/pages/onboarding_page/onboarding_page.dart';
 import 'package:swap/screens/pages/router/router.dart';
@@ -38,6 +39,9 @@ Future<void> _pumpRouterApp(WidgetTester tester, {Profile? profile}) {
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
+          locale: const Locale('ja'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: buildLightTheme(),
           routerConfig: ref.watch(routerProvider),
         ),

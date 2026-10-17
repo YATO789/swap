@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
 import '../../theme/app_theme.dart';
 import 'sheet_parts.dart';
 
@@ -16,7 +17,7 @@ Future<bool> showConfirmSheet(
   Widget? preview,
   bool irreversible = false,
   required String confirmLabel,
-  String cancelLabel = 'キャンセル',
+  String? cancelLabel,
   bool destructive = false,
 }) async {
   final confirmed = await showModalBottomSheet<bool>(
@@ -43,7 +44,7 @@ Future<bool> showConfirmSheet(
                   Icon(Icons.error_outline, size: 16, color: errorColor),
                   const SizedBox(width: 6),
                   Text(
-                    'この操作は取り消せません',
+                    context.l10n.confirmSheetIrreversible,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,

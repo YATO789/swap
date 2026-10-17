@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 
-const _labels = {
-  ThemeMode.system: '端末に合わせる',
-  ThemeMode.light: 'ライト',
-  ThemeMode.dark: 'ダーク',
+String _label(AppLocalizations l10n, ThemeMode mode) => switch (mode) {
+  ThemeMode.system => l10n.themeModeSystem,
+  ThemeMode.light => l10n.themeModeLight,
+  ThemeMode.dark => l10n.themeModeDark,
 };
 
 /// テーマを3つ横に並べ、選んでいるものを白い札で浮かせて見せる。押したらすぐ切り替える。
@@ -31,10 +32,10 @@ class ThemeModePicker extends StatelessWidget {
       ),
       child: Row(
         children: [
-          for (final MapEntry(key: mode, value: label) in _labels.entries)
+          for (final mode in ThemeMode.values)
             Expanded(
               child: _Segment(
-                label: label,
+                label: _label(context.l10n, mode),
                 selected: mode == selected,
                 onTap: () => onChanged(mode),
               ),

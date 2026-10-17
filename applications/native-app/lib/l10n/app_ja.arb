@@ -1,0 +1,578 @@
+{
+  "@@locale": "ja",
+  "commonCancel": "キャンセル",
+  "commonClose": "閉じる",
+  "commonRetry": "もう一度試す",
+  "commonSave": "保存する",
+  "commonDelete": "削除する",
+  "commonComingSoon": "準備中です",
+  "commonToday": "今日",
+  "commonYesterday": "昨日",
+  "commonName": "名前",
+  "commonEnterName": "名前を入力",
+  "commonFormerMember": "抜けたメンバー",
+  "@commonFormerMember": {
+    "description": "日記帳から抜けた人の名前の代わりに出す"
+  },
+  "commonNoPostsThisDay": "この日の記録はありません",
+  "commonInviteCode": "招待コード",
+  "commonJoinWithInviteCode": "招待コードで参加",
+  "commonCreateDiaryBook": "日記帳を作る",
+  "commonDiaryBookInfo": "日記帳の情報",
+  "commonDiaryBookNameHint": "日記帳の名前を入力",
+  "commonDiaryBookUnavailable": "この日記帳は表示できません",
+  "commonWriteDiary": "日記を書く",
+  "commonPost": "記録する",
+  "commonWhatAreYouDoing": "今なにしてる？",
+  "commonTermsOfService": "利用規約",
+  "commonPrivacyPolicy": "プライバシーポリシー",
+  "commonMemberCount": "{count}人",
+  "@commonMemberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commonDiaryOfDate": "{date}の日記",
+  "@commonDiaryOfDate": {
+    "description": "date は formatMonthDay で作った「10月3日」",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "commonTodayWithDate": "今日・{date}",
+  "@commonTodayWithDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "postHintShare": "いまをひとことシェア",
+  "@postHintShare": {
+    "description": "ホームの入力欄の上に手書きで添える説明。変えたら assets/fonts/Yomogi-Hint.ttf を作り直す"
+  },
+  "postHintDiary": "日記はここ！",
+  "@postHintDiary": {
+    "description": "ホームのペンのボタンに手書きで添える説明。変えたら assets/fonts/Yomogi-Hint.ttf を作り直す"
+  },
+  "confirmSheetIrreversible": "この操作は取り消せません",
+  "discardGuardTitle": "入力内容を破棄しますか？",
+  "discardGuardMessage": "保存していない内容は失われます。",
+  "discardGuardKeepEditing": "編集を続ける",
+  "discardGuardDiscard": "破棄する",
+  "inviteSheetMessage": "Swap!で「{name}」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\n招待コード: {code}",
+  "@inviteSheetMessage": {
+    "description": "友達に送る招待メッセージ。参加するシートは最後に見つかったコードを使うので、コードは必ず最後に置く",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetCopied": "招待メッセージをコピーしました",
+  "inviteSheetCreatedTitle": "「{name}」を作りました",
+  "@inviteSheetCreatedTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetTitle": "「{name}」に招待",
+  "@inviteSheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetCreatedDescription": "友達を招待して、記録や日記を共有しましょう。招待コードを送ると、受け取った人がコードを入れて参加できます",
+  "inviteSheetDescription": "招待コードを送ると、受け取った人がコードを入れて参加できます",
+  "inviteSheetCodeSemantics": "招待コード {code}",
+  "@inviteSheetCodeSemantics": {
+    "description": "読み上げ用。code は1文字ずつ空白で区切った招待コード",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetCopy": "招待メッセージをコピー",
+  "inviteSheetLater": "あとで招待する",
+  "postSheetFailed": "記録できませんでした。もう一度お試しください",
+  "postSheetPosted": "記録しました",
+  "postSheetPostingTo": "{name}に記録します",
+  "@postSheetPostingTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "postSheetShareTo": "共有する日記帳",
+  "postButtonWriteToday": "今日の日記を書く",
+  "postButtonWriteYesterday": "昨日の日記を書く",
+  "coverColorLabel": "表紙の色",
+  "homeRefreshFailed": "日記帳を読み込めませんでした。もう一度お試しください",
+  "homeAddDiaryBook": "日記帳を追加",
+  "homeProfileAndSettings": "プロフィールと設定",
+  "homeLoadFailed": "日記帳を読み込めませんでした",
+  "homeDiaryBookSemantics": "{name}、{memberCount}",
+  "@homeDiaryBookSemantics": {
+    "description": "読み上げ用。日記帳の名前と人数（「3人」など）",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "memberCount": {
+        "type": "String"
+      }
+    }
+  },
+  "addDiaryBookCreateDescription": "新しい日記帳を作って友達を招待します",
+  "addDiaryBookJoinDescription": "友達から届いたコードで日記帳に入ります",
+  "emptyDiaryBooksTitle": "最初の日記帳を\nつくろう",
+  "emptyDiaryBooksMessage": "1冊のノートを友達とまわして、\n毎日のできごとを交換しよう。",
+  "joinSheetCheckFailed": "確認できませんでした。もう一度お試しください",
+  "joinSheetCodeNotFound": "招待コードが見つかりません",
+  "joinSheetJoinFailed": "参加できませんでした。もう一度お試しください",
+  "joinSheetDescription": "友達から届いた{length}文字のコードを入れてください",
+  "@joinSheetDescription": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "joinSheetPaste": "貼り付け",
+  "joinSheetCheck": "確認する",
+  "joinSheetOpen": "日記帳を開く",
+  "joinSheetJoin": "この日記帳に参加する",
+  "joinSheetAlreadyJoined": "この日記帳にはもう参加しています",
+  "joinSheetFull": "この日記帳は満員です（{limit}人まで）",
+  "@joinSheetFull": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "joinSheetSpotsLeft": "あと{count}人まで参加できます",
+  "@joinSheetSpotsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "joinSheetMemberCount": "{count}人のメンバー",
+  "@joinSheetMemberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diaryBookNoLongerAvailableTitle": "「{name}」は見られなくなりました",
+  "@diaryBookNoLongerAvailableTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    },
+    "description": "開いている日記帳から外されたときのお知らせのタイトル。name は日記帳の名前"
+  },
+  "diaryBookNoLongerAvailableMessage": "この日記帳の記録や日記は表示できません。",
+  "diaryBookBackToHome": "ホームに戻る",
+  "diaryBookDeletePostTitle": "記録を削除しますか？",
+  "diaryBookDeletePostMessage": "ほかの日記帳に出した分は残ります。",
+  "diaryBookPostDeleted": "記録を削除しました",
+  "diaryBookPostDeleteFailed": "記録を削除できませんでした。もう一度お試しください",
+  "diaryBookPickDate": "日付を選ぶ",
+  "diaryBookLoadFailed": "日記帳を読み込めませんでした",
+  "timelineNoPostsYet": "まだ記録がありません",
+  "deletePostPickerTitle": "削除する記録を選んでください",
+  "diarySectionUntitled": "タイトルなし",
+  "diarySectionLockedPast": "この日に日記を書いていないので読めません",
+  "diarySectionLockedToday": "この日記帳に今日の日記を書くと読めます",
+  "diarySectionLockedYesterday": "この日記帳に昨日の日記を書くと読めます",
+  "diarySectionLockedSemantics": "{name}の日記（{time}）。まだ読めません。{hint}",
+  "@diarySectionLockedSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    },
+    "description": "読めない日記のカードの読み上げ。time は書いた時刻、hint は読めるようにする方法"
+  },
+  "calendarPreviousMonth": "前の月",
+  "calendarNextMonth": "次の月",
+  "calendarHasDiary": "日記あり",
+  "calendarHasPost": "記録あり",
+  "calendarLabelSeparator": "、",
+  "@calendarLabelSeparator": {
+    "description": "カレンダーの日の読み上げで、日付・今日・日記あり などをつなぐ区切り"
+  },
+  "diaryDetailFallbackDiaryBookName": "日記帳",
+  "@diaryDetailFallbackDiaryBookName": {
+    "description": "日記帳の名前が分からないときに削除の確認文で代わりに使う名前"
+  },
+  "diaryDetailDeleteTitle": "日記を削除しますか？",
+  "diaryDetailDeleteMessage": "「{diaryBookName}」からこの日記を削除します。",
+  "@diaryDetailDeleteMessage": {
+    "placeholders": {
+      "diaryBookName": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryDetailDeleteFailed": "日記を削除できませんでした。もう一度お試しください",
+  "diaryDetailDeleted": "日記を削除しました",
+  "diaryDetailMenu": "メニュー",
+  "diaryDetailEdit": "編集",
+  "diaryDetailDelete": "削除",
+  "diaryDetailPrevious": "前の日記",
+  "diaryDetailNext": "次の日記",
+  "diaryDetailUnavailable": "この日記は表示できません",
+  "diaryDetailLoadFailed": "日記を読み込めませんでした",
+  "diaryDetailWrittenAt": "{time}に書きました",
+  "@diaryDetailWrittenAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "diaryDetailPostsOfDay": "この日の記録",
+  "infoRenameFailed": "名前を変えられませんでした。もう一度お試しください",
+  "infoCoverColorFailed": "表紙の色を変えられませんでした。もう一度お試しください",
+  "infoMemberLimitFailed": "人数の上限を変えられませんでした。もう一度お試しください",
+  "infoRegenerateInviteCodeTitle": "招待コードを作り直しますか？",
+  "infoRegenerateInviteCodeMessage": "今のコード（{code}）では参加できなくなります。参加しているメンバーはそのままです。",
+  "@infoRegenerateInviteCodeMessage": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "infoRegenerateInviteCodeConfirm": "作り直す",
+  "@infoRegenerateInviteCodeConfirm": {
+    "description": "招待コードを作り直す確認シートの決定ボタン"
+  },
+  "infoRegenerateInviteCodeFailed": "招待コードを作り直せませんでした。もう一度お試しください",
+  "infoInviteCodeRegenerated": "招待コードを作り直しました",
+  "infoRemoveMemberTitle": "{name}さんを外しますか？",
+  "@infoRemoveMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoRemoveMemberMessage": "この日記帳の記録や日記が見られなくなります。また参加できないように、招待コードも作り直します。",
+  "infoRemoveMemberConfirm": "外す",
+  "@infoRemoveMemberConfirm": {
+    "description": "メンバーを外す確認シートの決定ボタン"
+  },
+  "infoRemoveMemberFailed": "メンバーを外せませんでした。もう一度お試しください",
+  "infoMemberRemoved": "{name}さんを外しました",
+  "@infoMemberRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoLeaveTitle": "「{name}」から退出しますか？",
+  "@infoLeaveTitle": {
+    "description": "name は日記帳の名前",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoLeaveMessage": "この日記帳の記録や日記が見られなくなります。招待コードがあればまた参加できます。",
+  "infoLeaveConfirm": "退出する",
+  "@infoLeaveConfirm": {
+    "description": "日記帳から退出する確認シートの決定ボタン"
+  },
+  "infoLeaveFailed": "日記帳から退出できませんでした。もう一度お試しください",
+  "infoLeft": "「{name}」から退出しました",
+  "@infoLeft": {
+    "description": "name は日記帳の名前",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoCoverSection": "表紙",
+  "@infoCoverSection": {
+    "description": "日記帳の情報の見出し"
+  },
+  "infoRename": "名前を変える",
+  "infoMembersSection": "この日記を書く人",
+  "@infoMembersSection": {
+    "description": "日記帳の情報の、メンバーの見出し"
+  },
+  "infoMemberLimit": "人数の上限",
+  "infoChangeMemberLimit": "人数の上限を変える",
+  "infoMemberLimitValue": "{count}人まで",
+  "@infoMemberLimitValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "infoRegenerateInviteCode": "招待コードを作り直す",
+  "infoLeaveDiaryBook": "日記帳を退出",
+  "infoRenameSemantics": "{name}、名前を変える",
+  "@infoRenameSemantics": {
+    "description": "題名のボタンの読み上げ。name は日記帳の名前",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoYou": "あなた",
+  "@infoYou": {
+    "description": "メンバーの一覧で自分の行に添える"
+  },
+  "infoMemberMenu": "{name}さんのメニュー",
+  "@infoMemberMenu": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "infoRemoveFromDiaryBook": "この日記帳から外す",
+  "infoInviteSemantics": "友達を招待、招待コード {code}",
+  "@infoInviteSemantics": {
+    "description": "招待の行の読み上げ。code は1文字ずつ空白で区切った招待コード",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "infoInviteFriends": "友達を招待する",
+  "infoLoadFailed": "日記帳の情報を読み込めませんでした",
+  "memberLimitTitle": "人数の上限",
+  "memberLimitCannotGoBelow": "今の人数より少なくはできません",
+  "memberLimitFull": "{count}人まで・満員",
+  "@memberLimitFull": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memberLimitLeft": "{count}人まで・あと{left}人",
+  "@memberLimitLeft": {
+    "description": "count は人数の上限、left はあと何人参加できるか",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "renameTitle": "日記帳の名前",
+  "renameIconHelper": "最初の1文字がアイコンになります",
+  "createDiaryBookFailed": "日記帳を作れませんでした。もう一度お試しください",
+  "createDiaryBookCreate": "作成",
+  "@createDiaryBookCreate": {
+    "description": "日記帳を作るページの右上のボタン"
+  },
+  "createDiaryBookIconHint": "名前の最初の1文字がアイコンになります",
+  "editorLoadFailed": "日記を読み込めませんでした",
+  "editorPickerTitle": "日記を書く日記帳",
+  "editorAllStatus": "{day, select, today{今日} other{昨日}}の日記: {total}冊中{written}冊に書いた",
+  "@editorAllStatus": {
+    "description": "「すべての日記帳」の下に添える。day は today か yesterday",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      },
+      "written": {
+        "type": "int"
+      }
+    }
+  },
+  "editorStatusWritten": "{day, select, today{今日} other{昨日}}の日記: 書いた",
+  "@editorStatusWritten": {
+    "description": "日記帳の名前の下に添える。day は today か yesterday",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "editorStatusNotYet": "{day, select, today{今日} other{昨日}}の日記: まだ",
+  "@editorStatusNotYet": {
+    "description": "日記帳の名前の下に添える。day は today か yesterday",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "editorSaveFailed": "日記を書けませんでした。もう一度お試しください",
+  "editorPosted": "日記を投稿しました",
+  "editorUpdated": "日記を更新しました",
+  "editorPost": "投稿",
+  "@editorPost": {
+    "description": "日記を書くページの右上のボタン（まだ書いていないとき）"
+  },
+  "editorUpdate": "更新",
+  "@editorUpdate": {
+    "description": "日記を書くページの右上のボタン（もう書いてあるとき）"
+  },
+  "editorDayPosts": "{day, select, today{今日} other{昨日}}の記録",
+  "@editorDayPosts": {
+    "description": "day は today か yesterday",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "editorTitleHint": "タイトル",
+  "editorBodyHint": "{day, select, today{今日} other{昨日}}はどんな一日だった？",
+  "@editorBodyHint": {
+    "description": "day は today か yesterday",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "editorNoDiaryBook": "日記帳を作ると書けます",
+  "editorDiaryBookSemantics": "日記を書く日記帳: {name}",
+  "@editorDiaryBookSemantics": {
+    "description": "name は日記帳の名前か「すべての日記帳」",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editorChangeDiaryBook": "日記帳を選び直す",
+  "diaryBookPickerAll": "すべての日記帳",
+  "settingsTitle": "設定",
+  "settingsSignOutConfirmTitle": "ログアウトしますか？",
+  "settingsSignOut": "ログアウト",
+  "settingsSignOutFailed": "ログアウトできませんでした。もう一度お試しください",
+  "settingsDeleteAccountConfirmTitle": "アカウントを削除しますか？",
+  "settingsDeleteAccountConfirmMessage": "プロフィール・記録・日記がすべて削除されます。日記帳からも抜け、ほかに誰もいない日記帳は削除されます。",
+  "settingsDeleteAccountFailed": "アカウントを削除できませんでした。もう一度お試しください",
+  "settingsHomeLayoutSection": "ホームの日記帳の並べ方",
+  "settingsDisplaySection": "表示",
+  "settingsTheme": "テーマ",
+  "settingsPostHint": "書き込みバーの説明",
+  "@settingsPostHint": {
+    "description": "ホームの書き込みバーに手書きの説明を出すかの設定"
+  },
+  "settingsPostHintDescription": "ホームの入力欄とペンに、手書きの説明を添えます",
+  "settingsDiarySection": "日記",
+  "settingsDayStart": "日付の切り替わり",
+  "settingsDayStartDescription": "これより前に書いた記録や日記は前日の分になります",
+  "settingsDayStartValue": "朝{hour}:00",
+  "@settingsDayStartValue": {
+    "description": "日付が切り替わる朝の時刻",
+    "placeholders": {
+      "hour": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsOtherSection": "その他",
+  "settingsVersion": "バージョン",
+  "settingsAccountSection": "アカウント",
+  "settingsDeleteAccount": "アカウントを削除",
+  "settingsEditProfile": "プロフィールを編集",
+  "settingsProfileTileSemantics": "{name}、プロフィールを編集",
+  "@settingsProfileTileSemantics": {
+    "description": "設定のプロフィール行の読み上げ",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "themeModeSystem": "端末に合わせる",
+  "themeModeLight": "ライト",
+  "themeModeDark": "ダーク",
+  "layoutList": "リスト",
+  "layoutCover": "表紙",
+  "@layoutCover": {
+    "description": "ホームの日記帳を表紙のグリッドで並べる選択肢"
+  },
+  "onboardingSaveNameFailed": "名前を保存できませんでした。もう一度お試しください",
+  "onboardingNameTitle": "なんて呼べばいい？",
+  "onboardingNameDescription": "日記帳のメンバーに表示される名前です。あとから変えられます。",
+  "onboardingAllowNotifications": "通知を許可する",
+  "onboardingLater": "あとで",
+  "onboardingNext": "次へ",
+  "notificationStepTitle": "通知をオンにしよう",
+  "notificationStepDescription": "日記帳のメンバーが記録を書くと、お知らせが届きます。",
+  "notificationStepSample1Name": "はるか",
+  "@notificationStepSample1Name": {
+    "description": "通知の見本に出す架空の人の名前"
+  },
+  "notificationStepSample1Body": "駅前の新しいカフェに来てみた☕",
+  "notificationStepSample1Time": "たった今",
+  "notificationStepSample2Name": "そうた",
+  "@notificationStepSample2Name": {
+    "description": "通知の見本に出す架空の人の名前"
+  },
+  "notificationStepSample2Body": "やっとレポート終わった！",
+  "notificationStepSample2Time": "5分前",
+  "notificationStepFootnote": "通知はあとから端末の設定で変えられます。",
+  "profileEditTitle": "プロフィール",
+  "profileEditSave": "保存",
+  "profileEditSaveFailed": "プロフィールを保存できませんでした。もう一度お試しください",
+  "profileEditSaved": "プロフィールを保存しました",
+  "profileEditNameRequired": "名前を入力してください",
+  "welcomeSignInFailed": "サインインできませんでした。もう一度お試しください",
+  "welcomeTagline": "交換日記みたいに、みんなで\n1日の日記を共有しよう",
+  "welcomeSigningIn": "サインイン中…",
+  "welcomeSignInWithApple": "Appleでサインイン",
+  "welcomeTryAnonymously": "匿名で試す（開発用）",
+  "welcomeAgreementPrefix": "続けると、",
+  "@welcomeAgreementPrefix": {
+    "description": "同意文のうち、利用規約のリンクの前"
+  },
+  "welcomeAgreementConjunction": "と",
+  "@welcomeAgreementConjunction": {
+    "description": "同意文のうち、利用規約とプライバシーポリシーのリンクの間"
+  },
+  "welcomeAgreementSuffix": "に\n同意したことになります",
+  "@welcomeAgreementSuffix": {
+    "description": "同意文のうち、プライバシーポリシーのリンクの後"
+  },
+  "splashLoadFailed": "読み込めませんでした"
+}

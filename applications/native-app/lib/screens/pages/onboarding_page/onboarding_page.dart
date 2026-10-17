@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/profile/profile.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/form_field.dart';
 import '../../components/user_avatar.dart';
@@ -16,6 +17,7 @@ class OnboardingPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
+    final l10n = context.l10n;
     final nameController = useTextEditingController();
     // 文字を打つたびに「次へ」ボタンとアバターを更新する。
     useListenable(nameController);
@@ -46,9 +48,7 @@ class OnboardingPage extends HookConsumerWidget {
       if (!context.mounted || succeeded) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('名前を保存できませんでした。もう一度お試しください')),
-        );
+        ..showSnackBar(SnackBar(content: Text(l10n.onboardingSaveNameFailed)));
     }
 
     void back() => showsNotificationStep.value = false;
@@ -78,16 +78,16 @@ class OnboardingPage extends HookConsumerWidget {
                       ? const NotificationStep()
                       : ListView(
                           children: [
-                            const Text(
-                              'なんて呼べばいい？',
-                              style: TextStyle(
+                            Text(
+                              l10n.onboardingNameTitle,
+                              style: const TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '日記帳のメンバーに表示される名前です。あとから変えられます。',
+                              l10n.onboardingNameDescription,
                               style: TextStyle(
                                 fontSize: 14,
                                 height: 1.6,
@@ -103,12 +103,12 @@ class OnboardingPage extends HookConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            const FieldLabel('名前'),
+                            FieldLabel(l10n.commonName),
                             const SizedBox(height: 8),
                             InputField(
                               controller: nameController,
                               maxLength: maxDisplayNameLength,
-                              hintText: '名前を入力',
+                              hintText: l10n.commonEnterName,
                               autofocus: true,
                               textInputAction: TextInputAction.next,
                               onSubmitted: (_) => next(),
@@ -130,7 +130,7 @@ class OnboardingPage extends HookConsumerWidget {
                               color: colors.textSecondary,
                             ),
                           )
-                        : const Text('通知を許可する'),
+                        : Text(l10n.onboardingAllowNotifications),
                   ),
                   const SizedBox(height: 8),
                   // 許可を聞かずに名前だけ保存して始める。通知はあとから端末の設定でオンにできる。
@@ -146,12 +146,12 @@ class OnboardingPage extends HookConsumerWidget {
                               color: colors.textSecondary,
                             ),
                           )
-                        : const Text('あとで'),
+                        : Text(l10n.onboardingLater),
                   ),
                 ] else
                   FilledButton(
                     onPressed: name.isEmpty ? null : next,
-                    child: const Text('次へ'),
+                    child: Text(l10n.onboardingNext),
                   ),
               ],
             ),

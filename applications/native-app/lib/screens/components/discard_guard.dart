@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
 import 'confirm_sheet.dart';
 
 /// 書きかけの内容を捨てて閉じてよいかを聞く。捨てるなら true。
 Future<bool> confirmDiscard(BuildContext context) => showConfirmSheet(
   context,
-  title: '入力内容を破棄しますか？',
-  message: '保存していない内容は失われます。',
-  cancelLabel: '編集を続ける',
-  confirmLabel: '破棄する',
+  title: context.l10n.discardGuardTitle,
+  message: context.l10n.discardGuardMessage,
+  cancelLabel: context.l10n.discardGuardKeepEditing,
+  confirmLabel: context.l10n.discardGuardDiscard,
   destructive: true,
 );
 

@@ -6,6 +6,7 @@ import '../../../domains/diary/diary.dart';
 import '../../../domains/post/timeline_post.dart';
 import '../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
@@ -37,7 +38,9 @@ class DiaryDetailPage extends HookConsumerWidget {
     final colors = context.appColors;
     final provider = diaryDetailPageControllerProvider(diaryBookId, date);
     final pageState = ref.watch(provider);
-    final title = Text('${date.month}月${date.day}日の日記');
+    final title = Text(
+      context.l10n.commonDiaryOfDate(formatMonthDay(context, date)),
+    );
 
     return switch (pageState) {
       AsyncValue(:final value?, hasError: false) when value.diaries.isEmpty =>
@@ -121,6 +124,7 @@ class _DiaryPages extends HookConsumerWidget {
     }
 
     Future<void> confirmDelete() async {
+      final l10n = context.l10n;
       final diaryBookName =
           ref
               .read(diaryBookRepositoryProvider)
@@ -128,13 +132,13 @@ class _DiaryPages extends HookConsumerWidget {
               ?.where((diaryBook) => diaryBook.id == diaryBookId)
               .firstOrNull
               ?.name ??
-          '日記帳';
+          l10n.diaryDetailFallbackDiaryBookName;
       final confirmed = await showConfirmSheet(
         context,
-        title: '日記を削除しますか？',
-        message: '「$diaryBookName」からこの日記を削除します。',
+        title: l10n.diaryDetailDeleteTitle,
+        message: l10n.diaryDetailDeleteMessage(diaryBookName),
         irreversible: true,
-        confirmLabel: '削除する',
+        confirmLabel: l10n.commonDelete,
         destructive: true,
       );
       if (!confirmed || !context.mounted) return;
@@ -143,11 +147,11 @@ class _DiaryPages extends HookConsumerWidget {
       messenger.hideCurrentSnackBar();
       if (!deleted) {
         messenger.showSnackBar(
-          const SnackBar(content: Text('日記を削除できませんでした。もう一度お試しください')),
+          SnackBar(content: Text(l10n.diaryDetailDeleteFailed)),
         );
         return;
       }
-      messenger.showSnackBar(const SnackBar(content: Text('日記を削除しました')));
+      messenger.showSnackBar(SnackBar(content: Text(l10n.diaryDetailDeleted)));
       if (context.mounted) Navigator.of(context).pop();
     }
 
@@ -157,7 +161,7 @@ class _DiaryPages extends HookConsumerWidget {
         actions: [
           if (diary.authorId == myId)
             PopupMenuButton<VoidCallback>(
-              tooltip: 'メニュー',
+              tooltip: context.l10n.diaryDetailMenu,
               icon: const Icon(Icons.more_horiz),
               onSelected: (action) => action(),
               itemBuilder: (context) => [
@@ -167,9 +171,9 @@ class _DiaryPages extends HookConsumerWidget {
                 ))
                   PopupMenuItem(
                     value: edit,
-                    child: const ListTile(
-                      leading: Icon(Icons.edit_outlined),
-                      title: Text('編集'),
+                    child: ListTile(
+                      leading: const Icon(Icons.edit_outlined),
+                      title: Text(context.l10n.diaryDetailEdit),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -177,7 +181,10 @@ class _DiaryPages extends HookConsumerWidget {
                   value: confirmDelete,
                   child: ListTile(
                     leading: Icon(Icons.delete_outline, color: error),
-                    title: Text('削除', style: TextStyle(color: error)),
+                    title: Text(
+                      context.l10n.diaryDetailDelete,
+                      style: TextStyle(color: error),
+                    ),
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
@@ -195,7 +202,8 @@ class _DiaryPages extends HookConsumerWidget {
           return _DiaryBody(
             diary: diary,
             // 日記帳を抜けた人の名前は読めない。
-            name: state.names[diary.authorId] ?? '抜けたメンバー',
+            name:
+                state.names[diary.authorId] ?? context.l10n.commonFormerMember,
             isMine: diary.authorId == myId,
             posts: state.posts[diary.authorId] ?? const [],
           );
@@ -244,7 +252,7 @@ class _PageFooter extends StatelessWidget {
           children: [
             IconButton(
               onPressed: onPrevious,
-              tooltip: '前の日記',
+              tooltip: context.l10n.diaryDetailPrevious,
               icon: const Icon(Icons.chevron_left),
             ),
             Expanded(
@@ -260,7 +268,7 @@ class _PageFooter extends StatelessWidget {
             ),
             IconButton(
               onPressed: onNext,
-              tooltip: '次の日記',
+              tooltip: context.l10n.diaryDetailNext,
               icon: const Icon(Icons.chevron_right),
             ),
           ],
@@ -278,7 +286,7 @@ class _MissingDiary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        'この日記は表示できません',
+        context.l10n.diaryDetailUnavailable,
         style: TextStyle(fontSize: 14, color: context.appColors.textSecondary),
       ),
     );
@@ -297,11 +305,11 @@ class _LoadError extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '日記を読み込めませんでした',
+            context.l10n.diaryDetailLoadFailed,
             style: TextStyle(color: context.appColors.textSecondary),
           ),
           const SizedBox(height: 12),
-          TextButton(onPressed: onRetry, child: const Text('もう一度試す')),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.commonRetry)),
         ],
       ),
     );
@@ -361,7 +369,7 @@ class _DiaryBody extends StatelessWidget {
               ),
             ),
             Text(
-              '${formatTime(diary.writtenAt)}に書きました',
+              context.l10n.diaryDetailWrittenAt(formatTime(diary.writtenAt)),
               style: TextStyle(fontSize: 12, color: colors.textSecondary),
             ),
           ],
@@ -369,7 +377,7 @@ class _DiaryBody extends StatelessWidget {
         const SizedBox(height: 20),
         // 日記を書く画面と同じく、その日の記録を本文の上に出す。
         Text(
-          'この日の記録',
+          context.l10n.diaryDetailPostsOfDay,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -379,7 +387,7 @@ class _DiaryBody extends StatelessWidget {
         const SizedBox(height: 8),
         if (posts.isEmpty)
           Text(
-            'この日の記録はありません',
+            context.l10n.commonNoPostsThisDay,
             style: TextStyle(fontSize: 14, color: colors.textSecondary),
           )
         else

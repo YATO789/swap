@@ -2,13 +2,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 
 /// ホームの書き込みバー（PostButton）に重ねる、鉛筆で書き込んだような説明。
 /// ペンを丸で囲んで「日記はここ！」、入力欄の上に「いまをひとことシェア」と書いて矢印で指す。
 /// バーと同じ大きさに置き、はみ出してバーの上の余白に描く。タップは下に通す。
-/// 文字は Yomogi を使う文字だけに絞って入れているので、文言を変えたら
-/// assets/fonts/Yomogi-Hint.ttf も作り直す。
+/// 文字は Yomogi を、日本語の文言の文字と ASCII だけに絞って入れているので、
+/// 日本語の文言を変えたら assets/fonts/Yomogi-Hint.ttf も作り直す。
 class PostHint extends StatelessWidget {
   const PostHint({super.key, required this.visible});
 
@@ -18,6 +19,7 @@ class PostHint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = context.appColors.textPrimary;
+    final l10n = context.l10n;
 
     return IgnorePointer(
       child: ExcludeSemantics(
@@ -28,8 +30,10 @@ class PostHint extends StatelessWidget {
             fit: StackFit.expand,
             clipBehavior: Clip.none,
             children: [
-              CustomPaint(painter: _PostHintPainter(color)),
-              CustomPaint(painter: _DiaryHintPainter(color)),
+              CustomPaint(painter: _PostHintPainter(l10n.postHintShare, color)),
+              CustomPaint(
+                painter: _DiaryHintPainter(l10n.postHintDiary, color),
+              ),
             ],
           ),
         ),
@@ -81,13 +85,15 @@ void _drawPencilLine(Canvas canvas, Path path, Color color) {
 }
 
 /// 鉛筆で書いた文字。[baseline] の位置を左下にして、[angle] だけ傾けて書く。
-void _drawPencilText(
+/// [align] が 0.5 なら [baseline] を下辺の真ん中にする。書いた文字の幅を返す。
+double _drawPencilText(
   Canvas canvas,
   String text,
   Offset baseline,
   Color color, {
   required double fontSize,
   double angle = 0,
+  double align = 0,
 }) {
   final painter = TextPainter(
     text: TextSpan(
@@ -103,27 +109,40 @@ void _drawPencilText(
   final ascent = painter.computeDistanceToActualBaseline(
     TextBaseline.alphabetic,
   );
+  final width = painter.width;
   canvas
     ..save()
     ..translate(baseline.dx, baseline.dy)
     ..rotate(angle);
-  painter.paint(canvas, Offset(0, -ascent));
+  painter.paint(canvas, Offset(-width * align, -ascent));
   canvas.restore();
   painter.dispose();
+  return width;
 }
 
 /// 入力欄の上に「いまをひとことシェア」と書き、その右端から入力欄へ矢印を下ろす。
 class _PostHintPainter extends CustomPainter {
-  const _PostHintPainter(this.color);
+  const _PostHintPainter(this.text, this.color);
 
+  final String text;
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final input = _inputRect(size);
-    Offset p(double dx, double dy) => input.topLeft + Offset(dx, dy);
 
-    _drawPencilText(canvas, 'いまをひとことシェア', p(18, -26), color, fontSize: 16);
+    final width = _drawPencilText(
+      canvas,
+      text,
+      input.topLeft + const Offset(18, -26),
+      color,
+      fontSize: 16,
+    );
+
+    // 矢印は、日本語の文言（16 の大きさで 10 文字、幅 160）の右に合わせて描いてあるので、
+    // 文字の幅が違う分だけ左右にずらす。
+    final shift = width - 160;
+    Offset p(double dx, double dy) => input.topLeft + Offset(dx + shift, dy);
 
     // 文字の右から少しふくらませて、入力欄の上の縁へ下ろす。
     final control = p(213, -20);
@@ -154,13 +173,14 @@ class _PostHintPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_PostHintPainter oldDelegate) =>
-      color != oldDelegate.color;
+      text != oldDelegate.text || color != oldDelegate.color;
 }
 
 /// ペンをぐるっと丸で囲み、左上に「日記はここ！」と書いて線でつなぐ。
 class _DiaryHintPainter extends CustomPainter {
-  const _DiaryHintPainter(this.color);
+  const _DiaryHintPainter(this.text, this.color);
 
+  final String text;
   final Color color;
 
   @override
@@ -204,17 +224,20 @@ class _DiaryHintPainter extends CustomPainter {
     final line = curve([p(-16, -51), p(-10, -45), p(-6, -40), p(-4, -34)]);
     _drawPencilLine(canvas, line, color);
 
+    // 日本語の文言（18 の大きさで 6 文字、幅 108）の真ん中に、文字の真ん中を合わせる。
+    const angle = -5 * math.pi / 180;
     _drawPencilText(
       canvas,
-      '日記はここ！',
-      p(-80, -60),
+      text,
+      p(-80, -60) + Offset.fromDirection(angle, 54),
       color,
       fontSize: 18,
-      angle: -5 * math.pi / 180,
+      angle: angle,
+      align: 0.5,
     );
   }
 
   @override
   bool shouldRepaint(_DiaryHintPainter oldDelegate) =>
-      color != oldDelegate.color;
+      text != oldDelegate.text || color != oldDelegate.color;
 }
