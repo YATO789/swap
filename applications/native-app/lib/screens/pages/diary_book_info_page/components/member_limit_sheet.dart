@@ -48,12 +48,22 @@ class _MemberLimitSheet extends HookWidget {
             onSelected: (count) => selected.value = count,
           ),
           const SizedBox(height: 8),
-          Text(
-            left == 0
-                ? '${selected.value}人まで・満員'
-                : '${selected.value}人まで・あと$left人',
-            textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 12, color: colors.textSecondary),
+          Row(
+            children: [
+              // 選べない人数があるときだけ、なぜ選べないかを添える。
+              if (memberCount > 1)
+                Text(
+                  '今の人数より少なくはできません',
+                  style: TextStyle(fontSize: 12, color: colors.textSecondary),
+                ),
+              const Spacer(),
+              Text(
+                left == 0
+                    ? '${selected.value}人まで・満員'
+                    : '${selected.value}人まで・あと$left人',
+                style: TextStyle(fontSize: 12, color: colors.textSecondary),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           SheetButtons(
