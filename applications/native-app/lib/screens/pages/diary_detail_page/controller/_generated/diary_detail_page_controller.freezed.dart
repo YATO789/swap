@@ -16,8 +16,8 @@ T _$identity<T>(T value) => value;
 mixin _$DiaryDetailPageState implements DiagnosticableTreeMixin {
 
 /// 読める日記。自分の日記を先頭に、あとは書いた時刻の新しい順。この順にページをめくる。
- List<Diary> get diaries;/// 日記を書いた人の表示名。
- Map<String, String> get names;/// 日記を書いた人ごとの、その日（朝4時区切り）の記録。古い順。
+ List<Diary> get diaries;/// 日記帳のメンバー。user id ごと。
+ Map<String, DiaryBookMember> get members;/// 日記を書いた人ごとの、その日（朝4時区切り）の記録。古い順。
  Map<String, List<TimelinePost>> get posts;
 /// Create a copy of DiaryDetailPageState
 /// with the given fields replaced by the non-null parameter values.
@@ -31,26 +31,26 @@ void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   final _this = this as DiaryDetailPageState;
   properties
     ..add(DiagnosticsProperty('type', 'DiaryDetailPageState'))
-    ..add(DiagnosticsProperty('diaries', _this.diaries))..add(DiagnosticsProperty('names', _this.names))..add(DiagnosticsProperty('posts', _this.posts));
+    ..add(DiagnosticsProperty('diaries', _this.diaries))..add(DiagnosticsProperty('members', _this.members))..add(DiagnosticsProperty('posts', _this.posts));
 }
 
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryDetailPageState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryDetailPageState&&const DeepCollectionEquality().equals(other.diaries, _this.diaries)&&const DeepCollectionEquality().equals(other.names, _this.names)&&const DeepCollectionEquality().equals(other.posts, _this.posts));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryDetailPageState&&const DeepCollectionEquality().equals(other.diaries, _this.diaries)&&const DeepCollectionEquality().equals(other.members, _this.members)&&const DeepCollectionEquality().equals(other.posts, _this.posts));
 }
 
 
 @override
 int get hashCode {
   final _this = this as DiaryDetailPageState;
-  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.diaries),const DeepCollectionEquality().hash(_this.names),const DeepCollectionEquality().hash(_this.posts));
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.diaries),const DeepCollectionEquality().hash(_this.members),const DeepCollectionEquality().hash(_this.posts));
 }
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
   final _this = this as DiaryDetailPageState;
-  return 'DiaryDetailPageState(diaries: ${_this.diaries}, names: ${_this.names}, posts: ${_this.posts})';
+  return 'DiaryDetailPageState(diaries: ${_this.diaries}, members: ${_this.members}, posts: ${_this.posts})';
 }
 
 
@@ -61,7 +61,7 @@ abstract mixin class $DiaryDetailPageStateCopyWith<$Res>  {
   factory $DiaryDetailPageStateCopyWith(DiaryDetailPageState value, $Res Function(DiaryDetailPageState) _then) = _$DiaryDetailPageStateCopyWithImpl;
 @useResult
 $Res call({
- List<Diary> diaries, Map<String, String> names, Map<String, List<TimelinePost>> posts
+ List<Diary> diaries, Map<String, DiaryBookMember> members, Map<String, List<TimelinePost>> posts
 });
 
 
@@ -78,11 +78,11 @@ class _$DiaryDetailPageStateCopyWithImpl<$Res>
 
 /// Create a copy of DiaryDetailPageState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? diaries = null,Object? names = null,Object? posts = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? diaries = null,Object? members = null,Object? posts = null,}) {
   return _then(DiaryDetailPageState(
 diaries: null == diaries ? _self.diaries : diaries // ignore: cast_nullable_to_non_nullable
-as List<Diary>,names: null == names ? _self.names : names // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,posts: null == posts ? _self.posts : posts // ignore: cast_nullable_to_non_nullable
+as List<Diary>,members: null == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
+as Map<String, DiaryBookMember>,posts: null == posts ? _self.posts : posts // ignore: cast_nullable_to_non_nullable
 as Map<String, List<TimelinePost>>,
   ));
 }
@@ -168,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Diary> diaries,  Map<String, String> names,  Map<String, List<TimelinePost>> posts)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Diary> diaries,  Map<String, DiaryBookMember> members,  Map<String, List<TimelinePost>> posts)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryDetailPageState() when $default != null:
-return $default(_that.diaries,_that.names,_that.posts);case _:
+return $default(_that.diaries,_that.members,_that.posts);case _:
   return orElse();
 
 }
@@ -189,10 +189,10 @@ return $default(_that.diaries,_that.names,_that.posts);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Diary> diaries,  Map<String, String> names,  Map<String, List<TimelinePost>> posts)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Diary> diaries,  Map<String, DiaryBookMember> members,  Map<String, List<TimelinePost>> posts)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryDetailPageState():
-return $default(_that.diaries,_that.names,_that.posts);case _:
+return $default(_that.diaries,_that.members,_that.posts);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +209,10 @@ return $default(_that.diaries,_that.names,_that.posts);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Diary> diaries,  Map<String, String> names,  Map<String, List<TimelinePost>> posts)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Diary> diaries,  Map<String, DiaryBookMember> members,  Map<String, List<TimelinePost>> posts)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryDetailPageState() when $default != null:
-return $default(_that.diaries,_that.names,_that.posts);case _:
+return $default(_that.diaries,_that.members,_that.posts);case _:
   return null;
 
 }
@@ -224,7 +224,7 @@ return $default(_that.diaries,_that.names,_that.posts);case _:
 
 
 class _DiaryDetailPageState with DiagnosticableTreeMixin implements DiaryDetailPageState {
-  const _DiaryDetailPageState({required  List<Diary> diaries, required  Map<String, String> names, required  Map<String, List<TimelinePost>> posts}): _diaries = diaries,_names = names,_posts = posts;
+  const _DiaryDetailPageState({required  List<Diary> diaries, required  Map<String, DiaryBookMember> members, required  Map<String, List<TimelinePost>> posts}): _diaries = diaries,_members = members,_posts = posts;
   
 
 /// 読める日記。自分の日記を先頭に、あとは書いた時刻の新しい順。この順にページをめくる。
@@ -236,13 +236,13 @@ class _DiaryDetailPageState with DiagnosticableTreeMixin implements DiaryDetailP
   return EqualUnmodifiableListView(_diaries);
 }
 
-/// 日記を書いた人の表示名。
- final  Map<String, String> _names;
-/// 日記を書いた人の表示名。
-@override Map<String, String> get names {
-  if (_names is EqualUnmodifiableMapView) return _names;
+/// 日記帳のメンバー。user id ごと。
+ final  Map<String, DiaryBookMember> _members;
+/// 日記帳のメンバー。user id ごと。
+@override Map<String, DiaryBookMember> get members {
+  if (_members is EqualUnmodifiableMapView) return _members;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_names);
+  return EqualUnmodifiableMapView(_members);
 }
 
 /// 日記を書いた人ごとの、その日（朝4時区切り）の記録。古い順。
@@ -266,23 +266,23 @@ _$DiaryDetailPageStateCopyWith<_DiaryDetailPageState> get copyWith => __$DiaryDe
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
     ..add(DiagnosticsProperty('type', 'DiaryDetailPageState'))
-    ..add(DiagnosticsProperty('diaries', diaries))..add(DiagnosticsProperty('names', names))..add(DiagnosticsProperty('posts', posts));
+    ..add(DiagnosticsProperty('diaries', diaries))..add(DiagnosticsProperty('members', members))..add(DiagnosticsProperty('posts', posts));
 }
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryDetailPageState&&const DeepCollectionEquality().equals(other.diaries, _diaries)&&const DeepCollectionEquality().equals(other.names, _names)&&const DeepCollectionEquality().equals(other.posts, _posts));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryDetailPageState&&const DeepCollectionEquality().equals(other.diaries, _diaries)&&const DeepCollectionEquality().equals(other.members, _members)&&const DeepCollectionEquality().equals(other.posts, _posts));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_diaries),const DeepCollectionEquality().hash(_names),const DeepCollectionEquality().hash(_posts));
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_diaries),const DeepCollectionEquality().hash(_members),const DeepCollectionEquality().hash(_posts));
 }
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-    return 'DiaryDetailPageState(diaries: $diaries, names: $names, posts: $posts)';
+    return 'DiaryDetailPageState(diaries: $diaries, members: $members, posts: $posts)';
 }
 
 
@@ -293,7 +293,7 @@ abstract mixin class _$DiaryDetailPageStateCopyWith<$Res> implements $DiaryDetai
   factory _$DiaryDetailPageStateCopyWith(_DiaryDetailPageState value, $Res Function(_DiaryDetailPageState) _then) = __$DiaryDetailPageStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<Diary> diaries, Map<String, String> names, Map<String, List<TimelinePost>> posts
+ List<Diary> diaries, Map<String, DiaryBookMember> members, Map<String, List<TimelinePost>> posts
 });
 
 
@@ -310,11 +310,11 @@ class __$DiaryDetailPageStateCopyWithImpl<$Res>
 
 /// Create a copy of DiaryDetailPageState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? diaries = null,Object? names = null,Object? posts = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? diaries = null,Object? members = null,Object? posts = null,}) {
   return _then(_DiaryDetailPageState(
 diaries: null == diaries ? _self._diaries : diaries // ignore: cast_nullable_to_non_nullable
-as List<Diary>,names: null == names ? _self._names : names // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,posts: null == posts ? _self._posts : posts // ignore: cast_nullable_to_non_nullable
+as List<Diary>,members: null == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
+as Map<String, DiaryBookMember>,posts: null == posts ? _self._posts : posts // ignore: cast_nullable_to_non_nullable
 as Map<String, List<TimelinePost>>,
   ));
 }

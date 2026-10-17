@@ -15,6 +15,7 @@ class DiarySection extends StatelessWidget {
     required this.diaries,
     required this.myId,
     required this.nameOf,
+    required this.avatarColorOf,
     required this.onOpen,
     required this.onWrite,
   });
@@ -25,6 +26,9 @@ class DiarySection extends StatelessWidget {
 
   /// 書いた人の表示名。
   final String Function(String userId) nameOf;
+
+  /// 書いた人のアイコンの色。
+  final int? Function(String userId) avatarColorOf;
 
   /// 読める日記を押したとき。
   final ValueChanged<Diary> onOpen;
@@ -45,6 +49,7 @@ class DiarySection extends StatelessWidget {
           _DiaryCard(
             diary: mine,
             name: nameOf(mine.authorId),
+            avatarColor: avatarColorOf(mine.authorId),
             isMine: true,
             onTap: () => onOpen(mine),
           ),
@@ -53,6 +58,7 @@ class DiarySection extends StatelessWidget {
               ? _LockedDiaryCard(
                   diary: diary,
                   name: nameOf(diary.authorId),
+                  avatarColor: avatarColorOf(diary.authorId),
                   today: today,
                   // この日記帳に書けば読めるようになるので、そのまま日記を開く。
                   // 書けない古い日はもう読めないので、何もしない。
@@ -63,6 +69,7 @@ class DiarySection extends StatelessWidget {
               : _DiaryCard(
                   diary: diary,
                   name: nameOf(diary.authorId),
+                  avatarColor: avatarColorOf(diary.authorId),
                   isMine: false,
                   onTap: () => onOpen(diary),
                 ),
@@ -86,12 +93,14 @@ class _DiaryCard extends StatelessWidget {
   const _DiaryCard({
     required this.diary,
     required this.name,
+    required this.avatarColor,
     required this.isMine,
     required this.onTap,
   });
 
   final Diary diary;
   final String name;
+  final int? avatarColor;
   final bool isMine;
   final VoidCallback onTap;
 
@@ -116,7 +125,7 @@ class _DiaryCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                UserAvatar(name: name, filled: isMine),
+                UserAvatar(name: name, filled: isMine, color: avatarColor),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -188,12 +197,14 @@ class _LockedDiaryCard extends StatelessWidget {
   const _LockedDiaryCard({
     required this.diary,
     required this.name,
+    required this.avatarColor,
     required this.today,
     required this.onTap,
   });
 
   final Diary diary;
   final String name;
+  final int? avatarColor;
   final DateTime today;
   final VoidCallback? onTap;
 
@@ -231,7 +242,7 @@ class _LockedDiaryCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  UserAvatar(name: name, filled: false),
+                  UserAvatar(name: name, filled: false, color: avatarColor),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

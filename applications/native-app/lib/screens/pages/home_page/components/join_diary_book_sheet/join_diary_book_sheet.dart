@@ -387,7 +387,10 @@ class _FoundDiaryBook extends StatelessWidget {
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 12),
-        _Members(names: diaryBook.memberNames),
+        _Members(
+          names: diaryBook.memberNames,
+          avatarColors: diaryBook.memberAvatarColors,
+        ),
         const SizedBox(height: 28),
         _PillButton(label: label, busy: busy, onPressed: onPressed),
         const SizedBox(height: 10),
@@ -408,9 +411,12 @@ class _FoundDiaryBook extends StatelessWidget {
 
 /// メンバーのアバターと人数。
 class _Members extends StatelessWidget {
-  const _Members({required this.names});
+  const _Members({required this.names, required this.avatarColors});
 
   final List<String> names;
+
+  /// [names] と同じ順のアイコンの色。
+  final List<int?> avatarColors;
 
   /// アバターを並べる最大人数。残りは「+n」にする。
   static const _maxAvatars = 5;
@@ -427,8 +433,13 @@ class _Members extends StatelessWidget {
       alignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        for (final name in names.take(_maxAvatars))
-          UserAvatar(name: name, filled: false, size: 30),
+        for (final (index, name) in names.take(_maxAvatars).indexed)
+          UserAvatar(
+            name: name,
+            filled: false,
+            color: avatarColors.elementAtOrNull(index),
+            size: 30,
+          ),
         if (rest > 0) Text('+$rest', style: secondary),
         const SizedBox(width: 6),
         Text(context.l10n.joinSheetMemberCount(names.length), style: secondary),

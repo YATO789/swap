@@ -59,7 +59,7 @@ final class DiaryDetailPageControllerProvider
 }
 
 String _$diaryDetailPageControllerHash() =>
-    r'51ea78a71f8f0b590fc0eacd418af1b6d934fd81';
+    r'7139345c893daac86c789a185e8e9c2ab73192dc';
 
 /// 日記の詳細ページで、[diaryBookId] の日記帳の [date] の日記を読む。
 

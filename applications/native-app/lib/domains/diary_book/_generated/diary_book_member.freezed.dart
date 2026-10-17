@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DiaryBookMember {
 
- String get userId; String get displayName;
+ String get userId; String get displayName;/// アイコンの色（0xAARRGGBB）。null なら決まった色。
+ int? get avatarColor;
 /// Create a copy of DiaryBookMember
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +28,20 @@ $DiaryBookMemberCopyWith<DiaryBookMember> get copyWith => _$DiaryBookMemberCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryBookMember;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBookMember&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBookMember&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarColor, _this.avatarColor) || other.avatarColor == _this.avatarColor));
 }
 
 
 @override
 int get hashCode {
   final _this = this as DiaryBookMember;
-  return Object.hash(runtimeType,_this.userId,_this.displayName);
+  return Object.hash(runtimeType,_this.userId,_this.displayName,_this.avatarColor);
 }
 
 @override
 String toString() {
   final _this = this as DiaryBookMember;
-  return 'DiaryBookMember(userId: ${_this.userId}, displayName: ${_this.displayName})';
+  return 'DiaryBookMember(userId: ${_this.userId}, displayName: ${_this.displayName}, avatarColor: ${_this.avatarColor})';
 }
 
 
@@ -51,7 +52,7 @@ abstract mixin class $DiaryBookMemberCopyWith<$Res>  {
   factory $DiaryBookMemberCopyWith(DiaryBookMember value, $Res Function(DiaryBookMember) _then) = _$DiaryBookMemberCopyWithImpl;
 @useResult
 $Res call({
- String userId, String displayName
+ String userId, String displayName, int? avatarColor
 });
 
 
@@ -68,11 +69,12 @@ class _$DiaryBookMemberCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBookMember
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? displayName = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? displayName = null,Object? avatarColor = freezed,}) {
   return _then(DiaryBookMember(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,
+as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -157,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String displayName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  String displayName,  int? avatarColor)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryBookMember() when $default != null:
-return $default(_that.userId,_that.displayName);case _:
+return $default(_that.userId,_that.displayName,_that.avatarColor);case _:
   return orElse();
 
 }
@@ -178,10 +180,10 @@ return $default(_that.userId,_that.displayName);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String displayName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  String displayName,  int? avatarColor)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBookMember():
-return $default(_that.userId,_that.displayName);case _:
+return $default(_that.userId,_that.displayName,_that.avatarColor);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +200,10 @@ return $default(_that.userId,_that.displayName);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String displayName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  String displayName,  int? avatarColor)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBookMember() when $default != null:
-return $default(_that.userId,_that.displayName);case _:
+return $default(_that.userId,_that.displayName,_that.avatarColor);case _:
   return null;
 
 }
@@ -213,11 +215,13 @@ return $default(_that.userId,_that.displayName);case _:
 
 
 class _DiaryBookMember implements DiaryBookMember {
-  const _DiaryBookMember({required this.userId, required this.displayName});
+  const _DiaryBookMember({required this.userId, required this.displayName, this.avatarColor});
   
 
 @override final  String userId;
 @override final  String displayName;
+/// アイコンの色（0xAARRGGBB）。null なら決まった色。
+@override final  int? avatarColor;
 
 /// Create a copy of DiaryBookMember
 /// with the given fields replaced by the non-null parameter values.
@@ -229,18 +233,18 @@ _$DiaryBookMemberCopyWith<_DiaryBookMember> get copyWith => __$DiaryBookMemberCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBookMember&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.displayName, displayName) || other.displayName == displayName));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBookMember&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarColor, avatarColor) || other.avatarColor == avatarColor));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,userId,displayName);
+    return Object.hash(runtimeType,userId,displayName,avatarColor);
 }
 
 @override
 String toString() {
-    return 'DiaryBookMember(userId: $userId, displayName: $displayName)';
+    return 'DiaryBookMember(userId: $userId, displayName: $displayName, avatarColor: $avatarColor)';
 }
 
 
@@ -251,7 +255,7 @@ abstract mixin class _$DiaryBookMemberCopyWith<$Res> implements $DiaryBookMember
   factory _$DiaryBookMemberCopyWith(_DiaryBookMember value, $Res Function(_DiaryBookMember) _then) = __$DiaryBookMemberCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, String displayName
+ String userId, String displayName, int? avatarColor
 });
 
 
@@ -268,11 +272,12 @@ class __$DiaryBookMemberCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBookMember
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? displayName = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? displayName = null,Object? avatarColor = freezed,}) {
   return _then(_DiaryBookMember(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,
+as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

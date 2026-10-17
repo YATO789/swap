@@ -38,7 +38,7 @@ class HomePage extends HookConsumerWidget {
     final l10n = context.l10n;
     final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
-    final myName = ref.watch(profileRepositoryProvider).value?.displayName;
+    final profile = ref.watch(profileRepositoryProvider).value;
     final showPostHint = ref.watch(postHintRepositoryProvider);
     // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
@@ -162,7 +162,12 @@ class HomePage extends HookConsumerWidget {
           IconButton(
             onPressed: () => const MyPageRoute().push<void>(context),
             tooltip: l10n.homeProfileAndSettings,
-            icon: UserAvatar(name: myName ?? '', filled: true, size: 30),
+            icon: UserAvatar(
+              name: profile?.displayName ?? '',
+              filled: true,
+              color: profile?.avatarColor,
+              size: 30,
+            ),
           ),
           const SizedBox(width: 8),
         ],

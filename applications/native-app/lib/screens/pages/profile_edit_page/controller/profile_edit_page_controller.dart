@@ -11,14 +11,16 @@ class ProfileEditPageController extends _$ProfileEditPageController {
   @override
   AsyncValue<void> build() => const AsyncData(null);
 
-  /// 表示名を保存し、成功したかを返す。失敗したときは状態にエラーが入る。
-  Future<bool> saveName(String name) async {
+  /// 表示名とアイコンの色を保存し、成功したかを返す。失敗したときは状態にエラーが入る。
+  Future<bool> save({required String name, required int? avatarColor}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => ref.read(profileRepositoryProvider.notifier).saveDisplayName(name),
+      () => ref
+          .read(profileRepositoryProvider.notifier)
+          .save(displayName: name, avatarColor: avatarColor),
     );
     if (state case AsyncError(:final error, :final stackTrace)) {
-      debugPrint('名前を保存できませんでした: $error\n$stackTrace');
+      debugPrint('プロフィールを保存できませんでした: $error\n$stackTrace');
       return false;
     }
     return true;

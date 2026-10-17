@@ -24,7 +24,7 @@ class MyPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final myName = ref.watch(profileRepositoryProvider).value?.displayName;
+    final profile = ref.watch(profileRepositoryProvider).value;
     final diaryBookGrid = ref.watch(diaryBookGridRepositoryProvider);
     final themeMode = ref.watch(themeModeRepositoryProvider);
     final showPostHint = ref.watch(postHintRepositoryProvider);
@@ -86,7 +86,8 @@ class MyPage extends HookConsumerWidget {
         padding: const EdgeInsets.only(top: 8, bottom: 32),
         children: [
           _ProfileTile(
-            name: myName ?? '',
+            name: profile?.displayName ?? '',
+            avatarColor: profile?.avatarColor,
             onTap: () => const ProfileEditRoute().push<void>(context),
           ),
           _SectionHeader(l10n.settingsHomeLayoutSection),
@@ -165,9 +166,14 @@ class MyPage extends HookConsumerWidget {
 }
 
 class _ProfileTile extends StatelessWidget {
-  const _ProfileTile({required this.name, required this.onTap});
+  const _ProfileTile({
+    required this.name,
+    required this.avatarColor,
+    required this.onTap,
+  });
 
   final String name;
+  final int? avatarColor;
   final VoidCallback onTap;
 
   @override
@@ -184,7 +190,12 @@ class _ProfileTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Row(
             children: [
-              UserAvatar(name: name, filled: true, size: 56),
+              UserAvatar(
+                name: name,
+                filled: true,
+                color: avatarColor,
+                size: 56,
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(

@@ -55,6 +55,8 @@ class DiaryBookDatasource {
       id: row['id'] as String,
       name: row['name'] as String,
       memberNames: (row['member_names'] as List<dynamic>).cast<String>(),
+      memberAvatarColors: (row['member_avatar_colors'] as List<dynamic>)
+          .cast<int?>(),
       alreadyJoined: row['already_joined'] as bool,
       memberLimit: row['member_limit'] as int,
       coverColor: row['cover_color'] as int?,
@@ -71,7 +73,7 @@ class DiaryBookDatasource {
   Future<List<DiaryBookMember>> fetchMembers(String diaryBookId) async {
     final rows = await _client
         .from('diary_book_members')
-        .select('user_id, profiles(display_name)')
+        .select('user_id, profiles(display_name, avatar_color)')
         .eq('diary_book_id', diaryBookId)
         .order('joined_at');
     return rows.map((row) {
@@ -79,6 +81,7 @@ class DiaryBookDatasource {
       return DiaryBookMember(
         userId: row['user_id'] as String,
         displayName: profile['display_name'] as String,
+        avatarColor: profile['avatar_color'] as int?,
       );
     }).toList();
   }

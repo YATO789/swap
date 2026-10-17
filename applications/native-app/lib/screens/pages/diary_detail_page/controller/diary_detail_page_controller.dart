@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../domains/diary/diary.dart';
+import '../../../../domains/diary_book/diary_book_member.dart';
 import '../../../../domains/post/timeline_post.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
@@ -19,8 +20,8 @@ abstract class DiaryDetailPageState with _$DiaryDetailPageState {
     /// 読める日記。自分の日記を先頭に、あとは書いた時刻の新しい順。この順にページをめくる。
     required List<Diary> diaries,
 
-    /// 日記を書いた人の表示名。
-    required Map<String, String> names,
+    /// 日記帳のメンバー。user id ごと。
+    required Map<String, DiaryBookMember> members,
 
     /// 日記を書いた人ごとの、その日（朝4時区切り）の記録。古い順。
     required Map<String, List<TimelinePost>> posts,
@@ -48,7 +49,7 @@ class DiaryDetailPageController extends _$DiaryDetailPageController {
     ], date);
     return DiaryDetailPageState(
       diaries: readable,
-      names: {for (final member in members) member.userId: member.displayName},
+      members: {for (final member in members) member.userId: member},
       posts: {
         for (final diary in readable)
           diary.authorId: [

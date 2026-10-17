@@ -723,6 +723,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get profileEditNameRequired => '名前を入力してください';
 
   @override
+  String get profileEditAvatarColor => 'アイコンの色';
+
+  @override
   String get welcomeSignInFailed => 'サインインできませんでした。もう一度お試しください';
 
   @override

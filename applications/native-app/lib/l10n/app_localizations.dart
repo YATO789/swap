@@ -1364,6 +1364,12 @@ abstract class AppLocalizations {
   /// **'名前を入力してください'**
   String get profileEditNameRequired;
 
+  /// No description provided for @profileEditAvatarColor.
+  ///
+  /// In ja, this message translates to:
+  /// **'アイコンの色'**
+  String get profileEditAvatarColor;
+
   /// No description provided for @welcomeSignInFailed.
   ///
   /// In ja, this message translates to:

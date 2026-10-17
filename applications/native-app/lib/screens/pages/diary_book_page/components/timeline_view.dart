@@ -75,12 +75,11 @@ class TimelineView extends HookWidget {
       return () => timer?.cancel();
     }, const []);
 
-    final names = {
-      for (final member in members) member.userId: member.displayName,
-    };
+    final membersById = {for (final member in members) member.userId: member};
     // 日記帳を抜けた人の名前は読めない。
     String nameOf(String userId) =>
-        names[userId] ?? context.l10n.commonFormerMember;
+        membersById[userId]?.displayName ?? context.l10n.commonFormerMember;
+    int? avatarColorOf(String userId) => membersById[userId]?.avatarColor;
 
     final hours = _groupByHour(posts);
     final currentHour = date == diaryDateOf(now.value) ? now.value.hour : null;
@@ -106,6 +105,7 @@ class TimelineView extends HookWidget {
                 diaries: diaries,
                 myId: myId,
                 nameOf: nameOf,
+                avatarColorOf: avatarColorOf,
                 onOpen: onOpenDiary,
                 onWrite: onWriteDiary,
               ),
@@ -153,6 +153,7 @@ class TimelineView extends HookWidget {
                   hour: otherHours[index],
                   myId: myId,
                   nameOf: nameOf,
+                  avatarColorOf: avatarColorOf,
                   onDeletePost: onDeletePost,
                 ),
                 separatorBuilder: (context, index) => const Divider(),
@@ -205,12 +206,14 @@ class _HourSection extends StatelessWidget {
     required this.hour,
     required this.myId,
     required this.nameOf,
+    required this.avatarColorOf,
     required this.onDeletePost,
   });
 
   final _TimelineHour hour;
   final String? myId;
   final String Function(String userId) nameOf;
+  final int? Function(String userId) avatarColorOf;
   final ValueChanged<TimelinePost> onDeletePost;
 
   @override
@@ -228,6 +231,7 @@ class _HourSection extends StatelessWidget {
               child: _PostCard(
                 post: post,
                 name: nameOf(post.authorId),
+                avatarColor: avatarColorOf(post.authorId),
                 isMine: post.authorId == myId,
                 onDelete: () => onDeletePost(post),
               ),
@@ -295,6 +299,7 @@ class _CurrentHourSection extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 6),
               child: _MemberCard(
                 name: member.displayName,
+                avatarColor: member.avatarColor,
                 isMe: member.userId == myId,
                 onRecord: onRecord,
                 onDeletePost: onDeletePost,
@@ -316,6 +321,7 @@ class _CurrentHourSection extends StatelessWidget {
 class _MemberCard extends StatelessWidget {
   const _MemberCard({
     required this.name,
+    required this.avatarColor,
     required this.isMe,
     required this.onRecord,
     required this.onDeletePost,
@@ -323,6 +329,7 @@ class _MemberCard extends StatelessWidget {
   });
 
   final String name;
+  final int? avatarColor;
   final bool isMe;
   final VoidCallback onRecord;
   final ValueChanged<TimelinePost> onDeletePost;
@@ -345,7 +352,7 @@ class _MemberCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserAvatar(name: name, filled: isMe),
+            UserAvatar(name: name, filled: isMe, color: avatarColor),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -428,12 +435,14 @@ class _PostCard extends StatelessWidget {
   const _PostCard({
     required this.post,
     required this.name,
+    required this.avatarColor,
     required this.isMine,
     required this.onDelete,
   });
 
   final TimelinePost post;
   final String name;
+  final int? avatarColor;
   final bool isMine;
   final VoidCallback onDelete;
 
@@ -457,7 +466,7 @@ class _PostCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              UserAvatar(name: name, filled: isMine),
+              UserAvatar(name: name, filled: isMine, color: avatarColor),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

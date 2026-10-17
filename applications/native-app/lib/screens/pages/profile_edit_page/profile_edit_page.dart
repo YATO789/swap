@@ -7,12 +7,29 @@ import '../../../domains/profile/profile.dart';
 import '../../../infrastructures/repositories/profile_repository.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
+import '../../components/cover_color_picker.dart';
 import '../../components/discard_guard.dart';
 import '../../components/form_field.dart';
 import '../../components/user_avatar.dart';
 import 'controller/profile_edit_page_controller.dart';
 
-/// 表示名を編集するページ。
+/// 選べるアイコンの色。先頭の null は決まった塗り。
+/// 表紙と同じ明るいパステルに、表紙にない色を足して色相の順に並べる。
+/// 黒は決まった塗りと見分けにくいので入れない。
+const _avatarColors = <Color?>[
+  null,
+  Color(0xFFFFB4A8),
+  Color(0xFFFFC98A),
+  Color(0xFFFFE07A),
+  Color(0xFFC8E68C),
+  Color(0xFF9EE6C4),
+  Color(0xFF9EDCF0),
+  Color(0xFFA8C8FF),
+  Color(0xFFD9C2FF),
+  Color(0xFFFFB3D9),
+];
+
+/// 表示名とアイコンの色を編集するページ。
 class ProfileEditPage extends HookConsumerWidget {
   const ProfileEditPage({super.key});
 
@@ -20,15 +37,17 @@ class ProfileEditPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final l10n = context.l10n;
-    final savedName =
-        ref.watch(profileRepositoryProvider).value?.displayName ?? '';
+    final profile = ref.watch(profileRepositoryProvider).value;
+    final savedName = profile?.displayName ?? '';
+    final savedColor = profile?.avatarColor;
     final nameController = useTextEditingController(text: savedName);
     // 文字を打つたびに保存ボタンやエラー表示、アバターを更新する。
     useListenable(nameController);
     final name = nameController.text.trim();
-    final isDirty = name != savedName;
+    final avatarColor = useState(savedColor);
+    final isDirty = name != savedName || avatarColor.value != savedColor;
 
-    /// 名前の保存中か。ボタンを押せなくして、処理中の表示を出す。
+    /// 保存中か。ボタンを押せなくして、処理中の表示を出す。
     final saving = ref.watch(profileEditPageControllerProvider).isLoading;
 
     Future<void> save() async {
@@ -37,7 +56,7 @@ class ProfileEditPage extends HookConsumerWidget {
       final messenger = ScaffoldMessenger.of(context);
       final succeeded = await ref
           .read(profileEditPageControllerProvider.notifier)
-          .saveName(name);
+          .save(name: name, avatarColor: avatarColor.value);
       messenger.hideCurrentSnackBar();
       if (!succeeded) {
         messenger.showSnackBar(
@@ -79,7 +98,14 @@ class ProfileEditPage extends HookConsumerWidget {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
           children: [
-            Center(child: UserAvatar(name: name, filled: true, size: 72)),
+            Center(
+              child: UserAvatar(
+                name: name,
+                filled: true,
+                color: avatarColor.value,
+                size: 72,
+              ),
+            ),
             const SizedBox(height: 24),
             FieldLabel(l10n.commonName),
             const SizedBox(height: 8),
@@ -90,6 +116,20 @@ class ProfileEditPage extends HookConsumerWidget {
               textInputAction: TextInputAction.done,
               onSubmitted: (_) => save(),
               errorText: name.isEmpty ? l10n.profileEditNameRequired : null,
+            ),
+            const SizedBox(height: 24),
+            FieldLabel(l10n.profileEditAvatarColor),
+            const SizedBox(height: 8),
+            CoverColorPicker(
+              alignment: WrapAlignment.start,
+              choices: _avatarColors,
+              // 色を選ばなければ、自分のアイコンはいつもの塗りつぶしになる。
+              defaultColor: colors.textPrimary,
+              label: l10n.profileEditAvatarColor,
+              selected: avatarColor.value == null
+                  ? null
+                  : Color(avatarColor.value!),
+              onSelected: (color) => avatarColor.value = color?.toARGB32(),
             ),
           ],
         ),

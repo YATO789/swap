@@ -8,6 +8,9 @@ abstract class Profile with _$Profile {
   const factory Profile({
     required String id,
     required String displayName,
+
+    /// アイコンの色（0xAARRGGBB）。null なら決まった色。
+    int? avatarColor,
   }) = _Profile;
 }
 

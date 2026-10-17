@@ -20,17 +20,30 @@ const coverColors = <Color?>[
 ];
 
 /// 表紙の色を選ぶ丸の並び。選んでいる色は外側に輪を付ける。
+/// アイコンの色のように表紙以外の色を選ぶときは、[choices]・[defaultColor]・[label] を変える。
 class CoverColorPicker extends StatelessWidget {
   const CoverColorPicker({
     super.key,
     required this.selected,
     required this.onSelected,
     this.alignment = WrapAlignment.center,
+    this.choices = coverColors,
+    this.defaultColor,
+    this.label,
   });
 
   final Color? selected;
   final ValueChanged<Color?> onSelected;
   final WrapAlignment alignment;
+
+  /// 並べる色。null は [defaultColor] の丸。
+  final List<Color?> choices;
+
+  /// 先頭の null の丸に塗る色。なければ [defaultCoverColor]。
+  final Color? defaultColor;
+
+  /// 読み上げで丸に付ける名前。なければ「表紙の色」。
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +54,11 @@ class CoverColorPicker extends StatelessWidget {
       spacing: 4,
       runSpacing: 4,
       children: [
-        for (final color in coverColors)
+        for (final color in choices)
           Semantics(
             button: true,
             selected: color == selected,
-            label: context.l10n.coverColorLabel,
+            label: label ?? context.l10n.coverColorLabel,
             child: GestureDetector(
               onTap: () => onSelected(color),
               behavior: HitTestBehavior.opaque,
@@ -69,7 +82,8 @@ class CoverColorPicker extends StatelessWidget {
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: color ?? defaultCoverColor(context),
+                      color:
+                          color ?? defaultColor ?? defaultCoverColor(context),
                     ),
                   ),
                 ),

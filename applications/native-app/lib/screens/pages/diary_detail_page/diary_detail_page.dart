@@ -203,7 +203,9 @@ class _DiaryPages extends HookConsumerWidget {
             diary: diary,
             // 日記帳を抜けた人の名前は読めない。
             name:
-                state.names[diary.authorId] ?? context.l10n.commonFormerMember,
+                state.members[diary.authorId]?.displayName ??
+                context.l10n.commonFormerMember,
+            avatarColor: state.members[diary.authorId]?.avatarColor,
             isMine: diary.authorId == myId,
             posts: state.posts[diary.authorId] ?? const [],
           );
@@ -335,12 +337,14 @@ class _DiaryBody extends StatelessWidget {
   const _DiaryBody({
     required this.diary,
     required this.name,
+    required this.avatarColor,
     required this.isMine,
     required this.posts,
   });
 
   final Diary diary;
   final String name;
+  final int? avatarColor;
   final bool isMine;
 
   /// 書いた人のその日の記録。古い順。
@@ -357,7 +361,7 @@ class _DiaryBody extends StatelessWidget {
       children: [
         Row(
           children: [
-            UserAvatar(name: name, filled: isMine),
+            UserAvatar(name: name, filled: isMine, color: avatarColor),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

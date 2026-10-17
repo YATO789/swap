@@ -16,4 +16,15 @@ void main() {
 
     expect(find.byIcon(Icons.person), findsOneWidget);
   });
+
+  testWidgets('色があれば、自分かどうかにかかわらずその色で塗る', (tester) async {
+    await tester.pumpApp(
+      const UserAvatar(name: '美緒', filled: false, color: 0xFFFFE07A),
+    );
+
+    final decoration =
+        tester.widget<Container>(find.byType(Container)).decoration
+            as BoxDecoration;
+    expect(decoration.color, const Color(0xFFFFE07A));
+  });
 }

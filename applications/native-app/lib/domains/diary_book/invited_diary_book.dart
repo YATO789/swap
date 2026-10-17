@@ -11,6 +11,10 @@ abstract class InvitedDiaryBook with _$InvitedDiaryBook {
     required String id,
     required String name,
     required List<String> memberNames,
+
+    /// メンバーのアイコンの色。[memberNames] と同じ順。
+    @Default([]) List<int?> memberAvatarColors,
+
     /// 自分がもう参加しているか。
     required bool alreadyJoined,
 

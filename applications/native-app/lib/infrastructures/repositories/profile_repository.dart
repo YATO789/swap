@@ -22,4 +22,17 @@ class ProfileRepository extends _$ProfileRepository {
   Future<void> saveDisplayName(String displayName) async {
     state = AsyncData(await _datasource.saveMine(displayName));
   }
+
+  /// 作ってあるプロフィールの表示名とアイコンの色を保存する。
+  Future<void> save({
+    required String displayName,
+    required int? avatarColor,
+  }) async {
+    state = AsyncData(
+      await _datasource.updateMine(
+        displayName: displayName,
+        avatarColor: avatarColor,
+      ),
+    );
+  }
 }

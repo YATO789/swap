@@ -557,6 +557,7 @@
   "profileEditSaveFailed": "プロフィールを保存できませんでした。もう一度お試しください",
   "profileEditSaved": "プロフィールを保存しました",
   "profileEditNameRequired": "名前を入力してください",
+  "profileEditAvatarColor": "アイコンの色",
   "welcomeSignInFailed": "サインインできませんでした。もう一度お試しください",
   "welcomeTagline": "交換日記みたいに、みんなで\n1日の日記を共有しよう",
   "welcomeSigningIn": "サインイン中…",
