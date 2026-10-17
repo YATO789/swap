@@ -32,7 +32,7 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
-            "toolArgs": ["--flavor=prod"]
+            "toolArgs": ["--flavor=prod", "--dart-define-from-file=config/prod.json"]
         },
         {
             "name": "Production-Android",
@@ -40,7 +40,7 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
-            "toolArgs": ["--flavor=prod"]
+            "toolArgs": ["--flavor=prod", "--dart-define-from-file=config/prod.json"]
         }
     ]
 }

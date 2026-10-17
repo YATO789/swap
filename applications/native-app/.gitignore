@@ -49,3 +49,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# 本番の Supabase の接続先。config/prod.example.json を写して作る。
+/config/prod.json
