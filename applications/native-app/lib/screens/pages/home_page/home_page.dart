@@ -133,7 +133,7 @@ class HomePage extends HookConsumerWidget {
             IconButton(
               onPressed: addDiaryBook,
               tooltip: '日記帳を追加',
-              icon: const Icon(Icons.menu_book_outlined),
+              icon: const Icon(Icons.add),
             ),
           IconButton(
             onPressed: () => const MyPageRoute().push<void>(context),
