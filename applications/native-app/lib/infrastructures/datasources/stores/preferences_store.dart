@@ -37,9 +37,9 @@ class PreferencesStore {
 
   final SharedPreferencesWithCache _preferences;
 
-  /// ホームの日記帳の一覧を表紙のグリッドで出すか。まだ選んだことがなければリスト。
+  /// ホームの日記帳の一覧を表紙のグリッドで出すか。まだ選んだことがなければグリッド。
   bool readDiaryBookGrid() {
-    return _preferences.getBool(diaryBookGridKey) ?? false;
+    return _preferences.getBool(diaryBookGridKey) ?? true;
   }
 
   Future<void> saveDiaryBookGrid(bool grid) {

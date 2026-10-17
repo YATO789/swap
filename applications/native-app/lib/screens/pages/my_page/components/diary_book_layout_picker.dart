@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 
-/// ホームの日記帳の並べ方を、リストと表紙のグリッドの見本を並べて選ばせる。
+/// ホームの日記帳の並べ方を、表紙のグリッドとリストの見本を並べて選ばせる。
 class DiaryBookLayoutPicker extends StatelessWidget {
   const DiaryBookLayoutPicker({
     super.key,
@@ -21,21 +21,22 @@ class DiaryBookLayoutPicker extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
       child: Row(
         children: [
-          Expanded(
-            child: _Option(
-              label: context.l10n.layoutList,
-              selected: !grid,
-              onTap: () => onChanged(false),
-              preview: const _ListPreview(),
-            ),
-          ),
-          const SizedBox(width: 12),
+          // 最初に選ばれている表紙を左に置く。
           Expanded(
             child: _Option(
               label: context.l10n.layoutCover,
               selected: grid,
               onTap: () => onChanged(true),
               preview: const _GridPreview(),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _Option(
+              label: context.l10n.layoutList,
+              selected: !grid,
+              onTap: () => onChanged(false),
+              preview: const _ListPreview(),
             ),
           ),
         ],

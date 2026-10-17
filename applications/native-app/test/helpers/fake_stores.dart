@@ -4,7 +4,7 @@ import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 /// 端末に保存せず、設定をメモリに覚えておく。
 class FakePreferencesStore implements PreferencesStore {
   FakePreferencesStore({
-    this.diaryBookGrid = false,
+    this.diaryBookGrid = true,
     Set<String>? postDiaryBookIds,
     this.postHintVisible = true,
     this.themeMode = ThemeMode.system,

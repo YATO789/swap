@@ -123,16 +123,17 @@ void main() {
   testWidgets('設定に合わせてリストかグリッドで出す', (tester) async {
     await _pumpHome(tester, _diaryBooks);
 
-    expect(find.byIcon(Icons.chevron_right), findsWidgets);
+    // 選んだことがなければグリッド。
+    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.text('5人'), findsOneWidget);
 
     // 設定画面で切り替えたときと同じく、保存した値を変える。
     await ProviderScope.containerOf(tester.element(find.byType(HomePage)))
         .read(diaryBookGridRepositoryProvider.notifier)
-        .save(true);
+        .save(false);
     await tester.pump();
 
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
-    expect(find.text('5人'), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right), findsWidgets);
   });
 
   testWidgets('新しいバージョンがあれば知らせ、あとでにすると覚えておく', (tester) async {
