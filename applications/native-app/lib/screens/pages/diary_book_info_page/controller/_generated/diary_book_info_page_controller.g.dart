@@ -66,7 +66,7 @@ final class DiaryBookInfoPageControllerProvider
 }
 
 String _$diaryBookInfoPageControllerHash() =>
-    r'c8d39e5dd083db3c22f142397e1742aba7a323ad';
+    r'7a6e6ed11c19f78a06a6effe37785930dc5ebea5';
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
 /// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
