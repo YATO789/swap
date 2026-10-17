@@ -306,8 +306,8 @@ class _CurrentHourSection extends StatelessWidget {
   }
 }
 
-/// 今の時間の欄の1人ぶん。記録がなければ、自分なら「記録」ボタンを出す。
-/// そのときはカードのどこを押しても投稿シートを開く。
+/// 今の時間の欄の1人ぶん。自分がまだ記録していなければ、
+/// カードのどこを押しても投稿シートを開く。
 class _MemberCard extends StatelessWidget {
   const _MemberCard({
     required this.name,
@@ -335,90 +335,66 @@ class _MemberCard extends StatelessWidget {
         border: Border.all(color: colors.border),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: MergeSemantics(
-              // 記録が何行あっても、アイコンは左上に置いたままにする。
-              child: Row(
+      child: MergeSemantics(
+        // 記録が何行あっても、アイコンは左上に置いたままにする。
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            UserAvatar(name: name, filled: isMe),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  UserAvatar(name: name, filled: isMe),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        if (posts.isEmpty) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            'まだ記録がありません',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: colors.textSecondary,
-                            ),
-                          ),
-                        ],
-                        for (final post in posts) ...[
-                          const SizedBox(height: 2),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text(
-                                formatTime(post.postedAt),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: colors.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  post.message,
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
+                  Text(
+                    name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
+                  if (posts.isEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      'まだ記録がありません',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ],
+                  for (final post in posts) ...[
+                    const SizedBox(height: 2),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          formatTime(post.postedAt),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: colors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            post.message,
+                            style: const TextStyle(fontSize: 15),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
-          ),
-          if (canRecord) ...[
-            const SizedBox(width: 12),
-            FilledButton(
-              onPressed: onRecord,
-              // テーマの大きいボタンだと行が太るので、行の中に収まる小さめにする。
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(0, 32),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                textStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-                shape: const StadiumBorder(),
-              ),
-              child: const Text('記録'),
-            ),
           ],
-        ],
+        ),
       ),
     );
     if (canRecord) {
-      // 小さいボタンだけだと押しにくいので、カード全体を押せるようにする。
       return InkWell(
         onTap: onRecord,
         borderRadius: BorderRadius.circular(12),

@@ -142,7 +142,7 @@ void main() {
     expect(find.text('図書館で勉強中'), findsOneWidget);
   });
 
-  testWidgets('今の時間の欄の「記録」から、この日記帳に記録できる', (tester) async {
+  testWidgets('今の時間の欄の自分のカードから、この日記帳に記録できる', (tester) async {
     await _openDiaryBook(tester);
 
     // 今日を見ているので、今の時間の欄にメンバー全員が出る。
@@ -151,7 +151,7 @@ void main() {
     // 自分もまだ記録していなければ、ほかの人と同じく「まだ記録がありません」と出す。
     expect(find.text('まだ記録がありません'), findsNWidgets(3));
 
-    await tester.tap(find.widgetWithText(FilledButton, '記録'));
+    await tester.tap(find.widgetWithText(InkWell, '彩人'));
     await tester.pumpAndSettle();
     expect(find.text('大学に記録します'), findsOneWidget);
     expect(find.text('共有する日記帳'), findsNothing);
