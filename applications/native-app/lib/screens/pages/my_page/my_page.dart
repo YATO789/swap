@@ -13,14 +13,8 @@ import '../../components/confirm_sheet.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
 import 'components/diary_book_layout_picker.dart';
-import 'components/theme_mode_sheet.dart';
+import 'components/theme_mode_picker.dart';
 import 'controller/my_page_controller.dart';
-
-const _themeModeLabels = {
-  ThemeMode.system: '端末の設定',
-  ThemeMode.light: 'ライト',
-  ThemeMode.dark: 'ダーク',
-};
 
 /// ホームの AppBar 右のアイコンから開く、プロフィールとその他の設定のページ。
 class MyPage extends HookConsumerWidget {
@@ -47,16 +41,6 @@ class MyPage extends HookConsumerWidget {
     }
 
     void showNotReady() => showMessage('準備中です');
-
-    Future<void> pickThemeMode() async {
-      final mode = await showThemeModeSheet(
-        context,
-        selected: themeMode,
-        labels: _themeModeLabels,
-      );
-      if (mode == null) return;
-      await ref.read(themeModeRepositoryProvider.notifier).save(mode);
-    }
 
     Future<void> signOut() async {
       final confirmed = await showConfirmSheet(
@@ -106,17 +90,21 @@ class MyPage extends HookConsumerWidget {
             onChanged: ref.read(diaryBookGridRepositoryProvider.notifier).save,
           ),
           const _SectionHeader('表示'),
-          ListTile(
-            contentPadding: _tilePadding,
-            title: const Text('テーマ', style: _titleStyle),
-            trailing: Text(
-              _themeModeLabels[themeMode]!,
-              style: TextStyle(
-                fontSize: 15,
-                color: context.appColors.textSecondary,
-              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text('テーマ', style: _titleStyle),
+                const SizedBox(height: 10),
+                ThemeModePicker(
+                  selected: themeMode,
+                  onChanged: ref
+                      .read(themeModeRepositoryProvider.notifier)
+                      .save,
+                ),
+              ],
             ),
-            onTap: pickThemeMode,
           ),
           SwitchListTile(
             contentPadding: _tilePadding,

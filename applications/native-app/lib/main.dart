@@ -71,6 +71,8 @@ class MyApp extends ConsumerWidget {
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
       themeMode: ref.watch(themeModeRepositoryProvider),
+      // 色を少しずつ変えると、途中で文字の色だけ先に切り替わってちらつくので、一度に切り替える。
+      themeAnimationDuration: Duration.zero,
       routerConfig: ref.watch(routerProvider),
     );
   }
