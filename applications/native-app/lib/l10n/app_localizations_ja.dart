@@ -92,11 +92,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String commonTodayWithDate(String date) {
-    return '今日・$date';
-  }
-
-  @override
   String get postHintShare => 'いまをひとことシェア';
 
   @override

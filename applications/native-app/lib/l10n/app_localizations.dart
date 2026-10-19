@@ -254,12 +254,6 @@ abstract class AppLocalizations {
   /// **'{date}の日記'**
   String commonDiaryOfDate(String date);
 
-  /// No description provided for @commonTodayWithDate.
-  ///
-  /// In ja, this message translates to:
-  /// **'今日・{date}'**
-  String commonTodayWithDate(String date);
-
   /// ホームの入力欄の上に手書きで添える説明。変えたら assets/fonts/Yomogi-Hint.ttf を作り直す
   ///
   /// In ja, this message translates to:

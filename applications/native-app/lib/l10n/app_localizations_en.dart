@@ -98,11 +98,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String commonTodayWithDate(String date) {
-    return 'Today · $date';
-  }
-
-  @override
   String get postHintShare => 'Share a moment';
 
   @override

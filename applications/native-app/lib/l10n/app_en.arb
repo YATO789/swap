@@ -26,7 +26,6 @@
   "commonPrivacyPolicy": "Privacy Policy",
   "commonMemberCount": "{count, plural, =1{1 member} other{{count} members}}",
   "commonDiaryOfDate": "Diary for {date}",
-  "commonTodayWithDate": "Today · {date}",
   "postHintShare": "Share a moment",
   "postHintDiary": "Diary here!",
   "confirmSheetIrreversible": "This can't be undone",

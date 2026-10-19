@@ -44,14 +44,6 @@
       }
     }
   },
-  "commonTodayWithDate": "今日・{date}",
-  "@commonTodayWithDate": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "postHintShare": "いまをひとことシェア",
   "@postHintShare": {
     "description": "ホームの入力欄の上に手書きで添える説明。変えたら assets/fonts/Yomogi-Hint.ttf を作り直す"

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../domains/diary/diary.dart';
-import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 
@@ -14,16 +12,12 @@ class DatedTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateLabel = formatDateWithWeekday(context, date);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(title),
         Text(
-          date == diaryDateOf(DateTime.now())
-              ? context.l10n.commonTodayWithDate(dateLabel)
-              : dateLabel,
+          formatDateWithWeekday(context, date),
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
