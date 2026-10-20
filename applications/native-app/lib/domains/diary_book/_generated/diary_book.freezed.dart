@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DiaryBook {
 
- String get id; String get name; String get inviteCode; int get memberCount;/// 参加できる人数の上限。作った人が 1〜[maxDiaryBookMembers] 人で変えられる。
- int get memberLimit;/// 日記帳を作った人の id。メンバーを外したり人数の上限を変えたりできるのはこの人だけ。
+ String get id; String get name; String get inviteCode; int get memberCount; int get memberLimit;/// 日記帳を作った人の id。メンバーを外したり人数の上限を変えたりできるのはこの人だけ。
 /// アカウントを消していれば null。
  String? get createdBy; int? get coverColor;
 /// Create a copy of DiaryBook
@@ -228,7 +227,6 @@ class _DiaryBook implements DiaryBook {
 @override final  String name;
 @override final  String inviteCode;
 @override final  int memberCount;
-/// 参加できる人数の上限。作った人が 1〜[maxDiaryBookMembers] 人で変えられる。
 @override@JsonKey() final  int memberLimit;
 /// 日記帳を作った人の id。メンバーを外したり人数の上限を変えたりできるのはこの人だけ。
 /// アカウントを消していれば null。

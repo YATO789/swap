@@ -1,3 +1,7 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part '_generated/app_update.freezed.dart';
+
 /// アップデートを促すか。
 enum AppUpdate {
   /// 促さない。
@@ -10,21 +14,20 @@ enum AppUpdate {
   required,
 }
 
-/// Remote Config の `update_info` に置く、アップデートの案内。
-///
-/// ```json
-/// {
-///   "latestVersion": "1.2.0",
-///   "requiredVersion": "1.1.0",
-///   "enabledAt": "2026-10-20T10:00:00+09:00"
-/// }
-/// ```
-class UpdateInfo {
-  const UpdateInfo({
-    required this.latestVersion,
-    required this.requiredVersion,
-    required this.enabledAt,
-  });
+@freezed
+abstract class UpdateInfo with _$UpdateInfo {
+  const UpdateInfo._();
+
+  const factory UpdateInfo({
+    /// これより古ければ、アップデートを促す。
+    required AppVersion latestVersion,
+
+    /// これより古ければ、アップデートするまで使えなくする。
+    required AppVersion requiredVersion,
+
+    /// この日時から案内を出す。ストアの審査が通るのを待ってから出すために使う。
+    required DateTime enabledAt,
+  }) = _UpdateInfo;
 
   /// 書き方がおかしい項目があれば null。
   static UpdateInfo? tryParse(Map<String, dynamic> json) {
@@ -38,15 +41,6 @@ class UpdateInfo {
       enabledAt: enabledAt,
     );
   }
-
-  /// これより古ければ、アップデートを促す。
-  final AppVersion latestVersion;
-
-  /// これより古ければ、アップデートするまで使えなくする。
-  final AppVersion requiredVersion;
-
-  /// この日時から案内を出す。ストアの審査が通るのを待ってから出すために使う。
-  final DateTime enabledAt;
 
   /// [current] のアプリにアップデートを促すか。
   ///
@@ -68,8 +62,11 @@ class UpdateInfo {
 }
 
 /// `1.2.3` の形のバージョン。足りない桁は 0 とみなす。
-class AppVersion implements Comparable<AppVersion> {
-  const AppVersion(this.parts);
+@freezed
+abstract class AppVersion with _$AppVersion implements Comparable<AppVersion> {
+  const AppVersion._();
+
+  const factory AppVersion(List<int> parts) = _AppVersion;
 
   /// 数字をドットでつないだ形でなければ null。`+` より後のビルド番号は見ない。
   static AppVersion? tryParse(Object? value) {
@@ -78,8 +75,6 @@ class AppVersion implements Comparable<AppVersion> {
     if (parts.isEmpty || parts.contains(null)) return null;
     return AppVersion(parts.cast<int>());
   }
-
-  final List<int> parts;
 
   @override
   int compareTo(AppVersion other) {

@@ -10,8 +10,6 @@ abstract class DiaryBook with _$DiaryBook {
     required String name,
     required String inviteCode,
     required int memberCount,
-
-    /// 参加できる人数の上限。作った人が 1〜[maxDiaryBookMembers] 人で変えられる。
     @Default(maxDiaryBookMembers) int memberLimit,
 
     /// 日記帳を作った人の id。メンバーを外したり人数の上限を変えたりできるのはこの人だけ。
