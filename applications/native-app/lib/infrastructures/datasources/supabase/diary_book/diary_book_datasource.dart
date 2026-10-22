@@ -1,8 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:swap/domains/diary_book/diary_book.dart';
-import 'package:swap/domains/diary_book/diary_book_member.dart';
-import 'package:swap/domains/diary_book/invited_diary_book.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary_book/models/diary_book_member_response.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary_book/models/diary_book_response.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary_book/models/invited_diary_book_response.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary_book/models/joined_diary_book_response.dart';
 
 part '_generated/diary_book_datasource.g.dart';
 
@@ -18,7 +19,7 @@ class DiaryBookDatasource {
   final SupabaseClient _client;
 
   /// 自分が参加している日記帳。RLS で参加しているものだけが返る。
-  Future<List<DiaryBook>> fetchJoined() async {
+  Future<List<JoinedDiaryBookResponse>> fetchJoined() async {
     final rows = await _client
         .from('diary_books')
         .select(
@@ -26,31 +27,28 @@ class DiaryBookDatasource {
           'diary_book_members(count)',
         )
         .order('created_at');
-    return rows.map((row) {
-      final members = row['diary_book_members'] as List<dynamic>;
-      final count = (members.first as Map<String, dynamic>)['count'] as int;
-      return DiaryBook.fromJson({...row, 'member_count': count});
-    }).toList();
+    return rows.map(JoinedDiaryBookResponse.fromJson).toList();
   }
 
   /// 日記帳を作って参加する。招待コードは DB が作る。
-  Future<DiaryBook> create(String name, {int? coverColor}) async {
+  Future<DiaryBookResponse> create(String name, {int? coverColor}) async {
     final row = await _client.rpc<Map<String, dynamic>>(
       'create_diary_book',
       params: {'p_name': name, 'p_cover_color': coverColor},
     );
-    // 作った人だけが入っている。
-    return DiaryBook.fromJson({...row, 'member_count': 1});
+    return DiaryBookResponse.fromJson(row);
   }
 
   /// 招待コード [code] の日記帳を、参加する前に見せるために探す。見つからなければ null。
-  Future<InvitedDiaryBook?> findByCode(String code) async {
+  Future<InvitedDiaryBookResponse?> findByCode(String code) async {
     final rows = await _client.rpc<List<dynamic>>(
       'find_diary_book_by_code',
       params: {'p_code': code},
     );
     if (rows.isEmpty) return null;
-    return InvitedDiaryBook.fromJson(rows.first as Map<String, dynamic>);
+    return InvitedDiaryBookResponse.fromJson(
+      rows.first as Map<String, dynamic>,
+    );
   }
 
   /// 招待コード [code] の日記帳に参加し、その id を返す。コードが違えば null。
@@ -60,16 +58,13 @@ class DiaryBookDatasource {
   }
 
   /// [diaryBookId] の日記帳に参加している人を、参加した順に返す。
-  Future<List<DiaryBookMember>> fetchMembers(String diaryBookId) async {
+  Future<List<DiaryBookMemberResponse>> fetchMembers(String diaryBookId) async {
     final rows = await _client
         .from('diary_book_members')
         .select('user_id, profiles(display_name, avatar_color)')
         .eq('diary_book_id', diaryBookId)
         .order('joined_at');
-    return rows.map((row) {
-      final profile = row['profiles'] as Map<String, dynamic>;
-      return DiaryBookMember.fromJson({'user_id': row['user_id'], ...profile});
-    }).toList();
+    return rows.map(DiaryBookMemberResponse.fromJson).toList();
   }
 
   /// [diaryBookId] の日記帳の名前を [name] にする。

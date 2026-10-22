@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/infrastructures/datasources/supabase/profile/models/profile_response.dart';
 
 part '_generated/profile_datasource.g.dart';
 
@@ -16,18 +16,18 @@ class ProfileDatasource {
   final SupabaseClient _client;
 
   /// 自分のプロフィール。まだ作っていなければ null。
-  Future<Profile?> fetchMine() async {
+  Future<ProfileResponse?> fetchMine() async {
     final row = await _client
         .from('profiles')
         .select(_columns)
         .eq('id', _userId)
         .maybeSingle();
-    return row == null ? null : Profile.fromJson(row);
+    return row == null ? null : ProfileResponse.fromJson(row);
   }
 
   /// 自分のプロフィールを作る。もうあれば表示名とアイコンの色を書き換える。
   /// [avatarColor] が null なら決まった色にする。
-  Future<Profile> saveMine({
+  Future<ProfileResponse> saveMine({
     required String displayName,
     required int? avatarColor,
   }) async {
@@ -40,7 +40,7 @@ class ProfileDatasource {
         })
         .select(_columns)
         .single();
-    return Profile.fromJson(row);
+    return ProfileResponse.fromJson(row);
   }
 
   static const _columns = 'id, display_name, avatar_color';

@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../timeline_post.dart';
+part of '../post_response.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_TimelinePost _$TimelinePostFromJson(Map<String, dynamic> json) =>
-    _TimelinePost(
+_PostResponse _$PostResponseFromJson(Map<String, dynamic> json) =>
+    _PostResponse(
       id: json['id'] as String,
       authorId: json['author_id'] as String,
       message: json['message'] as String,
@@ -16,7 +16,7 @@ _TimelinePost _$TimelinePostFromJson(Map<String, dynamic> json) =>
       ),
     );
 
-Map<String, dynamic> _$TimelinePostToJson(_TimelinePost instance) =>
+Map<String, dynamic> _$PostResponseToJson(_PostResponse instance) =>
     <String, dynamic>{
       'id': instance.id,
       'author_id': instance.authorId,

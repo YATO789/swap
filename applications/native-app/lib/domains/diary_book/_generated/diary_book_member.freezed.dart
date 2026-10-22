@@ -12,7 +12,6 @@ part of '../diary_book_member.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$DiaryBookMember {
 
@@ -24,8 +23,6 @@ mixin _$DiaryBookMember {
 @pragma('vm:prefer-inline')
 $DiaryBookMemberCopyWith<DiaryBookMember> get copyWith => _$DiaryBookMemberCopyWithImpl<DiaryBookMember>(this as DiaryBookMember, _$identity);
 
-  /// Serializes this DiaryBookMember to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -34,7 +31,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBookMember&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarColor, _this.avatarColor) || other.avatarColor == _this.avatarColor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
   final _this = this as DiaryBookMember;
@@ -215,11 +212,11 @@ return $default(_that.userId,_that.displayName,_that.avatarColor);case _:
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _DiaryBookMember implements DiaryBookMember {
   const _DiaryBookMember({required this.userId, required this.displayName, this.avatarColor});
-  factory _DiaryBookMember.fromJson(Map<String, dynamic> json) => _$DiaryBookMemberFromJson(json);
+  
 
 @override final  String userId;
 @override final  String displayName;
@@ -232,17 +229,14 @@ class _DiaryBookMember implements DiaryBookMember {
 @pragma('vm:prefer-inline')
 _$DiaryBookMemberCopyWith<_DiaryBookMember> get copyWith => __$DiaryBookMemberCopyWithImpl<_DiaryBookMember>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$DiaryBookMemberToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBookMember&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarColor, avatarColor) || other.avatarColor == avatarColor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
     return Object.hash(runtimeType,userId,displayName,avatarColor);

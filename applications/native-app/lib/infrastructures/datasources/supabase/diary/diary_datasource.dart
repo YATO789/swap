@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:swap/domains/diary/diary.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary/models/diary_response.dart';
 
 part '_generated/diary_datasource.g.dart';
 
@@ -17,14 +17,14 @@ class DiaryDatasource {
 
   /// [diaryBookId] の日記帳に書かれた [date] の日記を、書いた時刻の新しい順に返す。
   /// 本文（diary_contents）は RLS で読めるものだけが返り、読めない日記は本文が null になる。
-  Future<List<Diary>> fetchOn(String diaryBookId, DateTime date) async {
+  Future<List<DiaryResponse>> fetchOn(String diaryBookId, DateTime date) async {
     final rows = await _client
         .from('diaries')
-        .select('id, author_id, date, written_at, diary_contents(title, body)')
+        .select(_columns)
         .eq('diary_book_id', diaryBookId)
         .eq('date', _toDateString(date))
         .order('written_at', ascending: false);
-    return rows.map(_toDiary).toList();
+    return rows.map(DiaryResponse.fromJson).toList();
   }
 
   /// [diaryBookId] の日記帳に、[from] から [to] まで（両端を含む）の間で誰かが日記を書いた日。
@@ -42,19 +42,14 @@ class DiaryDatasource {
     return {for (final row in rows) DateTime.parse(row['date'] as String)};
   }
 
-  /// 自分が [date] に書いた日記を、日記帳の id ごとに返す。
-  Future<Map<String, Diary>> fetchMineOn(DateTime date) async {
+  /// 自分が [date] に書いた日記。日記帳ごとに1つずつ。
+  Future<List<DiaryResponse>> fetchMineOn(DateTime date) async {
     final rows = await _client
         .from('diaries')
-        .select(
-          'id, diary_book_id, author_id, date, written_at, '
-          'diary_contents(title, body)',
-        )
+        .select(_columns)
         .eq('author_id', _client.auth.currentUser!.id)
         .eq('date', _toDateString(date));
-    return {
-      for (final row in rows) row['diary_book_id'] as String: _toDiary(row),
-    };
+    return rows.map(DiaryResponse.fromJson).toList();
   }
 
   /// [diaryBookId] の日記帳に自分の [date] の日記を書く。
@@ -81,11 +76,9 @@ class DiaryDatasource {
     await _client.from('diaries').delete().eq('id', diaryId);
   }
 
-  Diary _toDiary(Map<String, dynamic> row) {
-    // diary_id が主キーなので1対1になり、読めれば Map、読めなければ null が入る。
-    final content = row['diary_contents'] as Map<String, dynamic>?;
-    return Diary.fromJson({...row, ...?content});
-  }
+  static const _columns =
+      'id, diary_book_id, author_id, date, written_at, '
+      'diary_contents(title, body)';
 
   String _toDateString(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-'

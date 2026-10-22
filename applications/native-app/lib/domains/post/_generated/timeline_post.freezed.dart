@@ -12,19 +12,16 @@ part of '../timeline_post.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$TimelinePost {
 
- String get id; String get authorId; String get message;@LocalDateTimeConverter() DateTime get postedAt;
+ String get id; String get authorId; String get message; DateTime get postedAt;
 /// Create a copy of TimelinePost
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $TimelinePostCopyWith<TimelinePost> get copyWith => _$TimelinePostCopyWithImpl<TimelinePost>(this as TimelinePost, _$identity);
 
-  /// Serializes this TimelinePost to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -33,7 +30,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is TimelinePost&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.postedAt, _this.postedAt) || other.postedAt == _this.postedAt));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
   final _this = this as TimelinePost;
@@ -54,7 +51,7 @@ abstract mixin class $TimelinePostCopyWith<$Res>  {
   factory $TimelinePostCopyWith(TimelinePost value, $Res Function(TimelinePost) _then) = _$TimelinePostCopyWithImpl;
 @useResult
 $Res call({
- String id, String authorId, String message,@LocalDateTimeConverter() DateTime postedAt
+ String id, String authorId, String message, DateTime postedAt
 });
 
 
@@ -162,7 +159,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  String message,  DateTime postedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TimelinePost() when $default != null:
 return $default(_that.id,_that.authorId,_that.message,_that.postedAt);case _:
@@ -183,7 +180,7 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  String message,  DateTime postedAt)  $default,) {final _that = this;
 switch (_that) {
 case _TimelinePost():
 return $default(_that.id,_that.authorId,_that.message,_that.postedAt);case _:
@@ -203,7 +200,7 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  String message,  DateTime postedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _TimelinePost() when $default != null:
 return $default(_that.id,_that.authorId,_that.message,_that.postedAt);case _:
@@ -215,16 +212,16 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt);case _:
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _TimelinePost implements TimelinePost {
-  const _TimelinePost({required this.id, required this.authorId, required this.message, @LocalDateTimeConverter() required this.postedAt});
-  factory _TimelinePost.fromJson(Map<String, dynamic> json) => _$TimelinePostFromJson(json);
+  const _TimelinePost({required this.id, required this.authorId, required this.message, required this.postedAt});
+  
 
 @override final  String id;
 @override final  String authorId;
 @override final  String message;
-@override@LocalDateTimeConverter() final  DateTime postedAt;
+@override final  DateTime postedAt;
 
 /// Create a copy of TimelinePost
 /// with the given fields replaced by the non-null parameter values.
@@ -232,17 +229,14 @@ class _TimelinePost implements TimelinePost {
 @pragma('vm:prefer-inline')
 _$TimelinePostCopyWith<_TimelinePost> get copyWith => __$TimelinePostCopyWithImpl<_TimelinePost>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$TimelinePostToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _TimelinePost&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.message, message) || other.message == message)&&(identical(other.postedAt, postedAt) || other.postedAt == postedAt));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
     return Object.hash(runtimeType,id,authorId,message,postedAt);
@@ -261,7 +255,7 @@ abstract mixin class _$TimelinePostCopyWith<$Res> implements $TimelinePostCopyWi
   factory _$TimelinePostCopyWith(_TimelinePost value, $Res Function(_TimelinePost) _then) = __$TimelinePostCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String authorId, String message,@LocalDateTimeConverter() DateTime postedAt
+ String id, String authorId, String message, DateTime postedAt
 });
 
 

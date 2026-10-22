@@ -12,7 +12,6 @@ part of '../profile.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$Profile {
 
@@ -24,8 +23,6 @@ mixin _$Profile {
 @pragma('vm:prefer-inline')
 $ProfileCopyWith<Profile> get copyWith => _$ProfileCopyWithImpl<Profile>(this as Profile, _$identity);
 
-  /// Serializes this Profile to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -34,7 +31,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is Profile&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarColor, _this.avatarColor) || other.avatarColor == _this.avatarColor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
   final _this = this as Profile;
@@ -215,11 +212,11 @@ return $default(_that.id,_that.displayName,_that.avatarColor);case _:
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _Profile implements Profile {
   const _Profile({required this.id, required this.displayName, this.avatarColor});
-  factory _Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
+  
 
 @override final  String id;
 @override final  String displayName;
@@ -232,17 +229,14 @@ class _Profile implements Profile {
 @pragma('vm:prefer-inline')
 _$ProfileCopyWith<_Profile> get copyWith => __$ProfileCopyWithImpl<_Profile>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$ProfileToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarColor, avatarColor) || other.avatarColor == avatarColor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
     return Object.hash(runtimeType,id,displayName,avatarColor);

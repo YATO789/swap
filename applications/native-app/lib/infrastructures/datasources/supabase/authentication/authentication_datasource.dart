@@ -4,7 +4,6 @@ import 'package:crypto/crypto.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:swap/domains/authentication/authentication.dart';
 
 part '_generated/authentication_datasource.g.dart';
 
@@ -21,8 +20,8 @@ class AuthenticationDatasource {
 
   GoTrueClient get _auth => _client.auth;
 
-  /// 今のサインイン状態。
-  Authentication get current => _toAuthentication(_auth.currentSession);
+  /// 今サインインしているか。
+  bool get isSignedIn => _auth.currentSession != null;
 
   /// iOS の Apple サインイン画面を出し、その結果で Supabase にサインインする。
   ///
@@ -69,9 +68,5 @@ class AuthenticationDatasource {
     await _client.rpc<void>('delete_account');
     // サーバーのセッションはユーザーと一緒に消えているので、端末の分だけ捨てる。
     await _auth.signOut(scope: SignOutScope.local);
-  }
-
-  Authentication _toAuthentication(Session? session) {
-    return Authentication(isLoginApp: session != null);
   }
 }

@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:swap/domains/post/post.dart';
-import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/infrastructures/datasources/supabase/post/models/post_response.dart';
 
 part '_generated/post_datasource.g.dart';
 
@@ -16,14 +15,14 @@ class PostDatasource {
 
   final SupabaseClient _client;
 
-  /// [post] を書いて日記帳に出し、記録の id を返す。書いた時刻は DB が決める。
-  Future<String> create(Post post) {
+  /// [message] を書いて [diaryBookIds] の日記帳に出し、記録の id を返す。書いた時刻は DB が決める。
+  Future<String> create({
+    required String message,
+    required List<String> diaryBookIds,
+  }) {
     return _client.rpc<String>(
       'create_post',
-      params: {
-        'p_message': post.message,
-        'p_diary_book_ids': post.diaryBookIds,
-      },
+      params: {'p_message': message, 'p_diary_book_ids': diaryBookIds},
     );
   }
 
@@ -37,7 +36,7 @@ class PostDatasource {
   }
 
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録を古い順に返す。
-  Future<List<TimelinePost>> fetchInDiaryBook(
+  Future<List<PostResponse>> fetchInDiaryBook(
     String diaryBookId, {
     required DateTime from,
     required DateTime to,
@@ -53,12 +52,12 @@ class PostDatasource {
         .lt('posted_at', to.toUtc().toIso8601String())
         // Dart の order は既定が降順なので、古い順を明示する。
         .order('posted_at', ascending: true);
-    return rows.map(TimelinePost.fromJson).toList();
+    return rows.map(PostResponse.fromJson).toList();
   }
 
   /// [authorIds] の人が [from] 以降 [to] より前に書いた記録を古い順に返す。
   /// 自分の記録と、自分の入っている日記帳に出た記録だけが RLS で返る。
-  Future<List<TimelinePost>> fetchByAuthors(
+  Future<List<PostResponse>> fetchByAuthors(
     List<String> authorIds, {
     required DateTime from,
     required DateTime to,
@@ -70,7 +69,7 @@ class PostDatasource {
         .gte('posted_at', from.toUtc().toIso8601String())
         .lt('posted_at', to.toUtc().toIso8601String())
         .order('posted_at');
-    return rows.map(TimelinePost.fromJson).toList();
+    return rows.map(PostResponse.fromJson).toList();
   }
 
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録の書いた時刻。

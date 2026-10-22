@@ -12,7 +12,6 @@ part of '../diary_book.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$DiaryBook {
 
@@ -25,8 +24,6 @@ mixin _$DiaryBook {
 @pragma('vm:prefer-inline')
 $DiaryBookCopyWith<DiaryBook> get copyWith => _$DiaryBookCopyWithImpl<DiaryBook>(this as DiaryBook, _$identity);
 
-  /// Serializes this DiaryBook to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -35,7 +32,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBook&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.inviteCode, _this.inviteCode) || other.inviteCode == _this.inviteCode)&&(identical(other.memberCount, _this.memberCount) || other.memberCount == _this.memberCount)&&(identical(other.memberLimit, _this.memberLimit) || other.memberLimit == _this.memberLimit)&&(identical(other.createdBy, _this.createdBy) || other.createdBy == _this.createdBy)&&(identical(other.coverColor, _this.coverColor) || other.coverColor == _this.coverColor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
   final _this = this as DiaryBook;
@@ -220,11 +217,11 @@ return $default(_that.id,_that.name,_that.inviteCode,_that.memberCount,_that.mem
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _DiaryBook implements DiaryBook {
   const _DiaryBook({required this.id, required this.name, required this.inviteCode, required this.memberCount, this.memberLimit = maxDiaryBookMembers, this.createdBy, this.coverColor});
-  factory _DiaryBook.fromJson(Map<String, dynamic> json) => _$DiaryBookFromJson(json);
+  
 
 @override final  String id;
 @override final  String name;
@@ -242,17 +239,14 @@ class _DiaryBook implements DiaryBook {
 @pragma('vm:prefer-inline')
 _$DiaryBookCopyWith<_DiaryBook> get copyWith => __$DiaryBookCopyWithImpl<_DiaryBook>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$DiaryBookToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBook&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.inviteCode, inviteCode) || other.inviteCode == inviteCode)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.memberLimit, memberLimit) || other.memberLimit == memberLimit)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.coverColor, coverColor) || other.coverColor == coverColor));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
     return Object.hash(runtimeType,id,name,inviteCode,memberCount,memberLimit,createdBy,coverColor);
