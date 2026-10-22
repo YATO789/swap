@@ -1,12 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary/diary.dart';
-import 'package:swap/infrastructures/datasources/supabase/diary_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary/diary_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/diary/models/diary_response.dart';
 
 part '_generated/diary_repository.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 DiaryRepository diaryRepository(Ref ref) {
-  return DiaryRepository(ref.read(diaryDatasourceProvider));
+  return DiaryRepository(ref.watch(diaryDatasourceProvider));
 }
 
 /// 日記を読み書きする。
@@ -16,8 +17,9 @@ class DiaryRepository {
   final DiaryDatasource _datasource;
 
   /// [diaryBookId] の日記帳に書かれた [date] の日記を、書いた時刻の新しい順に返す。
-  Future<List<Diary>> fetchOn(String diaryBookId, DateTime date) {
-    return _datasource.fetchOn(diaryBookId, date);
+  Future<List<Diary>> fetchOn(String diaryBookId, DateTime date) async {
+    final responses = await _datasource.fetchOn(diaryBookId, date);
+    return responses.map(_toDiary).toList();
   }
 
   /// [diaryBookId] の日記帳に、[month] の月の間で誰かが日記を書いた日。
@@ -30,8 +32,12 @@ class DiaryRepository {
   }
 
   /// 自分が [date] に書いた日記を、日記帳の id ごとに返す。
-  Future<Map<String, Diary>> fetchMineOn(DateTime date) {
-    return _datasource.fetchMineOn(date);
+  Future<Map<String, Diary>> fetchMineOn(DateTime date) async {
+    final responses = await _datasource.fetchMineOn(date);
+    return {
+      for (final response in responses)
+        response.diaryBookId: _toDiary(response),
+    };
   }
 
   /// [diaryBookIds] の日記帳それぞれに、自分の [date] の日記として同じ内容を書く。
@@ -51,5 +57,16 @@ class DiaryRepository {
   /// 自分の日記を消す。
   Future<void> delete(String diaryId) {
     return _datasource.delete(diaryId);
+  }
+
+  Diary _toDiary(DiaryResponse response) {
+    return Diary(
+      id: response.id,
+      authorId: response.authorId,
+      date: response.date,
+      writtenAt: response.writtenAt,
+      title: response.content?.title,
+      body: response.content?.body,
+    );
   }
 }

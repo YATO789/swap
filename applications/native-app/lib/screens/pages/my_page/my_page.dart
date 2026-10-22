@@ -4,10 +4,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../domains/diary/diary.dart';
-import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
-import '../../../infrastructures/repositories/post_hint_repository.dart';
-import '../../../infrastructures/repositories/profile_repository.dart';
-import '../../../infrastructures/repositories/theme_mode_repository.dart';
+import '../../helpers/diary_book_grid_helper.dart';
+import '../../helpers/post_hint_helper.dart';
+import '../../helpers/profile_helper.dart';
+import '../../helpers/theme_mode_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/legal_pages.dart';
@@ -24,10 +24,10 @@ class MyPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileRepositoryProvider).value;
-    final diaryBookGrid = ref.watch(diaryBookGridRepositoryProvider);
-    final themeMode = ref.watch(themeModeRepositoryProvider);
-    final showPostHint = ref.watch(postHintRepositoryProvider);
+    final profile = ref.watch(profileProvider).value;
+    final diaryBookGrid = ref.watch(diaryBookGridProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    final showPostHint = ref.watch(postHintProvider);
 
     // pubspec.yaml の version（ビルド番号を除く）。読み込むまでは空にしておく。
     final packageInfo = useFuture(useMemoized(PackageInfo.fromPlatform));
@@ -93,7 +93,7 @@ class MyPage extends HookConsumerWidget {
           _SectionHeader(l10n.settingsHomeLayoutSection),
           DiaryBookLayoutPicker(
             grid: diaryBookGrid,
-            onChanged: ref.read(diaryBookGridRepositoryProvider.notifier).save,
+            onChanged: ref.read(diaryBookGridProvider.notifier).save,
           ),
           _SectionHeader(l10n.settingsDisplaySection),
           Padding(
@@ -106,7 +106,7 @@ class MyPage extends HookConsumerWidget {
                 ThemeModePicker(
                   selected: themeMode,
                   onChanged: ref
-                      .read(themeModeRepositoryProvider.notifier)
+                      .read(themeModeProvider.notifier)
                       .save,
                 ),
               ],
@@ -123,7 +123,7 @@ class MyPage extends HookConsumerWidget {
               ),
             ),
             value: showPostHint,
-            onChanged: ref.read(postHintRepositoryProvider.notifier).save,
+            onChanged: ref.read(postHintProvider.notifier).save,
           ),
           _SectionHeader(l10n.settingsDiarySection),
           _InfoTile(

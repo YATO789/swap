@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../infrastructures/repositories/profile_repository.dart';
+import '../../../helpers/profile_helper.dart';
 
 part '_generated/profile_edit_page_controller.g.dart';
 
@@ -16,7 +16,7 @@ class ProfileEditPageController extends _$ProfileEditPageController {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
       () => ref
-          .read(profileRepositoryProvider.notifier)
+          .read(profileProvider.notifier)
           .save(displayName: name, avatarColor: avatarColor),
     );
     if (state case AsyncError(:final error, :final stackTrace)) {

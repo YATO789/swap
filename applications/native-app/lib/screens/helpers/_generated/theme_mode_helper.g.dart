@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../theme_mode_repository.dart';
+part of '../theme_mode_helper.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -10,30 +10,30 @@ part of '../theme_mode_repository.dart';
 // ignore_for_file: type=lint, type=warning
 /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。設定画面で切り替える。
 
-@ProviderFor(ThemeModeRepository)
-final themeModeRepositoryProvider = ThemeModeRepositoryProvider._();
+@ProviderFor(ThemeModeHelper)
+final themeModeProvider = ThemeModeHelperProvider._();
 
 /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。設定画面で切り替える。
-final class ThemeModeRepositoryProvider
-    extends $NotifierProvider<ThemeModeRepository, ThemeMode> {
+final class ThemeModeHelperProvider
+    extends $NotifierProvider<ThemeModeHelper, ThemeMode> {
   /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。設定画面で切り替える。
-  ThemeModeRepositoryProvider._()
+  ThemeModeHelperProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'themeModeRepositoryProvider',
-        isAutoDispose: false,
+        name: r'themeModeProvider',
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$themeModeRepositoryHash();
+  String debugGetCreateSourceHash() => _$themeModeHelperHash();
 
   @$internal
   @override
-  ThemeModeRepository create() => ThemeModeRepository();
+  ThemeModeHelper create() => ThemeModeHelper();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(ThemeMode value) {
@@ -44,12 +44,11 @@ final class ThemeModeRepositoryProvider
   }
 }
 
-String _$themeModeRepositoryHash() =>
-    r'a1e59b07f9e47015df7d54ce1b64d689bf739846';
+String _$themeModeHelperHash() => r'3711ad6bf74d0f5c755919fe72acc8127d12bc3f';
 
 /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。設定画面で切り替える。
 
-abstract class _$ThemeModeRepository extends $Notifier<ThemeMode> {
+abstract class _$ThemeModeHelper extends $Notifier<ThemeMode> {
   ThemeMode build();
   @$mustCallSuper
   @override

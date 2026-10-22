@@ -48,9 +48,9 @@ class WelcomePage extends HookConsumerWidget {
 
     final controller = ref.read(welcomePageControllerProvider.notifier);
 
+    //Apple・匿名ログインがあるため引数でログインの関数を取る
     Future<void> signIn(Future<SignInResult> Function() run) async {
       final result = await run();
-      // 成功したらルーターがホームに切り替える。やめたときは何も出さない。
       if (!context.mounted || result != SignInResult.failed) return;
       showSnackBar(l10n.welcomeSignInFailed);
     }

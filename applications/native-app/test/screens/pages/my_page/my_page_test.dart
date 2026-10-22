@@ -22,8 +22,14 @@ import '../../../helpers/fake_stores.dart';
 Future<void> _openMyPage(
   WidgetTester tester, {
   FakePreferencesStore? preferencesStore,
+  FakeAuthenticationRepository? authenticationRepository,
   FakePushTokenRepository? pushTokenRepository,
 }) async {
+  final authentication =
+      authenticationRepository ??
+      FakeAuthenticationRepository(
+        initial: const Authentication(isLoginApp: true),
+      );
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -33,21 +39,17 @@ Future<void> _openMyPage(
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
-        authenticationRepositoryProvider.overrideWith(
-          () => FakeAuthenticationRepository(
-            initial: const Authentication(isLoginApp: true),
-          ),
-        ),
-        profileRepositoryProvider.overrideWith(
-          () => FakeProfileRepository(
+        authenticationRepositoryProvider.overrideWithValue(authentication),
+        profileRepositoryProvider.overrideWithValue(
+          FakeProfileRepository(
             profile: const Profile(id: 'me', displayName: '彩人'),
           ),
         ),
-        pushTokenRepositoryProvider.overrideWith(
-          () => pushTokenRepository ?? FakePushTokenRepository(),
+        pushTokenRepositoryProvider.overrideWithValue(
+          pushTokenRepository ?? FakePushTokenRepository(authentication),
         ),
-        diaryBookRepositoryProvider.overrideWith(
-          () => FakeDiaryBookRepository(const []),
+        diaryBookRepositoryProvider.overrideWithValue(
+          FakeDiaryBookRepository(const []),
         ),
       ],
       child: Consumer(
@@ -98,8 +100,17 @@ void main() {
   });
 
   testWidgets('ログアウトを確かめると、通知の送り先から外してウェルカム画面に戻る', (tester) async {
-    final pushTokenRepository = FakePushTokenRepository();
-    await _openMyPage(tester, pushTokenRepository: pushTokenRepository);
+    final authenticationRepository = FakeAuthenticationRepository(
+      initial: const Authentication(isLoginApp: true),
+    );
+    final pushTokenRepository = FakePushTokenRepository(
+      authenticationRepository,
+    );
+    await _openMyPage(
+      tester,
+      authenticationRepository: authenticationRepository,
+      pushTokenRepository: pushTokenRepository,
+    );
     await tester.scrollUntilVisible(find.text('ログアウト'), 200);
 
     await tester.tap(find.text('ログアウト'));

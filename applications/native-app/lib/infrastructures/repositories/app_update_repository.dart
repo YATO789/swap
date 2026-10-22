@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/app_update/app_update.dart';
@@ -7,29 +7,33 @@ import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 
 part '_generated/app_update_repository.g.dart';
 
+@riverpod
+AppUpdateRepository appUpdateRepository(Ref ref) {
+  return AppUpdateRepository(
+    ref.watch(remoteConfigDatasourceProvider),
+    ref.watch(preferencesStoreProvider),
+  );
+}
+
 /// このアプリにアップデートを促すか。Remote Config の `update_info` と今のバージョンを比べる。
-///
-/// アプリを開いたときと、裏から戻ってきたときに確かめ直す。
-@Riverpod(keepAlive: true)
-class AppUpdateRepository extends _$AppUpdateRepository {
-  PreferencesStore get _store => ref.read(preferencesStoreProvider);
+class AppUpdateRepository {
+  const AppUpdateRepository(this._remoteConfig, this._store);
 
-  @override
-  Future<AppUpdate> build() async {
-    final listener = AppLifecycleListener(onResume: ref.invalidateSelf);
-    ref.onDispose(listener.dispose);
+  final RemoteConfigDatasource _remoteConfig;
+  final PreferencesStore _store;
 
-    final datasource = ref.read(remoteConfigDatasourceProvider);
+  /// Remote Config の案内を取ってきて、アップデートを促すかを返す。
+  Future<AppUpdate> fetch() async {
     // 取れなくても、前に取って端末に残した値で確かめる。
     try {
-      await datasource.fetch();
+      await _remoteConfig.fetch();
     } catch (error, stackTrace) {
       debugPrint('Remote Config を取れませんでした: $error\n$stackTrace');
     }
 
     final UpdateInfo? info;
     try {
-      final json = datasource.readUpdateInfo();
+      final json = _remoteConfig.readUpdateInfo();
       info = json == null ? null : UpdateInfo.tryParse(json);
     } on FormatException catch (error) {
       debugPrint('update_info が JSON になっていません: $error');
@@ -48,9 +52,8 @@ class AppUpdateRepository extends _$AppUpdateRepository {
     );
   }
 
-  /// 促すだけの案内で「あとで」を押した。次に新しい案内を出すまで出さない。
-  Future<void> skip() async {
-    state = const AsyncData(AppUpdate.none);
-    await _store.saveUpdateSkippedAt(DateTime.now());
+  /// 促すだけの案内で「あとで」を押したことを覚えておく。次に新しい案内を出すまで出さない。
+  Future<void> skip() {
+    return _store.saveUpdateSkippedAt(DateTime.now());
   }
 }

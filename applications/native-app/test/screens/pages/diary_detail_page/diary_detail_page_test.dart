@@ -54,18 +54,18 @@ Future<FakeDiaryRepository> _openDiaryBook(
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
-        authenticationRepositoryProvider.overrideWith(
-          () => FakeAuthenticationRepository(
+        authenticationRepositoryProvider.overrideWithValue(
+          FakeAuthenticationRepository(
             initial: const Authentication(isLoginApp: true),
           ),
         ),
-        profileRepositoryProvider.overrideWith(
-          () => FakeProfileRepository(
+        profileRepositoryProvider.overrideWithValue(
+          FakeProfileRepository(
             profile: const Profile(id: 'me', displayName: '彩人'),
           ),
         ),
-        diaryBookRepositoryProvider.overrideWith(
-          () => FakeDiaryBookRepository(
+        diaryBookRepositoryProvider.overrideWithValue(
+          FakeDiaryBookRepository(
             [_university],
             members: {_university.id: _members},
           ),

@@ -5,13 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/app_update/app_update.dart';
 import '../../../domains/diary_book/diary_book.dart';
-import '../../../infrastructures/repositories/app_update_repository.dart';
-import '../../../infrastructures/repositories/diary_book_grid_repository.dart';
-import '../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../helpers/diary_book_grid_helper.dart';
+import '../../helpers/diary_book_helper.dart';
 import '../../../infrastructures/repositories/opened_notification_repository.dart';
-import '../../../infrastructures/repositories/post_hint_repository.dart';
-import '../../../infrastructures/repositories/profile_repository.dart';
-import '../../../infrastructures/repositories/push_token_repository.dart';
+import '../../helpers/post_hint_helper.dart';
+import '../../helpers/profile_helper.dart';
+import '../../helpers/push_token_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_sheet.dart';
@@ -24,6 +23,7 @@ import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
 import '../../components/user_avatar.dart';
+import '../../helpers/app_update_helper.dart';
 import '../router/router.dart';
 
 /// ホーム。日記帳の一覧と、下に「今なにしてる？」と日記を書くバーを置く。
@@ -32,21 +32,21 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final grid = ref.watch(diaryBookGridRepositoryProvider);
+    final grid = ref.watch(diaryBookGridProvider);
 
     final colors = context.appColors;
     final l10n = context.l10n;
-    final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
+    final diaryBooksState = ref.watch(diaryBookProvider);
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
-    final profile = ref.watch(profileRepositoryProvider).value;
-    final showPostHint = ref.watch(postHintRepositoryProvider);
+    final profile = ref.watch(profileProvider).value;
+    final showPostHint = ref.watch(postHintProvider);
     // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
-    ref.listen(pushTokenRepositoryProvider, (_, _) {});
+    ref.listen(pushTokenProvider, (_, _) {});
 
     // アプリを開いたら、通知の未読数を 0 に戻す。ホームはサインインしている間ずっと一番下にある。
     void resetUnreadCount() =>
-        ref.read(pushTokenRepositoryProvider.notifier).resetUnreadCount();
+        ref.read(pushTokenProvider.notifier).resetUnreadCount();
     useEffect(() {
       resetUnreadCount();
       return null;
@@ -58,7 +58,7 @@ class HomePage extends HookConsumerWidget {
     // 新しいバージョンがあれば、一度だけ知らせる。ホームを開く前に確かめ終わっていることもある。
     // アップデートしないと使えないときは、ルーターがアップデートの画面に切り替える。
     useEffect(() {
-      final subscription = ref.listenManual(appUpdateRepositoryProvider, (
+      final subscription = ref.listenManual(appUpdateProvider, (
         previous,
         next,
       ) {
@@ -70,7 +70,7 @@ class HomePage extends HookConsumerWidget {
           if (!context.mounted) return;
           final updating = await showUpdateSheet(context);
           if (updating || !context.mounted) return;
-          await ref.read(appUpdateRepositoryProvider.notifier).skip();
+          await ref.read(appUpdateProvider.notifier).skip();
         });
       }, fireImmediately: true);
       return subscription.close;
@@ -113,7 +113,7 @@ class HomePage extends HookConsumerWidget {
     // 引っ張って一覧を読み直す。ほかの人が変えた名前や表紙を映す。
     Future<void> refresh() async {
       try {
-        await ref.read(diaryBookRepositoryProvider.notifier).refresh();
+        await ref.read(diaryBookProvider.notifier).refresh();
       } catch (error, stackTrace) {
         debugPrint('日記帳を読み直せませんでした: $error\n$stackTrace');
         if (!context.mounted) return;
@@ -193,7 +193,7 @@ class HomePage extends HookConsumerWidget {
               ),
               const SizedBox(height: 12),
               TextButton(
-                onPressed: () => ref.invalidate(diaryBookRepositoryProvider),
+                onPressed: () => ref.invalidate(diaryBookProvider),
                 child: Text(l10n.commonRetry),
               ),
             ],

@@ -59,7 +59,7 @@ final class DiaryEditorPageControllerProvider
 }
 
 String _$diaryEditorPageControllerHash() =>
-    r'30e197dc240dfa72b81965d84e1fa78a00ee6059';
+    r'5e4482dda7a4641d385469f9c4204f66c4d1d371';
 
 /// 日記を書くページで、自分の [date] の日記と記録を読み、日記を書く。
 

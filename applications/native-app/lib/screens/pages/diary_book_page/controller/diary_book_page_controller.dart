@@ -44,7 +44,7 @@ class DiaryBookPageController extends _$DiaryBookPageController {
   @override
   Future<DiaryBookPageState> build(String diaryBookId, DateTime date) async {
     final (members, diaries, posts) = await (
-      ref.read(diaryBookRepositoryProvider.notifier).fetchMembers(diaryBookId),
+      ref.read(diaryBookRepositoryProvider).fetchMembers(diaryBookId),
       ref.read(diaryRepositoryProvider).fetchOn(diaryBookId, date),
       ref.read(postRepositoryProvider).fetchInDiaryBook(diaryBookId, date),
     ).wait;

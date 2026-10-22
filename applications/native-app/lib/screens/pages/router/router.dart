@@ -3,10 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swipeable_page_route/swipeable_page_route.dart';
 import 'package:swap/domains/app_update/app_update.dart';
-import 'package:swap/infrastructures/repositories/app_update_repository.dart';
-import 'package:swap/infrastructures/repositories/authentication_repository.dart';
-import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
-import 'package:swap/infrastructures/repositories/profile_repository.dart';
+import 'package:swap/screens/helpers/authentication_helper.dart';
+import 'package:swap/screens/helpers/diary_book_helper.dart';
+import 'package:swap/screens/helpers/profile_helper.dart';
 
 import '../create_diary_book_page/create_diary_book_page.dart';
 import '../diary_book_info_page/diary_book_info_page.dart';
@@ -20,6 +19,7 @@ import '../profile_edit_page/profile_edit_page.dart';
 import '../splash_page/splash_page.dart';
 import '../update_page/update_page.dart';
 import '../welcome_page/welcome_page.dart';
+import '../../helpers/app_update_helper.dart';
 
 part '_generated/router.g.dart';
 
@@ -37,9 +37,9 @@ GoRouter router(Ref ref) {
   // ルーターは作り直さず、状態が変わったことだけを伝える。値に意味はない。
   final refresh = ValueNotifier(0);
   ref
-    ..listen(appUpdateRepositoryProvider, (_, _) => refresh.value++)
-    ..listen(authenticationRepositoryProvider, (_, _) => refresh.value++)
-    ..listen(profileRepositoryProvider, (_, _) => refresh.value++);
+    ..listen(appUpdateProvider, (_, _) => refresh.value++)
+    ..listen(authenticationProvider, (_, _) => refresh.value++)
+    ..listen(profileProvider, (_, _) => refresh.value++);
 
   final home = const HomeRoute().location;
   final welcome = const WelcomeRoute().location;
@@ -54,13 +54,13 @@ GoRouter router(Ref ref) {
       String? goTo(String path) => state.matchedLocation == path ? null : path;
 
       // 確かめている間や確かめられなかったときは、使えるままにする。
-      if (ref.read(appUpdateRepositoryProvider).value == AppUpdate.required) {
+      if (ref.read(appUpdateProvider).value == AppUpdate.required) {
         return goTo(update);
       }
-      if (!ref.read(authenticationRepositoryProvider).isLoginApp) {
+      if (!ref.read(authenticationProvider).isLoginApp) {
         return goTo(welcome);
       }
-      final profile = ref.read(profileRepositoryProvider);
+      final profile = ref.read(profileProvider);
       if (profile.isLoading || profile.hasError) return goTo(splash);
       if (profile.value == null) return goTo(onboarding);
 
@@ -89,15 +89,15 @@ GoRouter router(Ref ref) {
 /// 読めなかったときは、やり直すボタンを見せるために消す。
 @riverpod
 bool firstScreenReady(Ref ref) {
-  if (ref.watch(appUpdateRepositoryProvider).value == AppUpdate.required) {
+  if (ref.watch(appUpdateProvider).value == AppUpdate.required) {
     return true;
   }
-  if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return true;
-  final profile = ref.watch(profileRepositoryProvider);
+  if (!ref.watch(authenticationProvider).isLoginApp) return true;
+  final profile = ref.watch(profileProvider);
   if (profile.hasError) return true;
   if (profile.isLoading) return false;
   if (profile.value == null) return true;
-  return !ref.watch(diaryBookRepositoryProvider).isLoading;
+  return !ref.watch(diaryBookProvider).isLoading;
 }
 
 /// 日付を URL に `2026-10-13` の形で載せる。

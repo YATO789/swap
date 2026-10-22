@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../domains/diary_book/diary_book_member.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../helpers/diary_book_helper.dart';
 
 part '_generated/diary_book_info_page_controller.freezed.dart';
 part '_generated/diary_book_info_page_controller.g.dart';
@@ -22,12 +23,14 @@ abstract class DiaryBookInfoPageState with _$DiaryBookInfoPageState {
 /// 日記帳から抜けたりする。
 @riverpod
 class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
-  DiaryBookRepository get _diaryBookRepository =>
-      ref.read(diaryBookRepositoryProvider.notifier);
+  DiaryBookHelper get _diaryBooks =>
+      ref.read(diaryBookProvider.notifier);
 
   @override
   Future<DiaryBookInfoPageState> build(String diaryBookId) async {
-    final members = await _diaryBookRepository.fetchMembers(diaryBookId);
+    final members = await ref
+        .read(diaryBookRepositoryProvider)
+        .fetchMembers(diaryBookId);
     return DiaryBookInfoPageState(members: members);
   }
 
@@ -36,7 +39,7 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
   Future<void> refresh() async {
     ref.invalidateSelf();
     try {
-      await (future, _diaryBookRepository.refresh()).wait;
+      await (future, _diaryBooks.refresh()).wait;
     } catch (_) {
       // メンバーを読めなかったことは状態に入り、画面に出る。
       // 一覧を読めなかったときは、今の一覧を出したままにする。
@@ -45,17 +48,14 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
 
   /// 日記帳の名前を [name] にする。変えられたら true。
   Future<bool> rename(String name) {
-    return _run(
-      '名前を変えられませんでした',
-      () => _diaryBookRepository.rename(diaryBookId, name),
-    );
+    return _run('名前を変えられませんでした', () => _diaryBooks.rename(diaryBookId, name));
   }
 
   /// 表紙の色を [coverColor] にする。変えられたら true。
   Future<bool> setCoverColor(int? coverColor) {
     return _run(
       '表紙の色を変えられませんでした',
-      () => _diaryBookRepository.setCoverColor(diaryBookId, coverColor),
+      () => _diaryBooks.setCoverColor(diaryBookId, coverColor),
     );
   }
 
@@ -63,7 +63,7 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
   Future<bool> setMemberLimit(int memberLimit) {
     return _run(
       '人数の上限を変えられませんでした',
-      () => _diaryBookRepository.setMemberLimit(diaryBookId, memberLimit),
+      () => _diaryBooks.setMemberLimit(diaryBookId, memberLimit),
     );
   }
 
@@ -71,14 +71,14 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
   Future<bool> regenerateInviteCode() {
     return _run(
       '招待コードを作り直せませんでした',
-      () => _diaryBookRepository.regenerateInviteCode(diaryBookId),
+      () => _diaryBooks.regenerateInviteCode(diaryBookId),
     );
   }
 
   /// [userId] の人を日記帳から外す。招待コードも作り直される。外せたら true。
   Future<bool> removeMember(String userId) {
     return _run('メンバーを外せませんでした', () async {
-      await _diaryBookRepository.removeMember(diaryBookId, userId);
+      await _diaryBooks.removeMember(diaryBookId, userId);
       final current = state.value;
       if (current == null) return;
       state = AsyncData(
@@ -94,10 +94,7 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
 
   /// 日記帳から抜ける。抜けられたら true。
   Future<bool> leave() {
-    return _run(
-      '日記帳から退出できませんでした',
-      () => _diaryBookRepository.leave(diaryBookId),
-    );
+    return _run('日記帳から退出できませんでした', () => _diaryBooks.leave(diaryBookId));
   }
 
   Future<bool> _run(String failure, Future<void> Function() action) async {

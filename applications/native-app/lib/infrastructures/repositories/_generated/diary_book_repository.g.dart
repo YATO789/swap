@@ -8,28 +8,25 @@ part of '../diary_book_repository.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 自分が参加している日記帳の一覧を持つ。サインインしていなければ空。
-///
-/// サインイン・サインアウトのたびに読み直す。
 
-@ProviderFor(DiaryBookRepository)
+@ProviderFor(diaryBookRepository)
 final diaryBookRepositoryProvider = DiaryBookRepositoryProvider._();
 
-/// 自分が参加している日記帳の一覧を持つ。サインインしていなければ空。
-///
-/// サインイン・サインアウトのたびに読み直す。
 final class DiaryBookRepositoryProvider
-    extends $AsyncNotifierProvider<DiaryBookRepository, List<DiaryBook>> {
-  /// 自分が参加している日記帳の一覧を持つ。サインインしていなければ空。
-  ///
-  /// サインイン・サインアウトのたびに読み直す。
+    extends
+        $FunctionalProvider<
+          DiaryBookRepository,
+          DiaryBookRepository,
+          DiaryBookRepository
+        >
+    with $Provider<DiaryBookRepository> {
   DiaryBookRepositoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'diaryBookRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -39,30 +36,23 @@ final class DiaryBookRepositoryProvider
 
   @$internal
   @override
-  DiaryBookRepository create() => DiaryBookRepository();
+  $ProviderElement<DiaryBookRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  DiaryBookRepository create(Ref ref) {
+    return diaryBookRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DiaryBookRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DiaryBookRepository>(value),
+    );
+  }
 }
 
 String _$diaryBookRepositoryHash() =>
-    r'ef8778f6caba1d57c6c44233a7473bbd12b6a0d2';
-
-/// 自分が参加している日記帳の一覧を持つ。サインインしていなければ空。
-///
-/// サインイン・サインアウトのたびに読み直す。
-
-abstract class _$DiaryBookRepository extends $AsyncNotifier<List<DiaryBook>> {
-  FutureOr<List<DiaryBook>> build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<DiaryBook>>, List<DiaryBook>>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<DiaryBook>>, List<DiaryBook>>,
-              AsyncValue<List<DiaryBook>>,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
+    r'5c19a9a215f32346ec53606c19574bde53173f9f';

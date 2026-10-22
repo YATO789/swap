@@ -21,7 +21,7 @@ final class PostRepositoryProvider
         argument: null,
         retry: null,
         name: r'postRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,4 +48,4 @@ final class PostRepositoryProvider
   }
 }
 
-String _$postRepositoryHash() => r'347a2adf3db7451baf8454fa13bbaf68a3edbfc8';
+String _$postRepositoryHash() => r'b50453d572848305686a91a213542c53bc5f5aed';

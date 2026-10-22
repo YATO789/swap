@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/profile/profile.dart';
-import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../helpers/profile_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/avatar_color_picker.dart';
@@ -21,7 +21,7 @@ class ProfileEditPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final l10n = context.l10n;
-    final profile = ref.watch(profileRepositoryProvider).value;
+    final profile = ref.watch(profileProvider).value;
     final savedName = profile?.displayName ?? '';
     final savedColor = profile?.avatarColor;
     final nameController = useTextEditingController(text: savedName);

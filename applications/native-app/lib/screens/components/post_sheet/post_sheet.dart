@@ -6,8 +6,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/post.dart';
-import '../../../infrastructures/repositories/diary_book_repository.dart';
-import '../../../infrastructures/repositories/post_diary_book_repository.dart';
+import '../../helpers/diary_book_helper.dart';
+import '../../helpers/post_diary_book_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
@@ -44,12 +44,12 @@ class _PostSheet extends HookConsumerWidget {
     final l10n = context.l10n;
     final fixedDiaryBook = diaryBook;
     final diaryBooks =
-        ref.watch(diaryBookRepositoryProvider).value ?? const <DiaryBook>[];
+        ref.watch(diaryBookProvider).value ?? const <DiaryBook>[];
     final controller = useTextEditingController();
     useListenable(controller);
     final message = controller.text.trim();
 
-    final savedIds = ref.watch(postDiaryBookRepositoryProvider);
+    final savedIds = ref.watch(postDiaryBookProvider);
     final selectedIds = fixedDiaryBook != null
         ? [fixedDiaryBook.id]
         // 抜けた日記帳は外す。並び順は日記帳一覧と揃える。
@@ -76,7 +76,7 @@ class _PostSheet extends HookConsumerWidget {
     void toggleDiaryBook(String id) {
       final ids = {...selectedIds};
       if (!ids.remove(id)) ids.add(id);
-      ref.read(postDiaryBookRepositoryProvider.notifier).save(ids);
+      ref.read(postDiaryBookProvider.notifier).save(ids);
     }
 
     Future<void> submit() async {

@@ -22,7 +22,7 @@ final class DiaryRepositoryProvider
         argument: null,
         retry: null,
         name: r'diaryRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,4 +49,4 @@ final class DiaryRepositoryProvider
   }
 }
 
-String _$diaryRepositoryHash() => r'9ef8cbca1354d901005286b866e98709189e7c7f';
+String _$diaryRepositoryHash() => r'ed117fa56a7cc5cec339c387c341aa17b402d4aa';

@@ -4,8 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
 import '../../../domains/post/timeline_post.dart';
-import '../../../infrastructures/repositories/diary_book_repository.dart';
-import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../helpers/diary_book_helper.dart';
+import '../../helpers/profile_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
@@ -104,7 +104,7 @@ class _DiaryPages extends HookConsumerWidget {
     final current = index.value.clamp(0, pageCount - 1);
     final diary = diaries[current];
 
-    final myId = ref.watch(profileRepositoryProvider).value?.id;
+    final myId = ref.watch(profileProvider).value?.id;
     final error = Theme.of(context).colorScheme.error;
 
     void turnTo(int page) {
@@ -127,7 +127,7 @@ class _DiaryPages extends HookConsumerWidget {
       final l10n = context.l10n;
       final diaryBookName =
           ref
-              .read(diaryBookRepositoryProvider)
+              .read(diaryBookProvider)
               .value
               ?.where((diaryBook) => diaryBook.id == diaryBookId)
               .firstOrNull

@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../../../domains/diary_book/diary_book.dart';
 import '../../../../../../domains/diary_book/invited_diary_book.dart';
 import '../../../../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../../../helpers/diary_book_helper.dart';
 
 part '_generated/join_diary_book_sheet_controller.g.dart';
 
@@ -19,9 +20,7 @@ class JoinDiaryBookSheetController extends _$JoinDiaryBookSheetController {
     state = const AsyncLoading();
     InvitedDiaryBook? found;
     state = await AsyncValue.guard(() async {
-      found = await ref
-          .read(diaryBookRepositoryProvider.notifier)
-          .findByCode(code);
+      found = await ref.read(diaryBookRepositoryProvider).findByCode(code);
     });
     if (state case AsyncError(:final error, :final stackTrace)) {
       debugPrint('招待コードを確かめられませんでした: $error\n$stackTrace');
@@ -37,7 +36,7 @@ class JoinDiaryBookSheetController extends _$JoinDiaryBookSheetController {
     DiaryBook? diaryBook;
     state = await AsyncValue.guard(() async {
       diaryBook = await ref
-          .read(diaryBookRepositoryProvider.notifier)
+          .read(diaryBookProvider.notifier)
           .join(code);
       if (diaryBook == null) throw StateError('招待コードの日記帳が見つかりません');
     });

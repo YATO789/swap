@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../domains/diary_book/diary_book.dart';
-import '../../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../../helpers/diary_book_helper.dart';
 
 part '_generated/create_diary_book_page_controller.g.dart';
 
@@ -18,7 +18,7 @@ class CreateDiaryBookPageController extends _$CreateDiaryBookPageController {
     DiaryBook? diaryBook;
     state = await AsyncValue.guard(() async {
       diaryBook = await ref
-          .read(diaryBookRepositoryProvider.notifier)
+          .read(diaryBookProvider.notifier)
           .create(name, coverColor: coverColor);
     });
     if (state case AsyncError(:final error, :final stackTrace)) {

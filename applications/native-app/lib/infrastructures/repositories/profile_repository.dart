@@ -1,33 +1,44 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/profile/profile.dart';
-import 'package:swap/infrastructures/datasources/supabase/profile_datasource.dart';
-import 'package:swap/infrastructures/repositories/authentication_repository.dart';
+import 'package:swap/infrastructures/datasources/supabase/profile/models/profile_response.dart';
+import 'package:swap/infrastructures/datasources/supabase/profile/profile_datasource.dart';
 
 part '_generated/profile_repository.g.dart';
 
-/// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
-///
-/// サインイン・サインアウトのたびに読み直す。画面の切り替えにも使うので破棄しない。
-@Riverpod(keepAlive: true)
-class ProfileRepository extends _$ProfileRepository {
-  ProfileDatasource get _datasource => ref.read(profileDatasourceProvider);
+@riverpod
+ProfileRepository profileRepository(Ref ref) {
+  return ProfileRepository(ref.watch(profileDatasourceProvider));
+}
 
-  @override
-  Future<Profile?> build() async {
-    if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return null;
-    return _datasource.fetchMine();
+/// 自分のプロフィールを読み書きする。
+class ProfileRepository {
+  const ProfileRepository(this._datasource);
+
+  final ProfileDatasource _datasource;
+
+  /// 自分のプロフィール。まだ作っていなければ null。
+  Future<Profile?> fetchMine() async {
+    final response = await _datasource.fetchMine();
+    return response == null ? null : _toProfile(response);
   }
 
-  /// 表示名とアイコンの色を保存する。まだプロフィールがなければ作る。
-  Future<void> save({
+  /// 表示名とアイコンの色を保存し、保存したプロフィールを返す。まだプロフィールがなければ作る。
+  Future<Profile> save({
     required String displayName,
     required int? avatarColor,
   }) async {
-    state = AsyncData(
-      await _datasource.saveMine(
-        displayName: displayName,
-        avatarColor: avatarColor,
-      ),
+    final response = await _datasource.saveMine(
+      displayName: displayName,
+      avatarColor: avatarColor,
+    );
+    return _toProfile(response);
+  }
+
+  Profile _toProfile(ProfileResponse response) {
+    return Profile(
+      id: response.id,
+      displayName: response.displayName,
+      avatarColor: response.avatarColor,
     );
   }
 }

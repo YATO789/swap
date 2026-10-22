@@ -55,18 +55,18 @@ Future<void> _openDiaryBook(
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
-        authenticationRepositoryProvider.overrideWith(
-          () => FakeAuthenticationRepository(
+        authenticationRepositoryProvider.overrideWithValue(
+          FakeAuthenticationRepository(
             initial: const Authentication(isLoginApp: true),
           ),
         ),
-        profileRepositoryProvider.overrideWith(
-          () => FakeProfileRepository(
+        profileRepositoryProvider.overrideWithValue(
+          FakeProfileRepository(
             profile: const Profile(id: 'me', displayName: '彩人'),
           ),
         ),
-        diaryBookRepositoryProvider.overrideWith(
-          () => FakeDiaryBookRepository([
+        diaryBookRepositoryProvider.overrideWithValue(
+          FakeDiaryBookRepository([
             _university,
           ], members: members ?? {_university.id: _members}),
         ),
@@ -104,7 +104,11 @@ void main() {
     await _openDiaryBook(tester);
 
     expect(find.byType(DiaryBookPage), findsOneWidget);
-    expect(find.textContaining('今日・'), findsOneWidget);
+    // 見出しの下に、今日の日付を「10月3日 金曜日」の形で出す。
+    expect(
+      find.textContaining('${today.month}月${today.day}日 '),
+      findsOneWidget,
+    );
     expect(find.byTooltip('日付を選ぶ'), findsOneWidget);
   });
 

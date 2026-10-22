@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../post_hint_repository.dart';
+part of '../post_hint_helper.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -10,30 +10,30 @@ part of '../post_hint_repository.dart';
 // ignore_for_file: type=lint, type=warning
 /// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
 
-@ProviderFor(PostHintRepository)
-final postHintRepositoryProvider = PostHintRepositoryProvider._();
+@ProviderFor(PostHintHelper)
+final postHintProvider = PostHintHelperProvider._();
 
 /// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
-final class PostHintRepositoryProvider
-    extends $NotifierProvider<PostHintRepository, bool> {
+final class PostHintHelperProvider
+    extends $NotifierProvider<PostHintHelper, bool> {
   /// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
-  PostHintRepositoryProvider._()
+  PostHintHelperProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'postHintRepositoryProvider',
-        isAutoDispose: false,
+        name: r'postHintProvider',
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$postHintRepositoryHash();
+  String debugGetCreateSourceHash() => _$postHintHelperHash();
 
   @$internal
   @override
-  PostHintRepository create() => PostHintRepository();
+  PostHintHelper create() => PostHintHelper();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
@@ -44,12 +44,11 @@ final class PostHintRepositoryProvider
   }
 }
 
-String _$postHintRepositoryHash() =>
-    r'e84e14ffb065f4d3fdba93d5222d3faa5961cbcb';
+String _$postHintHelperHash() => r'30057d0021fa46279a81998a4223852a02bf817f';
 
 /// ホームの書き込みバーに手書きの説明を出すか。設定画面で切り替える。
 
-abstract class _$PostHintRepository extends $Notifier<bool> {
+abstract class _$PostHintHelper extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override

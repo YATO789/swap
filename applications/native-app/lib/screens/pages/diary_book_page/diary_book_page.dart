@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../domains/diary/diary.dart';
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/timeline_post.dart';
-import '../../../infrastructures/repositories/diary_book_repository.dart';
-import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../helpers/diary_book_helper.dart';
+import '../../helpers/profile_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
@@ -43,11 +43,11 @@ class DiaryBookPage extends HookConsumerWidget {
     final date = pickedDate.value ?? today;
     final notifiedRemoval = useRef(false);
 
-    final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
+    final diaryBooksState = ref.watch(diaryBookProvider);
     final diaryBook = diaryBooksState.value
         ?.where((diaryBook) => diaryBook.id == diaryBookId)
         .firstOrNull;
-    final myId = ref.watch(profileRepositoryProvider).value?.id;
+    final myId = ref.watch(profileProvider).value?.id;
 
     if (diaryBook == null) {
       return Scaffold(
@@ -80,7 +80,7 @@ class DiaryBookPage extends HookConsumerWidget {
         buttonLabel: context.l10n.diaryBookBackToHome,
       );
       if (!context.mounted) return;
-      final diaryBooks = ref.read(diaryBookRepositoryProvider.notifier);
+      final diaryBooks = ref.read(diaryBookProvider.notifier);
       const HomeRoute().go(context);
       diaryBooks.forget(diaryBookId);
     });

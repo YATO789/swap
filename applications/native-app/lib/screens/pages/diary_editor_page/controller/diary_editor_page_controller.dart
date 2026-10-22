@@ -6,7 +6,7 @@ import '../../../../domains/diary/diary.dart';
 import '../../../../domains/post/timeline_post.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
 import '../../../../infrastructures/repositories/post_repository.dart';
-import '../../../../infrastructures/repositories/profile_repository.dart';
+import '../../../helpers/profile_helper.dart';
 
 part '_generated/diary_editor_page_controller.freezed.dart';
 part '_generated/diary_editor_page_controller.g.dart';
@@ -28,7 +28,7 @@ abstract class DiaryEditorPageState with _$DiaryEditorPageState {
 class DiaryEditorPageController extends _$DiaryEditorPageController {
   @override
   Future<DiaryEditorPageState> build(DateTime date) async {
-    final myId = (await ref.read(profileRepositoryProvider.future))?.id;
+    final myId = (await ref.read(profileProvider.future))?.id;
     final (diaries, posts) = await (
       ref.read(diaryRepositoryProvider).fetchMineOn(date),
       ref.read(postRepositoryProvider).fetchByAuthorsOn([?myId], date),

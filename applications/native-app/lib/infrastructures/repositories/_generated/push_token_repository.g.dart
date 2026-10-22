@@ -8,37 +8,25 @@ part of '../push_token_repository.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
-///
-/// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
-/// サインアウトの前に [unregister] で送り先から外し、サインアウトしたらトークンも無効にして、
-/// 前のアカウントの通知が届かないようにする。
-/// サインイン状態を追い続けるので、一度読んだら破棄しない。
 
-@ProviderFor(PushTokenRepository)
+@ProviderFor(pushTokenRepository)
 final pushTokenRepositoryProvider = PushTokenRepositoryProvider._();
 
-/// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
-///
-/// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
-/// サインアウトの前に [unregister] で送り先から外し、サインアウトしたらトークンも無効にして、
-/// 前のアカウントの通知が届かないようにする。
-/// サインイン状態を追い続けるので、一度読んだら破棄しない。
 final class PushTokenRepositoryProvider
-    extends $AsyncNotifierProvider<PushTokenRepository, void> {
-  /// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
-  ///
-  /// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
-  /// サインアウトの前に [unregister] で送り先から外し、サインアウトしたらトークンも無効にして、
-  /// 前のアカウントの通知が届かないようにする。
-  /// サインイン状態を追い続けるので、一度読んだら破棄しない。
+    extends
+        $FunctionalProvider<
+          PushTokenRepository,
+          PushTokenRepository,
+          PushTokenRepository
+        >
+    with $Provider<PushTokenRepository> {
   PushTokenRepositoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'pushTokenRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,33 +36,23 @@ final class PushTokenRepositoryProvider
 
   @$internal
   @override
-  PushTokenRepository create() => PushTokenRepository();
+  $ProviderElement<PushTokenRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  PushTokenRepository create(Ref ref) {
+    return pushTokenRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PushTokenRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PushTokenRepository>(value),
+    );
+  }
 }
 
 String _$pushTokenRepositoryHash() =>
-    r'5bfcf263a5a698360c17783a3789700866818e41';
-
-/// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
-///
-/// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
-/// サインアウトの前に [unregister] で送り先から外し、サインアウトしたらトークンも無効にして、
-/// 前のアカウントの通知が届かないようにする。
-/// サインイン状態を追い続けるので、一度読んだら破棄しない。
-
-abstract class _$PushTokenRepository extends $AsyncNotifier<void> {
-  FutureOr<void> build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<void>, void>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<void>, void>,
-              AsyncValue<void>,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
+    r'e74ea3f4654c31c775bb853880c8d080e8b92732';

@@ -1,40 +1,42 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/infrastructures/datasources/firebase/messaging_datasource.dart';
-import 'package:swap/infrastructures/datasources/supabase/push_token_datasource.dart';
-import 'package:swap/infrastructures/repositories/authentication_repository.dart';
+import 'package:swap/infrastructures/datasources/supabase/push_token/push_token_datasource.dart';
 
 part '_generated/push_token_repository.g.dart';
 
-/// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
-///
-/// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
-/// サインアウトの前に [unregister] で送り先から外し、サインアウトしたらトークンも無効にして、
-/// 前のアカウントの通知が届かないようにする。
-/// サインイン状態を追い続けるので、一度読んだら破棄しない。
-@Riverpod(keepAlive: true)
-class PushTokenRepository extends _$PushTokenRepository {
-  MessagingDatasource get _messaging => ref.read(messagingDatasourceProvider);
-  PushTokenDatasource get _pushTokens => ref.read(pushTokenDatasourceProvider);
+@riverpod
+PushTokenRepository pushTokenRepository(Ref ref) {
+  return PushTokenRepository(
+    ref.watch(messagingDatasourceProvider),
+    ref.watch(pushTokenDatasourceProvider),
+  );
+}
 
-  @override
-  Future<void> build() async {
-    if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return;
+/// この端末を自分のプッシュ通知の送り先にしたり、送り先から外したりする。
+class PushTokenRepository {
+  const PushTokenRepository(this._messaging, this._pushTokens);
 
-    // onDispose の中では ref を使えないので、先に取り出しておく。
-    final messaging = _messaging;
-    final subscription = messaging.onTokenRefresh.listen(_register);
-    ref.onDispose(() {
-      subscription.cancel();
-      // サインアウトしてサインイン状態が変わったときにここに来る。
-      unawaited(messaging.deleteToken().catchError(_logFailure));
-    });
+  final MessagingDatasource _messaging;
+  final PushTokenDatasource _pushTokens;
 
-    await _messaging.requestPermission();
-    final token = await _messaging.fetchToken();
-    if (token != null) await _register(token);
+  /// FCM トークンが替わったら、新しいトークンを流す。
+  Stream<String> get onTokenRefresh {
+    return _messaging.onTokenRefresh;
+  }
+
+  /// 通知の許可を聞く。
+  Future<void> requestPermission() {
+    return _messaging.requestPermission();
+  }
+
+  /// この端末の FCM トークン。
+  Future<String?> fetchToken() {
+    return _messaging.fetchToken();
+  }
+
+  /// [token] を自分の送り先として保存する。
+  Future<void> register(String token) {
+    return _pushTokens.register(token);
   }
 
   /// この端末を自分の送り先から外す。サーバーに聞く必要があるので、サインアウトする前に呼ぶ。
@@ -43,26 +45,14 @@ class PushTokenRepository extends _$PushTokenRepository {
     if (token != null) await _pushTokens.unregister(token);
   }
 
-  /// アプリを開いたら呼び、この端末の未読数を 0 に戻す。アイコンのバッジは iOS 側（SceneDelegate）で消す。
+  /// この端末の FCM トークンを無効にする。
+  Future<void> deleteToken() {
+    return _messaging.deleteToken();
+  }
+
+  /// この端末の未読数を 0 に戻す。
   Future<void> resetUnreadCount() async {
-    if (!ref.read(authenticationRepositoryProvider).isLoginApp) return;
-    try {
-      final token = await _messaging.fetchToken();
-      if (token != null) await _pushTokens.resetUnreadCount(token);
-    } on Object catch (e, stackTrace) {
-      _logFailure(e, stackTrace);
-    }
-  }
-
-  Future<void> _register(String token) async {
-    try {
-      await _pushTokens.register(token);
-    } on Object catch (e, stackTrace) {
-      _logFailure(e, stackTrace);
-    }
-  }
-
-  void _logFailure(Object error, StackTrace stackTrace) {
-    debugPrint('プッシュ通知の送り先を更新できませんでした: $error\n$stackTrace');
+    final token = await _messaging.fetchToken();
+    if (token != null) await _pushTokens.resetUnreadCount(token);
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../infrastructures/repositories/profile_repository.dart';
-import '../../../../infrastructures/repositories/push_token_repository.dart';
+import '../../../helpers/profile_helper.dart';
+import '../../../helpers/push_token_helper.dart';
 
 part '_generated/onboarding_page_controller.g.dart';
 
@@ -25,7 +25,7 @@ class OnboardingPageController extends _$OnboardingPageController {
     if (requestsNotification) await _requestNotificationPermission();
     state = await AsyncValue.guard(
       () => ref
-          .read(profileRepositoryProvider.notifier)
+          .read(profileProvider.notifier)
           .save(displayName: name, avatarColor: avatarColor),
     );
     if (state case AsyncError(:final error, :final stackTrace)) {
@@ -39,7 +39,7 @@ class OnboardingPageController extends _$OnboardingPageController {
   /// 断られたり失敗したりしても、そのまま始められるようにする。
   Future<void> _requestNotificationPermission() async {
     try {
-      await ref.read(pushTokenRepositoryProvider.future);
+      await ref.read(pushTokenProvider.future);
     } on Object catch (e, stackTrace) {
       debugPrint('通知の許可を聞けませんでした: $e\n$stackTrace');
     }

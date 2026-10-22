@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../post_diary_book_repository.dart';
+part of '../post_diary_book_helper.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -11,32 +11,32 @@ part of '../post_diary_book_repository.dart';
 /// 投稿シートで前に選んだ共有先の日記帳の id を持つ。次に開いたときも選んだままにする。
 /// 抜けた日記帳の id が残っていることもあるので、使う側で参加している日記帳と突き合わせる。
 
-@ProviderFor(PostDiaryBookRepository)
-final postDiaryBookRepositoryProvider = PostDiaryBookRepositoryProvider._();
+@ProviderFor(PostDiaryBookHelper)
+final postDiaryBookProvider = PostDiaryBookHelperProvider._();
 
 /// 投稿シートで前に選んだ共有先の日記帳の id を持つ。次に開いたときも選んだままにする。
 /// 抜けた日記帳の id が残っていることもあるので、使う側で参加している日記帳と突き合わせる。
-final class PostDiaryBookRepositoryProvider
-    extends $NotifierProvider<PostDiaryBookRepository, Set<String>> {
+final class PostDiaryBookHelperProvider
+    extends $NotifierProvider<PostDiaryBookHelper, Set<String>> {
   /// 投稿シートで前に選んだ共有先の日記帳の id を持つ。次に開いたときも選んだままにする。
   /// 抜けた日記帳の id が残っていることもあるので、使う側で参加している日記帳と突き合わせる。
-  PostDiaryBookRepositoryProvider._()
+  PostDiaryBookHelperProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'postDiaryBookRepositoryProvider',
-        isAutoDispose: false,
+        name: r'postDiaryBookProvider',
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$postDiaryBookRepositoryHash();
+  String debugGetCreateSourceHash() => _$postDiaryBookHelperHash();
 
   @$internal
   @override
-  PostDiaryBookRepository create() => PostDiaryBookRepository();
+  PostDiaryBookHelper create() => PostDiaryBookHelper();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(Set<String> value) {
@@ -47,13 +47,13 @@ final class PostDiaryBookRepositoryProvider
   }
 }
 
-String _$postDiaryBookRepositoryHash() =>
-    r'ae56ec1956a14dfe529f8ef4e6d3a4dcd58e5dea';
+String _$postDiaryBookHelperHash() =>
+    r'5875ca37107560fcaa7273740b2bc5d99b10bbaa';
 
 /// 投稿シートで前に選んだ共有先の日記帳の id を持つ。次に開いたときも選んだままにする。
 /// 抜けた日記帳の id が残っていることもあるので、使う側で参加している日記帳と突き合わせる。
 
-abstract class _$PostDiaryBookRepository extends $Notifier<Set<String>> {
+abstract class _$PostDiaryBookHelper extends $Notifier<Set<String>> {
   Set<String> build();
   @$mustCallSuper
   @override

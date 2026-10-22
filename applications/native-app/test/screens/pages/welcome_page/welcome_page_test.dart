@@ -24,17 +24,17 @@ Future<void> _pumpRouterApp(WidgetTester tester, {Profile? profile}) {
     ProviderScope(
       overrides: [
         preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
-        authenticationRepositoryProvider.overrideWith(
-          FakeAuthenticationRepository.new,
+        authenticationRepositoryProvider.overrideWithValue(
+          FakeAuthenticationRepository(),
         ),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
-        profileRepositoryProvider.overrideWith(
-          () => FakeProfileRepository(profile: profile),
+        profileRepositoryProvider.overrideWithValue(
+          FakeProfileRepository(profile: profile),
         ),
-        diaryBookRepositoryProvider.overrideWith(
-          () => FakeDiaryBookRepository(const []),
+        diaryBookRepositoryProvider.overrideWithValue(
+          FakeDiaryBookRepository(const []),
         ),
       ],
       child: Consumer(

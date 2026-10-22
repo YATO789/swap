@@ -27,7 +27,7 @@ final class OpenedNotificationRepositoryProvider
         argument: null,
         retry: null,
         name: r'openedNotificationRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -56,4 +56,4 @@ final class OpenedNotificationRepositoryProvider
 }
 
 String _$openedNotificationRepositoryHash() =>
-    r'f5b718e0ff5f16e671cbcec763d07d99b19fd3f6';
+    r'4f19b49b22ef414bd3a5cfd5bcc13d54dce8c9c3';

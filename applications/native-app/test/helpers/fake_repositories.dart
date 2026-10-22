@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
@@ -20,75 +19,115 @@ import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/infrastructures/repositories/push_token_repository.dart';
 
 /// Remote Config を見ず、[initial] を返す。「あとで」を押すと [skipped] を true にする。
-class FakeAppUpdateRepository extends AppUpdateRepository {
+class FakeAppUpdateRepository implements AppUpdateRepository {
   FakeAppUpdateRepository([this.initial = AppUpdate.none]);
 
   final AppUpdate initial;
   var skipped = false;
 
   @override
-  Future<AppUpdate> build() async => initial;
+  Future<AppUpdate> fetch() async {
+    return initial;
+  }
 
   @override
   Future<void> skip() async {
     skipped = true;
-    state = const AsyncData(AppUpdate.none);
   }
 }
 
 /// Supabase につながず、サインインすると少し待ってからサインイン済みになる。
-class FakeAuthenticationRepository extends AuthenticationRepository {
-  FakeAuthenticationRepository({this.initial = const Authentication()});
-
-  final Authentication initial;
+class FakeAuthenticationRepository implements AuthenticationRepository {
+  FakeAuthenticationRepository({
+    Authentication initial = const Authentication(),
+  }) : current = initial;
 
   @override
-  Authentication build() => initial;
+  Authentication current;
 
   @override
   Future<bool> signInWithApple() async {
     await Future<void>.delayed(const Duration(milliseconds: 10));
-    state = const Authentication(isLoginApp: true);
+    current = const Authentication(isLoginApp: true);
     return true;
   }
 
   @override
   Future<void> signInAnonymously() async {
     await Future<void>.delayed(const Duration(milliseconds: 10));
-    state = const Authentication(isLoginApp: true);
+    current = const Authentication(isLoginApp: true);
   }
 
   @override
   Future<void> signOut() async {
-    state = const Authentication();
+    current = const Authentication();
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    current = const Authentication();
   }
 }
 
-/// Firebase につながず、送り先から外したときにサインインしていたかを [unregisteredWhileSignedIn] にためる。
-class FakePushTokenRepository extends PushTokenRepository {
+/// Firebase につながず、送り先から外したときに [authentication] でサインインしていたかを
+/// [unregisteredWhileSignedIn] にためる。
+class FakePushTokenRepository implements PushTokenRepository {
+  FakePushTokenRepository(this.authentication);
+
+  final AuthenticationRepository authentication;
   final unregisteredWhileSignedIn = <bool>[];
 
   @override
-  Future<void> build() async {}
+  Stream<String> get onTokenRefresh {
+    return const Stream.empty();
+  }
+
+  @override
+  Future<void> requestPermission() async {}
+
+  @override
+  Future<String?> fetchToken() async {
+    return null;
+  }
+
+  @override
+  Future<void> register(String token) async {}
 
   @override
   Future<void> unregister() async {
-    unregisteredWhileSignedIn.add(
-      ref.read(authenticationRepositoryProvider).isLoginApp,
-    );
+    unregisteredWhileSignedIn.add(authentication.current.isLoginApp);
   }
-}
-
-/// サインインしていれば [profile] を返す。
-class FakeProfileRepository extends ProfileRepository {
-  FakeProfileRepository({this.profile});
-
-  final Profile? profile;
 
   @override
-  Future<Profile?> build() async {
-    if (!ref.watch(authenticationRepositoryProvider).isLoginApp) return null;
+  Future<void> deleteToken() async {}
+
+  @override
+  Future<void> resetUnreadCount() async {}
+}
+
+/// [profile] を返す。保存すると [profile] を書き換える。
+class FakeProfileRepository implements ProfileRepository {
+  FakeProfileRepository({this.profile});
+
+  Profile? profile;
+
+  @override
+  Future<Profile?> fetchMine() async {
     return profile;
+  }
+
+  @override
+  Future<Profile> save({
+    required String displayName,
+    required int? avatarColor,
+  }) async {
+    final saved = Profile(
+      id: profile?.id ?? 'me',
+      displayName: displayName,
+      avatarColor: avatarColor,
+    );
+    profile = saved;
+    return saved;
   }
 }
 
@@ -97,7 +136,9 @@ class FakeOpenedNotificationRepository implements OpenedNotificationRepository {
   final diaryBookIds = StreamController<String>.broadcast();
 
   @override
-  Stream<String> openedDiaryBookIds() => diaryBookIds.stream;
+  Stream<String> openedDiaryBookIds() {
+    return diaryBookIds.stream;
+  }
 }
 
 /// 書いた記録を [posts] にためる。日記帳のタイムラインには [timelinePosts] を返し、
@@ -248,35 +289,44 @@ class FakeDiaryRepository implements DiaryRepository {
   }
 }
 
-/// [diaryBooks] をそのまま返す。メンバーは日記帳の id ごとの [members] を返す。
+/// 最初は [diaryBooks] を返す。メンバーは日記帳の id ごとの [members] を返す。
 /// 招待コードは [invitable] の日記帳のコードで探し、参加すると一覧に足す。
-class FakeDiaryBookRepository extends DiaryBookRepository {
+class FakeDiaryBookRepository implements DiaryBookRepository {
   FakeDiaryBookRepository(
-    this.diaryBooks, {
+    List<DiaryBook> diaryBooks, {
     this.members = const {},
     this.invitable = const [],
-  });
+  }) : _joined = [...diaryBooks];
 
-  final List<DiaryBook> diaryBooks;
   final Map<String, List<DiaryBookMember>> members;
 
   /// 招待コードで参加できる日記帳。参加しているものも含めてよい。
   final List<DiaryBook> invitable;
 
-  /// 読み直したときに返す一覧。ほかの人が変えたことにする。null なら [diaryBooks]。
+  /// 読み直したときに返す一覧。ほかの人が変えたことにする。null なら今の一覧。
   List<DiaryBook>? refreshed;
 
-  /// true なら読み直しに失敗する。
+  /// true なら読み直しに失敗する。最初に読むときは失敗しない。
   bool failsToRefresh = false;
 
+  List<DiaryBook> _joined;
+  var _fetched = false;
+
   @override
-  Future<void> refresh() async {
-    if (failsToRefresh) throw Exception('読み直しに失敗');
-    state = AsyncData(refreshed ?? diaryBooks);
+  Future<List<DiaryBook>> fetchJoined() async {
+    if (_fetched) {
+      if (failsToRefresh) throw Exception('読み直しに失敗');
+      _joined = [...refreshed ?? _joined];
+    }
+    _fetched = true;
+    return [..._joined];
   }
 
-  DiaryBook? _byCode(String code) =>
-      invitable.where((diaryBook) => diaryBook.inviteCode == code).firstOrNull;
+  DiaryBook? _byCode(String code) {
+    return invitable
+        .where((diaryBook) => diaryBook.inviteCode == code)
+        .firstOrNull;
+  }
 
   @override
   Future<InvitedDiaryBook?> findByCode(String code) async {
@@ -289,31 +339,26 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
         for (final member in members[diaryBook.id] ?? const <DiaryBookMember>[])
           member.displayName,
       ],
-      alreadyJoined: [...?state.value]
-          .any((joined) => joined.id == diaryBook.id),
+      alreadyJoined: _joined.any((joined) => joined.id == diaryBook.id),
       memberLimit: diaryBook.memberLimit,
       coverColor: diaryBook.coverColor,
     );
   }
 
   @override
-  Future<DiaryBook?> join(String code) async {
+  Future<String?> join(String code) async {
     final diaryBook = _byCode(code);
     if (diaryBook == null) return null;
-    final current = [...?state.value];
-    if (!current.any((joined) => joined.id == diaryBook.id)) {
-      state = AsyncData([...current, diaryBook]);
+    if (!_joined.any((joined) => joined.id == diaryBook.id)) {
+      _joined.add(diaryBook);
     }
-    return diaryBook;
+    return diaryBook.id;
   }
 
   @override
   Future<List<DiaryBookMember>> fetchMembers(String diaryBookId) async {
     return members[diaryBookId] ?? const [];
   }
-
-  @override
-  Future<List<DiaryBook>> build() async => diaryBooks;
 
   @override
   Future<void> rename(String diaryBookId, String name) async {
@@ -337,37 +382,38 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
   }
 
   @override
-  Future<void> regenerateInviteCode(String diaryBookId) async {
+  Future<String> regenerateInviteCode(String diaryBookId) async {
+    const inviteCode = 'Re23456';
     _replace(
       diaryBookId,
-      (diaryBook) => diaryBook.copyWith(inviteCode: 'Re23456'),
+      (diaryBook) => diaryBook.copyWith(inviteCode: inviteCode),
     );
+    return inviteCode;
   }
 
   @override
-  Future<void> removeMember(String diaryBookId, String userId) async {
+  Future<String> removeMember(String diaryBookId, String userId) async {
+    const inviteCode = 'Re23456';
     _replace(
       diaryBookId,
       (diaryBook) => diaryBook.copyWith(
-        inviteCode: 'Re23456',
+        inviteCode: inviteCode,
         memberCount: diaryBook.memberCount - 1,
       ),
     );
+    return inviteCode;
   }
 
   @override
   Future<void> leave(String diaryBookId) async {
-    state = AsyncData([
-      for (final diaryBook in [...?state.value])
-        if (diaryBook.id != diaryBookId) diaryBook,
-    ]);
+    _joined.removeWhere((diaryBook) => diaryBook.id == diaryBookId);
   }
 
   void _replace(String diaryBookId, DiaryBook Function(DiaryBook) update) {
-    state = AsyncData([
-      for (final diaryBook in [...?state.value])
+    _joined = [
+      for (final diaryBook in _joined)
         diaryBook.id == diaryBookId ? update(diaryBook) : diaryBook,
-    ]);
+    ];
   }
 
   @override
@@ -379,7 +425,7 @@ class FakeDiaryBookRepository extends DiaryBookRepository {
       memberCount: 1,
       coverColor: coverColor,
     );
-    state = AsyncData([...?state.value, diaryBook]);
+    _joined.add(diaryBook);
     return diaryBook;
   }
 }

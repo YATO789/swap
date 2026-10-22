@@ -8,28 +8,25 @@ part of '../profile_repository.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
-///
-/// サインイン・サインアウトのたびに読み直す。画面の切り替えにも使うので破棄しない。
 
-@ProviderFor(ProfileRepository)
+@ProviderFor(profileRepository)
 final profileRepositoryProvider = ProfileRepositoryProvider._();
 
-/// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
-///
-/// サインイン・サインアウトのたびに読み直す。画面の切り替えにも使うので破棄しない。
 final class ProfileRepositoryProvider
-    extends $AsyncNotifierProvider<ProfileRepository, Profile?> {
-  /// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
-  ///
-  /// サインイン・サインアウトのたびに読み直す。画面の切り替えにも使うので破棄しない。
+    extends
+        $FunctionalProvider<
+          ProfileRepository,
+          ProfileRepository,
+          ProfileRepository
+        >
+    with $Provider<ProfileRepository> {
   ProfileRepositoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'profileRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -39,29 +36,22 @@ final class ProfileRepositoryProvider
 
   @$internal
   @override
-  ProfileRepository create() => ProfileRepository();
-}
+  $ProviderElement<ProfileRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
 
-String _$profileRepositoryHash() => r'2b89bc6450c8973ddc43d871070840eff33ace70';
-
-/// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
-///
-/// サインイン・サインアウトのたびに読み直す。画面の切り替えにも使うので破棄しない。
-
-abstract class _$ProfileRepository extends $AsyncNotifier<Profile?> {
-  FutureOr<Profile?> build();
-  @$mustCallSuper
   @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<Profile?>, Profile?>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<Profile?>, Profile?>,
-              AsyncValue<Profile?>,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
+  ProfileRepository create(Ref ref) {
+    return profileRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ProfileRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ProfileRepository>(value),
+    );
   }
 }
+
+String _$profileRepositoryHash() => r'0c1355fd4f8c81490776d5c5f1495111c8c4f7bf';

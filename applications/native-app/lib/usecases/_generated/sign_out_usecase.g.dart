@@ -48,4 +48,4 @@ final class SignOutUseCaseProvider
   }
 }
 
-String _$signOutUseCaseHash() => r'2c5b5f3e898d1bdcd8184abb64e16030362a09b7';
+String _$signOutUseCaseHash() => r'9238771b64b14e8eecffa7947e1a8d93aeebbb2f';

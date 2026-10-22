@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../diary_book_grid_repository.dart';
+part of '../diary_book_grid_helper.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -11,32 +11,32 @@ part of '../diary_book_grid_repository.dart';
 /// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
 /// 設定画面で切り替える。
 
-@ProviderFor(DiaryBookGridRepository)
-final diaryBookGridRepositoryProvider = DiaryBookGridRepositoryProvider._();
+@ProviderFor(DiaryBookGridHelper)
+final diaryBookGridProvider = DiaryBookGridHelperProvider._();
 
 /// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
 /// 設定画面で切り替える。
-final class DiaryBookGridRepositoryProvider
-    extends $NotifierProvider<DiaryBookGridRepository, bool> {
+final class DiaryBookGridHelperProvider
+    extends $NotifierProvider<DiaryBookGridHelper, bool> {
   /// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
   /// 設定画面で切り替える。
-  DiaryBookGridRepositoryProvider._()
+  DiaryBookGridHelperProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'diaryBookGridRepositoryProvider',
-        isAutoDispose: false,
+        name: r'diaryBookGridProvider',
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$diaryBookGridRepositoryHash();
+  String debugGetCreateSourceHash() => _$diaryBookGridHelperHash();
 
   @$internal
   @override
-  DiaryBookGridRepository create() => DiaryBookGridRepository();
+  DiaryBookGridHelper create() => DiaryBookGridHelper();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(bool value) {
@@ -47,13 +47,13 @@ final class DiaryBookGridRepositoryProvider
   }
 }
 
-String _$diaryBookGridRepositoryHash() =>
-    r'c5bcd2baabd4c7af3eeed5244c8e378352375efe';
+String _$diaryBookGridHelperHash() =>
+    r'2a6f5535133cdbeeae5a9e1db445b426cd83a590';
 
 /// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
 /// 設定画面で切り替える。
 
-abstract class _$DiaryBookGridRepository extends $Notifier<bool> {
+abstract class _$DiaryBookGridHelper extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override

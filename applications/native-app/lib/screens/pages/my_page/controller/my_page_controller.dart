@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../infrastructures/repositories/authentication_repository.dart';
-import '../../../../usecases/sign_out_usecase.dart';
+import '../../../helpers/authentication_helper.dart';
 
 part '_generated/my_page_controller.g.dart';
 
@@ -14,13 +13,13 @@ class MyPageController extends _$MyPageController {
 
   /// ログアウトし、成功したかを返す。失敗したときは状態にエラーが入る。
   Future<bool> signOut() => _run(
-    ref.read(signOutUseCaseProvider).call,
+    ref.read(authenticationProvider.notifier).signOut,
     failureLog: 'ログアウトできませんでした',
   );
 
   /// アカウントを消し、成功したかを返す。失敗したときは状態にエラーが入る。
   Future<bool> deleteAccount() => _run(
-    ref.read(authenticationRepositoryProvider.notifier).deleteAccount,
+    ref.read(authenticationProvider.notifier).deleteAccount,
     failureLog: 'アカウントを削除できませんでした',
   );
 

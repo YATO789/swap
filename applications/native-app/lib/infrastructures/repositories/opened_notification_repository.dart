@@ -4,10 +4,10 @@ import 'package:swap/infrastructures/datasources/firebase/opened_notification_da
 
 part '_generated/opened_notification_repository.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 OpenedNotificationRepository openedNotificationRepository(Ref ref) {
   return OpenedNotificationRepository(
-    ref.read(openedNotificationDatasourceProvider),
+    ref.watch(openedNotificationDatasourceProvider),
   );
 }
 
@@ -33,6 +33,7 @@ class OpenedNotificationRepository {
   }
 
   /// 記録の通知（Edge Function の notify-post）に入れている日記帳の id。
-  String? _diaryBookIdOf(RemoteMessage message) =>
-      message.data['diary_book_id'] as String?;
+  String? _diaryBookIdOf(RemoteMessage message) {
+    return message.data['diary_book_id'] as String?;
+  }
 }

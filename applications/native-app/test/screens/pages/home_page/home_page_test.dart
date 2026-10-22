@@ -10,8 +10,8 @@ import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
-import 'package:swap/infrastructures/repositories/diary_book_grid_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/screens/helpers/diary_book_grid_helper.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/l10n/l10n.dart';
@@ -39,21 +39,21 @@ List<Override> _overrides(
   FakeDiaryBookRepository? diaryBookRepository,
   FakeAppUpdateRepository? appUpdateRepository,
 }) => [
-  appUpdateRepositoryProvider.overrideWith(
-    () => appUpdateRepository ?? FakeAppUpdateRepository(),
+  appUpdateRepositoryProvider.overrideWithValue(
+    appUpdateRepository ?? FakeAppUpdateRepository(),
   ),
-  authenticationRepositoryProvider.overrideWith(
-    () => FakeAuthenticationRepository(
+  authenticationRepositoryProvider.overrideWithValue(
+    FakeAuthenticationRepository(
       initial: const Authentication(isLoginApp: true),
     ),
   ),
-  profileRepositoryProvider.overrideWith(
-    () => FakeProfileRepository(
+  profileRepositoryProvider.overrideWithValue(
+    FakeProfileRepository(
       profile: const Profile(id: 'me', displayName: '彩人'),
     ),
   ),
-  diaryBookRepositoryProvider.overrideWith(
-    () => diaryBookRepository ?? FakeDiaryBookRepository(diaryBooks),
+  diaryBookRepositoryProvider.overrideWithValue(
+    diaryBookRepository ?? FakeDiaryBookRepository(diaryBooks),
   ),
   openedNotificationRepositoryProvider.overrideWithValue(
     notifications ?? FakeOpenedNotificationRepository(),
@@ -129,7 +129,7 @@ void main() {
 
     // 設定画面で切り替えたときと同じく、保存した値を変える。
     await ProviderScope.containerOf(tester.element(find.byType(HomePage)))
-        .read(diaryBookGridRepositoryProvider.notifier)
+        .read(diaryBookGridProvider.notifier)
         .save(false);
     await tester.pump();
 

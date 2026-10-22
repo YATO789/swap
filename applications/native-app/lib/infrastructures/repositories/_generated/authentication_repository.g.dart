@@ -8,28 +8,25 @@ part of '../authentication_repository.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 今のサインイン状態を持ち、サインイン・サインアウトで更新する。
-///
-/// サインイン状態はアプリ全体で使うので、誰も見ていなくても破棄しない。
 
-@ProviderFor(AuthenticationRepository)
+@ProviderFor(authenticationRepository)
 final authenticationRepositoryProvider = AuthenticationRepositoryProvider._();
 
-/// 今のサインイン状態を持ち、サインイン・サインアウトで更新する。
-///
-/// サインイン状態はアプリ全体で使うので、誰も見ていなくても破棄しない。
 final class AuthenticationRepositoryProvider
-    extends $NotifierProvider<AuthenticationRepository, Authentication> {
-  /// 今のサインイン状態を持ち、サインイン・サインアウトで更新する。
-  ///
-  /// サインイン状態はアプリ全体で使うので、誰も見ていなくても破棄しない。
+    extends
+        $FunctionalProvider<
+          AuthenticationRepository,
+          AuthenticationRepository,
+          AuthenticationRepository
+        >
+    with $Provider<AuthenticationRepository> {
   AuthenticationRepositoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'authenticationRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -39,38 +36,23 @@ final class AuthenticationRepositoryProvider
 
   @$internal
   @override
-  AuthenticationRepository create() => AuthenticationRepository();
+  $ProviderElement<AuthenticationRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  AuthenticationRepository create(Ref ref) {
+    return authenticationRepository(ref);
+  }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(Authentication value) {
+  Override overrideWithValue(AuthenticationRepository value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<Authentication>(value),
+      providerOverride: $SyncValueProvider<AuthenticationRepository>(value),
     );
   }
 }
 
 String _$authenticationRepositoryHash() =>
-    r'f8c2a6b3c51f4542e2004d39f35237a82d153aa4';
-
-/// 今のサインイン状態を持ち、サインイン・サインアウトで更新する。
-///
-/// サインイン状態はアプリ全体で使うので、誰も見ていなくても破棄しない。
-
-abstract class _$AuthenticationRepository extends $Notifier<Authentication> {
-  Authentication build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<Authentication, Authentication>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<Authentication, Authentication>,
-              Authentication,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
+    r'e89a6a6ab20555ae3007f4d1180f2d23a58b79c1';

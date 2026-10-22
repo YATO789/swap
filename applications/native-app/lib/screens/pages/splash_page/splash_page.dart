@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../infrastructures/repositories/profile_repository.dart';
+import '../../helpers/profile_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 
@@ -12,7 +12,7 @@ class SplashPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
-    final failed = ref.watch(profileRepositoryProvider).hasError;
+    final failed = ref.watch(profileProvider).hasError;
 
     return Scaffold(
       body: Center(
@@ -26,7 +26,7 @@ class SplashPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   TextButton(
-                    onPressed: () => ref.invalidate(profileRepositoryProvider),
+                    onPressed: () => ref.invalidate(profileProvider),
                     child: Text(context.l10n.commonRetry),
                   ),
                 ],

@@ -8,28 +8,25 @@ part of '../app_update_repository.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// このアプリにアップデートを促すか。Remote Config の `update_info` と今のバージョンを比べる。
-///
-/// アプリを開いたときと、裏から戻ってきたときに確かめ直す。
 
-@ProviderFor(AppUpdateRepository)
+@ProviderFor(appUpdateRepository)
 final appUpdateRepositoryProvider = AppUpdateRepositoryProvider._();
 
-/// このアプリにアップデートを促すか。Remote Config の `update_info` と今のバージョンを比べる。
-///
-/// アプリを開いたときと、裏から戻ってきたときに確かめ直す。
 final class AppUpdateRepositoryProvider
-    extends $AsyncNotifierProvider<AppUpdateRepository, AppUpdate> {
-  /// このアプリにアップデートを促すか。Remote Config の `update_info` と今のバージョンを比べる。
-  ///
-  /// アプリを開いたときと、裏から戻ってきたときに確かめ直す。
+    extends
+        $FunctionalProvider<
+          AppUpdateRepository,
+          AppUpdateRepository,
+          AppUpdateRepository
+        >
+    with $Provider<AppUpdateRepository> {
   AppUpdateRepositoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'appUpdateRepositoryProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -39,30 +36,23 @@ final class AppUpdateRepositoryProvider
 
   @$internal
   @override
-  AppUpdateRepository create() => AppUpdateRepository();
+  $ProviderElement<AppUpdateRepository> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  AppUpdateRepository create(Ref ref) {
+    return appUpdateRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AppUpdateRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AppUpdateRepository>(value),
+    );
+  }
 }
 
 String _$appUpdateRepositoryHash() =>
-    r'b1f5d471cdd9ca9df957edd9e275baf755779868';
-
-/// このアプリにアップデートを促すか。Remote Config の `update_info` と今のバージョンを比べる。
-///
-/// アプリを開いたときと、裏から戻ってきたときに確かめ直す。
-
-abstract class _$AppUpdateRepository extends $AsyncNotifier<AppUpdate> {
-  FutureOr<AppUpdate> build();
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<AppUpdate>, AppUpdate>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<AsyncValue<AppUpdate>, AppUpdate>,
-              AsyncValue<AppUpdate>,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, build);
-  }
-}
+    r'06a66fc01734a44496f99ea55d176819b616bcc3';

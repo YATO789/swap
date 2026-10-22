@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
 import '../../../domains/diary_book/diary_book.dart';
-import '../../../infrastructures/repositories/diary_book_repository.dart';
+import '../../helpers/diary_book_helper.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
@@ -50,7 +50,7 @@ class DiaryEditorPage extends HookConsumerWidget {
     final colors = context.appColors;
     final provider = diaryEditorPageControllerProvider(date);
     final pageState = ref.watch(provider);
-    final diaryBooksState = ref.watch(diaryBookRepositoryProvider);
+    final diaryBooksState = ref.watch(diaryBookProvider);
 
     Widget scaffold(Widget body) => Scaffold(
       appBar: AppBar(
@@ -95,7 +95,7 @@ class DiaryEditorPage extends HookConsumerWidget {
               TextButton(
                 onPressed: () {
                   if (diaryBooksState.hasError) {
-                    ref.invalidate(diaryBookRepositoryProvider);
+                    ref.invalidate(diaryBookProvider);
                   }
                   ref.read(provider.notifier).refresh();
                 },

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/authentication/authentication.dart';
+import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/profile/profile.dart';
@@ -64,18 +65,18 @@ Future<void> _openJoinSheet(
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
-        authenticationRepositoryProvider.overrideWith(
-          () => FakeAuthenticationRepository(
+        authenticationRepositoryProvider.overrideWithValue(
+          FakeAuthenticationRepository(
             initial: const Authentication(isLoginApp: true),
           ),
         ),
-        profileRepositoryProvider.overrideWith(
-          () => FakeProfileRepository(
+        profileRepositoryProvider.overrideWithValue(
+          FakeProfileRepository(
             profile: const Profile(id: 'me', displayName: '彩人'),
           ),
         ),
-        diaryBookRepositoryProvider.overrideWith(
-          () => FakeDiaryBookRepository(
+        diaryBookRepositoryProvider.overrideWithValue(
+          FakeDiaryBookRepository(
             joined,
             members: {
               _university.id: const [
@@ -147,7 +148,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(DiaryBookPage), findsOneWidget);
-    expect(find.textContaining('今日・'), findsOneWidget);
+    // 見出しの下に、今日の日付を「10月3日 金曜日」の形で出す。
+    final today = diaryDateOf(DateTime.now());
+    expect(
+      find.textContaining('${today.month}月${today.day}日 '),
+      findsOneWidget,
+    );
   });
 
   testWidgets('大文字と小文字が違えば、合うコードはない', (tester) async {

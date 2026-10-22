@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/post/post.dart';
+import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
-import 'package:swap/infrastructures/repositories/post_diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/screens/components/post_button.dart';
 
 import '../../../helpers/fake_repositories.dart';
+import '../../../helpers/fake_stores.dart';
 import '../../../helpers/pump_app.dart';
 
 const _university = DiaryBook(
@@ -24,21 +26,6 @@ const _family = DiaryBook(
   memberCount: 3,
 );
 
-/// 前に [savedIds] の日記帳を選んだことにする。
-class _FakePostDiaryBookRepository extends PostDiaryBookRepository {
-  _FakePostDiaryBookRepository(this.savedIds);
-
-  final Set<String> savedIds;
-
-  @override
-  Set<String> build() => savedIds;
-
-  @override
-  Future<void> save(Set<String> diaryBookIds) async {
-    state = diaryBookIds;
-  }
-}
-
 /// 書き込みバーを置いて、押して投稿シートを開く。前に [savedIds] の日記帳を選んだことにする。
 Future<FakePostRepository> _openSheet(
   WidgetTester tester, {
@@ -47,14 +34,17 @@ Future<FakePostRepository> _openSheet(
   final postRepository = FakePostRepository();
   await tester.pumpApp(
     const Scaffold(bottomNavigationBar: PostButton()),
+    preferencesStore: FakePreferencesStore(postDiaryBookIds: {...savedIds}),
     overrides: [
-      diaryBookRepositoryProvider.overrideWith(
-        () => FakeDiaryBookRepository([_university, _family]),
+      authenticationRepositoryProvider.overrideWithValue(
+        FakeAuthenticationRepository(
+          initial: const Authentication(isLoginApp: true),
+        ),
+      ),
+      diaryBookRepositoryProvider.overrideWithValue(
+        FakeDiaryBookRepository([_university, _family]),
       ),
       postRepositoryProvider.overrideWithValue(postRepository),
-      postDiaryBookRepositoryProvider.overrideWith(
-        () => _FakePostDiaryBookRepository(savedIds),
-      ),
     ],
   );
   await tester.pumpAndSettle();

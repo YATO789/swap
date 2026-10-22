@@ -1,41 +1,41 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/authentication/authentication.dart';
-import 'package:swap/infrastructures/datasources/supabase/authentication_datasource.dart';
+import 'package:swap/infrastructures/datasources/supabase/authentication/authentication_datasource.dart';
 
 part '_generated/authentication_repository.g.dart';
 
-/// 今のサインイン状態を持ち、サインイン・サインアウトで更新する。
-///
-/// サインイン状態はアプリ全体で使うので、誰も見ていなくても破棄しない。
-@Riverpod(keepAlive: true)
-class AuthenticationRepository extends _$AuthenticationRepository {
-  AuthenticationDatasource get _datasource =>
-      ref.read(authenticationDatasourceProvider);
+@riverpod
+AuthenticationRepository authenticationRepository(Ref ref) {
+  return AuthenticationRepository(ref.watch(authenticationDatasourceProvider));
+}
 
-  @override
-  Authentication build() => _datasource.current;
+/// サインイン状態を読み、サインイン・サインアウトする。
+class AuthenticationRepository {
+  const AuthenticationRepository(this._datasource);
+
+  final AuthenticationDatasource _datasource;
+
+  /// 今のサインイン状態。
+  Authentication get current {
+    return Authentication(isLoginApp: _datasource.isSignedIn);
+  }
 
   /// Apple アカウントでサインインする。利用者がやめたら false を返す。
-  Future<bool> signInWithApple() async {
-    final signedIn = await _datasource.signInWithApple();
-    state = _datasource.current;
-    return signedIn;
+  Future<bool> signInWithApple() {
+    return _datasource.signInWithApple();
   }
 
   /// 匿名ユーザーとしてサインインする。開発中の確認用。
-  Future<void> signInAnonymously() async {
-    await _datasource.signInAnonymously();
-    state = _datasource.current;
+  Future<void> signInAnonymously() {
+    return _datasource.signInAnonymously();
   }
 
-  Future<void> signOut() async {
-    await _datasource.signOut();
-    state = _datasource.current;
+  Future<void> signOut() {
+    return _datasource.signOut();
   }
 
-  /// アカウントとそのデータを消し、サインアウトした状態にする。
-  Future<void> deleteAccount() async {
-    await _datasource.deleteAccount();
-    state = _datasource.current;
+  /// アカウントとそのデータを消し、サインアウトする。
+  Future<void> deleteAccount() {
+    return _datasource.deleteAccount();
   }
 }

@@ -8,7 +8,7 @@ import '../../../../domains/post/timeline_post.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
 import '../../../../infrastructures/repositories/post_repository.dart';
-import '../../../../infrastructures/repositories/profile_repository.dart';
+import '../../../helpers/profile_helper.dart';
 
 part '_generated/diary_detail_page_controller.freezed.dart';
 part '_generated/diary_detail_page_controller.g.dart';
@@ -35,8 +35,8 @@ class DiaryDetailPageController extends _$DiaryDetailPageController {
   Future<DiaryDetailPageState> build(String diaryBookId, DateTime date) async {
     final (diaries, members, profile) = await (
       ref.read(diaryRepositoryProvider).fetchOn(diaryBookId, date),
-      ref.read(diaryBookRepositoryProvider.notifier).fetchMembers(diaryBookId),
-      ref.read(profileRepositoryProvider.future),
+      ref.read(diaryBookRepositoryProvider).fetchMembers(diaryBookId),
+      ref.read(profileProvider.future),
     ).wait;
     final myId = profile?.id;
     // 伏せてある日記はめくっても読めないので、ページにしない。

@@ -46,7 +46,7 @@ final class CreateDiaryBookPageControllerProvider
 }
 
 String _$createDiaryBookPageControllerHash() =>
-    r'257d57de3b49f8331361fc6af40ed533865114d0';
+    r'0befe94149f8d0b65cf7e2221434f5cb350987bc';
 
 /// 日記帳を作るページの作成処理を受け持つ。状態は作成の進み具合。
 
