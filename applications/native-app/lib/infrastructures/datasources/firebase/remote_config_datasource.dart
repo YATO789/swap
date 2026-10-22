@@ -13,7 +13,6 @@ RemoteConfigDatasource remoteConfigDatasource(Ref ref) {
   return RemoteConfigDatasource(FirebaseRemoteConfig.instance);
 }
 
-/// アプリを出し直さずに変えたい値を Firebase Remote Config から受け取る。
 class RemoteConfigDatasource {
   const RemoteConfigDatasource(this._remoteConfig);
 

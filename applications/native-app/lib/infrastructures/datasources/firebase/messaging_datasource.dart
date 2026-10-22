@@ -27,7 +27,7 @@ class MessagingDatasource {
     );
   }
 
-  /// この端末の FCM トークン。iOS で APNs のトークンがまだ届いていなければ null。
+  /// この端末の FCM トークン取得
   Future<String?> fetchToken() async {
     // APNs のトークンがないうちに getToken を呼ぶと例外になる。届けば onTokenRefresh で受け取れる。
     if (defaultTargetPlatform == TargetPlatform.iOS &&
@@ -37,7 +37,7 @@ class MessagingDatasource {
     return _messaging.getToken();
   }
 
-  /// FCM トークンが新しく発行されるたびに流れる。
+  /// FCMトークンが新しく発行されるたびに流れる。
   Stream<String> get onTokenRefresh => _messaging.onTokenRefresh;
 
   /// この端末の FCM トークンを無効にする。古いトークンには送っても届かなくなる。

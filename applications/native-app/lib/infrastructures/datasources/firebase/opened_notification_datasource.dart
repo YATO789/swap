@@ -14,11 +14,10 @@ class OpenedNotificationDatasource {
 
   final FirebaseMessaging _messaging;
 
-  /// アプリが閉じていたときに通知のタップで起動したなら、その通知。
-  /// 一度受け取ると、次からは null になる。
+  /// アプリが閉じていたときに通知のタップで起動したとき
   Future<RemoteMessage?> fetchInitialMessage() =>
       _messaging.getInitialMessage();
 
-  /// アプリが裏にあるときに通知がタップされるたびに流れる。
+  /// アプリが裏にあるときに通知がタップされたとき。
   Stream<RemoteMessage> get onOpened => FirebaseMessaging.onMessageOpenedApp;
 }
