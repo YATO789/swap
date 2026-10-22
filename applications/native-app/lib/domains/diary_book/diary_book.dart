@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part '_generated/diary_book.freezed.dart';
+part '_generated/diary_book.g.dart';
 
 /// 友達と記録や日記を見せ合うグループ。
 @freezed
@@ -17,6 +18,9 @@ abstract class DiaryBook with _$DiaryBook {
     String? createdBy,
     int? coverColor,
   }) = _DiaryBook;
+
+  factory DiaryBook.fromJson(Map<String, dynamic> json) =>
+      _$DiaryBookFromJson(json);
 }
 
 /// 日記帳の名前の最大文字数。DB の diary_books.name の制約と合わせる。

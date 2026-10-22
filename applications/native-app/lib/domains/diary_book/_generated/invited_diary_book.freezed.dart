@@ -12,6 +12,7 @@ part of '../invited_diary_book.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$InvitedDiaryBook {
 
@@ -25,6 +26,8 @@ mixin _$InvitedDiaryBook {
 @pragma('vm:prefer-inline')
 $InvitedDiaryBookCopyWith<InvitedDiaryBook> get copyWith => _$InvitedDiaryBookCopyWithImpl<InvitedDiaryBook>(this as InvitedDiaryBook, _$identity);
 
+  /// Serializes this InvitedDiaryBook to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -33,7 +36,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is InvitedDiaryBook&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&const DeepCollectionEquality().equals(other.memberNames, _this.memberNames)&&const DeepCollectionEquality().equals(other.memberAvatarColors, _this.memberAvatarColors)&&(identical(other.alreadyJoined, _this.alreadyJoined) || other.alreadyJoined == _this.alreadyJoined)&&(identical(other.memberLimit, _this.memberLimit) || other.memberLimit == _this.memberLimit)&&(identical(other.coverColor, _this.coverColor) || other.coverColor == _this.coverColor));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as InvitedDiaryBook;
@@ -218,11 +221,11 @@ return $default(_that.id,_that.name,_that.memberNames,_that.memberAvatarColors,_
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _InvitedDiaryBook extends InvitedDiaryBook {
   const _InvitedDiaryBook({required this.id, required this.name, required  List<String> memberNames,  List<int?> memberAvatarColors = const [], required this.alreadyJoined, this.memberLimit = maxDiaryBookMembers, this.coverColor}): _memberNames = memberNames,_memberAvatarColors = memberAvatarColors,super._();
-  
+  factory _InvitedDiaryBook.fromJson(Map<String, dynamic> json) => _$InvitedDiaryBookFromJson(json);
 
 @override final  String id;
 @override final  String name;
@@ -254,14 +257,17 @@ class _InvitedDiaryBook extends InvitedDiaryBook {
 @pragma('vm:prefer-inline')
 _$InvitedDiaryBookCopyWith<_InvitedDiaryBook> get copyWith => __$InvitedDiaryBookCopyWithImpl<_InvitedDiaryBook>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$InvitedDiaryBookToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _InvitedDiaryBook&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.memberNames, _memberNames)&&const DeepCollectionEquality().equals(other.memberAvatarColors, _memberAvatarColors)&&(identical(other.alreadyJoined, alreadyJoined) || other.alreadyJoined == alreadyJoined)&&(identical(other.memberLimit, memberLimit) || other.memberLimit == memberLimit)&&(identical(other.coverColor, coverColor) || other.coverColor == coverColor));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
     return Object.hash(runtimeType,id,name,const DeepCollectionEquality().hash(_memberNames),const DeepCollectionEquality().hash(_memberAvatarColors),alreadyJoined,memberLimit,coverColor);

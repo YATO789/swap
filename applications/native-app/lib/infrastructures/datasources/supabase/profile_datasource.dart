@@ -22,7 +22,7 @@ class ProfileDatasource {
         .select(_columns)
         .eq('id', _userId)
         .maybeSingle();
-    return row == null ? null : _toProfile(row);
+    return row == null ? null : Profile.fromJson(row);
   }
 
   /// 自分のプロフィールを作る。もうあれば表示名とアイコンの色を書き換える。
@@ -40,7 +40,7 @@ class ProfileDatasource {
         })
         .select(_columns)
         .single();
-    return _toProfile(row);
+    return Profile.fromJson(row);
   }
 
   static const _columns = 'id, display_name, avatar_color';
@@ -49,13 +49,5 @@ class ProfileDatasource {
     final user = _client.auth.currentUser;
     if (user == null) throw StateError('サインインしていません');
     return user.id;
-  }
-
-  Profile _toProfile(Map<String, dynamic> row) {
-    return Profile(
-      id: row['id'] as String,
-      displayName: row['display_name'] as String,
-      avatarColor: row['avatar_color'] as int?,
-    );
   }
 }

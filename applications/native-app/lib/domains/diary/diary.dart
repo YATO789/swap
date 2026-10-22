@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:swap/utils/local_date_time_converter.dart';
 
 part '_generated/diary.freezed.dart';
+part '_generated/diary.g.dart';
 
 /// 1日の締めくくりに書く日記。日記帳と [date]（朝4時区切り）ごとに1人1つだけ。
 @freezed
@@ -13,12 +15,14 @@ abstract class Diary with _$Diary {
     /// どの日の日記か（年月日のみ）。朝4時区切りなので、深夜に書いたものは前日になる。
     required DateTime date,
     /// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
-    required DateTime writtenAt,
+    @LocalDateTimeConverter() required DateTime writtenAt,
 
     /// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
     String? title,
     String? body,
   }) = _Diary;
+
+  factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
 
   /// 本文が伏せてあるか。他の人の日記は、自分も同じ日記帳にその日の日記を書くと読める。
   bool get isLocked => body == null;

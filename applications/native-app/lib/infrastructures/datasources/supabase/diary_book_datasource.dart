@@ -29,7 +29,7 @@ class DiaryBookDatasource {
     return rows.map((row) {
       final members = row['diary_book_members'] as List<dynamic>;
       final count = (members.first as Map<String, dynamic>)['count'] as int;
-      return _toDiaryBook(row, memberCount: count);
+      return DiaryBook.fromJson({...row, 'member_count': count});
     }).toList();
   }
 
@@ -40,7 +40,7 @@ class DiaryBookDatasource {
       params: {'p_name': name, 'p_cover_color': coverColor},
     );
     // 作った人だけが入っている。
-    return _toDiaryBook(row, memberCount: 1);
+    return DiaryBook.fromJson({...row, 'member_count': 1});
   }
 
   /// 招待コード [code] の日記帳を、参加する前に見せるために探す。見つからなければ null。
@@ -50,17 +50,7 @@ class DiaryBookDatasource {
       params: {'p_code': code},
     );
     if (rows.isEmpty) return null;
-    final row = rows.first as Map<String, dynamic>;
-    return InvitedDiaryBook(
-      id: row['id'] as String,
-      name: row['name'] as String,
-      memberNames: (row['member_names'] as List<dynamic>).cast<String>(),
-      memberAvatarColors: (row['member_avatar_colors'] as List<dynamic>)
-          .cast<int?>(),
-      alreadyJoined: row['already_joined'] as bool,
-      memberLimit: row['member_limit'] as int,
-      coverColor: row['cover_color'] as int?,
-    );
+    return InvitedDiaryBook.fromJson(rows.first as Map<String, dynamic>);
   }
 
   /// 招待コード [code] の日記帳に参加し、その id を返す。コードが違えば null。
@@ -78,11 +68,7 @@ class DiaryBookDatasource {
         .order('joined_at');
     return rows.map((row) {
       final profile = row['profiles'] as Map<String, dynamic>;
-      return DiaryBookMember(
-        userId: row['user_id'] as String,
-        displayName: profile['display_name'] as String,
-        avatarColor: profile['avatar_color'] as int?,
-      );
+      return DiaryBookMember.fromJson({'user_id': row['user_id'], ...profile});
     }).toList();
   }
 
@@ -134,17 +120,5 @@ class DiaryBookDatasource {
         .delete()
         .eq('diary_book_id', diaryBookId)
         .eq('user_id', _client.auth.currentUser!.id);
-  }
-
-  DiaryBook _toDiaryBook(Map<String, dynamic> row, {required int memberCount}) {
-    return DiaryBook(
-      id: row['id'] as String,
-      name: row['name'] as String,
-      inviteCode: row['invite_code'] as String,
-      memberCount: memberCount,
-      memberLimit: row['member_limit'] as int,
-      createdBy: row['created_by'] as String?,
-      coverColor: row['cover_color'] as int?,
-    );
   }
 }

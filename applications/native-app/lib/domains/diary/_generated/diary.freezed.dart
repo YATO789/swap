@@ -12,12 +12,13 @@ part of '../diary.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$Diary {
 
  String get id; String get authorId;/// どの日の日記か（年月日のみ）。朝4時区切りなので、深夜に書いたものは前日になる。
  DateTime get date;/// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
- DateTime get writtenAt;/// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
+@LocalDateTimeConverter() DateTime get writtenAt;/// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
  String? get title; String? get body;
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
@@ -25,6 +26,8 @@ mixin _$Diary {
 @pragma('vm:prefer-inline')
 $DiaryCopyWith<Diary> get copyWith => _$DiaryCopyWithImpl<Diary>(this as Diary, _$identity);
 
+  /// Serializes this Diary to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -33,7 +36,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is Diary&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.writtenAt, _this.writtenAt) || other.writtenAt == _this.writtenAt)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.body, _this.body) || other.body == _this.body));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Diary;
@@ -54,7 +57,7 @@ abstract mixin class $DiaryCopyWith<$Res>  {
   factory $DiaryCopyWith(Diary value, $Res Function(Diary) _then) = _$DiaryCopyWithImpl;
 @useResult
 $Res call({
- String id, String authorId, DateTime date, DateTime writtenAt, String? title, String? body
+ String id, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String? title, String? body
 });
 
 
@@ -164,7 +167,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String? title,  String? body)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String? title,  String? body)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Diary() when $default != null:
 return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body);case _:
@@ -185,7 +188,7 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String? title,  String? body)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String? title,  String? body)  $default,) {final _that = this;
 switch (_that) {
 case _Diary():
 return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body);case _:
@@ -205,7 +208,7 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String? title,  String? body)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String? title,  String? body)?  $default,) {final _that = this;
 switch (_that) {
 case _Diary() when $default != null:
 return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body);case _:
@@ -217,18 +220,18 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _Diary extends Diary {
-  const _Diary({required this.id, required this.authorId, required this.date, required this.writtenAt, this.title, this.body}): super._();
-  
+  const _Diary({required this.id, required this.authorId, required this.date, @LocalDateTimeConverter() required this.writtenAt, this.title, this.body}): super._();
+  factory _Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
 
 @override final  String id;
 @override final  String authorId;
 /// どの日の日記か（年月日のみ）。朝4時区切りなので、深夜に書いたものは前日になる。
 @override final  DateTime date;
 /// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
-@override final  DateTime writtenAt;
+@override@LocalDateTimeConverter() final  DateTime writtenAt;
 /// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
 @override final  String? title;
 @override final  String? body;
@@ -239,14 +242,17 @@ class _Diary extends Diary {
 @pragma('vm:prefer-inline')
 _$DiaryCopyWith<_Diary> get copyWith => __$DiaryCopyWithImpl<_Diary>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$DiaryToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _Diary&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.date, date) || other.date == date)&&(identical(other.writtenAt, writtenAt) || other.writtenAt == writtenAt)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
     return Object.hash(runtimeType,id,authorId,date,writtenAt,title,body);
@@ -265,7 +271,7 @@ abstract mixin class _$DiaryCopyWith<$Res> implements $DiaryCopyWith<$Res> {
   factory _$DiaryCopyWith(_Diary value, $Res Function(_Diary) _then) = __$DiaryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String authorId, DateTime date, DateTime writtenAt, String? title, String? body
+ String id, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String? title, String? body
 });
 
 

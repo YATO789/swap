@@ -53,7 +53,7 @@ class PostDatasource {
         .lt('posted_at', to.toUtc().toIso8601String())
         // Dart の order は既定が降順なので、古い順を明示する。
         .order('posted_at', ascending: true);
-    return rows.map(_toTimelinePost).toList();
+    return rows.map(TimelinePost.fromJson).toList();
   }
 
   /// [authorIds] の人が [from] 以降 [to] より前に書いた記録を古い順に返す。
@@ -70,15 +70,8 @@ class PostDatasource {
         .gte('posted_at', from.toUtc().toIso8601String())
         .lt('posted_at', to.toUtc().toIso8601String())
         .order('posted_at');
-    return rows.map(_toTimelinePost).toList();
+    return rows.map(TimelinePost.fromJson).toList();
   }
-
-  TimelinePost _toTimelinePost(Map<String, dynamic> row) => TimelinePost(
-    id: row['id'] as String,
-    authorId: row['author_id'] as String,
-    message: row['message'] as String,
-    postedAt: DateTime.parse(row['posted_at'] as String).toLocal(),
-  );
 
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録の書いた時刻。
   Future<List<DateTime>> fetchPostedTimesInDiaryBook(

@@ -84,14 +84,7 @@ class DiaryDatasource {
   Diary _toDiary(Map<String, dynamic> row) {
     // diary_id が主キーなので1対1になり、読めれば Map、読めなければ null が入る。
     final content = row['diary_contents'] as Map<String, dynamic>?;
-    return Diary(
-      id: row['id'] as String,
-      authorId: row['author_id'] as String,
-      date: DateTime.parse(row['date'] as String),
-      writtenAt: DateTime.parse(row['written_at'] as String).toLocal(),
-      title: content?['title'] as String?,
-      body: content?['body'] as String?,
-    );
+    return Diary.fromJson({...row, ...?content});
   }
 
   String _toDateString(DateTime date) =>
