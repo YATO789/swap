@@ -17,7 +17,7 @@ part '_generated/push_token_helper.g.dart';
 class PushTokenHelper extends _$PushTokenHelper {
   @override
   Future<void> build() async {
-    if (!ref.watch(authenticationProvider).isLoginApp) return;
+    if (!ref.watch(authenticationProvider).isSignedIn) return;
 
     // onDispose の中では ref を使えないので、先に取り出しておく。
     final repository = ref.read(pushTokenRepositoryProvider);
@@ -37,7 +37,7 @@ class PushTokenHelper extends _$PushTokenHelper {
 
   /// アプリを開いたら呼び、この端末の未読数を 0 に戻す。アイコンのバッジは iOS 側（SceneDelegate）で消す。
   Future<void> resetUnreadCount() async {
-    if (!ref.read(authenticationProvider).isLoginApp) return;
+    if (!ref.read(authenticationProvider).isSignedIn) return;
     try {
       await ref.read(pushTokenRepositoryProvider).resetUnreadCount();
     } on Object catch (e, stackTrace) {

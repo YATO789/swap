@@ -28,7 +28,7 @@ Future<void> _openMyPage(
   final authentication =
       authenticationRepository ??
       FakeAuthenticationRepository(
-        initial: const Authentication(isLoginApp: true),
+        initial: const Authentication(isSignedIn: true),
       );
   await tester.pumpWidget(
     ProviderScope(
@@ -101,7 +101,7 @@ void main() {
 
   testWidgets('ログアウトを確かめると、通知の送り先から外してウェルカム画面に戻る', (tester) async {
     final authenticationRepository = FakeAuthenticationRepository(
-      initial: const Authentication(isLoginApp: true),
+      initial: const Authentication(isSignedIn: true),
     );
     final pushTokenRepository = FakePushTokenRepository(
       authenticationRepository,

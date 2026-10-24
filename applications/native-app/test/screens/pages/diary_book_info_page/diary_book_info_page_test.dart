@@ -59,7 +59,7 @@ Future<void> _openInfo(
         ),
         authenticationRepositoryProvider.overrideWithValue(
           FakeAuthenticationRepository(
-            initial: const Authentication(isLoginApp: true),
+            initial: const Authentication(isSignedIn: true),
           ),
         ),
         profileRepositoryProvider.overrideWithValue(

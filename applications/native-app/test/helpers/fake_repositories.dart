@@ -48,14 +48,14 @@ class FakeAuthenticationRepository implements AuthenticationRepository {
   @override
   Future<bool> signInWithApple() async {
     await Future<void>.delayed(const Duration(milliseconds: 10));
-    current = const Authentication(isLoginApp: true);
+    current = const Authentication(isSignedIn: true);
     return true;
   }
 
   @override
   Future<void> signInAnonymously() async {
     await Future<void>.delayed(const Duration(milliseconds: 10));
-    current = const Authentication(isLoginApp: true);
+    current = const Authentication(isSignedIn: true);
   }
 
   @override
@@ -95,7 +95,7 @@ class FakePushTokenRepository implements PushTokenRepository {
 
   @override
   Future<void> unregister() async {
-    unregisteredWhileSignedIn.add(authentication.current.isLoginApp);
+    unregisteredWhileSignedIn.add(authentication.current.isSignedIn);
   }
 
   @override

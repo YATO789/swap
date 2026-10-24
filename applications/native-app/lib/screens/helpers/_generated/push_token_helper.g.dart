@@ -48,7 +48,7 @@ final class PushTokenHelperProvider
   PushTokenHelper create() => PushTokenHelper();
 }
 
-String _$pushTokenHelperHash() => r'd2645fc9b2e4c1c71deb07ccaf12ea7a37a4f6a3';
+String _$pushTokenHelperHash() => r'c3495538cbe6fdf62620b98e9c717cb4e4ab95f8';
 
 /// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
 ///

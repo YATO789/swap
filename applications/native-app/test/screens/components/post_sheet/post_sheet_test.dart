@@ -38,7 +38,7 @@ Future<FakePostRepository> _openSheet(
     overrides: [
       authenticationRepositoryProvider.overrideWithValue(
         FakeAuthenticationRepository(
-          initial: const Authentication(isLoginApp: true),
+          initial: const Authentication(isSignedIn: true),
         ),
       ),
       diaryBookRepositoryProvider.overrideWithValue(

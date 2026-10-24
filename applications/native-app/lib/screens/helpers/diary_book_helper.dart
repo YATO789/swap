@@ -17,14 +17,14 @@ class DiaryBookHelper extends _$DiaryBookHelper {
 
   @override
   Future<List<DiaryBook>> build() async {
-    if (!ref.watch(authenticationProvider).isLoginApp) return [];
+    if (!ref.watch(authenticationProvider).isSignedIn) return [];
     return _repository.fetchJoined();
   }
 
   /// 一覧を読み直す。ほかの人が変えた名前や表紙、人数も映る。
   /// 読み直している間も今の一覧を出したままにし、失敗したら一覧はそのままで投げる。
   Future<void> refresh() async {
-    if (!ref.read(authenticationProvider).isLoginApp) return;
+    if (!ref.read(authenticationProvider).isSignedIn) return;
     state = AsyncData(await _repository.fetchJoined());
   }
 

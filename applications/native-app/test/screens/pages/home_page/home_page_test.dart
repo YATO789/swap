@@ -44,7 +44,7 @@ List<Override> _overrides(
   ),
   authenticationRepositoryProvider.overrideWithValue(
     FakeAuthenticationRepository(
-      initial: const Authentication(isLoginApp: true),
+      initial: const Authentication(isSignedIn: true),
     ),
   ),
   profileRepositoryProvider.overrideWithValue(

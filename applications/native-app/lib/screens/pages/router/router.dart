@@ -57,7 +57,7 @@ GoRouter router(Ref ref) {
       if (ref.read(appUpdateProvider).value == AppUpdate.required) {
         return goTo(update);
       }
-      if (!ref.read(authenticationProvider).isLoginApp) {
+      if (!ref.read(authenticationProvider).isSignedIn) {
         return goTo(welcome);
       }
       final profile = ref.read(profileProvider);
@@ -92,7 +92,7 @@ bool firstScreenReady(Ref ref) {
   if (ref.watch(appUpdateProvider).value == AppUpdate.required) {
     return true;
   }
-  if (!ref.watch(authenticationProvider).isLoginApp) return true;
+  if (!ref.watch(authenticationProvider).isSignedIn) return true;
   final profile = ref.watch(profileProvider);
   if (profile.hasError) return true;
   if (profile.isLoading) return false;

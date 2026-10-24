@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Authentication {
 
- bool get isLoginApp;
+/// Supabase にサインインしているか。
+ bool get isSignedIn;
 /// Create a copy of Authentication
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +28,20 @@ $AuthenticationCopyWith<Authentication> get copyWith => _$AuthenticationCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as Authentication;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Authentication&&(identical(other.isLoginApp, _this.isLoginApp) || other.isLoginApp == _this.isLoginApp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Authentication&&(identical(other.isSignedIn, _this.isSignedIn) || other.isSignedIn == _this.isSignedIn));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Authentication;
-  return Object.hash(runtimeType,_this.isLoginApp);
+  return Object.hash(runtimeType,_this.isSignedIn);
 }
 
 @override
 String toString() {
   final _this = this as Authentication;
-  return 'Authentication(isLoginApp: ${_this.isLoginApp})';
+  return 'Authentication(isSignedIn: ${_this.isSignedIn})';
 }
 
 
@@ -51,7 +52,7 @@ abstract mixin class $AuthenticationCopyWith<$Res>  {
   factory $AuthenticationCopyWith(Authentication value, $Res Function(Authentication) _then) = _$AuthenticationCopyWithImpl;
 @useResult
 $Res call({
- bool isLoginApp
+ bool isSignedIn
 });
 
 
@@ -68,9 +69,9 @@ class _$AuthenticationCopyWithImpl<$Res>
 
 /// Create a copy of Authentication
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isLoginApp = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isSignedIn = null,}) {
   return _then(Authentication(
-isLoginApp: null == isLoginApp ? _self.isLoginApp : isLoginApp // ignore: cast_nullable_to_non_nullable
+isSignedIn: null == isSignedIn ? _self.isSignedIn : isSignedIn // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isLoginApp)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isSignedIn)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Authentication() when $default != null:
-return $default(_that.isLoginApp);case _:
+return $default(_that.isSignedIn);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.isLoginApp);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isLoginApp)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isSignedIn)  $default,) {final _that = this;
 switch (_that) {
 case _Authentication():
-return $default(_that.isLoginApp);case _:
+return $default(_that.isSignedIn);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.isLoginApp);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isLoginApp)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isSignedIn)?  $default,) {final _that = this;
 switch (_that) {
 case _Authentication() when $default != null:
-return $default(_that.isLoginApp);case _:
+return $default(_that.isSignedIn);case _:
   return null;
 
 }
@@ -212,10 +213,11 @@ return $default(_that.isLoginApp);case _:
 
 
 class _Authentication implements Authentication {
-  const _Authentication({this.isLoginApp = false});
+  const _Authentication({this.isSignedIn = false});
   
 
-@override@JsonKey() final  bool isLoginApp;
+/// Supabase にサインインしているか。
+@override@JsonKey() final  bool isSignedIn;
 
 /// Create a copy of Authentication
 /// with the given fields replaced by the non-null parameter values.
@@ -227,18 +229,18 @@ _$AuthenticationCopyWith<_Authentication> get copyWith => __$AuthenticationCopyW
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Authentication&&(identical(other.isLoginApp, isLoginApp) || other.isLoginApp == isLoginApp));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Authentication&&(identical(other.isSignedIn, isSignedIn) || other.isSignedIn == isSignedIn));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,isLoginApp);
+    return Object.hash(runtimeType,isSignedIn);
 }
 
 @override
 String toString() {
-    return 'Authentication(isLoginApp: $isLoginApp)';
+    return 'Authentication(isSignedIn: $isSignedIn)';
 }
 
 
@@ -249,7 +251,7 @@ abstract mixin class _$AuthenticationCopyWith<$Res> implements $AuthenticationCo
   factory _$AuthenticationCopyWith(_Authentication value, $Res Function(_Authentication) _then) = __$AuthenticationCopyWithImpl;
 @override @useResult
 $Res call({
- bool isLoginApp
+ bool isSignedIn
 });
 
 
@@ -266,9 +268,9 @@ class __$AuthenticationCopyWithImpl<$Res>
 
 /// Create a copy of Authentication
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isLoginApp = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isSignedIn = null,}) {
   return _then(_Authentication(
-isLoginApp: null == isLoginApp ? _self.isLoginApp : isLoginApp // ignore: cast_nullable_to_non_nullable
+isSignedIn: null == isSignedIn ? _self.isSignedIn : isSignedIn // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

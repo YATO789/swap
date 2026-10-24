@@ -42,7 +42,7 @@ final class DiaryBookHelperProvider
   DiaryBookHelper create() => DiaryBookHelper();
 }
 
-String _$diaryBookHelperHash() => r'1334b9429e3fd5218c66fdf2329743047b6620c8';
+String _$diaryBookHelperHash() => r'5c213d9b02ac73dae9da71906f9bbe748bd093c5';
 
 /// 自分が参加している日記帳の一覧を持つ。サインインしていなければ空。
 ///

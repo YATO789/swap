@@ -42,7 +42,7 @@ final class ProfileHelperProvider
   ProfileHelper create() => ProfileHelper();
 }
 
-String _$profileHelperHash() => r'b412f83681dbcbe5e893fe5f190da00de2e6c72e';
+String _$profileHelperHash() => r'47ffa95c0759ce85ab645b0d31ce97305d94bac0';
 
 /// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
 ///

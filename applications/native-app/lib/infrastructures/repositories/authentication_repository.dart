@@ -17,7 +17,7 @@ class AuthenticationRepository {
 
   /// 今のサインイン状態。
   Authentication get current {
-    return Authentication(isLoginApp: _datasource.isSignedIn);
+    return Authentication(isSignedIn: _datasource.isSignedIn);
   }
 
   /// Apple アカウントでサインインする。利用者がやめたら false を返す。

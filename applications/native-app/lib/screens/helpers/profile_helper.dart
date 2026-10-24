@@ -13,7 +13,7 @@ part '_generated/profile_helper.g.dart';
 class ProfileHelper extends _$ProfileHelper {
   @override
   Future<Profile?> build() async {
-    if (!ref.watch(authenticationProvider).isLoginApp) return null;
+    if (!ref.watch(authenticationProvider).isSignedIn) return null;
     return ref.read(profileRepositoryProvider).fetchMine();
   }
 

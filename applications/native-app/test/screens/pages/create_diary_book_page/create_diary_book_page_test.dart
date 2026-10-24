@@ -43,7 +43,7 @@ Future<void> _pumpHome(
         ),
         authenticationRepositoryProvider.overrideWithValue(
           FakeAuthenticationRepository(
-            initial: const Authentication(isLoginApp: true),
+            initial: const Authentication(isSignedIn: true),
           ),
         ),
         profileRepositoryProvider.overrideWithValue(
