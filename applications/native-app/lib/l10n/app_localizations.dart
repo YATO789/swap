@@ -437,7 +437,7 @@ abstract class AppLocalizations {
   /// No description provided for @emptyDiaryBooksTitle.
   ///
   /// In ja, this message translates to:
-  /// **'最初の日記帳を\nつくろう'**
+  /// **'最初の日記帳をつくろう'**
   String get emptyDiaryBooksTitle;
 
   /// No description provided for @emptyDiaryBooksMessage.

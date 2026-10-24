@@ -23,15 +23,6 @@ import '../../providers/app_update_notifier.dart';
 
 part '_generated/router.g.dart';
 
-/// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
-///
-/// - アップデートしないと使えない: アップデートの画面
-/// - サインインしていない: ウェルカム画面
-/// - プロフィールを読んでいる: スプラッシュ画面
-/// - プロフィールがまだない: オンボーディング画面
-/// - それ以外: ホーム
-///
-/// 状態が変わるたびに redirect をやり直すので、画面側で遷移しなくてよい。
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   // ルーターは作り直さず、状態が変わったことだけを伝える。値に意味はない。
@@ -83,10 +74,6 @@ GoRouter router(Ref ref) {
 }
 
 /// 起動直後の画面を消して、最初の画面を見せてよいか。
-///
-/// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
-/// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
-/// 読めなかったときは、やり直すボタンを見せるために消す。
 @riverpod
 bool firstScreenReady(Ref ref) {
   if (ref.watch(appUpdateProvider).value == AppUpdate.required) {

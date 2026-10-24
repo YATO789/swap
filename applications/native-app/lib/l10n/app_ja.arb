@@ -131,7 +131,7 @@
   },
   "addDiaryBookCreateDescription": "新しい日記帳を作って友達を招待します",
   "addDiaryBookJoinDescription": "友達から届いたコードで日記帳に入ります",
-  "emptyDiaryBooksTitle": "最初の日記帳を\nつくろう",
+  "emptyDiaryBooksTitle": "最初の日記帳をつくろう",
   "emptyDiaryBooksMessage": "1冊のノートを友達とまわして、\n毎日のできごとを交換しよう。",
   "joinSheetCheckFailed": "確認できませんでした。もう一度お試しください",
   "joinSheetCodeNotFound": "招待コードが見つかりません",

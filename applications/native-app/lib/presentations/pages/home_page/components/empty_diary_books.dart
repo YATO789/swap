@@ -7,7 +7,7 @@ import '../../../../theme/app_theme.dart';
 import '../../../components/cover_color_picker.dart';
 import '../../../components/diary_cover.dart';
 
-/// 日記帳に1冊も入っていないときの案内。真ん中に表紙を重ねた絵と見出しを置き、
+/// 日記帳に1冊も入っていないときの案内。真ん中に表紙を1冊置いた絵と見出しを置き、
 /// 下のボタンからその場で作るか参加できるようにする。
 class EmptyDiaryBooks extends StatelessWidget {
   const EmptyDiaryBooks({
@@ -36,17 +36,21 @@ class EmptyDiaryBooks extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Spacer(),
-                Center(
-                  child: _StackedCovers(
-                    width: min(constraints.maxWidth * 0.42, 170),
+                // 見出しとの間を広めに空けたいので、表紙だけ上にずらす。
+                Transform.translate(
+                  offset: const Offset(0, -30),
+                  child: Center(
+                    child: _TiltedCover(
+                      width: min(constraints.maxWidth * 0.46, 180),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 36),
                 Text(
                   l10n.emptyDiaryBooksTitle,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 26,
+                    fontSize: 22,
                     height: 1.4,
                     fontWeight: FontWeight.w800,
                   ),
@@ -63,28 +67,27 @@ class EmptyDiaryBooks extends StatelessWidget {
                 ),
                 const Spacer(),
                 const SizedBox(height: 32),
-                FilledButton.icon(
+                FilledButton(
                   onPressed: onCreate,
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(56),
                     shape: const StadiumBorder(),
                   ),
-                  icon: const Icon(Icons.add),
-                  label: Text(l10n.commonCreateDiaryBook),
+                  child: Text(l10n.commonCreateDiaryBook),
                 ),
                 const SizedBox(height: 6),
+                // 作るほうを主にしたいので、参加は控えめな灰色の文字にする。
                 TextButton(
                   onPressed: onJoin,
                   style: TextButton.styleFrom(
+                    foregroundColor: colors.textSecondary,
                     minimumSize: const Size.fromHeight(48),
-                  ),
-                  child: Text(
-                    l10n.commonJoinWithInviteCode,
-                    style: const TextStyle(
-                      decoration: TextDecoration.underline,
-                      decorationThickness: 1.5,
+                    textStyle: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                  child: Text(l10n.commonJoinWithInviteCode),
                 ),
               ],
             ),
@@ -95,62 +98,33 @@ class EmptyDiaryBooks extends StatelessWidget {
   }
 }
 
-/// ミントの表紙の後ろに、ラベンダーとピーチの表紙を扇のように傾けて重ねる。
-/// 飾りなので読み上げない。
-class _StackedCovers extends StatelessWidget {
-  const _StackedCovers({required this.width});
+/// ミントの表紙を1冊、少しだけ傾けて置く。飾りなので読み上げない。
+class _TiltedCover extends StatelessWidget {
+  const _TiltedCover({required this.width});
 
-  /// 手前の表紙の幅。後ろの表紙や全体の大きさもこれに合わせる。
+  /// 表紙の幅。中のロゴの大きさや位置もこれに合わせる。
   final double width;
-
-  // 表紙に選べる色から、ミントと並べてきれいな2色を選んだ。
-  static const _lavender = Color(0xFFD9C2FF);
-  static const _peach = Color(0xFFFFB4A8);
 
   @override
   Widget build(BuildContext context) {
-    final backWidth = width * 0.9;
-    final shift = width * 0.32;
-
     return ExcludeSemantics(
-      child: SizedBox(
-        width: width * 1.7,
-        height: width * 4 / 3 * 1.12,
+      child: Transform.rotate(
+        angle: -4 * pi / 180,
+        // 無地だと寂しいので、表紙にアプリのロゴを入れておく。
+        // 位置は表紙の名前と同じく、背表紙を除いた上のほうの真ん中。
         child: Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
           children: [
-            Transform.translate(
-              offset: Offset(-shift, width * 0.08),
-              child: Transform.rotate(
-                angle: -12 * pi / 180,
-                child: DiaryCover(color: _lavender, width: backWidth),
-              ),
-            ),
-            Transform.translate(
-              offset: Offset(shift, width * 0.06),
-              child: Transform.rotate(
-                angle: 10 * pi / 180,
-                child: DiaryCover(color: _peach, width: backWidth),
-              ),
-            ),
-            // 無地だと寂しいので、表紙にアプリのロゴを入れておく。
-            // 位置は表紙の名前と同じく、背表紙を除いた上のほうの真ん中。
-            Stack(
-              children: [
-                DiaryCover(color: initialCoverColor, width: width),
-                Positioned(
-                  left: width * 28 / 168,
-                  right: width * 16 / 168,
-                  top: width * 40 / 168,
-                  child: Center(
-                    child: Image.asset(
-                      'assets/icons/swap_title.png',
-                      width: width * 0.4,
-                    ),
-                  ),
+            DiaryCover(color: initialCoverColor, width: width),
+            Positioned(
+              left: width * 28 / 168,
+              right: width * 16 / 168,
+              top: width * 40 / 168,
+              child: Center(
+                child: Image.asset(
+                  'assets/icons/swap_title.png',
+                  width: width * 0.4,
                 ),
-              ],
+              ),
             ),
           ],
         ),

@@ -195,7 +195,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addDiaryBookJoinDescription => '友達から届いたコードで日記帳に入ります';
 
   @override
-  String get emptyDiaryBooksTitle => '最初の日記帳を\nつくろう';
+  String get emptyDiaryBooksTitle => '最初の日記帳をつくろう';
 
   @override
   String get emptyDiaryBooksMessage => '1冊のノートを友達とまわして、\n毎日のできごとを交換しよう。';

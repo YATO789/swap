@@ -45,7 +45,7 @@ final class WelcomePageControllerProvider
 }
 
 String _$welcomePageControllerHash() =>
-    r'1026a3e0b3d2aa07b2427ab916de419087968e96';
+    r'd8c34ceeef0ba174d3e8a275db0eb28919aef68c';
 
 /// ウェルカム画面のサインイン処理を受け持つ。状態はサインインの進み具合。
 

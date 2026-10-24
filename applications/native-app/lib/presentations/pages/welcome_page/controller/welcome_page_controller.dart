@@ -6,11 +6,7 @@ import '../../../providers/authentication_notifier.dart';
 part '_generated/welcome_page_controller.g.dart';
 
 /// サインインを試した結果。
-enum SignInResult {
-  succeeded,
-  canceled,
-  failed,
-}
+enum SignInResult { succeeded, canceled, failed }
 
 /// ウェルカム画面のサインイン処理を受け持つ。状態はサインインの進み具合。
 @riverpod
@@ -20,23 +16,24 @@ class WelcomePageController extends _$WelcomePageController {
     return const AsyncData(null);
   }
 
-  AuthenticationNotifier get _authentication {
-    return ref.read(authenticationProvider.notifier);
-  }
-
   /// Apple アカウントでサインインする。
   Future<SignInResult> signInWithApple() async {
+    final auth = ref.read(authenticationProvider.notifier);
+
     var signedIn = false;
     final result = await _run(() async {
-      signedIn = await _authentication.signInWithApple();
+      signedIn = await auth.signInWithApple();
     });
+
     if (result == SignInResult.failed) return result;
     return signedIn ? SignInResult.succeeded : SignInResult.canceled;
   }
 
-  /// 匿名ユーザーとしてサインインする。開発中の確認用。
+  /// 匿名ユーザーとしてサインインする。
   Future<SignInResult> signInAnonymously() {
-    return _run(_authentication.signInAnonymously);
+    final auth = ref.read(authenticationProvider.notifier);
+
+    return _run(auth.signInAnonymously);
   }
 
   Future<SignInResult> _run(Future<void> Function() signIn) async {

@@ -20,7 +20,7 @@ class OnboardingPage extends HookConsumerWidget {
     final colors = context.appColors;
     final l10n = context.l10n;
     final nameController = useTextEditingController();
-    // 文字を打つたびに「次へ」ボタンとアバターを更新する。
+    // 変更を監視し、変更があったときに Widget を再ビルドする Flutter Hooks の関数
     useListenable(nameController);
     final name = nameController.text.trim();
     final avatarColor = useState(initialAvatarColor);

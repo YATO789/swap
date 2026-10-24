@@ -205,7 +205,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Join a diary book with a code from a friend';
 
   @override
-  String get emptyDiaryBooksTitle => 'Create your\nfirst diary book';
+  String get emptyDiaryBooksTitle => 'Create your first diary book';
 
   @override
   String get emptyDiaryBooksMessage =>

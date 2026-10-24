@@ -22,7 +22,15 @@ class OnboardingPageController extends _$OnboardingPageController {
     required bool requestsNotification,
   }) async {
     state = const AsyncLoading();
-    if (requestsNotification) await _requestNotificationPermission();
+    // 通知の許可ダイアログを出し、許可されたらこの端末を送り先にする。
+    // 断られたり失敗したりしても、そのまま始められるようにする。
+    if (requestsNotification) {
+      try {
+        await ref.read(pushTokenProvider.future);
+      } on Object catch (e, stackTrace) {
+        debugPrint('通知の許可を聞けませんでした: $e\n$stackTrace');
+      }
+    }
     state = await AsyncValue.guard(
       () => ref
           .read(profileProvider.notifier)
@@ -33,15 +41,5 @@ class OnboardingPageController extends _$OnboardingPageController {
       return false;
     }
     return true;
-  }
-
-  /// 通知の許可ダイアログを出し、許可されたらこの端末を送り先にする。
-  /// 断られたり失敗したりしても、そのまま始められるようにする。
-  Future<void> _requestNotificationPermission() async {
-    try {
-      await ref.read(pushTokenProvider.future);
-    } on Object catch (e, stackTrace) {
-      debugPrint('通知の許可を聞けませんでした: $e\n$stackTrace');
-    }
   }
 }

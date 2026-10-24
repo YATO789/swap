@@ -56,7 +56,7 @@
   "homeDiaryBookSemantics": "{name}, {memberCount}",
   "addDiaryBookCreateDescription": "Start a new diary book and invite friends",
   "addDiaryBookJoinDescription": "Join a diary book with a code from a friend",
-  "emptyDiaryBooksTitle": "Create your\nfirst diary book",
+  "emptyDiaryBooksTitle": "Create your first diary book",
   "emptyDiaryBooksMessage": "Pass one notebook around with friends\nand swap what happens each day.",
   "joinSheetCheckFailed": "Couldn't check the code. Please try again.",
   "joinSheetCodeNotFound": "Invite code not found",

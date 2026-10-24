@@ -371,41 +371,13 @@ mixin $ProfileEditRoute on GoRouteData {
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
-///
-/// - アップデートしないと使えない: アップデートの画面
-/// - サインインしていない: ウェルカム画面
-/// - プロフィールを読んでいる: スプラッシュ画面
-/// - プロフィールがまだない: オンボーディング画面
-/// - それ以外: ホーム
-///
-/// 状態が変わるたびに redirect をやり直すので、画面側で遷移しなくてよい。
 
 @ProviderFor(router)
 final routerProvider = RouterProvider._();
 
-/// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
-///
-/// - アップデートしないと使えない: アップデートの画面
-/// - サインインしていない: ウェルカム画面
-/// - プロフィールを読んでいる: スプラッシュ画面
-/// - プロフィールがまだない: オンボーディング画面
-/// - それ以外: ホーム
-///
-/// 状態が変わるたびに redirect をやり直すので、画面側で遷移しなくてよい。
-
 final class RouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  /// アプリの画面遷移。アップデートの要否、サインイン状態とプロフィールの有無で出す画面を決める。
-  ///
-  /// - アップデートしないと使えない: アップデートの画面
-  /// - サインインしていない: ウェルカム画面
-  /// - プロフィールを読んでいる: スプラッシュ画面
-  /// - プロフィールがまだない: オンボーディング画面
-  /// - それ以外: ホーム
-  ///
-  /// 状態が変わるたびに redirect をやり直すので、画面側で遷移しなくてよい。
   RouterProvider._()
     : super(
         from: null,
@@ -442,28 +414,16 @@ final class RouterProvider
 String _$routerHash() => r'4aff468052bf89fa59d94375711e0884b3a3bef7';
 
 /// 起動直後の画面を消して、最初の画面を見せてよいか。
-///
-/// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
-/// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
-/// 読めなかったときは、やり直すボタンを見せるために消す。
 
 @ProviderFor(firstScreenReady)
 final firstScreenReadyProvider = FirstScreenReadyProvider._();
 
 /// 起動直後の画面を消して、最初の画面を見せてよいか。
-///
-/// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
-/// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
-/// 読めなかったときは、やり直すボタンを見せるために消す。
 
 final class FirstScreenReadyProvider
     extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// 起動直後の画面を消して、最初の画面を見せてよいか。
-  ///
-  /// [router] の redirect と同じ順に、行き先の画面が中身を出せるようになったかを見る。
-  /// ホームは日記帳の一覧を読み終えるまで待ち、読んでいる間の表示を起動直後の画面で隠す。
-  /// 読めなかったときは、やり直すボタンを見せるために消す。
   FirstScreenReadyProvider._()
     : super(
         from: null,

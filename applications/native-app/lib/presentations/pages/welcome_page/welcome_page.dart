@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../../theme/app_text_styles.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/legal_pages.dart';
 import 'controller/welcome_page_controller.dart';
@@ -55,11 +56,7 @@ class WelcomePage extends HookConsumerWidget {
       showSnackBar(l10n.welcomeSignInFailed);
     }
 
-    final linkStyle = TextStyle(
-      color: colors.textPrimary,
-      fontWeight: FontWeight.w600,
-      decoration: TextDecoration.underline,
-    );
+    final linkStyle = context.appTextStyles.link;
 
     return Scaffold(
       body: SafeArea(

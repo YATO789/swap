@@ -19,6 +19,7 @@ import '../../components/invite_sheet.dart';
 import 'components/join_diary_book_sheet/join_diary_book_sheet.dart';
 import 'components/post_hint.dart';
 import 'components/update_sheet.dart';
+import 'controller/home_page_controller.dart';
 import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
@@ -33,7 +34,7 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final grid = ref.watch(diaryBookGridProvider);
-
+    
     final colors = context.appColors;
     final l10n = context.l10n;
     final diaryBooksState = ref.watch(diaryBookProvider);
@@ -45,8 +46,8 @@ class HomePage extends HookConsumerWidget {
     ref.listen(pushTokenProvider, (_, _) {});
 
     // アプリを開いたら、通知の未読数を 0 に戻す。ホームはサインインしている間ずっと一番下にある。
-    void resetUnreadCount() =>
-        ref.read(pushTokenProvider.notifier).resetUnreadCount();
+    final controller = ref.read(homePageControllerProvider.notifier);
+    void resetUnreadCount() => controller.resetUnreadCount();
     useEffect(() {
       resetUnreadCount();
       return null;
@@ -70,7 +71,7 @@ class HomePage extends HookConsumerWidget {
           if (!context.mounted) return;
           final updating = await showUpdateSheet(context);
           if (updating || !context.mounted) return;
-          await ref.read(appUpdateProvider.notifier).skip();
+          await controller.skipUpdate();
         });
       }, fireImmediately: true);
       return subscription.close;
@@ -110,17 +111,13 @@ class HomePage extends HookConsumerWidget {
       openDiaryBook(diaryBook);
     }
 
-    // 引っ張って一覧を読み直す。ほかの人が変えた名前や表紙を映す。
+    // 引っ張って一覧を読み直す。
     Future<void> refresh() async {
-      try {
-        await ref.read(diaryBookProvider.notifier).refresh();
-      } catch (error, stackTrace) {
-        debugPrint('日記帳を読み直せませんでした: $error\n$stackTrace');
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(SnackBar(content: Text(l10n.homeRefreshFailed)));
-      }
+      final refreshed = await controller.refresh();
+      if (refreshed || !context.mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(l10n.homeRefreshFailed)));
     }
 
     Future<void> addDiaryBook() async {
@@ -247,7 +244,7 @@ class _DiaryBookList extends StatelessWidget {
   }
 }
 
-/// 日記帳の表紙を横2列に大きく並べる。表紙の下に人数を出す。
+/// 日記帳の表紙を横2列に大きく並べる。
 class _DiaryBookGrid extends StatelessWidget {
   const _DiaryBookGrid({required this.diaryBooks, required this.onTap});
 
@@ -258,13 +255,8 @@ class _DiaryBookGrid extends StatelessWidget {
   static const _crossSpacing = 20.0;
   static const _mainSpacing = 28.0;
 
-  /// 表紙と人数の間。
-  static const _captionGap = 10.0;
-  static const _captionHeight = 20.0;
-
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
     final l10n = context.l10n;
 
     return LayoutBuilder(
@@ -280,7 +272,7 @@ class _DiaryBookGrid extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: _crossSpacing,
             mainAxisSpacing: _mainSpacing,
-            mainAxisExtent: coverWidth * 4 / 3 + _captionGap + _captionHeight,
+            mainAxisExtent: coverWidth * 4 / 3,
           ),
           itemCount: diaryBooks.length,
           itemBuilder: (context, index) {
@@ -294,28 +286,12 @@ class _DiaryBookGrid extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => onTap(diaryBook),
                 behavior: HitTestBehavior.opaque,
-                child: Column(
-                  children: [
-                    DiaryCover(
-                      name: diaryBook.name,
-                      color: diaryBook.coverColor == null
-                          ? null
-                          : Color(diaryBook.coverColor!),
-                      width: coverWidth,
-                    ),
-                    const SizedBox(height: _captionGap),
-                    SizedBox(
-                      height: _captionHeight,
-                      child: Text(
-                        memberCount,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: colors.textSecondary,
-                        ),
-                        textScaler: TextScaler.noScaling,
-                      ),
-                    ),
-                  ],
+                child: DiaryCover(
+                  name: diaryBook.name,
+                  color: diaryBook.coverColor == null
+                      ? null
+                      : Color(diaryBook.coverColor!),
+                  width: coverWidth,
                 ),
               ),
             );
