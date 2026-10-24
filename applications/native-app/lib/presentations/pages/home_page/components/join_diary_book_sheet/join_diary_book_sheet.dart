@@ -268,7 +268,12 @@ class _CodeBoxes extends HookWidget {
                   textInputAction: TextInputAction.done,
                   inputFormatters: [_InviteCodeFormatter()],
                   onSubmitted: (_) => onSubmitted?.call(),
-                  style: const TextStyle(color: Colors.transparent),
+                  // 変換中の文字に引かれる下線は、テーマの decorationColor で描かれる。
+                  // 文字の色だけでは消えないので、下線の色も透明にする。
+                  style: const TextStyle(
+                    color: Colors.transparent,
+                    decorationColor: Colors.transparent,
+                  ),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     counterText: '',
