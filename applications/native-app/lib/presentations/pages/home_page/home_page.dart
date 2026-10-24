@@ -34,7 +34,7 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final grid = ref.watch(diaryBookGridProvider);
-    
+
     final colors = context.appColors;
     final l10n = context.l10n;
     final diaryBooksState = ref.watch(diaryBookProvider);
