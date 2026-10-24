@@ -23,7 +23,7 @@ class OnboardingPage extends HookConsumerWidget {
     // 文字を打つたびに「次へ」ボタンとアバターを更新する。
     useListenable(nameController);
     final name = nameController.text.trim();
-    final avatarColor = useState<int?>(null);
+    final avatarColor = useState(initialAvatarColor);
 
     /// 通知のページを出しているか。名前は最後にまとめて保存するので、ここでは進んだことだけ覚える。
     final showsNotificationStep = useState(false);
