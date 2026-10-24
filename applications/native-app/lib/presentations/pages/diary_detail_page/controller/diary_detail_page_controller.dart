@@ -33,10 +33,12 @@ abstract class DiaryDetailPageState with _$DiaryDetailPageState {
 class DiaryDetailPageController extends _$DiaryDetailPageController {
   @override
   Future<DiaryDetailPageState> build(String diaryBookId, DateTime date) async {
-    final (diaries, members, profile) = await (
+    // 記録はこの日記帳に出されたものだけを出す。ほかの日記帳にだけ出した記録は出さない。
+    final (diaries, members, profile, posts) = await (
       ref.read(diaryRepositoryProvider).fetchOn(diaryBookId, date),
       ref.read(diaryBookRepositoryProvider).fetchMembers(diaryBookId),
       ref.read(profileProvider.future),
+      ref.read(postRepositoryProvider).fetchInDiaryBook(diaryBookId, date),
     ).wait;
     final myId = profile?.id;
     // 伏せてある日記はめくっても読めないので、ページにしない。
@@ -44,9 +46,6 @@ class DiaryDetailPageController extends _$DiaryDetailPageController {
       ...diaries.where((diary) => diary.authorId == myId),
       ...diaries.where((diary) => diary.authorId != myId && !diary.isLocked),
     ];
-    final posts = await ref.read(postRepositoryProvider).fetchByAuthorsOn([
-      for (final diary in readable) diary.authorId,
-    ], date);
     return DiaryDetailPageState(
       diaries: readable,
       members: {for (final member in members) member.userId: member},

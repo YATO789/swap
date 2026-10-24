@@ -41,6 +41,7 @@ Future<FakeDiaryRepository> _openDiaryBook(
   WidgetTester tester, {
   required List<Diary> diaries,
   List<TimelinePost> posts = const [],
+  List<TimelinePost> otherDiaryBookPosts = const [],
 }) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
@@ -75,6 +76,7 @@ Future<FakeDiaryRepository> _openDiaryBook(
           FakePostRepository(
             timelinePosts: {
               _university.id: [...posts],
+              'family': [...otherDiaryBookPosts],
             },
           ),
         ),
@@ -132,6 +134,35 @@ void main() {
     expect(find.text('発表の準備中'), findsOneWidget);
     // 1ページだけならページ番号は出さない。
     expect(find.text('1 / 1'), findsNothing);
+  });
+
+  testWidgets('ほかの日記帳にだけ出した記録は出さない', (tester) async {
+    await _openDiaryBook(
+      tester,
+      diaries: [diary('me', '自分の日記'), diary('mio', '美緒の日記')],
+      posts: [
+        TimelinePost(
+          id: 'p1',
+          authorId: 'mio',
+          message: '大学に出した記録',
+          postedAt: diaryDayStartOf(today).add(const Duration(hours: 5)),
+        ),
+      ],
+      otherDiaryBookPosts: [
+        TimelinePost(
+          id: 'p2',
+          authorId: 'mio',
+          message: '家族にだけ出した記録',
+          postedAt: diaryDayStartOf(today).add(const Duration(hours: 6)),
+        ),
+      ],
+    );
+
+    await tester.tap(find.text('美緒の日記'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('大学に出した記録'), findsOneWidget);
+    expect(find.text('家族にだけ出した記録'), findsNothing);
   });
 
   testWidgets('読める日記を横にめくって読める。伏せてある日記はページにしない', (tester) async {
