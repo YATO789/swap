@@ -25,6 +25,6 @@ abstract class InvitedDiaryBook with _$InvitedDiaryBook {
 
   const InvitedDiaryBook._();
 
-  /// 人数が上限に達していて、新しく参加できないか。もう参加していれば開けるので false。
-  bool get isFull => !alreadyJoined && memberNames.length >= memberLimit;
+  /// 人数が上限に達しているか。
+  bool get isFull => memberNames.length >= memberLimit;
 }
