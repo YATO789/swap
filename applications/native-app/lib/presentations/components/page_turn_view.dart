@@ -3,43 +3,48 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-/// 左右のスワイプで、本のページをめくるように日付を移す。
+/// 左右のスワイプで、本のページをめくるように移る。ページは [T]（日付や番号）で表す。
 ///
-/// 左にスワイプすると、今のページの右側が紙のように丸まりながら左へめくれ、次の日が下から出てくる。
-/// 右にスワイプすると、めくれていた前の日のページが戻ってきて今のページに重なる。
+/// 左にスワイプすると、今のページの右側が紙のように丸まりながら左へめくれ、次のページが下から出てくる。
+/// 右にスワイプすると、めくれていた前のページが戻ってきて今のページに重なる。
 /// 指に合わせてめくれ、離したときの速さか、半分を越えたかで、めくるか戻すかを決める。
-/// [latest] より先にはめくれず、少しだけめくれて戻る。
-/// [date] が外から変わったとき（カレンダーで選んだときなど）は、その向きに1枚めくる。
-class PageTurnView extends StatefulWidget {
+/// 次のページがないときは少しだけめくれて戻り、前のページがないときは右にはめくれない。
+/// [page] が外から変わったとき（カレンダーで選んだときやボタンを押したときなど）は、その向きに1枚めくる。
+class PageTurnView<T extends Comparable<Object>> extends StatefulWidget {
   const PageTurnView({
     super.key,
-    required this.date,
-    required this.latest,
+    required this.page,
+    required this.previousOf,
+    required this.nextOf,
     required this.onChanged,
     required this.builder,
   });
 
-  /// 見ている日。
-  final DateTime date;
+  /// 見ているページ。大きいほど後ろのページ。
+  final T page;
 
-  /// これより先の日にはめくれない。
-  final DateTime latest;
+  /// そのページの前のページ。なければ null。
+  final T? Function(T page) previousOf;
 
-  /// めくり終えて、見る日が変わったとき。
-  final ValueChanged<DateTime> onChanged;
+  /// そのページの次のページ。なければ null。
+  final T? Function(T page) nextOf;
 
-  /// その日のページ。
-  final Widget Function(DateTime date) builder;
+  /// めくり終えて、見るページが変わったとき。
+  final ValueChanged<T> onChanged;
+
+  /// そのページの中身。
+  final Widget Function(T page) builder;
 
   @override
-  State<PageTurnView> createState() => _PageTurnViewState();
+  State<PageTurnView<T>> createState() => _PageTurnViewState<T>();
 }
 
-/// めくっている間の2枚。上で丸まる古い日と、その下の新しい日。
-/// 先の日がなくて少しだけめくるときは、下は無地の紙（[newer] が null）。
-typedef _Turning = ({DateTime older, DateTime? newer});
+/// めくっている間の2枚。上で丸まる前のページと、その下の後ろのページ。
+/// 次のページがなくて少しだけめくるときは、下は無地の紙（[newer] が null）。
+typedef _Turning<T> = ({T older, T? newer});
 
-class _PageTurnViewState extends State<PageTurnView>
+class _PageTurnViewState<T extends Comparable<Object>>
+    extends State<PageTurnView<T>>
     with SingleTickerProviderStateMixin {
   // 上に重ねたページがどれだけめくれたか。0 で重なったまま、1 でめくれきる。
   late final _turn = AnimationController(vsync: this, duration: _turnDuration);
@@ -50,9 +55,9 @@ class _PageTurnViewState extends State<PageTurnView>
 
   ui.FragmentProgram? _program;
 
-  /// 止まっているときに出す日。めくり終えたときに変わる。
-  late DateTime _shown = widget.date;
-  _Turning? _turning;
+  /// 止まっているときに出すページ。めくり終えたときに変わる。
+  late T _shown = widget.page;
+  _Turning<T>? _turning;
 
   @override
   void initState() {
@@ -65,9 +70,9 @@ class _PageTurnViewState extends State<PageTurnView>
   }
 
   @override
-  void didUpdateWidget(PageTurnView oldWidget) {
+  void didUpdateWidget(PageTurnView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.date != _shown && _turning == null) _turnToDate();
+    if (widget.page != _shown && _turning == null) _turnToPage();
   }
 
   @override
@@ -79,15 +84,15 @@ class _PageTurnViewState extends State<PageTurnView>
     super.dispose();
   }
 
-  /// 外から変わった [PageTurnView.date] へ、その向きに1枚めくる。
-  void _turnToDate() {
+  /// 外から変わった [PageTurnView.page] へ、その向きに1枚めくる。
+  void _turnToPage() {
     final from = _shown;
-    final to = widget.date;
+    final to = widget.page;
     if (_program == null) {
       setState(() => _shown = to);
       return;
     }
-    final forward = to.isAfter(from);
+    final forward = to.compareTo(from) > 0;
     final pages = forward ? (older: from, newer: to) : (older: to, newer: from);
     _turn.value = forward ? 0 : 1;
     setState(() => _turning = pages);
@@ -100,11 +105,11 @@ class _PageTurnViewState extends State<PageTurnView>
     var pages = _turning;
     if (pages == null) {
       if (dx < 0) {
-        final next = DateTime(_shown.year, _shown.month, _shown.day + 1);
-        pages = (older: _shown, newer: next.isAfter(widget.latest) ? null : next);
+        pages = (older: _shown, newer: widget.nextOf(_shown));
         _turn.value = 0;
       } else if (dx > 0) {
-        final previous = DateTime(_shown.year, _shown.month, _shown.day - 1);
+        final previous = widget.previousOf(_shown);
+        if (previous == null) return;
         pages = (older: previous, newer: _shown);
         _turn.value = 1;
       } else {
@@ -113,7 +118,7 @@ class _PageTurnViewState extends State<PageTurnView>
       setState(() => _turning = pages);
     }
     if (pages.newer == null) {
-      // 先の日がないので、重く少しだけめくれる。
+      // 次のページがないので、重く少しだけめくれる。
       _turn.value = (_turn.value - dx / width * _endResistance).clamp(
         0,
         _endLimit,
@@ -132,10 +137,10 @@ class _PageTurnViewState extends State<PageTurnView>
     _settle(pages, turnAway: turnAway);
   }
 
-  /// めくり終える。指でめくったときは見る日が変わったことを伝え、
+  /// めくり終える。指でめくったときは見るページが変わったことを伝え、
   /// 外から変わったときは、めくっている間にまた変わっていれば続けてめくる。
   Future<void> _settle(
-    _Turning pages, {
+    _Turning<T> pages, {
     required bool turnAway,
     bool byDrag = true,
   }) async {
@@ -147,24 +152,24 @@ class _PageTurnViewState extends State<PageTurnView>
       _shown = shown;
     });
     if (!byDrag) {
-      if (widget.date != shown) _turnToDate();
-    } else if (shown != widget.date) {
+      if (widget.page != shown) _turnToPage();
+    } else if (shown != widget.page) {
       widget.onChanged(shown);
     }
   }
 
-  // めくっていないときも同じ形で並べ、日ごとの key で中身（スクロール位置など）を保つ。
-  Widget _page(DateTime? day, {bool curling = false}) {
+  // めくっていないときも同じ形で並べ、ページごとの key で中身（スクロール位置など）を保つ。
+  Widget _page(T? page, {bool curling = false}) {
     final background = Theme.of(context).scaffoldBackgroundColor;
     return KeyedSubtree(
-      key: ValueKey(day),
+      key: ValueKey(page),
       child: SnapshotWidget(
         controller: curling ? _curling : _flat,
         mode: SnapshotMode.permissive,
         painter: _painter,
         child: ColoredBox(
           color: background,
-          child: day == null ? const SizedBox.expand() : widget.builder(day),
+          child: page == null ? const SizedBox.expand() : widget.builder(page),
         ),
       ),
     );

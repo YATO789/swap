@@ -12,11 +12,11 @@ import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
 import '../../components/diary_book_icon.dart';
+import '../../components/page_turn_view.dart';
 import '../../components/post_button.dart';
 import '../../components/post_sheet/post_sheet.dart';
 import '../router/router.dart';
 import 'components/dated_title.dart';
-import 'components/page_turn_view.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
 import 'controller/diary_book_page_controller.dart';
@@ -177,9 +177,13 @@ class DiaryBookPage extends HookConsumerWidget {
       ),
       // 右にスワイプすると前の日、左にスワイプすると次の日へページをめくる。今日より先には進まない。
       // めくっている間だけ隣の日も出す。触れるのは見ている日だけなので、操作は見ている日に向ける。
-      body: PageTurnView(
-        date: date,
-        latest: today,
+      body: PageTurnView<DateTime>(
+        page: date,
+        previousOf: (day) => DateTime(day.year, day.month, day.day - 1),
+        nextOf: (day) {
+          final next = DateTime(day.year, day.month, day.day + 1);
+          return next.isAfter(today) ? null : next;
+        },
         onChanged: turnTo,
         builder: (day) => _DayTimeline(
           diaryBookId: diaryBookId,

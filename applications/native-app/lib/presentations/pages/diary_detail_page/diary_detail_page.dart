@@ -10,6 +10,7 @@ import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
+import '../../components/page_turn_view.dart';
 import '../../components/post_line.dart';
 import '../../components/ruled_lines.dart';
 import '../../components/user_avatar.dart';
@@ -70,7 +71,7 @@ class DiaryDetailPage extends HookConsumerWidget {
   }
 }
 
-/// 読める日記を1ページずつ並べる。見出しと下のページ番号は固定して、日記の部分だけを横にスライドする。
+/// 読める日記を1ページずつ並べる。見出しと下のページ番号は固定して、日記の部分だけを本のようにめくる。
 class _DiaryPages extends HookConsumerWidget {
   const _DiaryPages({
     required this.title,
@@ -97,7 +98,6 @@ class _DiaryPages extends HookConsumerWidget {
     final initialIndex = diaries
         .indexWhere((diary) => diary.authorId == initialAuthorId)
         .clamp(0, pageCount - 1);
-    final pageController = usePageController(initialPage: initialIndex);
 
     /// 今開いているページ。読み直して日記が減っても、はみ出さないようにする。
     final index = useState(initialIndex);
@@ -107,13 +107,8 @@ class _DiaryPages extends HookConsumerWidget {
     final myId = ref.watch(profileProvider).value?.id;
     final error = Theme.of(context).colorScheme.error;
 
-    void turnTo(int page) {
-      pageController.animateToPage(
-        page,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-      );
-    }
+    // ボタンで変えたときも、PageTurnView がその向きに1枚めくる。
+    void turnTo(int page) => index.value = page;
 
     Future<void> edit() async {
       await DiaryEditorRoute(
@@ -193,12 +188,15 @@ class _DiaryPages extends HookConsumerWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: PageView.builder(
-        controller: pageController,
-        itemCount: pageCount,
-        onPageChanged: (page) => index.value = page,
-        itemBuilder: (context, page) {
-          final diary = diaries[page];
+      // 左にスワイプすると次の人、右にスワイプすると前の人の日記へページをめくる。
+      body: PageTurnView<int>(
+        page: current,
+        previousOf: (page) => page > 0 ? page - 1 : null,
+        nextOf: (page) => page < pageCount - 1 ? page + 1 : null,
+        onChanged: turnTo,
+        builder: (page) {
+          // めくっている間に読み直して日記が減っても、はみ出さないようにする。
+          final diary = diaries[page.clamp(0, pageCount - 1)];
           return _DiaryBody(
             diary: diary,
             // 日記帳を抜けた人の名前は読めない。
