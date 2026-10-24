@@ -60,11 +60,10 @@ async function unclaim(postId: string) {
 async function notify(postId: string) {
   const { data: post, error: postError } = await supabase
     .from("posts")
-    .select("message, author_id, profiles(display_name)")
+    .select("author_id, profiles(display_name)")
     .eq("id", postId)
     // DB の型を生成していないと、多対一の profiles も配列として型が付くので、実際の形を書く。
     .single<{
-      message: string;
       author_id: string;
       profiles: { display_name: string };
     }>();
@@ -87,7 +86,7 @@ async function notify(postId: string) {
         token,
         notification: {
           title: post.profiles.display_name,
-          body: post.message,
+          body: "新しい記録を書いたよ",
         },
         // 通知を開いたときに、その記録が出ている日記帳へ移れるようにする。
         data: { post_id: postId, diary_book_id: recipients.get(userId)! },
