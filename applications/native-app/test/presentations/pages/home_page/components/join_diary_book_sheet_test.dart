@@ -165,9 +165,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('招待コードが見つかりません'), findsOneWidget);
+    // 入れ直しやすいように、入れたコードは空になる。
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
 
-    // コードを書き換えると、メッセージは消える。
-    await tester.enterText(find.byType(TextField), 'UNI482');
+    // 打ち始めると、メッセージは消える。
+    await tester.enterText(find.byType(TextField), 'U');
     await tester.pump();
     expect(find.text('招待コードが見つかりません'), findsNothing);
   });

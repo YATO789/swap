@@ -63,10 +63,13 @@ class _JoinDiaryBookSheet extends HookConsumerWidget {
         failure.value = (code: code, message: l10n.joinSheetCheckFailed);
         return;
       }
-      checked.value = (code: code, found: diaryBook);
       if (diaryBook == null) {
-        failure.value = (code: code, message: l10n.joinSheetCodeNotFound);
+        // 入れ直しやすいように空にする。メッセージは次に打ち始めるまで出す。
+        failure.value = (code: '', message: l10n.joinSheetCodeNotFound);
+        codeController.clear();
+        return;
       }
+      checked.value = (code: code, found: diaryBook);
     }
 
     // もう参加していれば何もせずに、その日記帳を返す。
