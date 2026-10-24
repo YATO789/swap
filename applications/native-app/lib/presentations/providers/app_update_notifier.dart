@@ -20,7 +20,8 @@ class AppUpdateNotifier extends _$AppUpdateNotifier {
 
   /// 促すだけの案内で「あとで」を押した。次に新しい案内を出すまで出さない。
   Future<void> skip() async {
-    state = const AsyncData(AppUpdate.none);
     await ref.read(appUpdateRepositoryProvider).skip();
+    if (!ref.mounted) return;
+    state = const AsyncData(AppUpdate.none);
   }
 }

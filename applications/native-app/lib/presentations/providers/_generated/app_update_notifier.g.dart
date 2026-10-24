@@ -42,7 +42,7 @@ final class AppUpdateNotifierProvider
   AppUpdateNotifier create() => AppUpdateNotifier();
 }
 
-String _$appUpdateNotifierHash() => r'c579f65340a2edba5d7b3fa81dc7b5f156a55819';
+String _$appUpdateNotifierHash() => r'7263c93bd3a3d865b88b55ccc491d7ec5cfb87a2';
 
 /// アップデートを促すか。ルーターとホームが見る。
 ///
