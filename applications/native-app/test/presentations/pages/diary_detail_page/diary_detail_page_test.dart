@@ -136,6 +136,39 @@ void main() {
     expect(find.text('1 / 1'), findsNothing);
   });
 
+  testWidgets(
+    'iOS では画面の左端から右にスワイプすると、日記帳のページに戻る',
+    variant: TargetPlatformVariant.only(TargetPlatform.iOS),
+    (tester) async {
+      await _openDiaryBook(
+        tester,
+        diaries: [diary('me', '自分の日記'), diary('mio', '美緒の日記')],
+      );
+      await tester.tap(find.text('自分の日記'));
+      await tester.pumpAndSettle();
+      expect(find.byType(DiaryDetailPage), findsOneWidget);
+
+      // 画面の中ほどからのスワイプでは戻らない。
+      await tester.timedDragFrom(
+        const Offset(200, 400),
+        const Offset(150, 0),
+        const Duration(milliseconds: 300),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(DiaryDetailPage), findsOneWidget);
+
+      await tester.timedDragFrom(
+        const Offset(5, 400),
+        const Offset(300, 0),
+        const Duration(milliseconds: 300),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DiaryDetailPage), findsNothing);
+      expect(find.byType(DiaryBookPage), findsOneWidget);
+    },
+  );
+
   testWidgets('ほかの日記帳にだけ出した記録は出さない', (tester) async {
     await _openDiaryBook(
       tester,

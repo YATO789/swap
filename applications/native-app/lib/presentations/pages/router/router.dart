@@ -163,9 +163,11 @@ class DiaryBookRoute extends GoRouteData with $DiaryBookRoute {
   final String id;
 
   // 画面の中ほどの左右スワイプは日付の移動に使うので、戻るのは画面の端からだけにする。
+  // 端から戻れるよう、iOS の標準の画面遷移で開く（_materialPage を参照）。
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      DiaryBookPage(diaryBookId: id);
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _materialPage(state, DiaryBookPage(diaryBookId: id));
+  }
 }
 
 /// [id] の日記帳の情報ページ。
@@ -198,9 +200,14 @@ class DiaryDetailRoute extends GoRouteData with $DiaryDetailRoute {
   final DateTime date;
   final String? author;
 
+  // 画面の中ほどの左右スワイプはほかの人の日記へめくるのに使うので、戻るのは画面の端からだけにする。
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      DiaryDetailPage(diaryBookId: id, date: date, initialAuthorId: author);
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _materialPage(
+      state,
+      DiaryDetailPage(diaryBookId: id, date: date, initialAuthorId: author),
+    );
+  }
 }
 
 /// 自分の [date] の日記を書くページ。[diaryBook] が null なら参加している日記帳すべてに書く。
@@ -240,6 +247,16 @@ class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
   const ProfileEditRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const ProfileEditPage();
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _materialPage(state, const ProfileEditPage());
+  }
+}
+
+/// iOS では標準の画面遷移で開き、画面の左端から右にスワイプして戻れるページ。
+///
+/// go_router は `build` だけのページを、アプリが material_ui の MaterialApp のときだけ MaterialPage で開く。
+/// このアプリは Flutter の MaterialApp を使っているので、`build` だけだと遷移のアニメーションも戻るスワイプもないページになる。
+/// push で開くページは、これで MaterialPage を明示する。
+Page<void> _materialPage(GoRouterState state, Widget child) {
+  return MaterialPage(key: state.pageKey, child: child);
 }
