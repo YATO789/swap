@@ -11,9 +11,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'firebase_options_dev.dart' as dev;
 import 'firebase_options_prod.dart' as prod;
 import 'infrastructures/datasources/stores/preferences_store.dart';
-import 'screens/helpers/theme_mode_helper.dart';
+import 'presentations/providers/theme_mode_notifier.dart';
 import 'l10n/l10n.dart';
-import 'screens/pages/router/router.dart';
+import 'presentations/pages/router/router.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
