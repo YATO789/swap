@@ -112,7 +112,6 @@ void main() {
     expect(copied, contains('招待コード: New2345'));
     expect(find.text('「大学」を作りました'), findsNothing);
     expect(find.text('大学'), findsOneWidget);
-    expect(find.text('1人'), findsOneWidget);
   });
 
   testWidgets('日記帳があれば、AppBar の本のアイコンからも作れる', (tester) async {

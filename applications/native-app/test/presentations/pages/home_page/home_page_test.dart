@@ -106,7 +106,6 @@ void main() {
 
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('会社'), findsOneWidget);
-    expect(find.text('5人'), findsOneWidget);
     expect(find.text('今なにしてる？'), findsOneWidget);
     expect(find.byTooltip('日記帳を追加'), findsOneWidget);
   });
@@ -123,9 +122,9 @@ void main() {
   testWidgets('設定に合わせてリストかグリッドで出す', (tester) async {
     await _pumpHome(tester, _diaryBooks);
 
-    // 選んだことがなければグリッド。
+    // 選んだことがなければグリッド。グリッドには人数を出さない。
     expect(find.byIcon(Icons.chevron_right), findsNothing);
-    expect(find.text('5人'), findsOneWidget);
+    expect(find.text('5人'), findsNothing);
 
     // 設定画面で切り替えたときと同じく、保存した値を変える。
     await ProviderScope.containerOf(tester.element(find.byType(HomePage)))
@@ -134,6 +133,7 @@ void main() {
     await tester.pump();
 
     expect(find.byIcon(Icons.chevron_right), findsWidgets);
+    expect(find.text('5人'), findsOneWidget);
   });
 
   testWidgets('新しいバージョンがあれば知らせ、あとでにすると覚えておく', (tester) async {
@@ -177,7 +177,6 @@ void main() {
 
     expect(find.text('大学'), findsNothing);
     expect(find.text('ゼミ'), findsOneWidget);
-    expect(find.text('6人'), findsOneWidget);
   });
 
   testWidgets('読み直せなければ、一覧はそのままで知らせる', (tester) async {

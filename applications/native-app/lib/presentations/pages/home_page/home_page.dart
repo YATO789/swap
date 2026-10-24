@@ -45,8 +45,11 @@ class HomePage extends HookConsumerWidget {
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
     ref.listen(pushTokenProvider, (_, _) {});
 
-    // アプリを開いたら、通知の未読数を 0 に戻す。ホームはサインインしている間ずっと一番下にある。
+    // コントローラーは見ていないと捨てられ、読み直しの途中で状態を書けなくなるので見ておく。
+    ref.watch(homePageControllerProvider);
     final controller = ref.read(homePageControllerProvider.notifier);
+
+    // アプリを開いたら、通知の未読数を 0 に戻す。ホームはサインインしている間ずっと一番下にある。
     void resetUnreadCount() => controller.resetUnreadCount();
     useEffect(() {
       resetUnreadCount();
