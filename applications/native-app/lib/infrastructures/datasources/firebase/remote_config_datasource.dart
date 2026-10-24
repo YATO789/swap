@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:swap/infrastructures/datasources/firebase/models/update_info_response.dart';
 
 part '_generated/remote_config_datasource.g.dart';
 
@@ -35,9 +36,12 @@ class RemoteConfigDatasource {
   }
 
   /// アップデートの案内。Remote Config に置いていなければ null。
-  Map<String, dynamic>? readUpdateInfo() {
+  /// JSON の書き方がおかしければ例外を投げる。
+  UpdateInfoResponse? readUpdateInfo() {
     final value = _remoteConfig.getString(_updateInfoKey);
     if (value.isEmpty) return null;
-    return jsonDecode(value) as Map<String, dynamic>;
+    return UpdateInfoResponse.fromJson(
+      jsonDecode(value) as Map<String, dynamic>,
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/app_update/app_update.dart';
+import 'package:swap/infrastructures/datasources/firebase/models/update_info_response.dart';
 import 'package:swap/infrastructures/datasources/firebase/remote_config_datasource.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 
@@ -31,14 +32,15 @@ class AppUpdateRepository {
       debugPrint('Remote Config を取れませんでした: $error\n$stackTrace');
     }
 
-    final UpdateInfo? info;
+    final UpdateInfoResponse? response;
     try {
-      final json = _remoteConfig.readUpdateInfo();
-      info = json == null ? null : UpdateInfo.tryParse(json);
-    } on FormatException catch (error) {
-      debugPrint('update_info が JSON になっていません: $error');
+      response = _remoteConfig.readUpdateInfo();
+    } catch (error) {
+      debugPrint('update_info を読めません: $error');
       return AppUpdate.none;
     }
+    if (response == null) return AppUpdate.none;
+    final info = _toUpdateInfo(response);
     if (info == null) return AppUpdate.none;
 
     final packageInfo = await PackageInfo.fromPlatform();
@@ -55,5 +57,17 @@ class AppUpdateRepository {
   /// 促すだけの案内で「あとで」を押したことを覚えておく。次に新しい案内を出すまで出さない。
   Future<void> skip() {
     return _store.saveUpdateSkippedAt(DateTime.now());
+  }
+
+  /// バージョンの書き方がおかしければ null。
+  UpdateInfo? _toUpdateInfo(UpdateInfoResponse response) {
+    final latest = AppVersion.tryParse(response.latestVersion);
+    final required = AppVersion.tryParse(response.requiredVersion);
+    if (latest == null || required == null) return null;
+    return UpdateInfo(
+      latestVersion: latest,
+      requiredVersion: required,
+      enabledAt: response.enabledAt,
+    );
   }
 }

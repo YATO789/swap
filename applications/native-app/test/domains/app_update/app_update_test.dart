@@ -30,31 +30,6 @@ void main() {
     test('数字でなければ読めない', () {
       expect(AppVersion.tryParse('1.x.0'), isNull);
       expect(AppVersion.tryParse(''), isNull);
-      expect(AppVersion.tryParse(120), isNull);
-    });
-  });
-
-  group('UpdateInfo.tryParse', () {
-    test('Remote Config の JSON を読む', () {
-      final info = UpdateInfo.tryParse({
-        'latestVersion': '1.2.0',
-        'requiredVersion': '1.1.0',
-        'enabledAt': '2026-10-20T10:00:00+09:00',
-      })!;
-
-      expect(info.latestVersion.toString(), '1.2.0');
-      expect(info.requiredVersion.toString(), '1.1.0');
-      expect(info.enabledAt, DateTime.utc(2026, 10, 20, 1));
-    });
-
-    test('足りない項目があれば読めない', () {
-      expect(
-        UpdateInfo.tryParse({
-          'latestVersion': '1.2.0',
-          'enabledAt': '2026-10-20T10:00:00+09:00',
-        }),
-        isNull,
-      );
     });
   });
 

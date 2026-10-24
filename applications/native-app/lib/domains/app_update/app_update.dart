@@ -2,14 +2,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part '_generated/app_update.freezed.dart';
 
-/// アップデートを促すか。
 enum AppUpdate {
-  /// 促さない。
   none,
-
-  /// 促すが、あとでにしてアプリを使い続けられる。
+  /// アプリを使い続けられる。
   optional,
-
   /// アップデートするまでアプリを使えない。
   required,
 }
@@ -28,19 +24,6 @@ abstract class UpdateInfo with _$UpdateInfo {
     /// この日時から案内を出す。ストアの審査が通るのを待ってから出すために使う。
     required DateTime enabledAt,
   }) = _UpdateInfo;
-
-  /// 書き方がおかしい項目があれば null。
-  static UpdateInfo? tryParse(Map<String, dynamic> json) {
-    final latest = AppVersion.tryParse(json['latestVersion']);
-    final required = AppVersion.tryParse(json['requiredVersion']);
-    final enabledAt = DateTime.tryParse(json['enabledAt'] as String? ?? '');
-    if (latest == null || required == null || enabledAt == null) return null;
-    return UpdateInfo(
-      latestVersion: latest,
-      requiredVersion: required,
-      enabledAt: enabledAt,
-    );
-  }
 
   /// [current] のアプリにアップデートを促すか。
   ///
@@ -69,8 +52,7 @@ abstract class AppVersion with _$AppVersion implements Comparable<AppVersion> {
   const factory AppVersion(List<int> parts) = _AppVersion;
 
   /// 数字をドットでつないだ形でなければ null。`+` より後のビルド番号は見ない。
-  static AppVersion? tryParse(Object? value) {
-    if (value is! String) return null;
+  static AppVersion? tryParse(String value) {
     final parts = value.split('+').first.split('.').map(int.tryParse).toList();
     if (parts.isEmpty || parts.contains(null)) return null;
     return AppVersion(parts.cast<int>());
