@@ -140,6 +140,8 @@ class HomePage extends HookConsumerWidget {
     }
 
     return Scaffold(
+      // 一覧を書き込みバーの下までのばし、バーは一覧の上に浮かせる。
+      extendBody: true,
       appBar: AppBar(
         // アプリアイコンから地色と星を抜いた、ロゴの文字だけを置く。
         leading: Padding(
@@ -232,7 +234,11 @@ class _DiaryBookList extends StatelessWidget {
     return ListView(
       // 日記帳が少なくて画面に収まっても、引っ張って読み直せるようにする。
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(top: 8, bottom: 24),
+      // 下の書き込みバーに隠れないよう、バーの高さぶん下をあける。
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: 24 + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
         for (final diaryBook in diaryBooks)
           _ListTile(
@@ -273,7 +279,13 @@ class _DiaryBookGrid extends StatelessWidget {
         return GridView.builder(
           // 日記帳が少なくて画面に収まっても、引っ張って読み直せるようにする。
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(_padding, 16, _padding, 40),
+          // 下の書き込みバーに隠れないよう、バーの高さぶん下をあける。
+          padding: EdgeInsets.fromLTRB(
+            _padding,
+            16,
+            _padding,
+            40 + MediaQuery.paddingOf(context).bottom,
+          ),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: _crossSpacing,

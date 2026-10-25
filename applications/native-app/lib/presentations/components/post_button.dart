@@ -5,11 +5,12 @@ import '../../domains/diary_book/diary_book.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/app_theme.dart';
 import '../pages/router/router.dart';
+import 'floating_surface.dart';
 import 'post_sheet/post_sheet.dart';
 
-/// 画面の下に置く書き込みバー。左は「今なにしてる？」の入力欄風の欄で、
+/// 画面の下に浮かせる書き込みバー。左は「今なにしてる？」の入力欄風の欄で、
 /// 押すと投稿シートを開く。右のペンは日記を書くページを開く。
-/// 浮かぶボタンだと一覧に重なるので、画面の一部として置く。
+/// 背景は持たないので、Scaffold の extendBody と合わせて一覧の上に重ね、一覧はこの下をくぐらせる。
 /// [diaryBook] を渡すと、記録も日記もその日記帳に入れる前提で開く。
 /// 渡さなければ、日記は参加している日記帳すべてに書く（書くページで選び直せる）。
 class PostButton extends StatelessWidget {
@@ -63,16 +64,12 @@ class PostButton extends StatelessWidget {
                 button: true,
                 label: l10n.commonPost,
                 excludeSemantics: true,
-                // 角丸の四角に薄いグレーを敷いただけの、枠もアイコンもない入力欄の見た目。
-                child: Material(
-                  color: colors.placeholder,
-                  borderRadius: BorderRadius.circular(14),
-                  clipBehavior: Clip.antiAlias,
+                child: FloatingSurface(
                   child: InkWell(
                     onTap: () => _openPostSheet(context),
                     child: Container(
-                      height: 48,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      height: floatingButtonSize,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         l10n.commonWhatAreYouDoing,
@@ -87,19 +84,11 @@ class PostButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            IconButton.filled(
+            FloatingIconButton(
               onPressed: () => _openDiaryEditor(context, date),
               tooltip: date == today
                   ? l10n.postButtonWriteToday
                   : l10n.postButtonWriteYesterday,
-              style: IconButton.styleFrom(
-                fixedSize: const Size(48, 48),
-                backgroundColor: colors.textPrimary,
-                foregroundColor: Theme.of(context).colorScheme.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
               icon: const Icon(Icons.edit_outlined),
             ),
           ],

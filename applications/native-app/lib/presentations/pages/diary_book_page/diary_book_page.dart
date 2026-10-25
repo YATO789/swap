@@ -17,12 +17,13 @@ import '../../components/post_button.dart';
 import '../../components/post_sheet/post_sheet.dart';
 import '../router/router.dart';
 import 'components/dated_title.dart';
+import 'components/floating_top_bar.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
 import 'controller/diary_book_page_controller.dart';
 
 /// 日記帳のページ。その日記帳に書かれた日記と、メンバーの記録をタイムラインで表示する。
-/// AppBar のカレンダーから、ほかの日を見られる。
+/// 上に浮かせたカレンダーのボタンから、ほかの日を見られる。
 class DiaryBookPage extends HookConsumerWidget {
   const DiaryBookPage({super.key, required this.diaryBookId});
 
@@ -158,23 +159,11 @@ class DiaryBookPage extends HookConsumerWidget {
     // 名前や表紙を変えても、日記帳の一覧から読んでいるのでそのまま映る。
     void openInfo() => DiaryBookInfoRoute(id: diaryBookId).push<void>(context);
 
+    // ページは画面いっぱいにのばしてめくり、上下のボタンはページの上に浮かせる。
     return Scaffold(
-      appBar: AppBar(
-        title: DatedTitle(title: diaryBook.name, date: date),
-        actions: [
-          IconButton(
-            onPressed: pickDate,
-            tooltip: context.l10n.diaryBookPickDate,
-            icon: const Icon(Icons.calendar_month_outlined),
-          ),
-          IconButton(
-            onPressed: openInfo,
-            tooltip: context.l10n.commonDiaryBookInfo,
-            icon: const Icon(Icons.info_outline),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      appBar: FloatingTopBar(onPickDate: pickDate, onOpenInfo: openInfo),
       // 右にスワイプすると前の日、左にスワイプすると次の日へページをめくる。今日より先には進まない。
       // めくっている間だけ隣の日も出す。触れるのは見ている日だけなので、操作は見ている日に向ける。
       body: PageTurnView<DateTime>(
@@ -187,6 +176,7 @@ class DiaryBookPage extends HookConsumerWidget {
         onChanged: turnTo,
         builder: (day) => _DayTimeline(
           diaryBookId: diaryBookId,
+          diaryBookName: diaryBook.name,
           date: day,
           myId: myId,
           onRefresh: refresh,
@@ -209,9 +199,11 @@ class DiaryBookPage extends HookConsumerWidget {
 }
 
 /// [date] の1日ぶんのページ。その日の日記と記録を読んで出す。
+/// いちばん上には、どの日のページかを書いた見出しを、読み込み中や読めなかったときも出す。
 class _DayTimeline extends ConsumerWidget {
   const _DayTimeline({
     required this.diaryBookId,
+    required this.diaryBookName,
     required this.date,
     required this.myId,
     required this.onRefresh,
@@ -222,6 +214,7 @@ class _DayTimeline extends ConsumerWidget {
   });
 
   final String diaryBookId;
+  final String diaryBookName;
   final DateTime date;
   final String? myId;
   final Future<void> Function() onRefresh;
@@ -234,9 +227,11 @@ class _DayTimeline extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final provider = diaryBookPageControllerProvider(diaryBookId, date);
+    final heading = DatedTitle(title: diaryBookName, date: date);
 
     return switch (ref.watch(provider)) {
       AsyncValue(:final value?, hasError: false) => TimelineView(
+        heading: heading,
         date: date,
         myId: myId,
         members: value.members,
@@ -249,19 +244,46 @@ class _DayTimeline extends ConsumerWidget {
         onDeletePost: onDeletePost,
       ),
       // 知らせるダイアログの後ろには、もう読めないことだけを出す。
-      AsyncError(error: RemovedFromDiaryBookException()) => Center(
+      AsyncError(error: RemovedFromDiaryBookException()) => _Headed(
+        heading: heading,
         child: Text(
           context.l10n.commonDiaryBookUnavailable,
           style: TextStyle(color: colors.textSecondary),
         ),
       ),
-      AsyncError() => _LoadError(
-        onRetry: () => ref.read(provider.notifier).refresh(),
+      AsyncError() => _Headed(
+        heading: heading,
+        child: _LoadError(
+          onRetry: () => ref.read(provider.notifier).refresh(),
+        ),
       ),
-      _ => Center(
+      _ => _Headed(
+        heading: heading,
         child: CircularProgressIndicator(color: colors.textSecondary),
       ),
     };
+  }
+}
+
+/// 見出しを上に置き、下に浮かせたボタンまでの残りの真ん中に [child] を出す。
+class _Headed extends StatelessWidget {
+  const _Headed({required this.heading, required this.child});
+
+  final Widget heading;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          heading,
+          Expanded(child: Center(child: child)),
+        ],
+      ),
+    );
   }
 }
 

@@ -14,9 +14,11 @@ import 'diary_section.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
 /// 今日を表示しているときは、今の時間にまだ記録していないメンバーを一番上に出す。
+/// 上下に浮かせたボタンの下までのばして置き、最初と最後はボタンに隠れないようあける。
 class TimelineView extends HookWidget {
   const TimelineView({
     super.key,
+    required this.heading,
     required this.date,
     required this.myId,
     required this.members,
@@ -28,6 +30,9 @@ class TimelineView extends HookWidget {
     required this.onWriteDiary,
     required this.onDeletePost,
   });
+
+  /// いちばん上に置く見出し。上に浮かせたボタンの高さぶんを自分で占め、記録と一緒にスクロールする。
+  final Widget heading;
 
   final DateTime date;
   final String? myId;
@@ -91,14 +96,18 @@ class TimelineView extends HookWidget {
     final pendingMembers = currentHour == null
         ? <DiaryBookMember>[]
         : members.where((m) => !postedIds.contains(m.userId)).toList();
-    const bottomPadding = 24.0;
+    final insets = MediaQuery.paddingOf(context);
+    final bottomPadding = 24 + insets.bottom;
 
     return RefreshIndicator(
       onRefresh: onRefresh,
+      // 読み直しの印は、上に浮かせたボタンの下から出す。
+      edgeOffset: insets.top,
       child: CustomScrollView(
         // 記録が少なくても引っ張って読み直せるようにする。
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
+          SliverToBoxAdapter(child: heading),
           // 日記があれば記録の上に出す。なければ何も出さない。
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
@@ -132,9 +141,9 @@ class TimelineView extends HookWidget {
             ),
           if (hours.isEmpty) ...[
             if (pendingMembers.isEmpty)
-              const SliverPadding(
+              SliverPadding(
                 padding: EdgeInsets.fromLTRB(24, 40, 24, bottomPadding),
-                sliver: SliverToBoxAdapter(child: _EmptyPosts()),
+                sliver: const SliverToBoxAdapter(child: _EmptyPosts()),
               ),
           ] else ...[
             if (pendingMembers.isNotEmpty)
@@ -143,7 +152,7 @@ class TimelineView extends HookWidget {
                 sliver: SliverToBoxAdapter(child: Divider()),
               ),
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, bottomPadding),
+              padding: EdgeInsets.fromLTRB(24, 0, 24, bottomPadding),
               sliver: SliverList.separated(
                 itemCount: hours.length,
                 itemBuilder: (context, index) => _HourSection(
