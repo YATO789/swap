@@ -769,14 +769,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationStepDescription =>
-      'You\'ll get a notification when a member of your diary book posts.';
+      'You\'ll get a notification when a member of your diary book posts or writes a diary entry.';
 
   @override
   String get notificationStepSample1Name => 'Haruka';
 
   @override
-  String get notificationStepSample1Body =>
-      'Trying out the new café by the station ☕';
+  String get notificationStepSample1Body => 'Posted a new update';
 
   @override
   String get notificationStepSample1Time => 'now';
@@ -785,7 +784,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationStepSample2Name => 'Sota';
 
   @override
-  String get notificationStepSample2Body => 'Finally finished my report!';
+  String get notificationStepSample2Body => 'Wrote a diary entry';
 
   @override
   String get notificationStepSample2Time => '5m ago';

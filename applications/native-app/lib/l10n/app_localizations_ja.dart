@@ -684,13 +684,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notificationStepTitle => '通知をオンにしよう';
 
   @override
-  String get notificationStepDescription => '日記帳のメンバーが記録を書くと、お知らせが届きます。';
+  String get notificationStepDescription => '日記帳のメンバーが記録や日記を書くと、お知らせが届きます。';
 
   @override
   String get notificationStepSample1Name => 'はるか';
 
   @override
-  String get notificationStepSample1Body => '駅前の新しいカフェに来てみた☕';
+  String get notificationStepSample1Body => '新しい記録を書いたよ';
 
   @override
   String get notificationStepSample1Time => 'たった今';
@@ -699,7 +699,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get notificationStepSample2Name => 'そうた';
 
   @override
-  String get notificationStepSample2Body => 'やっとレポート終わった！';
+  String get notificationStepSample2Body => '日記を書いたよ';
 
   @override
   String get notificationStepSample2Time => '5分前';

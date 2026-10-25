@@ -538,18 +538,24 @@
   "onboardingLater": "あとで",
   "onboardingNext": "次へ",
   "notificationStepTitle": "通知をオンにしよう",
-  "notificationStepDescription": "日記帳のメンバーが記録を書くと、お知らせが届きます。",
+  "notificationStepDescription": "日記帳のメンバーが記録や日記を書くと、お知らせが届きます。",
   "notificationStepSample1Name": "はるか",
   "@notificationStepSample1Name": {
     "description": "通知の見本に出す架空の人の名前"
   },
-  "notificationStepSample1Body": "駅前の新しいカフェに来てみた☕",
+  "notificationStepSample1Body": "新しい記録を書いたよ",
+  "@notificationStepSample1Body": {
+    "description": "記録の通知の本文。Edge Function（notify-post）が送る文面と合わせる"
+  },
   "notificationStepSample1Time": "たった今",
   "notificationStepSample2Name": "そうた",
   "@notificationStepSample2Name": {
     "description": "通知の見本に出す架空の人の名前"
   },
-  "notificationStepSample2Body": "やっとレポート終わった！",
+  "notificationStepSample2Body": "日記を書いたよ",
+  "@notificationStepSample2Body": {
+    "description": "日記の通知の本文。Edge Function（notify-diary）が送る文面と合わせる"
+  },
   "notificationStepSample2Time": "5分前",
   "notificationStepFootnote": "通知はあとから端末の設定で変えられます。",
   "profileEditTitle": "プロフィール",

@@ -1289,7 +1289,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationStepDescription.
   ///
   /// In ja, this message translates to:
-  /// **'日記帳のメンバーが記録を書くと、お知らせが届きます。'**
+  /// **'日記帳のメンバーが記録や日記を書くと、お知らせが届きます。'**
   String get notificationStepDescription;
 
   /// 通知の見本に出す架空の人の名前
@@ -1298,10 +1298,10 @@ abstract class AppLocalizations {
   /// **'はるか'**
   String get notificationStepSample1Name;
 
-  /// No description provided for @notificationStepSample1Body.
+  /// 記録の通知の本文。Edge Function（notify-post）が送る文面と合わせる
   ///
   /// In ja, this message translates to:
-  /// **'駅前の新しいカフェに来てみた☕'**
+  /// **'新しい記録を書いたよ'**
   String get notificationStepSample1Body;
 
   /// No description provided for @notificationStepSample1Time.
@@ -1316,10 +1316,10 @@ abstract class AppLocalizations {
   /// **'そうた'**
   String get notificationStepSample2Name;
 
-  /// No description provided for @notificationStepSample2Body.
+  /// 日記の通知の本文。Edge Function（notify-diary）が送る文面と合わせる
   ///
   /// In ja, this message translates to:
-  /// **'やっとレポート終わった！'**
+  /// **'日記を書いたよ'**
   String get notificationStepSample2Body;
 
   /// No description provided for @notificationStepSample2Time.

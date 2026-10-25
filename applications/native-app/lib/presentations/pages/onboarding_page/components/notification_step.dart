@@ -53,7 +53,7 @@ class NotificationStep extends StatelessWidget {
   }
 }
 
-/// 端末に届く通知の見本。送られる通知と同じく、題名に書いた人の名前、本文に記録を出す。
+/// 端末に届く通知の見本。送られる通知と同じく、題名に書いた人の名前、本文に何を書いたかを出す。
 class _NotificationSample extends StatelessWidget {
   const _NotificationSample({
     required this.title,
