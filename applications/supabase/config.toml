@@ -392,6 +392,10 @@ deno_version = 2
 [functions.notify-post]
 verify_jwt = false
 
+# 日記の通知。記録と同じく DB のトリガーから pg_net で呼ぶ。
+[functions.notify-diary]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

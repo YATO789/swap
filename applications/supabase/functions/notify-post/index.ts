@@ -5,23 +5,9 @@
 // 同じ id で何度呼ばれても、post_notifications に入れられた最初の1回だけ送る。
 // 途中で失敗して1台にも送れなかったときは印を外すので、もう一度呼べば送り直せる。
 //
-// 環境変数 FIREBASE_SERVICE_ACCOUNT に、Firebase コンソールの「プロジェクトの設定 > サービス アカウント」で
-// 作った秘密鍵の JSON を1行にして（jq -c .）入れておく。
-// ローカルは functions/.env に FIREBASE_SERVICE_ACCOUNT='...' と書き、本番は supabase secrets set で入れる。
+// FCM に送る部分は _shared/push.ts にある。
 
-import { createClient } from "npm:@supabase/supabase-js@2";
-import { JWT } from "npm:google-auth-library@9";
-
-type ServiceAccount = {
-  project_id: string;
-  client_email: string;
-  private_key: string;
-};
-
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-);
+import { pushToUsers, supabase } from "../_shared/push.ts";
 
 Deno.serve(async (req) => {
   const { post_id: postId } = await req.json().catch(() => ({}));
@@ -70,47 +56,11 @@ async function notify(postId: string) {
   if (postError) throw postError;
 
   const recipients = await findRecipients(postId, post.author_id);
-  const tokens = await findTokens([...recipients.keys()]);
-  if (tokens.length === 0) return { sent: 0, failed: 0 };
-
-  // .env から読むと private_key の \n が本物の改行になり、そのままでは JSON として読めない。
-  // JSON は1行で入れているので、改行は private_key の中にしかない。
-  const serviceAccount: ServiceAccount = JSON.parse(
-    Deno.env.get("FIREBASE_SERVICE_ACCOUNT")!.replaceAll("\n", "\\n"),
+  return await pushToUsers(
+    recipients,
+    { title: post.profiles.display_name, body: "新しい記録を書いたよ" },
+    { post_id: postId },
   );
-  const accessToken = await fetchAccessToken(serviceAccount);
-  const unreadCounts = await incrementUnreadCounts(tokens.map((t) => t.token));
-  const results = await Promise.all(
-    tokens.map(({ token, user_id: userId }) =>
-      send(serviceAccount.project_id, accessToken, {
-        token,
-        notification: {
-          title: post.profiles.display_name,
-          body: "新しい記録を書いたよ",
-        },
-        // 通知を開いたときに、その記録が出ている日記帳へ移れるようにする。
-        data: { post_id: postId, diary_book_id: recipients.get(userId)! },
-        apns: {
-          payload: {
-            aps: { sound: "default", badge: unreadCounts.get(token) ?? 1 },
-          },
-        },
-      })
-    ),
-  );
-
-  // アプリを消した端末などのトークンは、もう届かないので消しておく。
-  const staleTokens = tokens
-    .filter((_, i) => results[i] === "unregistered")
-    .map(({ token }) => token);
-  if (staleTokens.length > 0) {
-    await supabase.from("push_tokens").delete().in("token", staleTokens);
-  }
-
-  return {
-    sent: results.filter((r) => r === "sent").length,
-    failed: results.filter((r) => r === "failed").length,
-  };
 }
 
 /**
@@ -141,62 +91,4 @@ async function findRecipients(
     recipients.set(userId, diaryBookId);
   }
   return recipients;
-}
-
-async function findTokens(userIds: string[]) {
-  if (userIds.length === 0) return [];
-  const { data, error } = await supabase
-    .from("push_tokens")
-    .select("token, user_id")
-    .in("user_id", userIds);
-  if (error) throw error;
-  return data;
-}
-
-/** 端末ごとの未読数を1つ増やし、バッジに出す数を返す。 */
-async function incrementUnreadCounts(tokens: string[]) {
-  const { data, error } = await supabase.rpc("increment_push_unread_counts", {
-    p_tokens: tokens,
-  });
-  if (error) throw error;
-  return new Map<string, number>(
-    data.map((r: { token: string; unread_count: number }) => [
-      r.token,
-      r.unread_count,
-    ]),
-  );
-}
-
-async function fetchAccessToken(serviceAccount: ServiceAccount) {
-  const jwt = new JWT({
-    email: serviceAccount.client_email,
-    key: serviceAccount.private_key,
-    scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
-  });
-  const { access_token } = await jwt.authorize();
-  return access_token!;
-}
-
-/** FCM HTTP v1 API で1台に送る。 */
-async function send(
-  projectId: string,
-  accessToken: string,
-  message: Record<string, unknown>,
-): Promise<"sent" | "unregistered" | "failed"> {
-  const res = await fetch(
-    `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ message }),
-    },
-  );
-  if (res.ok) return "sent";
-
-  const body = await res.text();
-  console.error(`FCM に送れませんでした: ${res.status} ${body}`);
-  return body.includes('"UNREGISTERED"') ? "unregistered" : "failed";
 }
