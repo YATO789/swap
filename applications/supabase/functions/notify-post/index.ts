@@ -1,15 +1,16 @@
 // 記録が書かれたら、同じ日記帳の人の端末に FCM でプッシュ通知を送る。
 // posts への insert のトリガー（notify_post）から pg_net で呼ばれる。
 //
-// JWT なしで呼べるので、受け取るのは記録の id だけにして、中身は service role で DB から読む。
+// JWT なしで呼ぶので、トリガーが apikey ヘッダーに付けた Secret Key で確かめる（_shared/push.ts の withSecretKey）。
+// 受け取るのは記録の id だけにして、中身は service role で DB から読む。
 // 同じ id で何度呼ばれても、post_notifications に入れられた最初の1回だけ送る。
 // 途中で失敗して1台にも送れなかったときは印を外すので、もう一度呼べば送り直せる。
 //
 // FCM に送る部分は _shared/push.ts にある。
 
-import { pushToUsers, supabase } from "../_shared/push.ts";
+import { pushToUsers, supabase, withSecretKey } from "../_shared/push.ts";
 
-Deno.serve(async (req) => {
+Deno.serve(withSecretKey(async (req) => {
   const { post_id: postId } = await req.json().catch(() => ({}));
   if (typeof postId !== "string") {
     return new Response("post_id is required", { status: 400 });
@@ -32,7 +33,7 @@ Deno.serve(async (req) => {
     await unclaim(postId);
     throw e;
   }
-});
+}));
 
 async function unclaim(postId: string) {
   const { error } = await supabase

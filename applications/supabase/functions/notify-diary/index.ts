@@ -2,16 +2,17 @@
 // diaries への insert のトリガー（notify_diary）から pg_net で呼ばれる。
 // 書き直し（update）では呼ばれない。
 //
-// JWT なしで呼べるので、受け取るのは日記の id だけにして、中身は service role で DB から読む。
+// JWT なしで呼ぶので、トリガーが apikey ヘッダーに付けた Secret Key で確かめる（_shared/push.ts の withSecretKey）。
+// 受け取るのは日記の id だけにして、中身は service role で DB から読む。
 // 同じ id で何度呼ばれても、diary_notifications に入れられた最初の1回だけ送る。
 // 途中で失敗して1台にも送れなかったときは印を外すので、もう一度呼べば送り直せる。
 //
 // 本文は自分も書いた人しか読めないので、通知にはタイトルも本文も出さない。
 // FCM に送る部分は _shared/push.ts にある。
 
-import { pushToUsers, supabase } from "../_shared/push.ts";
+import { pushToUsers, supabase, withSecretKey } from "../_shared/push.ts";
 
-Deno.serve(async (req) => {
+Deno.serve(withSecretKey(async (req) => {
   const { diary_id: diaryId } = await req.json().catch(() => ({}));
   if (typeof diaryId !== "string") {
     return new Response("diary_id is required", { status: 400 });
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
     await unclaim(diaryId);
     throw e;
   }
-});
+}));
 
 async function unclaim(diaryId: string) {
   const { error } = await supabase

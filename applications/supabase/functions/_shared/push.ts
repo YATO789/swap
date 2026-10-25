@@ -5,6 +5,7 @@
 // ローカルは functions/.env に FIREBASE_SERVICE_ACCOUNT='...' と書き、本番は supabase secrets set で入れる。
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { withSupabase } from "npm:@supabase/server@1";
 import { JWT } from "npm:google-auth-library@9";
 
 type ServiceAccount = {
@@ -17,6 +18,16 @@ export const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
+
+/**
+ * apikey ヘッダーに Secret Key が付いたリクエストだけ [handler] に渡す。
+ * 通知の関数はトリガーが pg_net で Vault の notifications_secret_key を付けて呼ぶ。
+ * ローカルの Secret Key は default しかないので、名前で絞らずどの Secret Key でも通す。
+ * 本番では通知専用の notifications を使い、取り消すときにほかに響かないようにする。
+ */
+export function withSecretKey(handler: (req: Request) => Promise<Response>) {
+  return withSupabase({ auth: "secret:*", cors: "disabled" }, handler);
+}
 
 /**
  * [recipients] の人の端末に通知を送り、送れた台数と送れなかった台数を返す。
