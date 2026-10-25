@@ -5,10 +5,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/app_update/app_update.dart';
 import '../../../domains/diary_book/diary_book.dart';
-import '../../providers/diary_book_grid_notifier.dart';
 import '../../providers/diary_book_notifier.dart';
 import '../../../infrastructures/repositories/opened_notification_repository.dart';
-import '../../providers/post_hint_notifier.dart';
+import '../../providers/settings_notifier.dart';
 import '../../providers/profile_notifier.dart';
 import '../../providers/push_token_notifier.dart';
 import '../../../l10n/l10n.dart';
@@ -33,14 +32,18 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final grid = ref.watch(diaryBookGridProvider);
+    final grid = ref.watch(
+      settingsProvider.select((settings) => settings.diaryBookGrid),
+    );
 
     final colors = context.appColors;
     final l10n = context.l10n;
     final diaryBooksState = ref.watch(diaryBookProvider);
     final diaryBooks = diaryBooksState.value ?? const <DiaryBook>[];
     final profile = ref.watch(profileProvider).value;
-    final showPostHint = ref.watch(postHintProvider);
+    final showPostHint = ref.watch(
+      settingsProvider.select((settings) => settings.postHintVisible),
+    );
     // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
     ref.listen(pushTokenProvider, (_, _) {});

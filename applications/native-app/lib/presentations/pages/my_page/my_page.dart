@@ -4,10 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../domains/diary/diary.dart';
-import '../../providers/diary_book_grid_notifier.dart';
-import '../../providers/post_hint_notifier.dart';
 import '../../providers/profile_notifier.dart';
-import '../../providers/theme_mode_notifier.dart';
+import '../../providers/settings_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/legal_pages.dart';
@@ -25,9 +23,9 @@ class MyPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider).value;
-    final diaryBookGrid = ref.watch(diaryBookGridProvider);
-    final themeMode = ref.watch(themeModeProvider);
-    final showPostHint = ref.watch(postHintProvider);
+    // 設定画面なので、どの項目が変わっても作り直してよい。
+    final settings = ref.watch(settingsProvider);
+    final settingsNotifier = ref.read(settingsProvider.notifier);
 
     // pubspec.yaml の version（ビルド番号を除く）。読み込むまでは空にしておく。
     final packageInfo = useFuture(useMemoized(PackageInfo.fromPlatform));
@@ -92,8 +90,8 @@ class MyPage extends HookConsumerWidget {
           ),
           _SectionHeader(l10n.settingsHomeLayoutSection),
           DiaryBookLayoutPicker(
-            grid: diaryBookGrid,
-            onChanged: ref.read(diaryBookGridProvider.notifier).save,
+            grid: settings.diaryBookGrid,
+            onChanged: settingsNotifier.saveDiaryBookGrid,
           ),
           _SectionHeader(l10n.settingsDisplaySection),
           Padding(
@@ -104,10 +102,8 @@ class MyPage extends HookConsumerWidget {
                 Text(l10n.settingsTheme, style: _titleStyle),
                 const SizedBox(height: 10),
                 ThemeModePicker(
-                  selected: themeMode,
-                  onChanged: ref
-                      .read(themeModeProvider.notifier)
-                      .save,
+                  selected: settings.themeMode,
+                  onChanged: settingsNotifier.saveThemeMode,
                 ),
               ],
             ),
@@ -122,8 +118,8 @@ class MyPage extends HookConsumerWidget {
                 color: context.appColors.textSecondary,
               ),
             ),
-            value: showPostHint,
-            onChanged: ref.read(postHintProvider.notifier).save,
+            value: settings.postHintVisible,
+            onChanged: settingsNotifier.savePostHintVisible,
           ),
           _SectionHeader(l10n.settingsDiarySection),
           _InfoTile(

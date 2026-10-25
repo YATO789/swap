@@ -11,7 +11,7 @@ import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
-import 'package:swap/presentations/providers/diary_book_grid_notifier.dart';
+import 'package:swap/presentations/providers/settings_notifier.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/l10n/l10n.dart';
@@ -128,8 +128,8 @@ void main() {
 
     // 設定画面で切り替えたときと同じく、保存した値を変える。
     await ProviderScope.containerOf(tester.element(find.byType(HomePage)))
-        .read(diaryBookGridProvider.notifier)
-        .save(false);
+        .read(settingsProvider.notifier)
+        .saveDiaryBookGrid(false);
     await tester.pump();
 
     expect(find.byIcon(Icons.chevron_right), findsWidgets);

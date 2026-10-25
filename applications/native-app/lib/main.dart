@@ -11,7 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'firebase_options_dev.dart' as dev;
 import 'firebase_options_prod.dart' as prod;
 import 'infrastructures/datasources/stores/preferences_store.dart';
-import 'presentations/providers/theme_mode_notifier.dart';
+import 'presentations/providers/settings_notifier.dart';
 import 'l10n/l10n.dart';
 import 'presentations/pages/router/router.dart';
 import 'theme/app_theme.dart';
@@ -76,7 +76,9 @@ class MyApp extends HookConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
-      themeMode: ref.watch(themeModeProvider),
+      themeMode: ref.watch(
+        settingsProvider.select((settings) => settings.themeMode),
+      ),
       // 色を少しずつ変えると、途中で文字の色だけ先に切り替わってちらつくので、一度に切り替える。
       themeAnimationDuration: Duration.zero,
       // 端末の言語に合わせる。英語と日本語以外は、先頭の英語になる。
