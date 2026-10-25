@@ -692,18 +692,6 @@ abstract class AppLocalizations {
   /// **'削除'**
   String get diaryDetailDelete;
 
-  /// No description provided for @diaryDetailPrevious.
-  ///
-  /// In ja, this message translates to:
-  /// **'前の日記'**
-  String get diaryDetailPrevious;
-
-  /// No description provided for @diaryDetailNext.
-  ///
-  /// In ja, this message translates to:
-  /// **'次の日記'**
-  String get diaryDetailNext;
-
   /// No description provided for @diaryDetailUnavailable.
   ///
   /// In ja, this message translates to:

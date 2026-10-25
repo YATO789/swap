@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 
-import '../../../../theme/app_theme.dart';
-import '../../../../utils/format.dart';
+import '../../theme/app_theme.dart';
 import 'floating_top_bar.dart';
 
-/// ページのいちばん上、浮かせたボタンの間に書くタイトル。どの日を見ているかを下に小さく出す。
+/// ページのいちばん上、[FloatingTopBar] のボタンの間に書くタイトル。[subtitle] があれば下に小さく出す。
 /// ページと一緒にめくれ、スクロールすると流れていく。
 /// ステータスバーとボタンの並びの高さぶんを占め、ボタンの並びの真ん中に置く。
-class DatedTitle extends StatelessWidget {
-  const DatedTitle({super.key, required this.title, required this.date});
+class PaperTitle extends StatelessWidget {
+  const PaperTitle({super.key, required this.title, this.subtitle});
 
   final String title;
-  final DateTime date;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
+    final subtitle = this.subtitle;
+
     return SizedBox(
       height: MediaQuery.paddingOf(context).top,
       child: Align(
@@ -34,16 +35,17 @@ class DatedTitle extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).appBarTheme.titleTextStyle,
                 ),
-                Text(
-                  formatDateWithWeekday(context, date),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: context.appColors.textSecondary,
+                if (subtitle != null)
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: context.appColors.textSecondary,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

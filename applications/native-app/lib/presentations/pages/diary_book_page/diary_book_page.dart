@@ -12,12 +12,13 @@ import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
 import '../../components/diary_book_icon.dart';
+import '../../components/floating_surface.dart';
+import '../../components/floating_top_bar.dart';
 import '../../components/page_turn_view.dart';
+import '../../components/paper_title.dart';
 import '../../components/post_button.dart';
 import '../../components/post_sheet/post_sheet.dart';
 import '../router/router.dart';
-import 'components/dated_title.dart';
-import 'components/floating_top_bar.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
 import 'controller/diary_book_page_controller.dart';
@@ -163,7 +164,25 @@ class DiaryBookPage extends HookConsumerWidget {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      appBar: FloatingTopBar(onPickDate: pickDate, onOpenInfo: openInfo),
+      appBar: FloatingTopBar(
+        trailing: FloatingSurface(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FloatingSurfaceIcon(
+                onPressed: pickDate,
+                tooltip: context.l10n.diaryBookPickDate,
+                icon: const Icon(Icons.calendar_month_outlined),
+              ),
+              FloatingSurfaceIcon(
+                onPressed: openInfo,
+                tooltip: context.l10n.commonDiaryBookInfo,
+                icon: const Icon(Icons.info_outline),
+              ),
+            ],
+          ),
+        ),
+      ),
       // 右にスワイプすると前の日、左にスワイプすると次の日へページをめくる。今日より先には進まない。
       // めくっている間だけ隣の日も出す。触れるのは見ている日だけなので、操作は見ている日に向ける。
       body: PageTurnView<DateTime>(
@@ -227,7 +246,10 @@ class _DayTimeline extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final provider = diaryBookPageControllerProvider(diaryBookId, date);
-    final heading = DatedTitle(title: diaryBookName, date: date);
+    final heading = PaperTitle(
+      title: diaryBookName,
+      subtitle: formatDateWithWeekday(context, date),
+    );
 
     return switch (ref.watch(provider)) {
       AsyncValue(:final value?, hasError: false) => TimelineView(

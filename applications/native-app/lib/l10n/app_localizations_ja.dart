@@ -340,12 +340,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diaryDetailDelete => '削除';
 
   @override
-  String get diaryDetailPrevious => '前の日記';
-
-  @override
-  String get diaryDetailNext => '次の日記';
-
-  @override
   String get diaryDetailUnavailable => 'この日記は表示できません';
 
   @override

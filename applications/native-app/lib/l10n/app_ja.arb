@@ -244,8 +244,6 @@
   "diaryDetailMenu": "メニュー",
   "diaryDetailEdit": "編集",
   "diaryDetailDelete": "削除",
-  "diaryDetailPrevious": "前の日記",
-  "diaryDetailNext": "次の日記",
   "diaryDetailUnavailable": "この日記は表示できません",
   "diaryDetailLoadFailed": "日記を読み込めませんでした",
   "diaryDetailWrittenAt": "{time}に書きました",

@@ -371,12 +371,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryDetailDelete => 'Delete';
 
   @override
-  String get diaryDetailPrevious => 'Previous diary';
-
-  @override
-  String get diaryDetailNext => 'Next diary';
-
-  @override
   String get diaryDetailUnavailable => 'This diary can\'t be shown';
 
   @override

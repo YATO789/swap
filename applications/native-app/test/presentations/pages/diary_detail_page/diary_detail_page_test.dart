@@ -128,12 +128,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(DiaryDetailPage), findsOneWidget);
-    expect(find.text('${today.month}月${today.day}日の日記'), findsOneWidget);
+    expect(find.text('${today.month}月${today.day}日'), findsOneWidget);
     expect(find.text('発表の日'), findsOneWidget);
     expect(find.text('ゼミの発表がうまくいった'), findsOneWidget);
     expect(find.text('発表の準備中'), findsOneWidget);
     // 1ページだけならページ番号は出さない。
-    expect(find.text('1 / 1'), findsNothing);
+    expect(find.text('1'), findsNothing);
   });
 
   testWidgets(
@@ -198,7 +198,7 @@ void main() {
     expect(find.text('家族にだけ出した記録'), findsNothing);
   });
 
-  testWidgets('読める日記を横にめくって読める。伏せてある日記はページにしない', (tester) async {
+  testWidgets('読める日記を1人1ページにし、ページ番号を出す。伏せてある日記はページにしない', (tester) async {
     await _openDiaryBook(
       tester,
       diaries: [
@@ -217,15 +217,17 @@ void main() {
     await tester.tap(find.text('美緒の日記'));
     await tester.pumpAndSettle();
 
-    // 自分の日記が1ページ目なので、押した美緒の日記は2ページ目になる。
-    expect(find.text('2 / 2'), findsOneWidget);
+    // 自分の日記が1ページ目なので、押した美緒の日記は2ページ目になる。伏せてある日記の3ページ目はない。
+    expect(find.text('2'), findsOneWidget);
     expect(find.text('美緒の日記'), findsOneWidget);
     // 人の日記には編集や削除のメニューを出さない。
     expect(find.byTooltip('メニュー'), findsNothing);
 
-    await tester.tap(find.byTooltip('前の日記'));
+    await tester.tap(find.byTooltip('戻る'));
     await tester.pumpAndSettle();
-    expect(find.text('1 / 2'), findsOneWidget);
+    await tester.tap(find.text('自分の日記'));
+    await tester.pumpAndSettle();
+    expect(find.text('1'), findsOneWidget);
     expect(find.text('自分の日記'), findsOneWidget);
     expect(find.byTooltip('メニュー'), findsOneWidget);
   });

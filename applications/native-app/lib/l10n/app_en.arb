@@ -99,8 +99,6 @@
   "diaryDetailMenu": "Menu",
   "diaryDetailEdit": "Edit",
   "diaryDetailDelete": "Delete",
-  "diaryDetailPrevious": "Previous diary",
-  "diaryDetailNext": "Next diary",
   "diaryDetailUnavailable": "This diary can't be shown",
   "diaryDetailLoadFailed": "Couldn't load the diary",
   "diaryDetailWrittenAt": "Written at {time}",

@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../l10n/l10n.dart';
-import '../../../components/floating_surface.dart';
+import 'floating_surface.dart';
 
-/// 戻るボタンと、カレンダー・情報のボタンを、ページの上に浮かせて並べる。
-/// 真ん中は空けておき、ページに書いた [DatedTitle] がのぞくようにする。
+/// 戻るボタンと [trailing] のボタンを、ページの上に浮かせて並べる。Scaffold の appBar に置く。
+/// 真ん中は空けておき、ページに書いた [PaperTitle] がのぞくようにする。
 class FloatingTopBar extends StatelessWidget implements PreferredSizeWidget {
-  const FloatingTopBar({
-    super.key,
-    required this.onPickDate,
-    required this.onOpenInfo,
-  });
+  const FloatingTopBar({super.key, this.trailing});
 
-  final VoidCallback onPickDate;
-  final VoidCallback onOpenInfo;
+  /// 右に浮かせるボタン。[FloatingSurface] に載せて渡す。
+  final Widget? trailing;
 
   static const _padding = EdgeInsets.fromLTRB(20, 8, 20, 8);
 
@@ -29,7 +24,7 @@ class FloatingTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
+    final trailing = this.trailing;
     // AppBar と同じく、戻れるときだけ戻るボタンを出す。
     final canPop = ModalRoute.of(context)?.impliesAppBarDismissal ?? false;
     final dark = Theme.of(context).brightness == Brightness.dark;
@@ -50,23 +45,7 @@ class FloatingTopBar extends StatelessWidget implements PreferredSizeWidget {
                   icon: const BackButtonIcon(),
                 ),
               const Spacer(),
-              FloatingSurface(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    FloatingSurfaceIcon(
-                      onPressed: onPickDate,
-                      tooltip: l10n.diaryBookPickDate,
-                      icon: const Icon(Icons.calendar_month_outlined),
-                    ),
-                    FloatingSurfaceIcon(
-                      onPressed: onOpenInfo,
-                      tooltip: l10n.commonDiaryBookInfo,
-                      icon: const Icon(Icons.info_outline),
-                    ),
-                  ],
-                ),
-              ),
+              ?trailing,
             ],
           ),
         ),

@@ -10,7 +10,10 @@ import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
+import '../../components/floating_surface.dart';
+import '../../components/floating_top_bar.dart';
 import '../../components/page_turn_view.dart';
+import '../../components/paper_title.dart';
 import '../../components/post_line.dart';
 import '../../components/ruled_lines.dart';
 import '../../components/user_avatar.dart';
@@ -39,16 +42,11 @@ class DiaryDetailPage extends HookConsumerWidget {
     final colors = context.appColors;
     final provider = diaryDetailPageControllerProvider(diaryBookId, date);
     final pageState = ref.watch(provider);
-    final title = Text(
-      context.l10n.commonDiaryOfDate(formatMonthDay(context, date)),
-    );
+    final title = formatMonthDay(context, date);
 
     return switch (pageState) {
       AsyncValue(:final value?, hasError: false) when value.diaries.isEmpty =>
-        Scaffold(
-          appBar: AppBar(title: title),
-          body: const _MissingDiary(),
-        ),
+        _PlainPage(title: title, child: const _MissingDiary()),
       AsyncValue(:final value?, hasError: false) => _DiaryPages(
         title: title,
         diaryBookId: diaryBookId,
@@ -57,21 +55,44 @@ class DiaryDetailPage extends HookConsumerWidget {
         onRefresh: () => ref.read(provider.notifier).refresh(),
         onDelete: (diary) => ref.read(provider.notifier).delete(diary),
       ),
-      AsyncError() => Scaffold(
-        appBar: AppBar(title: title),
-        body: _LoadError(onRetry: () => ref.read(provider.notifier).refresh()),
+      AsyncError() => _PlainPage(
+        title: title,
+        child: _LoadError(onRetry: () => ref.read(provider.notifier).refresh()),
       ),
-      _ => Scaffold(
-        appBar: AppBar(title: title),
-        body: Center(
-          child: CircularProgressIndicator(color: colors.textSecondary),
-        ),
+      _ => _PlainPage(
+        title: title,
+        child: CircularProgressIndicator(color: colors.textSecondary),
       ),
     };
   }
 }
 
-/// 読める日記を1ページずつ並べる。見出しと下のページ番号は固定して、日記の部分だけを本のようにめくる。
+/// 日記を出せないときのページ。日記のページと同じく戻るボタンを浮かせ、タイトルを紙に書いて、
+/// 残りの真ん中に [child] を出す。
+class _PlainPage extends StatelessWidget {
+  const _PlainPage({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: const FloatingTopBar(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PaperTitle(title: title),
+          Expanded(child: Center(child: child)),
+        ],
+      ),
+    );
+  }
+}
+
+/// 読める日記を1ページずつ並べ、本のようにめくる。タイトルと下のページ番号は紙に書いて一緒にめくり、
+/// 上のボタンは紙の上に浮かせる。
 class _DiaryPages extends HookConsumerWidget {
   const _DiaryPages({
     required this.title,
@@ -82,7 +103,7 @@ class _DiaryPages extends HookConsumerWidget {
     required this.onDelete,
   });
 
-  final Widget title;
+  final String title;
   final String diaryBookId;
   final DiaryDetailPageState state;
   final String? initialAuthorId;
@@ -107,7 +128,6 @@ class _DiaryPages extends HookConsumerWidget {
     final myId = ref.watch(profileProvider).value?.id;
     final error = Theme.of(context).colorScheme.error;
 
-    // ボタンで変えたときも、PageTurnView がその向きに1枚めくる。
     void turnTo(int page) => index.value = page;
 
     Future<void> edit() async {
@@ -151,42 +171,45 @@ class _DiaryPages extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: title,
-        actions: [
-          if (diary.authorId == myId)
-            PopupMenuButton<VoidCallback>(
-              tooltip: context.l10n.diaryDetailMenu,
-              icon: const Icon(Icons.more_horiz),
-              onSelected: (action) => action(),
-              itemBuilder: (context) => [
-                if (isEditableDiaryDate(
-                  diary.date,
-                  today: diaryDateOf(DateTime.now()),
-                ))
-                  PopupMenuItem(
-                    value: edit,
-                    child: ListTile(
-                      leading: const Icon(Icons.edit_outlined),
-                      title: Text(context.l10n.diaryDetailEdit),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                PopupMenuItem(
-                  value: confirmDelete,
-                  child: ListTile(
-                    leading: Icon(Icons.delete_outline, color: error),
-                    title: Text(
-                      context.l10n.diaryDetailDelete,
-                      style: TextStyle(color: error),
-                    ),
-                    contentPadding: EdgeInsets.zero,
+      extendBodyBehindAppBar: true,
+      appBar: FloatingTopBar(
+        trailing: diary.authorId == myId
+            ? FloatingSurface(
+                child: SizedBox.square(
+                  dimension: floatingButtonSize,
+                  child: PopupMenuButton<VoidCallback>(
+                    tooltip: context.l10n.diaryDetailMenu,
+                    icon: const Icon(Icons.more_horiz),
+                    onSelected: (action) => action(),
+                    itemBuilder: (context) => [
+                      if (isEditableDiaryDate(
+                        diary.date,
+                        today: diaryDateOf(DateTime.now()),
+                      ))
+                        PopupMenuItem(
+                          value: edit,
+                          child: ListTile(
+                            leading: const Icon(Icons.edit_outlined),
+                            title: Text(context.l10n.diaryDetailEdit),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      PopupMenuItem(
+                        value: confirmDelete,
+                        child: ListTile(
+                          leading: Icon(Icons.delete_outline, color: error),
+                          title: Text(
+                            context.l10n.diaryDetailDelete,
+                            style: TextStyle(color: error),
+                          ),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          const SizedBox(width: 8),
-        ],
+              )
+            : null,
       ),
       // 左にスワイプすると次の人、右にスワイプすると前の人の日記へページをめくる。
       body: PageTurnView<int>(
@@ -197,81 +220,61 @@ class _DiaryPages extends HookConsumerWidget {
         builder: (page) {
           // めくっている間に読み直して日記が減っても、はみ出さないようにする。
           final diary = diaries[page.clamp(0, pageCount - 1)];
-          return _DiaryBody(
-            diary: diary,
-            // 日記帳を抜けた人の名前は読めない。
-            name:
-                state.members[diary.authorId]?.displayName ??
-                context.l10n.commonFormerMember,
-            avatarColor: state.members[diary.authorId]?.avatarColor,
-            isMine: diary.authorId == myId,
-            posts: state.posts[diary.authorId] ?? const [],
+          return Column(
+            children: [
+              // ページ番号の上で本文が切れるよう、下の安全な余白はページ番号の側であける。
+              // 上のボタンの高さが入った Scaffold の中の余白から外すため、Builder の context を使う。
+              Expanded(
+                child: Builder(
+                  builder: (context) => MediaQuery.removePadding(
+                    context: context,
+                    removeBottom: true,
+                    child: _DiaryBody(
+                      title: title,
+                      diary: diary,
+                      // 日記帳を抜けた人の名前は読めない。
+                      name:
+                          state.members[diary.authorId]?.displayName ??
+                          context.l10n.commonFormerMember,
+                      avatarColor: state.members[diary.authorId]?.avatarColor,
+                      isMine: diary.authorId == myId,
+                      posts: state.posts[diary.authorId] ?? const [],
+                    ),
+                  ),
+                ),
+              ),
+              SafeArea(
+                top: false,
+                // 1ページだけならページ番号は出さない。
+                child: pageCount > 1
+                    ? _PageNumber(number: page + 1)
+                    : const SizedBox.shrink(),
+              ),
+            ],
           );
         },
       ),
-      bottomNavigationBar: pageCount > 1
-          ? _PageFooter(
-              index: current,
-              count: pageCount,
-              onPrevious: current > 0 ? () => turnTo(current - 1) : null,
-              onNext: current < pageCount - 1
-                  ? () => turnTo(current + 1)
-                  : null,
-            )
-          : null,
     );
   }
 }
 
-/// 画面下の「‹ 2 / 5 ›」。今どのページかを示し、ボタンでもめくれるようにする。
-class _PageFooter extends StatelessWidget {
-  const _PageFooter({
-    required this.index,
-    required this.count,
-    required this.onPrevious,
-    required this.onNext,
-  });
+/// 紙の下に書くページ番号。本のページ番号のように、数字だけを小さく書く。
+class _PageNumber extends StatelessWidget {
+  const _PageNumber({required this.number});
 
-  final int index;
-  final int count;
-  final VoidCallback? onPrevious;
-  final VoidCallback? onNext;
+  final int number;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return SafeArea(
-      top: false,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: colors.border)),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          children: [
-            IconButton(
-              onPressed: onPrevious,
-              tooltip: context.l10n.diaryDetailPrevious,
-              icon: const Icon(Icons.chevron_left),
-            ),
-            Expanded(
-              child: Text(
-                '${index + 1} / $count',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: colors.textSecondary,
-                ),
-              ),
-            ),
-            IconButton(
-              onPressed: onNext,
-              tooltip: context.l10n.diaryDetailNext,
-              icon: const Icon(Icons.chevron_right),
-            ),
-          ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Text(
+        '$number',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: context.appColors.textSecondary,
         ),
       ),
     );
@@ -331,14 +334,19 @@ const _bodyStrut = StrutStyle(
 /// 書いた行の下に足す、薄くなっていく罫線の本数。書く画面と揃える。
 const _fadingLines = 6;
 
+/// 1人ぶんの日記のページ。いちばん上にタイトルを書き、上下に浮かせたボタンの下まで広げる。
 class _DiaryBody extends StatelessWidget {
   const _DiaryBody({
+    required this.title,
     required this.diary,
     required this.name,
     required this.avatarColor,
     required this.isMine,
     required this.posts,
   });
+
+  /// ページのいちばん上に書く日付。
+  final String title;
 
   final Diary diary;
   final String name;
@@ -351,12 +359,15 @@ class _DiaryBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final title = diary.title ?? '';
+    final diaryTitle = diary.title ?? '';
     final body = diary.body ?? '';
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+      // 上は PaperTitle がボタンの高さぶんを占めるので、あけない。
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
       children: [
+        PaperTitle(title: title),
+        const SizedBox(height: 8),
         Row(
           children: [
             UserAvatar(name: name, filled: isMine, color: avatarColor),
@@ -398,9 +409,9 @@ class _DiaryBody extends StatelessWidget {
         const Divider(),
         const SizedBox(height: 20),
         // 日記を書く画面と同じく、タイトルの下に線を引き、本文には罫線を敷く。
-        if (title.isNotEmpty) ...[
+        if (diaryTitle.isNotEmpty) ...[
           SelectableText(
-            title,
+            diaryTitle,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
