@@ -32,13 +32,15 @@ import '../../theme/app_theme.dart';
 /// [child]（複数行の入力欄）の下に、行に合わせた罫線を敷く。
 /// 線は [lineHeight] ごとに引く。書いた [filledLines] 行ぶんは濃いまま引き、
 /// その下に [lineCount] 本、下へいくほど薄くして足す。
+/// [fadeOut] が false なら薄くせず、[child] の高さいっぱいまで濃いまま引く。
 /// 文字は行の真ん中あたりに来て線から浮いて見えるので、[textOffset] だけ下げて線に寄せる。
 class RuledLines extends StatelessWidget {
   const RuledLines({
     super.key,
     required this.lineHeight,
-    required this.lineCount,
+    this.lineCount = 0,
     this.filledLines = 0,
+    this.fadeOut = true,
     this.textOffset = 6,
     required this.child,
   });
@@ -46,6 +48,7 @@ class RuledLines extends StatelessWidget {
   final double lineHeight;
   final int lineCount;
   final int filledLines;
+  final bool fadeOut;
   final double textOffset;
   final Widget child;
 
@@ -61,6 +64,7 @@ class RuledLines extends StatelessWidget {
                 lineHeight: lineHeight,
                 lineCount: lineCount,
                 filledLines: filledLines,
+                fadeOut: fadeOut,
               ),
             ),
           ),
@@ -81,20 +85,24 @@ class _FadingLinesPainter extends CustomPainter {
     required this.lineHeight,
     required this.lineCount,
     required this.filledLines,
+    required this.fadeOut,
   });
 
   final Color color;
   final double lineHeight;
   final int lineCount;
   final int filledLines;
+  final bool fadeOut;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..strokeWidth = 1;
-    for (var i = 0; i < filledLines + lineCount; i++) {
+    for (var i = 0; !fadeOut || i < filledLines + lineCount; i++) {
       final y = lineHeight * (i + 1);
       if (y > size.height) break;
-      final fade = i < filledLines ? 0 : (i - filledLines) / lineCount;
+      final fade = !fadeOut || i < filledLines
+          ? 0
+          : (i - filledLines) / lineCount;
       paint.color = color.withValues(alpha: color.a * (1 - fade));
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
@@ -105,5 +113,6 @@ class _FadingLinesPainter extends CustomPainter {
       oldDelegate.color != color ||
       oldDelegate.lineHeight != lineHeight ||
       oldDelegate.lineCount != lineCount ||
-      oldDelegate.filledLines != filledLines;
+      oldDelegate.filledLines != filledLines ||
+      oldDelegate.fadeOut != fadeOut;
 }

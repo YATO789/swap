@@ -331,10 +331,11 @@ const _bodyStrut = StrutStyle(
   forceStrutHeight: true,
 );
 
-/// 書いた行の下に足す、薄くなっていく罫線の本数。書く画面と揃える。
-const _fadingLines = 6;
+/// 罫線の下、ページ番号との間にあける高さ。
+const _bodyBottomPadding = 8.0;
 
 /// 1人ぶんの日記のページ。いちばん上にタイトルを書き、上下に浮かせたボタンの下まで広げる。
+/// 本文の罫線は、本文が短くてもページの下まで引く。
 class _DiaryBody extends StatelessWidget {
   const _DiaryBody({
     required this.title,
@@ -362,86 +363,100 @@ class _DiaryBody extends StatelessWidget {
     final diaryTitle = diary.title ?? '';
     final body = diary.body ?? '';
 
-    return ListView(
-      // 上は PaperTitle がボタンの高さぶんを占めるので、あけない。
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-      children: [
-        PaperTitle(title: title),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            UserAvatar(name: name, filled: isMine, color: avatarColor),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+    final header = [
+      PaperTitle(title: title),
+      const SizedBox(height: 8),
+      Row(
+        children: [
+          UserAvatar(name: name, filled: isMine, color: avatarColor),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              name,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
-            Text(
-              context.l10n.diaryDetailWrittenAt(formatTime(diary.writtenAt)),
-              style: TextStyle(fontSize: 12, color: colors.textSecondary),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        // 日記を書く画面と同じく、その日の記録を本文の上に出す。
-        Text(
-          context.l10n.diaryDetailPostsOfDay,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: colors.textSecondary,
           ),
-        ),
-        const SizedBox(height: 8),
-        if (posts.isEmpty)
           Text(
-            context.l10n.commonNoPostsThisDay,
-            style: TextStyle(fontSize: 14, color: colors.textSecondary),
-          )
-        else
-          for (final post in posts) PostLine(post: post),
-        const SizedBox(height: 20),
-        const Divider(),
-        const SizedBox(height: 20),
-        // 日記を書く画面と同じく、タイトルの下に線を引き、本文には罫線を敷く。
-        if (diaryTitle.isNotEmpty) ...[
-          SelectableText(
-            diaryTitle,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            context.l10n.diaryDetailWrittenAt(formatTime(diary.writtenAt)),
+            style: TextStyle(fontSize: 12, color: colors.textSecondary),
           ),
-          const SizedBox(height: 8),
-          Container(height: 1, color: colors.border),
-          const SizedBox(height: 8),
         ],
-        LayoutBuilder(
+      ),
+      const SizedBox(height: 20),
+      // 日記を書く画面と同じく、その日の記録を本文の上に出す。
+      Text(
+        context.l10n.diaryDetailPostsOfDay,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: colors.textSecondary,
+        ),
+      ),
+      const SizedBox(height: 8),
+      if (posts.isEmpty)
+        Text(
+          context.l10n.commonNoPostsThisDay,
+          style: TextStyle(fontSize: 14, color: colors.textSecondary),
+        )
+      else
+        for (final post in posts) PostLine(post: post),
+      const SizedBox(height: 20),
+      const Divider(),
+      const SizedBox(height: 20),
+      // 日記を書く画面と同じく、タイトルの下に線を引き、本文には罫線を敷く。
+      if (diaryTitle.isNotEmpty) ...[
+        SelectableText(
+          diaryTitle,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 8),
+        Container(height: 1, color: colors.border),
+        const SizedBox(height: 8),
+      ],
+    ];
+
+    return CustomScrollView(
+      slivers: [
+        // 上は PaperTitle がボタンの高さぶんを占めるので、あけない。
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          sliver: SliverList.list(children: header),
+        ),
+        // 本文の上までの高さが分かってから、残りの高さいっぱいに罫線を引く。
+        SliverLayoutBuilder(
           builder: (context, constraints) {
-            final lines = measureTextLines(
-              context,
-              text: body,
-              style: DefaultTextStyle.of(context).style.merge(_bodyStyle),
-              strutStyle: _bodyStrut,
-              width: constraints.maxWidth,
-            );
-            final filledLines = lines.count;
-            return RuledLines(
-              lineHeight: lines.lineHeight,
-              lineCount: _fadingLines,
-              filledLines: filledLines,
-              // 書く画面と同じく、書いた行の下にだんだん薄くなる罫線を足す。
-              // 本文だけの高さだと引けないので、その分の高さを空けておく。
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: lines.lineHeight * (filledLines + _fadingLines),
-                ),
-                child: SelectableText(
-                  body,
-                  style: _bodyStyle,
-                  strutStyle: _bodyStrut,
+            final remaining =
+                constraints.viewportMainAxisExtent -
+                constraints.precedingScrollExtent -
+                _bodyBottomPadding;
+            return SliverPadding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, _bodyBottomPadding),
+              sliver: SliverToBoxAdapter(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final lines = measureTextLines(
+                      context,
+                      text: body,
+                      style: DefaultTextStyle.of(context).style
+                          .merge(_bodyStyle),
+                      strutStyle: _bodyStrut,
+                      width: constraints.maxWidth,
+                    );
+                    return RuledLines(
+                      lineHeight: lines.lineHeight,
+                      filledLines: lines.count,
+                      fadeOut: false,
+                      // 本文だけの高さだと下まで引けないので、残りの高さを空けておく。
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: remaining),
+                        child: SelectableText(
+                          body,
+                          style: _bodyStyle,
+                          strutStyle: _bodyStrut,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             );
