@@ -13,7 +13,8 @@ import '../../../components/user_avatar.dart';
 import 'diary_section.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
-/// 今日を表示しているときは、今の時間にまだ記録していないメンバーを一番上に出す。
+/// 今日を表示しているときは、今の時間にまだ記録していないほかのメンバーを一番上に出す。
+/// 自分の記録は下の書き込みバーから書くので、ここには自分の書き込み欄を置かない。
 /// 上下に浮かせたボタンの下までのばして置き、最初と最後はボタンに隠れないようあける。
 class TimelineView extends HookWidget {
   const TimelineView({
@@ -25,7 +26,6 @@ class TimelineView extends HookWidget {
     required this.diaries,
     required this.posts,
     required this.onRefresh,
-    required this.onRecord,
     required this.onOpenDiary,
     required this.onWriteDiary,
     required this.onDeletePost,
@@ -46,9 +46,6 @@ class TimelineView extends HookWidget {
 
   /// 引っ張って読み直したとき。
   final Future<void> Function() onRefresh;
-
-  /// 今の時間の欄で、自分の「記録」を押したとき。
-  final VoidCallback onRecord;
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
 
@@ -88,14 +85,16 @@ class TimelineView extends HookWidget {
     // 新しい時間帯が上に来るように逆順で表示する。
     final hours = _groupByHour(posts).reversed.toList();
     final currentHour = date == diaryDateOf(now.value) ? now.value.hour : null;
-    // 今の時間にまだ記録していないメンバー。記録した人は時間帯の欄に出す。
+    // 今の時間にまだ記録していない、自分以外のメンバー。記録した人は時間帯の欄に出す。
     final postedIds = {
       for (final post in posts)
         if (post.postedAt.hour == currentHour) post.authorId,
     };
     final pendingMembers = currentHour == null
         ? <DiaryBookMember>[]
-        : members.where((m) => !postedIds.contains(m.userId)).toList();
+        : members
+              .where((m) => m.userId != myId && !postedIds.contains(m.userId))
+              .toList();
     final insets = MediaQuery.paddingOf(context);
     final bottomPadding = 24 + insets.bottom;
 
@@ -124,28 +123,25 @@ class TimelineView extends HookWidget {
           ),
           if (currentHour != null && pendingMembers.isNotEmpty)
             SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                24,
-                0,
-                24,
-                hours.isEmpty ? bottomPadding : 0,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               sliver: SliverToBoxAdapter(
                 child: _PendingMembersSection(
                   hour: currentHour,
                   members: pendingMembers,
-                  myId: myId,
-                  onRecord: onRecord,
                 ),
               ),
             ),
-          if (hours.isEmpty) ...[
-            if (pendingMembers.isEmpty)
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(24, 40, 24, bottomPadding),
-                sliver: const SliverToBoxAdapter(child: _EmptyPosts()),
+          if (hours.isEmpty)
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(24, 40, 24, bottomPadding),
+              // 今日は白紙のページとして出し、画面が寂しくならないようにする。
+              sliver: SliverToBoxAdapter(
+                child: currentHour != null
+                    ? const _BlankPage()
+                    : const _EmptyPosts(),
               ),
-          ] else ...[
+            )
+          else ...[
             if (pendingMembers.isNotEmpty)
               const SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: 24),
@@ -207,6 +203,34 @@ class _EmptyPosts extends StatelessWidget {
   }
 }
 
+/// 今日まだ誰も記録していないときに出す、白紙のページ。
+class _BlankPage extends StatelessWidget {
+  const _BlankPage();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Column(
+      children: [
+        Icon(Icons.menu_book_outlined, size: 56, color: colors.disabled),
+        const SizedBox(height: 12),
+        Text(
+          context.l10n.timelineBlankTitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          context.l10n.timelineBlankMessage,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 13, color: colors.textSecondary),
+        ),
+      ],
+    );
+  }
+}
+
 class _HourSection extends StatelessWidget {
   const _HourSection({
     required this.hour,
@@ -249,20 +273,22 @@ class _HourSection extends StatelessWidget {
 }
 
 class _HourHeader extends StatelessWidget {
-  const _HourHeader({required this.hour, this.small = false});
+  const _HourHeader({required this.hour, this.isNow = false});
 
   final int hour;
 
-  /// まだ記録していない人の欄では、時間を小さく出す。
-  final bool small;
+  /// 今の時間の欄では、時間を小さく出して「いま」を添える。
+  final bool isNow;
 
   @override
   Widget build(BuildContext context) {
+    final time = '${hour.toString().padLeft(2, '0')}:00';
+
     return Semantics(
       header: true,
       child: Text(
-        '${hour.toString().padLeft(2, '0')}:00',
-        style: small
+        isNow ? context.l10n.timelineNowHour(time) : time,
+        style: isNow
             ? TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -274,109 +300,96 @@ class _HourHeader extends StatelessWidget {
   }
 }
 
-/// 今の時間にまだ記録していないメンバーの欄。記録すると、この欄から外れて時間帯の欄に出る。
-/// 自分が一番上で、あとは日記帳に参加した順。
+/// 今の時間にまだ記録していない、自分以外のメンバーの欄。記録すると、この欄から外れて時間帯の欄に出る。
+/// メンバーは日記帳に参加した順。
 class _PendingMembersSection extends StatelessWidget {
-  const _PendingMembersSection({
-    required this.hour,
-    required this.members,
-    required this.myId,
-    required this.onRecord,
-  });
+  const _PendingMembersSection({required this.hour, required this.members});
 
   final int hour;
   final List<DiaryBookMember> members;
-  final String? myId;
-  final VoidCallback onRecord;
 
   @override
   Widget build(BuildContext context) {
-    final ordered = [
-      ...members.where((member) => member.userId == myId),
-      ...members.where((member) => member.userId != myId),
-    ];
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _HourHeader(hour: hour, small: true),
+          _HourHeader(hour: hour, isNow: true),
           const SizedBox(height: 10),
-          for (final member in ordered)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: _PendingMemberCard(
-                name: member.displayName,
-                avatarColor: member.avatarColor,
-                isMe: member.userId == myId,
-                onRecord: onRecord,
-              ),
-            ),
+          _PendingOthersRow(members: members),
         ],
       ),
     );
   }
 }
 
-/// まだ記録していないメンバーの1人ぶん。自分なら、カードのどこを押しても投稿シートを開く。
-class _PendingMemberCard extends StatelessWidget {
-  const _PendingMemberCard({
-    required this.name,
-    required this.avatarColor,
-    required this.isMe,
-    required this.onRecord,
-  });
+/// まだ記録していない人を1行にまとめる。人数が増えても長くならないよう、
+/// アイコンを重ねて、最初の2人の名前と残りの人数を出す。
+class _PendingOthersRow extends StatelessWidget {
+  const _PendingOthersRow({required this.members});
 
-  final String name;
-  final int? avatarColor;
-  final bool isMe;
-  final VoidCallback onRecord;
+  final List<DiaryBookMember> members;
+
+  /// 重ねて出すアイコンの数。
+  static const _maxAvatars = 4;
+  static const _avatarSize = 22.0;
+
+  /// アイコンのまわりに付ける、地の色の縁の太さ。重なった境目を見せる。
+  static const _ring = 2.0;
+
+  /// 隣のアイコンと重ねる幅。
+  static const _overlap = 8.0;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final l10n = context.l10n;
+    final names = [for (final member in members) member.displayName];
+    final label = switch (names.length) {
+      1 => l10n.timelinePendingOne(names[0]),
+      2 => l10n.timelinePendingTwo(names[0], names[1]),
+      _ => l10n.timelinePendingMany(names[0], names[1], names.length - 2),
+    };
+    final shown = members.take(_maxAvatars).toList();
+    const outer = _avatarSize + _ring * 2;
+    const step = outer - _overlap;
 
-    // 記録は枠で囲まず、アイコンの色で誰のものかを見せる。枠は日記のカードだけに付ける。
-    final card = Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: MergeSemantics(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            UserAvatar(name: name, filled: isMe, color: avatarColor),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
+    return Row(
+      children: [
+        SizedBox(
+          width: outer + step * (shown.length - 1),
+          height: outer,
+          child: Stack(
+            children: [
+              for (final (index, member) in shown.indexed)
+                Positioned(
+                  left: step * index,
+                  child: Container(
+                    padding: const EdgeInsets.all(_ring),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.surface,
+                    ),
+                    child: UserAvatar(
+                      name: member.displayName,
+                      filled: false,
+                      color: member.avatarColor,
+                      size: _avatarSize,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    context.l10n.timelineNoPostsYet,
-                    style: TextStyle(fontSize: 14, color: colors.textSecondary),
-                  ),
-                ],
-              ),
-            ),
-          ],
+                ),
+            ],
+          ),
         ),
-      ),
-    );
-    if (!isMe) return card;
-
-    return InkWell(
-      onTap: onRecord,
-      borderRadius: BorderRadius.circular(12),
-      child: card,
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(fontSize: 13, color: colors.textSecondary),
+          ),
+        ),
+      ],
     );
   }
 }

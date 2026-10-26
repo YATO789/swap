@@ -17,7 +17,6 @@ import '../../components/floating_top_bar.dart';
 import '../../components/page_turn_view.dart';
 import '../../components/paper_title.dart';
 import '../../components/post_button.dart';
-import '../../components/post_sheet/post_sheet.dart';
 import '../router/router.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
@@ -86,11 +85,6 @@ class DiaryBookPage extends HookConsumerWidget {
       const HomeRoute().go(context);
       diaryBooks.forget(diaryBookId);
     });
-
-    Future<void> record() async {
-      final posted = await showPostSheet(context, diaryBook: diaryBook);
-      if (posted) await controller().reloadPosts();
-    }
 
     Future<void> pickDate() async {
       final picked = await showTimelineCalendar(
@@ -199,7 +193,6 @@ class DiaryBookPage extends HookConsumerWidget {
           date: day,
           myId: myId,
           onRefresh: refresh,
-          onRecord: record,
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
           onDeletePost: confirmDeletePost,
@@ -226,7 +219,6 @@ class _DayTimeline extends ConsumerWidget {
     required this.date,
     required this.myId,
     required this.onRefresh,
-    required this.onRecord,
     required this.onOpenDiary,
     required this.onWriteDiary,
     required this.onDeletePost,
@@ -237,7 +229,6 @@ class _DayTimeline extends ConsumerWidget {
   final DateTime date;
   final String? myId;
   final Future<void> Function() onRefresh;
-  final VoidCallback onRecord;
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
   final ValueChanged<TimelinePost> onDeletePost;
@@ -260,7 +251,6 @@ class _DayTimeline extends ConsumerWidget {
         diaries: value.diaries,
         posts: value.posts,
         onRefresh: onRefresh,
-        onRecord: onRecord,
         onOpenDiary: onOpenDiary,
         onWriteDiary: onWriteDiary,
         onDeletePost: onDeletePost,

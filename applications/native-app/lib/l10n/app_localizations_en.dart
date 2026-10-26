@@ -301,7 +301,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryBookLoadFailed => 'Couldn\'t load the diary book';
 
   @override
-  String get timelineNoPostsYet => 'No posts yet';
+  String timelineNowHour(String time) {
+    return '$time · Now';
+  }
+
+  @override
+  String timelinePendingOne(String name) {
+    return '$name hasn\'t posted yet';
+  }
+
+  @override
+  String timelinePendingTwo(String first, String second) {
+    return '$first and $second haven\'t posted yet';
+  }
+
+  @override
+  String timelinePendingMany(String first, String second, int rest) {
+    return '$first, $second and $rest more haven\'t posted yet';
+  }
+
+  @override
+  String get timelineBlankTitle => 'Today\'s page is still blank';
+
+  @override
+  String get timelineBlankMessage => 'Today starts with the first post';
 
   @override
   String get diarySectionUntitled => 'Untitled';

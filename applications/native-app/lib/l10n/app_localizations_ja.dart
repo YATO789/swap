@@ -274,7 +274,30 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diaryBookLoadFailed => '日記帳を読み込めませんでした';
 
   @override
-  String get timelineNoPostsYet => 'まだ記録がありません';
+  String timelineNowHour(String time) {
+    return '$time ・ いま';
+  }
+
+  @override
+  String timelinePendingOne(String name) {
+    return '$nameはまだ';
+  }
+
+  @override
+  String timelinePendingTwo(String first, String second) {
+    return '$first・$secondはまだ';
+  }
+
+  @override
+  String timelinePendingMany(String first, String second, int rest) {
+    return '$first・$second ほか$rest人はまだ';
+  }
+
+  @override
+  String get timelineBlankTitle => '今日のページはまだ白紙です';
+
+  @override
+  String get timelineBlankMessage => '最初に書いた人の一言から、今日が始まります';
 
   @override
   String get diarySectionUntitled => 'タイトルなし';

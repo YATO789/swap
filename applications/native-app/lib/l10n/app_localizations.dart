@@ -572,11 +572,41 @@ abstract class AppLocalizations {
   /// **'日記帳を読み込めませんでした'**
   String get diaryBookLoadFailed;
 
-  /// No description provided for @timelineNoPostsYet.
+  /// 今の時間の欄の見出し。time は「14:00」
   ///
   /// In ja, this message translates to:
-  /// **'まだ記録がありません'**
-  String get timelineNoPostsYet;
+  /// **'{time} ・ いま'**
+  String timelineNowHour(String time);
+
+  /// 今の時間にまだ記録していない人が1人のとき
+  ///
+  /// In ja, this message translates to:
+  /// **'{name}はまだ'**
+  String timelinePendingOne(String name);
+
+  /// 今の時間にまだ記録していない人が2人のとき
+  ///
+  /// In ja, this message translates to:
+  /// **'{first}・{second}はまだ'**
+  String timelinePendingTwo(String first, String second);
+
+  /// 今の時間にまだ記録していない人が3人以上のとき。rest は名前を出さなかった人数
+  ///
+  /// In ja, this message translates to:
+  /// **'{first}・{second} ほか{rest}人はまだ'**
+  String timelinePendingMany(String first, String second, int rest);
+
+  /// No description provided for @timelineBlankTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'今日のページはまだ白紙です'**
+  String get timelineBlankTitle;
+
+  /// No description provided for @timelineBlankMessage.
+  ///
+  /// In ja, this message translates to:
+  /// **'最初に書いた人の一言から、今日が始まります'**
+  String get timelineBlankMessage;
 
   /// No description provided for @diarySectionUntitled.
   ///

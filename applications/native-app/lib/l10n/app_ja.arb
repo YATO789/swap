@@ -190,7 +190,53 @@
   "diaryBookPostDeleteFailed": "記録を削除できませんでした。もう一度お試しください",
   "diaryBookPickDate": "日付を選ぶ",
   "diaryBookLoadFailed": "日記帳を読み込めませんでした",
-  "timelineNoPostsYet": "まだ記録がありません",
+  "timelineNowHour": "{time} ・ いま",
+  "@timelineNowHour": {
+    "description": "今の時間の欄の見出し。time は「14:00」",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timelinePendingOne": "{name}はまだ",
+  "@timelinePendingOne": {
+    "description": "今の時間にまだ記録していない人が1人のとき",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "timelinePendingTwo": "{first}・{second}はまだ",
+  "@timelinePendingTwo": {
+    "description": "今の時間にまだ記録していない人が2人のとき",
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "timelinePendingMany": "{first}・{second} ほか{rest}人はまだ",
+  "@timelinePendingMany": {
+    "description": "今の時間にまだ記録していない人が3人以上のとき。rest は名前を出さなかった人数",
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      },
+      "rest": {
+        "type": "int"
+      }
+    }
+  },
+  "timelineBlankTitle": "今日のページはまだ白紙です",
+  "timelineBlankMessage": "最初に書いた人の一言から、今日が始まります",
   "diarySectionUntitled": "タイトルなし",
   "diarySectionAuthor": "{name} の日記",
   "@diarySectionAuthor": {
