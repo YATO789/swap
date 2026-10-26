@@ -1172,6 +1172,12 @@ abstract class AppLocalizations {
   /// **'その他'**
   String get settingsOtherSection;
 
+  /// No description provided for @settingsFeedback.
+  ///
+  /// In ja, this message translates to:
+  /// **'フィードバックを送る'**
+  String get settingsFeedback;
+
   /// No description provided for @settingsVersion.
   ///
   /// In ja, this message translates to:
@@ -1321,6 +1327,42 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'通知はあとから端末の設定で変えられます。'**
   String get notificationStepFootnote;
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'フィードバック'**
+  String get feedbackTitle;
+
+  /// フィードバックのページの右上のボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'送信'**
+  String get feedbackSend;
+
+  /// No description provided for @feedbackDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'使ってみた感想や、困ったこと、ほしい機能を教えてください。いただいた内容はアプリの改善に使います。返信はできません。'**
+  String get feedbackDescription;
+
+  /// No description provided for @feedbackHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'ご意見・ご要望を入力'**
+  String get feedbackHint;
+
+  /// No description provided for @feedbackSendFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'送信できませんでした。もう一度お試しください'**
+  String get feedbackSendFailed;
+
+  /// No description provided for @feedbackSent.
+  ///
+  /// In ja, this message translates to:
+  /// **'フィードバックを送りました。ありがとうございます'**
+  String get feedbackSent;
 
   /// No description provided for @profileEditTitle.
   ///

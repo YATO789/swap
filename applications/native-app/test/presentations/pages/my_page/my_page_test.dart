@@ -6,10 +6,12 @@ import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/feedback_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/infrastructures/repositories/push_token_repository.dart';
 import 'package:swap/l10n/l10n.dart';
+import 'package:swap/presentations/pages/feedback_page/feedback_page.dart';
 import 'package:swap/presentations/pages/my_page/my_page.dart';
 import 'package:swap/presentations/pages/router/router.dart';
 import 'package:swap/presentations/pages/welcome_page/welcome_page.dart';
@@ -24,6 +26,7 @@ Future<void> _openMyPage(
   FakePreferencesStore? preferencesStore,
   FakeAuthenticationRepository? authenticationRepository,
   FakePushTokenRepository? pushTokenRepository,
+  FakeFeedbackRepository? feedbackRepository,
 }) async {
   final authentication =
       authenticationRepository ??
@@ -50,6 +53,9 @@ Future<void> _openMyPage(
         ),
         diaryBookRepositoryProvider.overrideWithValue(
           FakeDiaryBookRepository(const []),
+        ),
+        feedbackRepositoryProvider.overrideWithValue(
+          feedbackRepository ?? FakeFeedbackRepository(),
         ),
       ],
       child: Consumer(
@@ -97,6 +103,47 @@ void main() {
     await tester.tap(hintSwitch);
     await tester.pumpAndSettle();
     expect(preferencesStore.postHintVisible, isTrue);
+  });
+
+  testWidgets('フィードバックを書いて送ると、送ってマイページに戻る', (tester) async {
+    final feedbackRepository = FakeFeedbackRepository();
+    await _openMyPage(tester, feedbackRepository: feedbackRepository);
+    // すぐ下の行まで送って、フィードバックの行を画面に収める。
+    await tester.scrollUntilVisible(find.text('バージョン'), 200);
+
+    await tester.tap(find.text('フィードバックを送る'));
+    await tester.pumpAndSettle();
+    expect(find.byType(FeedbackPage), findsOneWidget);
+    // 何も書いていなければ送れない。
+    final sendButton = find.widgetWithText(TextButton, '送信');
+    expect(tester.widget<TextButton>(sendButton).onPressed, isNull);
+
+    await tester.enterText(find.byType(TextField), '  通知の時間を選びたい  ');
+    await tester.pump();
+    await tester.tap(sendButton);
+    await tester.pumpAndSettle();
+
+    expect(feedbackRepository.sent, ['通知の時間を選びたい']);
+    expect(find.byType(FeedbackPage), findsNothing);
+    expect(find.byType(MyPage), findsOneWidget);
+    expect(find.text('フィードバックを送りました。ありがとうございます'), findsOneWidget);
+  });
+
+  testWidgets('フィードバックを送れなかったら、書いた内容を残してページに残る', (tester) async {
+    final feedbackRepository = FakeFeedbackRepository()..fails = true;
+    await _openMyPage(tester, feedbackRepository: feedbackRepository);
+    await tester.scrollUntilVisible(find.text('バージョン'), 200);
+    await tester.tap(find.text('フィードバックを送る'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '通知の時間を選びたい');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(TextButton, '送信'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FeedbackPage), findsOneWidget);
+    expect(find.text('通知の時間を選びたい'), findsOneWidget);
+    expect(find.text('送信できませんでした。もう一度お試しください'), findsOneWidget);
   });
 
   testWidgets('ログアウトを確かめると、通知の送り先から外してウェルカム画面に戻る', (tester) async {

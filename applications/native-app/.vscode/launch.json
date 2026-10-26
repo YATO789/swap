@@ -11,6 +11,7 @@
             "type": "dart",
             "toolArgs": [
                 "--flavor=dev",
+                "--dart-define-from-file=config/debug.json",
                 "--dart-define=SUPABASE_URL=http://127.0.0.1:54321",
                 "--dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
             ]
@@ -22,6 +23,7 @@
             "type": "dart",
             "toolArgs": [
                 "--flavor=dev",
+                "--dart-define-from-file=config/debug.json",
                 "--dart-define=SUPABASE_URL=http://10.0.2.2:54321",
                 "--dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
             ]

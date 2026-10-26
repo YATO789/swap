@@ -625,6 +625,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsOtherSection => 'その他';
 
   @override
+  String get settingsFeedback => 'フィードバックを送る';
+
+  @override
   String get settingsVersion => 'バージョン';
 
   @override
@@ -700,6 +703,25 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get notificationStepFootnote => '通知はあとから端末の設定で変えられます。';
+
+  @override
+  String get feedbackTitle => 'フィードバック';
+
+  @override
+  String get feedbackSend => '送信';
+
+  @override
+  String get feedbackDescription =>
+      '使ってみた感想や、困ったこと、ほしい機能を教えてください。いただいた内容はアプリの改善に使います。返信はできません。';
+
+  @override
+  String get feedbackHint => 'ご意見・ご要望を入力';
+
+  @override
+  String get feedbackSendFailed => '送信できませんでした。もう一度お試しください';
+
+  @override
+  String get feedbackSent => 'フィードバックを送りました。ありがとうございます';
 
   @override
   String get profileEditTitle => 'プロフィール';

@@ -129,6 +129,10 @@ class MyPage extends HookConsumerWidget {
           ),
           _SectionHeader(l10n.settingsOtherSection),
           _LinkTile(
+            title: l10n.settingsFeedback,
+            onTap: () => const FeedbackRoute().push<void>(context),
+          ),
+          _LinkTile(
             title: l10n.commonTermsOfService,
             onTap: () => openPage(termsOfServiceUrl),
           ),

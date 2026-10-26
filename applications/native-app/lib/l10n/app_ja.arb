@@ -508,6 +508,7 @@
     }
   },
   "settingsOtherSection": "その他",
+  "settingsFeedback": "フィードバックを送る",
   "settingsVersion": "バージョン",
   "settingsAccountSection": "アカウント",
   "settingsDeleteAccount": "アカウントを削除",
@@ -556,6 +557,15 @@
   },
   "notificationStepSample2Time": "5分前",
   "notificationStepFootnote": "通知はあとから端末の設定で変えられます。",
+  "feedbackTitle": "フィードバック",
+  "feedbackSend": "送信",
+  "@feedbackSend": {
+    "description": "フィードバックのページの右上のボタン"
+  },
+  "feedbackDescription": "使ってみた感想や、困ったこと、ほしい機能を教えてください。いただいた内容はアプリの改善に使います。返信はできません。",
+  "feedbackHint": "ご意見・ご要望を入力",
+  "feedbackSendFailed": "送信できませんでした。もう一度お試しください",
+  "feedbackSent": "フィードバックを送りました。ありがとうございます",
   "profileEditTitle": "プロフィール",
   "profileEditSave": "保存",
   "profileEditSaveFailed": "プロフィールを保存できませんでした。もう一度お試しください",

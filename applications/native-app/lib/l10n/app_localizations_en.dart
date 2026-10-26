@@ -707,6 +707,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsOtherSection => 'Other';
 
   @override
+  String get settingsFeedback => 'Send feedback';
+
+  @override
   String get settingsVersion => 'Version';
 
   @override
@@ -786,6 +789,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationStepFootnote =>
       'You can change notifications later in your device settings.';
+
+  @override
+  String get feedbackTitle => 'Feedback';
+
+  @override
+  String get feedbackSend => 'Send';
+
+  @override
+  String get feedbackDescription =>
+      'Tell us what you think, what\'s been hard to use, or what features you\'d like. We\'ll use it to improve the app. We can\'t reply to feedback.';
+
+  @override
+  String get feedbackHint => 'Enter your comments or requests';
+
+  @override
+  String get feedbackSendFailed => 'Couldn\'t send. Please try again.';
+
+  @override
+  String get feedbackSent => 'Feedback sent. Thank you!';
 
   @override
   String get profileEditTitle => 'Profile';

@@ -13,6 +13,7 @@ import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
+import 'package:swap/infrastructures/repositories/feedback_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
@@ -128,6 +129,18 @@ class FakeProfileRepository implements ProfileRepository {
     );
     profile = saved;
     return saved;
+  }
+}
+
+/// 送ったフィードバックを [sent] にためる。[fails] が true なら送れない。
+class FakeFeedbackRepository implements FeedbackRepository {
+  final sent = <String>[];
+  var fails = false;
+
+  @override
+  Future<void> send(String body) async {
+    if (fails) throw Exception('送信に失敗');
+    sent.add(body);
   }
 }
 

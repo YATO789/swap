@@ -12,6 +12,7 @@ import '../diary_book_info_page/diary_book_info_page.dart';
 import '../diary_book_page/diary_book_page.dart';
 import '../diary_detail_page/diary_detail_page.dart';
 import '../diary_editor_page/diary_editor_page.dart';
+import '../feedback_page/feedback_page.dart';
 import '../home_page/home_page.dart';
 import '../my_page/my_page.dart';
 import '../onboarding_page/onboarding_page.dart';
@@ -249,6 +250,16 @@ class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return _materialPage(state, const ProfileEditPage());
+  }
+}
+
+@TypedGoRoute<FeedbackRoute>(path: '/me/feedback')
+class FeedbackRoute extends GoRouteData with $FeedbackRoute {
+  const FeedbackRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return _materialPage(state, const FeedbackPage());
   }
 }
 
