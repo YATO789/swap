@@ -319,8 +319,10 @@ class _DiaryEditor extends HookWidget {
             const Divider(),
             const SizedBox(height: 20),
             // タイトルは任意。空なら本文だけの日記になる。
+            // まだ書いていない日を開いたときは、タイトルから書き始められるようにする。
             TextField(
               controller: titleController,
+              autofocus: initial == null,
               maxLength: maxDiaryTitleLength,
               textInputAction: TextInputAction.next,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
@@ -356,7 +358,6 @@ class _DiaryEditor extends HookWidget {
                   filledLines: filledLines,
                   child: TextField(
                     controller: bodyController,
-                    autofocus: initial == null,
                     maxLength: maxDiaryBodyLength,
                     minLines: max(_bodyMinLines, filledLines + _fadingLines),
                     maxLines: null,
