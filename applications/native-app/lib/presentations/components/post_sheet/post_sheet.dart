@@ -134,8 +134,8 @@ class _PostSheet extends HookConsumerWidget {
                           maxLength: maxPostMessageLength,
                           minLines: _lines,
                           maxLines: _lines,
-                          textInputAction: TextInputAction.done,
-                          onSubmitted: (_) => submit(),
+                          keyboardType: TextInputType.multiline,
+                          textInputAction: TextInputAction.newline,
                           style: const TextStyle(
                             fontSize: _fontSize,
                             height: _lineHeight,
