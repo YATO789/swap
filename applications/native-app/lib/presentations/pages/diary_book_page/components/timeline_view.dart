@@ -213,8 +213,6 @@ class _BlankPage extends StatelessWidget {
 
     return Column(
       children: [
-        Icon(Icons.menu_book_outlined, size: 56, color: colors.disabled),
-        const SizedBox(height: 12),
         Text(
           context.l10n.timelineBlankTitle,
           textAlign: TextAlign.center,
