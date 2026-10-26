@@ -14,17 +14,13 @@ type ServiceAccount = {
   private_key: string;
 };
 
+/*supabase clientの作成*/
 export const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-/**
- * apikey ヘッダーに Secret Key が付いたリクエストだけ [handler] に渡す。
- * 通知の関数はトリガーが pg_net で Vault の notifications_secret_key を付けて呼ぶ。
- * ローカルの Secret Key は default しかないので、名前で絞らずどの Secret Key でも通す。
- * 本番では通知専用の notifications を使い、取り消すときにほかに響かないようにする。
- */
+/*Edge Functionを呼び出せる相手を制限する*/
 export function withSecretKey(handler: (req: Request) => Promise<Response>) {
   return withSupabase({ auth: "secret:*", cors: "disabled" }, handler);
 }
@@ -79,6 +75,7 @@ export async function pushToUsers(
   };
 }
 
+/*push_tokensテーブルを参照して、そのユーザーが登録している端末トークンをすべて取得*/
 async function findTokens(userIds: string[]) {
   if (userIds.length === 0) return [];
   const { data, error } = await supabase
@@ -103,6 +100,7 @@ async function incrementUnreadCounts(tokens: string[]) {
   );
 }
 
+/*Firebaseのアクセストークンを取得*/
 async function fetchAccessToken(serviceAccount: ServiceAccount) {
   const jwt = new JWT({
     email: serviceAccount.client_email,

@@ -16,6 +16,7 @@ class PostDatasource {
   final SupabaseClient _client;
 
   /// [message] を書いて [diaryBookIds] の日記帳に出し、記録の id を返す。書いた時刻は DB が決める。
+  /// 複数のテーブルにまとめて追加したいためRPCを使用。
   Future<String> create({
     required String message,
     required List<String> diaryBookIds,
