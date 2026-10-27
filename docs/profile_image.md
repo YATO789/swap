@@ -58,7 +58,7 @@
 
 ### DB
 
-`profiles` に画像のパスの列を足し、色の列は強制アップデートのあとで消す（下の「出す順番」）。
+`profiles` に画像のパスの列を足し、色の列は消す（下の「出す順番」）。
 
 ```sql
 -- アイコンの画像の Storage 上のパス（avatars バケット）。null なら画像なし。
@@ -81,7 +81,9 @@ alter table public.profiles
 1. マイグレーション①: `avatar_path` 列と `avatars` バケットを足す。`find_diary_book_by_code` は `member_avatar_paths` を足して `member_avatar_colors` を外す（古いアプリも動く）
 2. 色を読まない新しいアプリを出し、審査が通るのを待つ
 3. Remote Config の `requiredVersion` を新しいバージョンにする（古いアプリは開いたときと裏から戻ったときに止まる）
-4. Remote Config が端末に行き渡るまで少し待ってから、マイグレーション②（`applications/supabase/pending/drop_avatar_color.sql` を `migrations/` に移す）: `avatar_color` 列を消す
+4. Remote Config が端末に行き渡るまで少し待ってから、マイグレーション②（`migrations/20261027100000_drop_avatar_color.sql`）: `avatar_color` 列を消す
+
+実際は、新しいビルド（1.0.0+8）の動作を確かめたうえで、①と②を同じ日（2026-10-27）に流した。
 
 ```sql
 -- マイグレーション②。アイコンの色はやめた。
