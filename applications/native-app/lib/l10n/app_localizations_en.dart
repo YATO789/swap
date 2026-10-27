@@ -34,9 +34,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonYesterday => 'Yesterday';
 
   @override
-  String get commonAvatarColor => 'Icon color';
-
-  @override
   String get commonName => 'Name';
 
   @override
@@ -847,6 +844,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileEditNameRequired => 'Please enter a name';
+
+  @override
+  String get profileEditChangeAvatar => 'Change icon';
+
+  @override
+  String get profileEditPickAvatar => 'Choose a photo';
+
+  @override
+  String get profileEditRemoveAvatar => 'Remove photo';
+
+  @override
+  String get profileEditPickAvatarFailed => 'Couldn\'t load the photo';
 
   @override
   String get welcomeSignInFailed => 'Couldn\'t sign in. Please try again.';

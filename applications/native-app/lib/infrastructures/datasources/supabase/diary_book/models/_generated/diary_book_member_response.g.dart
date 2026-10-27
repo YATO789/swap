@@ -26,12 +26,12 @@ _DiaryBookMemberProfileResponse _$DiaryBookMemberProfileResponseFromJson(
   Map<String, dynamic> json,
 ) => _DiaryBookMemberProfileResponse(
   displayName: json['display_name'] as String,
-  avatarColor: (json['avatar_color'] as num?)?.toInt(),
+  avatarPath: json['avatar_path'] as String?,
 );
 
 Map<String, dynamic> _$DiaryBookMemberProfileResponseToJson(
   _DiaryBookMemberProfileResponse instance,
 ) => <String, dynamic>{
   'display_name': instance.displayName,
-  'avatar_color': instance.avatarColor,
+  'avatar_path': instance.avatarPath,
 };

@@ -25,25 +25,25 @@ class ProfileDatasource {
     return row == null ? null : ProfileResponse.fromJson(row);
   }
 
-  /// 自分のプロフィールを作る。もうあれば表示名とアイコンの色を書き換える。
-  /// [avatarColor] が null なら決まった色にする。
+  /// 自分のプロフィールを作る。もうあれば表示名とアイコンの画像を書き換える。
+  /// [avatarPath] は avatars バケットの中のパスで、null なら画像なし。
   Future<ProfileResponse> saveMine({
     required String displayName,
-    required int? avatarColor,
+    required String? avatarPath,
   }) async {
     final row = await _client
         .from('profiles')
         .upsert({
           'id': _userId,
           'display_name': displayName,
-          'avatar_color': avatarColor,
+          'avatar_path': avatarPath,
         })
         .select(_columns)
         .single();
     return ProfileResponse.fromJson(row);
   }
 
-  static const _columns = 'id, display_name, avatar_color';
+  static const _columns = 'id, display_name, avatar_path';
 
   String get _userId {
     final user = _client.auth.currentUser;

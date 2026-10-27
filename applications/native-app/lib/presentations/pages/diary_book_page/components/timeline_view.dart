@@ -80,7 +80,7 @@ class TimelineView extends HookWidget {
     // 日記帳を抜けた人の名前は読めない。
     String nameOf(String userId) =>
         membersById[userId]?.displayName ?? context.l10n.commonFormerMember;
-    int? avatarColorOf(String userId) => membersById[userId]?.avatarColor;
+    String? avatarUrlOf(String userId) => membersById[userId]?.avatarUrl;
 
     // 新しい時間帯が上に来るように逆順で表示する。
     final hours = _groupByHour(posts).reversed.toList();
@@ -115,7 +115,7 @@ class TimelineView extends HookWidget {
                 diaries: diaries,
                 myId: myId,
                 nameOf: nameOf,
-                avatarColorOf: avatarColorOf,
+                avatarUrlOf: avatarUrlOf,
                 onOpen: onOpenDiary,
                 onWrite: onWriteDiary,
               ),
@@ -155,7 +155,7 @@ class TimelineView extends HookWidget {
                   hour: hours[index],
                   myId: myId,
                   nameOf: nameOf,
-                  avatarColorOf: avatarColorOf,
+                  avatarUrlOf: avatarUrlOf,
                   onDeletePost: onDeletePost,
                 ),
                 separatorBuilder: (context, index) => const Divider(),
@@ -234,14 +234,14 @@ class _HourSection extends StatelessWidget {
     required this.hour,
     required this.myId,
     required this.nameOf,
-    required this.avatarColorOf,
+    required this.avatarUrlOf,
     required this.onDeletePost,
   });
 
   final _TimelineHour hour;
   final String? myId;
   final String Function(String userId) nameOf;
-  final int? Function(String userId) avatarColorOf;
+  final String? Function(String userId) avatarUrlOf;
   final ValueChanged<TimelinePost> onDeletePost;
 
   @override
@@ -259,7 +259,7 @@ class _HourSection extends StatelessWidget {
               child: _PostCard(
                 post: post,
                 name: nameOf(post.authorId),
-                avatarColor: avatarColorOf(post.authorId),
+                avatarUrl: avatarUrlOf(post.authorId),
                 isMine: post.authorId == myId,
                 onDelete: () => onDeletePost(post),
               ),
@@ -370,9 +370,7 @@ class _PendingOthersRow extends StatelessWidget {
                       color: colors.surface,
                     ),
                     child: UserAvatar(
-                      name: member.displayName,
-                      filled: false,
-                      color: member.avatarColor,
+                      imageUrl: member.avatarUrl,
                       size: _avatarSize,
                     ),
                   ),
@@ -396,14 +394,14 @@ class _PostCard extends StatelessWidget {
   const _PostCard({
     required this.post,
     required this.name,
-    required this.avatarColor,
+    required this.avatarUrl,
     required this.isMine,
     required this.onDelete,
   });
 
   final TimelinePost post;
   final String name;
-  final int? avatarColor;
+  final String? avatarUrl;
   final bool isMine;
   final VoidCallback onDelete;
 
@@ -424,7 +422,7 @@ class _PostCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              UserAvatar(name: name, filled: isMine, color: avatarColor),
+              UserAvatar(imageUrl: avatarUrl),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

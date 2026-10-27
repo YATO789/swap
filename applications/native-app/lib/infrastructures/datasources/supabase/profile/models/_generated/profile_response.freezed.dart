@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProfileResponse {
 
- String get id; String get displayName; int? get avatarColor;
+ String get id; String get displayName;/// avatars バケットの中のパス。null なら画像なし。
+ String? get avatarPath;
 /// Create a copy of ProfileResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +31,20 @@ $ProfileResponseCopyWith<ProfileResponse> get copyWith => _$ProfileResponseCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as ProfileResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarColor, _this.avatarColor) || other.avatarColor == _this.avatarColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarPath, _this.avatarPath) || other.avatarPath == _this.avatarPath));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as ProfileResponse;
-  return Object.hash(runtimeType,_this.id,_this.displayName,_this.avatarColor);
+  return Object.hash(runtimeType,_this.id,_this.displayName,_this.avatarPath);
 }
 
 @override
 String toString() {
   final _this = this as ProfileResponse;
-  return 'ProfileResponse(id: ${_this.id}, displayName: ${_this.displayName}, avatarColor: ${_this.avatarColor})';
+  return 'ProfileResponse(id: ${_this.id}, displayName: ${_this.displayName}, avatarPath: ${_this.avatarPath})';
 }
 
 
@@ -54,7 +55,7 @@ abstract mixin class $ProfileResponseCopyWith<$Res>  {
   factory $ProfileResponseCopyWith(ProfileResponse value, $Res Function(ProfileResponse) _then) = _$ProfileResponseCopyWithImpl;
 @useResult
 $Res call({
- String id, String displayName, int? avatarColor
+ String id, String displayName, String? avatarPath
 });
 
 
@@ -71,12 +72,12 @@ class _$ProfileResponseCopyWithImpl<$Res>
 
 /// Create a copy of ProfileResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? displayName = null,Object? avatarColor = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? displayName = null,Object? avatarPath = freezed,}) {
   return _then(ProfileResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
-as int?,
+as String,avatarPath: freezed == avatarPath ? _self.avatarPath : avatarPath // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -161,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String displayName,  int? avatarColor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String displayName,  String? avatarPath)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProfileResponse() when $default != null:
-return $default(_that.id,_that.displayName,_that.avatarColor);case _:
+return $default(_that.id,_that.displayName,_that.avatarPath);case _:
   return orElse();
 
 }
@@ -182,10 +183,10 @@ return $default(_that.id,_that.displayName,_that.avatarColor);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String displayName,  int? avatarColor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String displayName,  String? avatarPath)  $default,) {final _that = this;
 switch (_that) {
 case _ProfileResponse():
-return $default(_that.id,_that.displayName,_that.avatarColor);case _:
+return $default(_that.id,_that.displayName,_that.avatarPath);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +203,10 @@ return $default(_that.id,_that.displayName,_that.avatarColor);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String displayName,  int? avatarColor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String displayName,  String? avatarPath)?  $default,) {final _that = this;
 switch (_that) {
 case _ProfileResponse() when $default != null:
-return $default(_that.id,_that.displayName,_that.avatarColor);case _:
+return $default(_that.id,_that.displayName,_that.avatarPath);case _:
   return null;
 
 }
@@ -217,12 +218,13 @@ return $default(_that.id,_that.displayName,_that.avatarColor);case _:
 @JsonSerializable()
 
 class _ProfileResponse implements ProfileResponse {
-  const _ProfileResponse({required this.id, required this.displayName, this.avatarColor});
+  const _ProfileResponse({required this.id, required this.displayName, this.avatarPath});
   factory _ProfileResponse.fromJson(Map<String, dynamic> json) => _$ProfileResponseFromJson(json);
 
 @override final  String id;
 @override final  String displayName;
-@override final  int? avatarColor;
+/// avatars バケットの中のパス。null なら画像なし。
+@override final  String? avatarPath;
 
 /// Create a copy of ProfileResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -237,18 +239,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarColor, avatarColor) || other.avatarColor == avatarColor));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarPath, avatarPath) || other.avatarPath == avatarPath));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,displayName,avatarColor);
+    return Object.hash(runtimeType,id,displayName,avatarPath);
 }
 
 @override
 String toString() {
-    return 'ProfileResponse(id: $id, displayName: $displayName, avatarColor: $avatarColor)';
+    return 'ProfileResponse(id: $id, displayName: $displayName, avatarPath: $avatarPath)';
 }
 
 
@@ -259,7 +261,7 @@ abstract mixin class _$ProfileResponseCopyWith<$Res> implements $ProfileResponse
   factory _$ProfileResponseCopyWith(_ProfileResponse value, $Res Function(_ProfileResponse) _then) = __$ProfileResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String displayName, int? avatarColor
+ String id, String displayName, String? avatarPath
 });
 
 
@@ -276,12 +278,12 @@ class __$ProfileResponseCopyWithImpl<$Res>
 
 /// Create a copy of ProfileResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? displayName = null,Object? avatarColor = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? displayName = null,Object? avatarPath = freezed,}) {
   return _then(_ProfileResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
-as int?,
+as String,avatarPath: freezed == avatarPath ? _self.avatarPath : avatarPath // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

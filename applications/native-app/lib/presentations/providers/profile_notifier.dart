@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domains/profile/profile.dart';
@@ -17,14 +18,20 @@ class ProfileNotifier extends _$ProfileNotifier {
     return ref.read(profileRepositoryProvider).fetchMine();
   }
 
-  /// 表示名とアイコンの色を保存する。まだプロフィールがなければ作る。
+  /// 表示名を保存する。まだプロフィールがなければ作る。
+  /// [newAvatar] があればアイコンの画像を替え、[removesAvatar] が true なら外す。
   Future<void> save({
     required String displayName,
-    required int? avatarColor,
+    Uint8List? newAvatar,
+    bool removesAvatar = false,
   }) async {
     final profile = await ref
         .read(profileRepositoryProvider)
-        .save(displayName: displayName, avatarColor: avatarColor);
+        .save(
+          displayName: displayName,
+          newAvatar: newAvatar,
+          removesAvatar: removesAvatar,
+        );
     state = AsyncData(profile);
   }
 }

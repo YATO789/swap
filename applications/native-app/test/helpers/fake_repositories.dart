@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/domains/authentication/authentication.dart';
@@ -120,12 +121,17 @@ class FakeProfileRepository implements ProfileRepository {
   @override
   Future<Profile> save({
     required String displayName,
-    required int? avatarColor,
+    Uint8List? newAvatar,
+    bool removesAvatar = false,
   }) async {
     final saved = Profile(
       id: profile?.id ?? 'me',
       displayName: displayName,
-      avatarColor: avatarColor,
+      avatarUrl: newAvatar != null
+          ? 'https://example.com/avatar.jpg'
+          : removesAvatar
+          ? null
+          : profile?.avatarUrl,
     );
     profile = saved;
     return saved;

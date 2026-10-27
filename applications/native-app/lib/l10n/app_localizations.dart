@@ -146,12 +146,6 @@ abstract class AppLocalizations {
   /// **'昨日'**
   String get commonYesterday;
 
-  /// No description provided for @commonAvatarColor.
-  ///
-  /// In ja, this message translates to:
-  /// **'アイコンの色'**
-  String get commonAvatarColor;
-
   /// No description provided for @commonName.
   ///
   /// In ja, this message translates to:
@@ -1423,6 +1417,30 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'名前を入力してください'**
   String get profileEditNameRequired;
+
+  /// プロフィール編集のアイコンを押したときの読み上げ
+  ///
+  /// In ja, this message translates to:
+  /// **'アイコンを変える'**
+  String get profileEditChangeAvatar;
+
+  /// No description provided for @profileEditPickAvatar.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を選ぶ'**
+  String get profileEditPickAvatar;
+
+  /// No description provided for @profileEditRemoveAvatar.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を外す'**
+  String get profileEditRemoveAvatar;
+
+  /// No description provided for @profileEditPickAvatarFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を読み込めませんでした'**
+  String get profileEditPickAvatarFailed;
 
   /// No description provided for @welcomeSignInFailed.
   ///

@@ -9,8 +9,8 @@ abstract class Profile with _$Profile {
     required String id,
     required String displayName,
 
-    /// アイコンの色（0xAARRGGBB）。null なら決まった色。
-    int? avatarColor,
+    /// アイコンの画像の URL。null なら画像なし。
+    String? avatarUrl,
   }) = _Profile;
 }
 

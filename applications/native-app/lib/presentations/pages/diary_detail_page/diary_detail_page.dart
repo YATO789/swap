@@ -236,7 +236,7 @@ class _DiaryPages extends HookConsumerWidget {
                       name:
                           state.members[diary.authorId]?.displayName ??
                           context.l10n.commonFormerMember,
-                      avatarColor: state.members[diary.authorId]?.avatarColor,
+                      avatarUrl: state.members[diary.authorId]?.avatarUrl,
                       isMine: diary.authorId == myId,
                       posts: state.posts[diary.authorId] ?? const [],
                     ),
@@ -341,7 +341,7 @@ class _DiaryBody extends StatelessWidget {
     required this.title,
     required this.diary,
     required this.name,
-    required this.avatarColor,
+    required this.avatarUrl,
     required this.isMine,
     required this.posts,
   });
@@ -351,7 +351,7 @@ class _DiaryBody extends StatelessWidget {
 
   final Diary diary;
   final String name;
-  final int? avatarColor;
+  final String? avatarUrl;
   final bool isMine;
 
   /// 書いた人のその日の記録。古い順。
@@ -368,7 +368,7 @@ class _DiaryBody extends StatelessWidget {
       const SizedBox(height: 8),
       Row(
         children: [
-          UserAvatar(name: name, filled: isMine, color: avatarColor),
+          UserAvatar(imageUrl: avatarUrl),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

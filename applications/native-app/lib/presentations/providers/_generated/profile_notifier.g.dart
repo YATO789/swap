@@ -42,7 +42,7 @@ final class ProfileNotifierProvider
   ProfileNotifier create() => ProfileNotifier();
 }
 
-String _$profileNotifierHash() => r'c3f6f52d028e376389612197cf484f4f55d8ad53';
+String _$profileNotifierHash() => r'096c47f7d5cb83322673c51a9a0d941d99230bea';
 
 /// 自分のプロフィールを持つ。サインインしていないか、まだ作っていなければ null。
 ///

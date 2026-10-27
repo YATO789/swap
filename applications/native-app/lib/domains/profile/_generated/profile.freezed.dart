@@ -15,8 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Profile {
 
- String get id; String get displayName;/// アイコンの色（0xAARRGGBB）。null なら決まった色。
- int? get avatarColor;
+ String get id; String get displayName;/// アイコンの画像の URL。null なら画像なし。
+ String? get avatarUrl;
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,20 +28,20 @@ $ProfileCopyWith<Profile> get copyWith => _$ProfileCopyWithImpl<Profile>(this as
 @override
 bool operator ==(Object other) {
   final _this = this as Profile;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Profile&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarColor, _this.avatarColor) || other.avatarColor == _this.avatarColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Profile&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarUrl, _this.avatarUrl) || other.avatarUrl == _this.avatarUrl));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Profile;
-  return Object.hash(runtimeType,_this.id,_this.displayName,_this.avatarColor);
+  return Object.hash(runtimeType,_this.id,_this.displayName,_this.avatarUrl);
 }
 
 @override
 String toString() {
   final _this = this as Profile;
-  return 'Profile(id: ${_this.id}, displayName: ${_this.displayName}, avatarColor: ${_this.avatarColor})';
+  return 'Profile(id: ${_this.id}, displayName: ${_this.displayName}, avatarUrl: ${_this.avatarUrl})';
 }
 
 
@@ -52,7 +52,7 @@ abstract mixin class $ProfileCopyWith<$Res>  {
   factory $ProfileCopyWith(Profile value, $Res Function(Profile) _then) = _$ProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String displayName, int? avatarColor
+ String id, String displayName, String? avatarUrl
 });
 
 
@@ -69,12 +69,12 @@ class _$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? displayName = null,Object? avatarColor = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? displayName = null,Object? avatarUrl = freezed,}) {
   return _then(Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
-as int?,
+as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -159,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String displayName,  int? avatarColor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String displayName,  String? avatarUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Profile() when $default != null:
-return $default(_that.id,_that.displayName,_that.avatarColor);case _:
+return $default(_that.id,_that.displayName,_that.avatarUrl);case _:
   return orElse();
 
 }
@@ -180,10 +180,10 @@ return $default(_that.id,_that.displayName,_that.avatarColor);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String displayName,  int? avatarColor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String displayName,  String? avatarUrl)  $default,) {final _that = this;
 switch (_that) {
 case _Profile():
-return $default(_that.id,_that.displayName,_that.avatarColor);case _:
+return $default(_that.id,_that.displayName,_that.avatarUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +200,10 @@ return $default(_that.id,_that.displayName,_that.avatarColor);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String displayName,  int? avatarColor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String displayName,  String? avatarUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _Profile() when $default != null:
-return $default(_that.id,_that.displayName,_that.avatarColor);case _:
+return $default(_that.id,_that.displayName,_that.avatarUrl);case _:
   return null;
 
 }
@@ -215,13 +215,13 @@ return $default(_that.id,_that.displayName,_that.avatarColor);case _:
 
 
 class _Profile implements Profile {
-  const _Profile({required this.id, required this.displayName, this.avatarColor});
+  const _Profile({required this.id, required this.displayName, this.avatarUrl});
   
 
 @override final  String id;
 @override final  String displayName;
-/// アイコンの色（0xAARRGGBB）。null なら決まった色。
-@override final  int? avatarColor;
+/// アイコンの画像の URL。null なら画像なし。
+@override final  String? avatarUrl;
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
@@ -233,18 +233,18 @@ _$ProfileCopyWith<_Profile> get copyWith => __$ProfileCopyWithImpl<_Profile>(thi
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarColor, avatarColor) || other.avatarColor == avatarColor));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,displayName,avatarColor);
+    return Object.hash(runtimeType,id,displayName,avatarUrl);
 }
 
 @override
 String toString() {
-    return 'Profile(id: $id, displayName: $displayName, avatarColor: $avatarColor)';
+    return 'Profile(id: $id, displayName: $displayName, avatarUrl: $avatarUrl)';
 }
 
 
@@ -255,7 +255,7 @@ abstract mixin class _$ProfileCopyWith<$Res> implements $ProfileCopyWith<$Res> {
   factory _$ProfileCopyWith(_Profile value, $Res Function(_Profile) _then) = __$ProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String displayName, int? avatarColor
+ String id, String displayName, String? avatarUrl
 });
 
 
@@ -272,12 +272,12 @@ class __$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? displayName = null,Object? avatarColor = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? displayName = null,Object? avatarUrl = freezed,}) {
   return _then(_Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
-as int?,
+as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

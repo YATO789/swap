@@ -61,7 +61,7 @@ class DiaryBookDatasource {
   Future<List<DiaryBookMemberResponse>> fetchMembers(String diaryBookId) async {
     final rows = await _client
         .from('diary_book_members')
-        .select('user_id, profiles(display_name, avatar_color)')
+        .select('user_id, profiles(display_name, avatar_path)')
         .eq('diary_book_id', diaryBookId)
         .order('joined_at');
     return rows.map(DiaryBookMemberResponse.fromJson).toList();

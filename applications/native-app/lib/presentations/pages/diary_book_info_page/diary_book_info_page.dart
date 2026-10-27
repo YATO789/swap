@@ -427,12 +427,7 @@ class _MemberLine extends StatelessWidget {
               ),
             ),
           ),
-          UserAvatar(
-            name: member.displayName,
-            filled: isMe,
-            color: member.avatarColor,
-            size: 28,
-          ),
+          UserAvatar(imageUrl: member.avatarUrl, size: 28),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

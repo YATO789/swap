@@ -34,9 +34,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonYesterday => '昨日';
 
   @override
-  String get commonAvatarColor => 'アイコンの色';
-
-  @override
   String get commonName => '名前';
 
   @override
@@ -760,6 +757,18 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get profileEditNameRequired => '名前を入力してください';
+
+  @override
+  String get profileEditChangeAvatar => 'アイコンを変える';
+
+  @override
+  String get profileEditPickAvatar => '写真を選ぶ';
+
+  @override
+  String get profileEditRemoveAvatar => '写真を外す';
+
+  @override
+  String get profileEditPickAvatarFailed => '写真を読み込めませんでした';
 
   @override
   String get welcomeSignInFailed => 'サインインできませんでした。もう一度お試しください';

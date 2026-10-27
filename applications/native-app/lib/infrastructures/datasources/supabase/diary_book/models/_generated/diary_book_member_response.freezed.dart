@@ -307,7 +307,8 @@ $DiaryBookMemberProfileResponseCopyWith<$Res> get profile {
 /// @nodoc
 mixin _$DiaryBookMemberProfileResponse {
 
- String get displayName; int? get avatarColor;
+ String get displayName;/// avatars バケットの中のパス。null なら画像なし。
+ String? get avatarPath;
 /// Create a copy of DiaryBookMemberProfileResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -321,20 +322,20 @@ $DiaryBookMemberProfileResponseCopyWith<DiaryBookMemberProfileResponse> get copy
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryBookMemberProfileResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBookMemberProfileResponse&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarColor, _this.avatarColor) || other.avatarColor == _this.avatarColor));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryBookMemberProfileResponse&&(identical(other.displayName, _this.displayName) || other.displayName == _this.displayName)&&(identical(other.avatarPath, _this.avatarPath) || other.avatarPath == _this.avatarPath));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as DiaryBookMemberProfileResponse;
-  return Object.hash(runtimeType,_this.displayName,_this.avatarColor);
+  return Object.hash(runtimeType,_this.displayName,_this.avatarPath);
 }
 
 @override
 String toString() {
   final _this = this as DiaryBookMemberProfileResponse;
-  return 'DiaryBookMemberProfileResponse(displayName: ${_this.displayName}, avatarColor: ${_this.avatarColor})';
+  return 'DiaryBookMemberProfileResponse(displayName: ${_this.displayName}, avatarPath: ${_this.avatarPath})';
 }
 
 
@@ -345,7 +346,7 @@ abstract mixin class $DiaryBookMemberProfileResponseCopyWith<$Res>  {
   factory $DiaryBookMemberProfileResponseCopyWith(DiaryBookMemberProfileResponse value, $Res Function(DiaryBookMemberProfileResponse) _then) = _$DiaryBookMemberProfileResponseCopyWithImpl;
 @useResult
 $Res call({
- String displayName, int? avatarColor
+ String displayName, String? avatarPath
 });
 
 
@@ -362,11 +363,11 @@ class _$DiaryBookMemberProfileResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBookMemberProfileResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? displayName = null,Object? avatarColor = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? displayName = null,Object? avatarPath = freezed,}) {
   return _then(DiaryBookMemberProfileResponse(
 displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
-as int?,
+as String,avatarPath: freezed == avatarPath ? _self.avatarPath : avatarPath // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -451,10 +452,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String displayName,  int? avatarColor)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String displayName,  String? avatarPath)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryBookMemberProfileResponse() when $default != null:
-return $default(_that.displayName,_that.avatarColor);case _:
+return $default(_that.displayName,_that.avatarPath);case _:
   return orElse();
 
 }
@@ -472,10 +473,10 @@ return $default(_that.displayName,_that.avatarColor);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String displayName,  int? avatarColor)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String displayName,  String? avatarPath)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBookMemberProfileResponse():
-return $default(_that.displayName,_that.avatarColor);case _:
+return $default(_that.displayName,_that.avatarPath);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -492,10 +493,10 @@ return $default(_that.displayName,_that.avatarColor);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String displayName,  int? avatarColor)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String displayName,  String? avatarPath)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryBookMemberProfileResponse() when $default != null:
-return $default(_that.displayName,_that.avatarColor);case _:
+return $default(_that.displayName,_that.avatarPath);case _:
   return null;
 
 }
@@ -507,11 +508,12 @@ return $default(_that.displayName,_that.avatarColor);case _:
 @JsonSerializable()
 
 class _DiaryBookMemberProfileResponse implements DiaryBookMemberProfileResponse {
-  const _DiaryBookMemberProfileResponse({required this.displayName, this.avatarColor});
+  const _DiaryBookMemberProfileResponse({required this.displayName, this.avatarPath});
   factory _DiaryBookMemberProfileResponse.fromJson(Map<String, dynamic> json) => _$DiaryBookMemberProfileResponseFromJson(json);
 
 @override final  String displayName;
-@override final  int? avatarColor;
+/// avatars バケットの中のパス。null なら画像なし。
+@override final  String? avatarPath;
 
 /// Create a copy of DiaryBookMemberProfileResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -526,18 +528,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBookMemberProfileResponse&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarColor, avatarColor) || other.avatarColor == avatarColor));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryBookMemberProfileResponse&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarPath, avatarPath) || other.avatarPath == avatarPath));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,displayName,avatarColor);
+    return Object.hash(runtimeType,displayName,avatarPath);
 }
 
 @override
 String toString() {
-    return 'DiaryBookMemberProfileResponse(displayName: $displayName, avatarColor: $avatarColor)';
+    return 'DiaryBookMemberProfileResponse(displayName: $displayName, avatarPath: $avatarPath)';
 }
 
 
@@ -548,7 +550,7 @@ abstract mixin class _$DiaryBookMemberProfileResponseCopyWith<$Res> implements $
   factory _$DiaryBookMemberProfileResponseCopyWith(_DiaryBookMemberProfileResponse value, $Res Function(_DiaryBookMemberProfileResponse) _then) = __$DiaryBookMemberProfileResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String displayName, int? avatarColor
+ String displayName, String? avatarPath
 });
 
 
@@ -565,11 +567,11 @@ class __$DiaryBookMemberProfileResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryBookMemberProfileResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? displayName = null,Object? avatarColor = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? displayName = null,Object? avatarPath = freezed,}) {
   return _then(_DiaryBookMemberProfileResponse(
 displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
-as String,avatarColor: freezed == avatarColor ? _self.avatarColor : avatarColor // ignore: cast_nullable_to_non_nullable
-as int?,
+as String,avatarPath: freezed == avatarPath ? _self.avatarPath : avatarPath // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

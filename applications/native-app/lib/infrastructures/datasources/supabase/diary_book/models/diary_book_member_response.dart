@@ -21,7 +21,9 @@ abstract class DiaryBookMemberProfileResponse
     with _$DiaryBookMemberProfileResponse {
   const factory DiaryBookMemberProfileResponse({
     required String displayName,
-    int? avatarColor,
+
+    /// avatars バケットの中のパス。null なら画像なし。
+    String? avatarPath,
   }) = _DiaryBookMemberProfileResponse;
 
   factory DiaryBookMemberProfileResponse.fromJson(Map<String, dynamic> json) =>

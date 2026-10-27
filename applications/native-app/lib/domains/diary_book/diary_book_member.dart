@@ -8,8 +8,6 @@ abstract class DiaryBookMember with _$DiaryBookMember {
   const factory DiaryBookMember({
     required String userId,
     required String displayName,
-
-    /// アイコンの色（0xAARRGGBB）。null なら決まった色。
-    int? avatarColor,
+    String? avatarUrl,
   }) = _DiaryBookMember;
 }

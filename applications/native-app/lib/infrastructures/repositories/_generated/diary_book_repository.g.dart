@@ -55,4 +55,4 @@ final class DiaryBookRepositoryProvider
 }
 
 String _$diaryBookRepositoryHash() =>
-    r'5c19a9a215f32346ec53606c19574bde53173f9f';
+    r'd9e5fe9db0e6be48d438df636972196403a4618e';

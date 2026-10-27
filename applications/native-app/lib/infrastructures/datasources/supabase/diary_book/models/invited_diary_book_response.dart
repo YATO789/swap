@@ -12,8 +12,8 @@ abstract class InvitedDiaryBookResponse with _$InvitedDiaryBookResponse {
     required int memberLimit,
     required List<String> memberNames,
 
-    /// [memberNames] と同じ順。
-    @Default([]) List<int?> memberAvatarColors,
+    /// avatars バケットの中のパス。[memberNames] と同じ順で、画像のない人は null。
+    @Default([]) List<String?> memberAvatarPaths,
     required bool alreadyJoined,
     int? coverColor,
   }) = _InvitedDiaryBookResponse;

@@ -85,7 +85,7 @@ class MyPage extends HookConsumerWidget {
         children: [
           _ProfileTile(
             name: profile?.displayName ?? '',
-            avatarColor: profile?.avatarColor,
+            avatarUrl: profile?.avatarUrl,
             onTap: () => const ProfileEditRoute().push<void>(context),
           ),
           _SectionHeader(l10n.settingsHomeLayoutSection),
@@ -168,12 +168,12 @@ class MyPage extends HookConsumerWidget {
 class _ProfileTile extends StatelessWidget {
   const _ProfileTile({
     required this.name,
-    required this.avatarColor,
+    required this.avatarUrl,
     required this.onTap,
   });
 
   final String name;
-  final int? avatarColor;
+  final String? avatarUrl;
   final VoidCallback onTap;
 
   @override
@@ -190,12 +190,7 @@ class _ProfileTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Row(
             children: [
-              UserAvatar(
-                name: name,
-                filled: true,
-                color: avatarColor,
-                size: 56,
-              ),
+              UserAvatar(imageUrl: avatarUrl, size: 56),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(

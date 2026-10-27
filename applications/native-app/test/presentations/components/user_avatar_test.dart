@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:swap/presentations/components/user_avatar.dart';
@@ -5,26 +8,36 @@ import 'package:swap/presentations/components/user_avatar.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
-  testWidgets('名前の1文字目を出す', (tester) async {
-    await tester.pumpApp(const UserAvatar(name: '彩人', filled: true));
+  Finder inAvatar(Finder matching) {
+    return find.descendant(of: find.byType(UserAvatar), matching: matching);
+  }
 
-    expect(find.text('彩'), findsOneWidget);
+  testWidgets('画像がなければシルエットを出す', (tester) async {
+    await tester.pumpApp(const UserAvatar());
+
+    expect(inAvatar(find.byType(CustomPaint)), findsOneWidget);
+    expect(inAvatar(find.byType(CachedNetworkImage)), findsNothing);
   });
 
-  testWidgets('名前が空なら人のアイコンを出す', (tester) async {
-    await tester.pumpApp(const UserAvatar(name: '  ', filled: false));
-
-    expect(find.byIcon(Icons.person), findsOneWidget);
-  });
-
-  testWidgets('色があれば、自分かどうかにかかわらずその色で塗る', (tester) async {
+  testWidgets('URL があれば、その画像を出す', (tester) async {
     await tester.pumpApp(
-      const UserAvatar(name: '美緒', filled: false, color: 0xFFFFE07A),
+      const UserAvatar(imageUrl: 'https://example.com/avatar.jpg'),
     );
 
-    final decoration =
-        tester.widget<Container>(find.byType(Container)).decoration
-            as BoxDecoration;
-    expect(decoration.color, const Color(0xFFFFE07A));
+    final image = tester.widget<CachedNetworkImage>(
+      inAvatar(find.byType(CachedNetworkImage)),
+    );
+    expect(image.imageUrl, 'https://example.com/avatar.jpg');
+  });
+
+  testWidgets('選んだばかりの画像は URL より優先して出す', (tester) async {
+    final bytes = Uint8List.fromList([1, 2, 3]);
+    await tester.pumpApp(
+      UserAvatar(imageUrl: 'https://example.com/avatar.jpg', imageBytes: bytes),
+    );
+
+    final image = tester.widget<Image>(inAvatar(find.byType(Image)));
+    expect((image.image as MemoryImage).bytes, bytes);
+    expect(inAvatar(find.byType(CachedNetworkImage)), findsNothing);
   });
 }

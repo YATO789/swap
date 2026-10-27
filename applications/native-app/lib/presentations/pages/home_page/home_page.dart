@@ -167,12 +167,7 @@ class HomePage extends HookConsumerWidget {
           IconButton(
             onPressed: () => const MyPageRoute().push<void>(context),
             tooltip: l10n.homeProfileAndSettings,
-            icon: UserAvatar(
-              name: profile?.displayName ?? '',
-              filled: true,
-              color: profile?.avatarColor,
-              size: 30,
-            ),
+            icon: UserAvatar(imageUrl: profile?.avatarUrl, size: 30),
           ),
           const SizedBox(width: 8),
         ],

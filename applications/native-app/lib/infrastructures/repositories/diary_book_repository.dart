@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/diary_book/invited_diary_book.dart';
+import 'package:swap/infrastructures/datasources/supabase/avatar/avatar_datasource.dart';
 import 'package:swap/infrastructures/datasources/supabase/diary_book/diary_book_datasource.dart';
 import 'package:swap/infrastructures/datasources/supabase/diary_book/models/diary_book_member_response.dart';
 import 'package:swap/infrastructures/datasources/supabase/diary_book/models/diary_book_response.dart';
@@ -11,14 +12,18 @@ part '_generated/diary_book_repository.g.dart';
 
 @riverpod
 DiaryBookRepository diaryBookRepository(Ref ref) {
-  return DiaryBookRepository(ref.watch(diaryBookDatasourceProvider));
+  return DiaryBookRepository(
+    ref.watch(diaryBookDatasourceProvider),
+    ref.watch(avatarDatasourceProvider),
+  );
 }
 
 /// 日記帳を読み書きする。
 class DiaryBookRepository {
-  const DiaryBookRepository(this._datasource);
+  const DiaryBookRepository(this._datasource, this._avatarDatasource);
 
   final DiaryBookDatasource _datasource;
+  final AvatarDatasource _avatarDatasource;
 
   /// 自分が参加している日記帳を返す。
   Future<List<DiaryBook>> fetchJoined() async {
@@ -105,7 +110,7 @@ class DiaryBookRepository {
       id: response.id,
       name: response.name,
       memberNames: response.memberNames,
-      memberAvatarColors: response.memberAvatarColors,
+      memberAvatarUrls: response.memberAvatarPaths.map(_avatarUrl).toList(),
       alreadyJoined: response.alreadyJoined,
       memberLimit: response.memberLimit,
       coverColor: response.coverColor,
@@ -116,7 +121,11 @@ class DiaryBookRepository {
     return DiaryBookMember(
       userId: response.userId,
       displayName: response.profile.displayName,
-      avatarColor: response.profile.avatarColor,
+      avatarUrl: _avatarUrl(response.profile.avatarPath),
     );
+  }
+
+  String? _avatarUrl(String? avatarPath) {
+    return avatarPath == null ? null : _avatarDatasource.publicUrl(avatarPath);
   }
 }

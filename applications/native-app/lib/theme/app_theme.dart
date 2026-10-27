@@ -11,9 +11,11 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.disabled,
     required this.placeholder,
     required this.surface,
+    required this.avatarBackground,
+    required this.avatarSilhouette,
   });
 
-  /// 本文や見出し。塗りつぶしたボタンやアバターの地にも使う。
+  /// 本文や見出し。塗りつぶしたボタンの地にも使う。
   final Color textPrimary;
 
   /// 補足のテキスト。背景に対して 4.5:1 以上のコントラストを保つ。
@@ -27,6 +29,12 @@ class AppColors extends ThemeExtension<AppColors> {
   /// 画面の地の色。[textPrimary] で塗った上に載せる文字色にも使う。
   final Color surface;
 
+  /// 画像のないアイコンの丸の地。
+  final Color avatarBackground;
+
+  /// 画像のないアイコンの、人のシルエット。
+  final Color avatarSilhouette;
+
   static const light = AppColors(
     textPrimary: Color(0xFF111111),
     textSecondary: Color(0xFF6B6B6B),
@@ -34,6 +42,8 @@ class AppColors extends ThemeExtension<AppColors> {
     disabled: Color(0xFFC4C4C4),
     placeholder: Color(0xFFEFEFEF),
     surface: Colors.white,
+    avatarBackground: Color(0xFFEBECEE),
+    avatarSilhouette: Color(0xFF7D848C),
   );
 
   static const dark = AppColors(
@@ -43,6 +53,8 @@ class AppColors extends ThemeExtension<AppColors> {
     disabled: Color(0xFF4D4D4D),
     placeholder: Color(0xFF2A2A2A),
     surface: Color(0xFF121212),
+    avatarBackground: Color(0xFF2C2F33),
+    avatarSilhouette: Color(0xFF7D848C),
   );
 
   @override
@@ -53,6 +65,8 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? disabled,
     Color? placeholder,
     Color? surface,
+    Color? avatarBackground,
+    Color? avatarSilhouette,
   }) {
     return AppColors(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -61,6 +75,8 @@ class AppColors extends ThemeExtension<AppColors> {
       disabled: disabled ?? this.disabled,
       placeholder: placeholder ?? this.placeholder,
       surface: surface ?? this.surface,
+      avatarBackground: avatarBackground ?? this.avatarBackground,
+      avatarSilhouette: avatarSilhouette ?? this.avatarSilhouette,
     );
   }
 
@@ -74,6 +90,16 @@ class AppColors extends ThemeExtension<AppColors> {
       disabled: Color.lerp(disabled, other.disabled, t)!,
       placeholder: Color.lerp(placeholder, other.placeholder, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
+      avatarBackground: Color.lerp(
+        avatarBackground,
+        other.avatarBackground,
+        t,
+      )!,
+      avatarSilhouette: Color.lerp(
+        avatarSilhouette,
+        other.avatarSilhouette,
+        t,
+      )!,
     );
   }
 }

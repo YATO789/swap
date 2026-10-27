@@ -9,7 +9,8 @@ abstract class ProfileResponse with _$ProfileResponse {
   const factory ProfileResponse({
     required String id,
     required String displayName,
-    int? avatarColor,
+    /// avatars バケットの中のパス。null なら画像なし。
+    String? avatarPath,
   }) = _ProfileResponse;
 
   factory ProfileResponse.fromJson(Map<String, dynamic> json) =>

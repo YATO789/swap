@@ -15,9 +15,9 @@ _InvitedDiaryBookResponse _$InvitedDiaryBookResponseFromJson(
   memberNames: (json['member_names'] as List<dynamic>)
       .map((e) => e as String)
       .toList(),
-  memberAvatarColors:
-      (json['member_avatar_colors'] as List<dynamic>?)
-          ?.map((e) => (e as num?)?.toInt())
+  memberAvatarPaths:
+      (json['member_avatar_paths'] as List<dynamic>?)
+          ?.map((e) => e as String?)
           .toList() ??
       const [],
   alreadyJoined: json['already_joined'] as bool,
@@ -31,7 +31,7 @@ Map<String, dynamic> _$InvitedDiaryBookResponseToJson(
   'name': instance.name,
   'member_limit': instance.memberLimit,
   'member_names': instance.memberNames,
-  'member_avatar_colors': instance.memberAvatarColors,
+  'member_avatar_paths': instance.memberAvatarPaths,
   'already_joined': instance.alreadyJoined,
   'cover_color': instance.coverColor,
 };

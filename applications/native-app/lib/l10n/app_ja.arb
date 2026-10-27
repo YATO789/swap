@@ -8,7 +8,6 @@
   "commonOpenLinkFailed": "ページを開けませんでした",
   "commonToday": "今日",
   "commonYesterday": "昨日",
-  "commonAvatarColor": "アイコンの色",
   "commonName": "名前",
   "commonEnterName": "名前を入力",
   "commonFormerMember": "抜けたメンバー",
@@ -617,6 +616,13 @@
   "profileEditSaveFailed": "プロフィールを保存できませんでした。もう一度お試しください",
   "profileEditSaved": "プロフィールを保存しました",
   "profileEditNameRequired": "名前を入力してください",
+  "profileEditChangeAvatar": "アイコンを変える",
+  "@profileEditChangeAvatar": {
+    "description": "プロフィール編集のアイコンを押したときの読み上げ"
+  },
+  "profileEditPickAvatar": "写真を選ぶ",
+  "profileEditRemoveAvatar": "写真を外す",
+  "profileEditPickAvatarFailed": "写真を読み込めませんでした",
   "welcomeSignInFailed": "サインインできませんでした。もう一度お試しください",
   "welcomeTagline": "交換日記みたいに、みんなで\n1日の日記を共有しよう",
   "welcomeSigningIn": "サインイン中…",
