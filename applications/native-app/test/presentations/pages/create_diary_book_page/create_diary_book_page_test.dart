@@ -117,10 +117,10 @@ void main() {
     expect(find.text('大学'), findsOneWidget);
   });
 
-  testWidgets('日記帳があれば、AppBar の本のアイコンからも作れる', (tester) async {
+  testWidgets('日記帳があれば、一覧の最後の追加ボタンからも作れる', (tester) async {
     await _pumpHome(tester, diaryBooks: [_university]);
 
-    await tester.tap(find.byTooltip('日記帳を追加'));
+    await tester.tap(find.text('日記帳を追加'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('日記帳を作る'));
     await tester.pumpAndSettle();

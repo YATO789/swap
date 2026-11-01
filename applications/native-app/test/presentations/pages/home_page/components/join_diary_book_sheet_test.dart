@@ -61,7 +61,10 @@ Future<void> _openJoinSheet(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
+        // 追加ボタンまでスクロールして押せるよう、表紙を並べるグリッドにする。
+        preferencesStoreProvider.overrideWithValue(
+          FakePreferencesStore(diaryBookPaged: false),
+        ),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),
@@ -116,7 +119,9 @@ Future<void> _openJoinSheet(
     await tester.ensureVisible(find.text('招待コードで参加'));
     await tester.tap(find.text('招待コードで参加'));
   } else {
-    await tester.tap(find.byTooltip('日記帳を追加'));
+    // 日記帳の一覧の最後にある、日記帳の形の追加ボタンから参加する。
+    await tester.scrollUntilVisible(find.text('日記帳を追加'), 300);
+    await tester.tap(find.text('日記帳を追加'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('招待コードで参加'));
   }

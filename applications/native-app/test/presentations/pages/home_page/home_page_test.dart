@@ -114,7 +114,9 @@ void main() {
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('会社'), findsOneWidget);
     expect(find.text('今なにしてる？'), findsOneWidget);
-    expect(find.byTooltip('日記帳を追加'), findsOneWidget);
+    // 追加は AppBar ではなく、一覧の最後の日記帳の形のボタンから。
+    expect(find.byIcon(Icons.add), findsOneWidget);
+    expect(find.text('日記帳を追加'), findsOneWidget);
   });
 
   testWidgets('日記帳がなければ作るか参加するよう案内する', (tester) async {
@@ -123,7 +125,7 @@ void main() {
     expect(find.text('日記帳を作る'), findsOneWidget);
     expect(find.text('招待コードで参加'), findsOneWidget);
     expect(find.text('今なにしてる？'), findsNothing);
-    expect(find.byTooltip('日記帳を追加'), findsNothing);
+    expect(find.text('日記帳を追加'), findsNothing);
   });
 
   testWidgets('日記帳を表紙で並べ、飾った表紙には飾りも出す', (tester) async {
@@ -166,6 +168,15 @@ void main() {
 
     expect(find.text('大学'), findsNothing);
     expect(find.text('会社'), findsOneWidget);
+
+    // 最後のページは日記帳の形の追加ボタン。押すと作るか参加するかを選ぶ。
+    await tester.fling(find.text('会社'), const Offset(0, -400), 1000);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('日記帳を追加'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('日記帳を作る'), findsOneWidget);
+    expect(find.text('招待コードで参加'), findsOneWidget);
   });
 
   testWidgets('新しいバージョンがあれば知らせ、あとでにすると覚えておく', (tester) async {

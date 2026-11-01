@@ -14,6 +14,7 @@ import '../../providers/profile_notifier.dart';
 import '../../providers/push_token_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
+import 'components/add_diary_book_cover.dart';
 import 'components/add_diary_book_sheet.dart';
 import 'components/empty_diary_books.dart';
 import '../../components/invite_sheet.dart';
@@ -164,13 +165,6 @@ class HomePage extends HookConsumerWidget {
         ),
         leadingWidth: 120,
         actions: [
-          // 日記帳がないうちは、画面の真ん中から作るか参加できるので出さない。
-          if (diaryBooks.isNotEmpty)
-            IconButton(
-              onPressed: addDiaryBook,
-              tooltip: l10n.homeAddDiaryBook,
-              icon: const Icon(Icons.add),
-            ),
           IconButton(
             onPressed: () => const MyPageRoute().push<void>(context),
             tooltip: l10n.homeProfileAndSettings,
@@ -187,8 +181,16 @@ class HomePage extends HookConsumerWidget {
         AsyncValue(hasValue: true) => RefreshIndicator(
           onRefresh: refresh,
           child: paged
-              ? _DiaryBookPager(diaryBooks: diaryBooks, onTap: openDiaryBook)
-              : _DiaryBookGrid(diaryBooks: diaryBooks, onTap: openDiaryBook),
+              ? _DiaryBookPager(
+                  diaryBooks: diaryBooks,
+                  onTap: openDiaryBook,
+                  onAdd: addDiaryBook,
+                )
+              : _DiaryBookGrid(
+                  diaryBooks: diaryBooks,
+                  onTap: openDiaryBook,
+                  onAdd: addDiaryBook,
+                ),
         ),
         AsyncError() => Center(
           child: Column(
@@ -225,12 +227,17 @@ class HomePage extends HookConsumerWidget {
   }
 }
 
-/// 日記帳の表紙を横2列に大きく並べる。
+/// 日記帳の表紙を横2列に大きく並べ、最後に追加ボタンを置く。
 class _DiaryBookGrid extends StatelessWidget {
-  const _DiaryBookGrid({required this.diaryBooks, required this.onTap});
+  const _DiaryBookGrid({
+    required this.diaryBooks,
+    required this.onTap,
+    required this.onAdd,
+  });
 
   final List<DiaryBook> diaryBooks;
   final ValueChanged<DiaryBook> onTap;
+  final VoidCallback onAdd;
 
   static const _padding = 24.0;
   static const _crossSpacing = 20.0;
@@ -259,8 +266,11 @@ class _DiaryBookGrid extends StatelessWidget {
             mainAxisSpacing: _mainSpacing,
             mainAxisExtent: coverWidth * 4 / 3,
           ),
-          itemCount: diaryBooks.length,
+          itemCount: diaryBooks.length + 1,
           itemBuilder: (context, index) {
+            if (index == diaryBooks.length) {
+              return AddDiaryBookCover(width: coverWidth, onPressed: onAdd);
+            }
             return _DiaryBookCover(
               diaryBook: diaryBooks[index],
               width: coverWidth,
@@ -273,12 +283,17 @@ class _DiaryBookGrid extends StatelessWidget {
   }
 }
 
-/// 日記帳を1冊ずつ画面いっぱいに出し、縦にスワイプして切り替える。
+/// 日記帳を1冊ずつ画面いっぱいに出し、縦にスワイプして切り替える。最後のページは追加ボタン。
 class _DiaryBookPager extends HookWidget {
-  const _DiaryBookPager({required this.diaryBooks, required this.onTap});
+  const _DiaryBookPager({
+    required this.diaryBooks,
+    required this.onTap,
+    required this.onAdd,
+  });
 
   final List<DiaryBook> diaryBooks;
   final ValueChanged<DiaryBook> onTap;
+  final VoidCallback onAdd;
 
   static const _horizontalPadding = 40.0;
   static const _topPadding = 16.0;
@@ -288,7 +303,8 @@ class _DiaryBookPager extends HookWidget {
     final controller = usePageController();
     final page = useState(0);
     // 日記帳が減って、見ていたページがなくなったら最後のページにする。
-    final current = min(page.value, diaryBooks.length - 1);
+    final pageCount = diaryBooks.length + 1;
+    final current = min(page.value, pageCount - 1);
     // 下の書き込みバーに隠れないよう、バーの高さぶん下をあける。
     final bottomPadding = 40 + MediaQuery.paddingOf(context).bottom;
 
@@ -300,7 +316,7 @@ class _DiaryBookPager extends HookWidget {
           // 1冊でも、引っ張って読み直せるようにする。
           physics: const AlwaysScrollableScrollPhysics(),
           onPageChanged: (index) => page.value = index,
-          itemCount: diaryBooks.length,
+          itemCount: pageCount,
           itemBuilder: (context, index) {
             return Padding(
               padding: EdgeInsets.fromLTRB(
@@ -317,11 +333,13 @@ class _DiaryBookPager extends HookWidget {
                     constraints.maxHeight * 3 / 4,
                   );
                   return Center(
-                    child: _DiaryBookCover(
-                      diaryBook: diaryBooks[index],
-                      width: width,
-                      onTap: onTap,
-                    ),
+                    child: index == diaryBooks.length
+                        ? AddDiaryBookCover(width: width, onPressed: onAdd)
+                        : _DiaryBookCover(
+                            diaryBook: diaryBooks[index],
+                            width: width,
+                            onTap: onTap,
+                          ),
                   );
                 },
               ),
@@ -329,13 +347,13 @@ class _DiaryBookPager extends HookWidget {
           },
         ),
         // 何冊あって今どれを見ているかを、右の縦の点で出す。
-        if (diaryBooks.length > 1)
+        if (pageCount > 1)
           Positioned(
             right: 16,
             top: _topPadding,
             bottom: bottomPadding,
             child: ExcludeSemantics(
-              child: _PageDots(count: diaryBooks.length, current: current),
+              child: _PageDots(count: pageCount, current: current),
             ),
           ),
       ],
