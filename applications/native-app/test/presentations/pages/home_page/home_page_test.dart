@@ -62,8 +62,13 @@ List<Override> _overrides(
   ),
 ];
 
+/// 全部の表紙が並ぶよう、グリッドにしてホームを出す。
 Future<void> _pumpHome(WidgetTester tester, List<DiaryBook> diaryBooks) async {
-  await tester.pumpApp(const HomePage(), overrides: _overrides(diaryBooks));
+  await tester.pumpApp(
+    const HomePage(),
+    overrides: _overrides(diaryBooks),
+    preferencesStore: FakePreferencesStore(diaryBookPaged: false),
+  );
   await tester.pump();
 }
 
@@ -135,6 +140,32 @@ void main() {
     expect(find.byType(CoverDecorationLayer), findsOneWidget);
     // 表紙には人数を出さない。
     expect(find.text('5人'), findsNothing);
+  });
+
+  testWidgets('1冊ずつにしていれば、1冊を大きく出し、縦にスワイプで次の日記帳に替える', (tester) async {
+    // 縦長のスマホの画面にする。
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpApp(
+      const HomePage(),
+      overrides: _overrides(_diaryBooks),
+      preferencesStore: FakePreferencesStore(diaryBookPaged: true),
+    );
+    await tester.pump();
+
+    expect(find.byType(PageView), findsOneWidget);
+    expect(find.text('大学'), findsOneWidget);
+    expect(find.text('会社'), findsNothing);
+    final width = tester.getSize(find.byType(DiaryCover)).width;
+    // 画面の幅 390 から左右の余白を除いた幅いっぱい（横2列なら 161）。
+    expect(width, 310);
+
+    await tester.fling(find.text('大学'), const Offset(0, -400), 1000);
+    await tester.pumpAndSettle();
+
+    expect(find.text('大学'), findsNothing);
+    expect(find.text('会社'), findsOneWidget);
   });
 
   testWidgets('新しいバージョンがあれば知らせ、あとでにすると覚えておく', (tester) async {

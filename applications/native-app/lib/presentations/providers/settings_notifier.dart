@@ -17,9 +17,16 @@ class SettingsNotifier extends _$SettingsNotifier {
   @override
   Settings build() {
     return Settings(
+      diaryBookPaged: _store.readDiaryBookPaged(),
       postHintVisible: _store.readPostHintVisible(),
       themeMode: _store.readThemeMode(),
     );
+  }
+
+  /// 日記帳を1冊ずつ出すかを [paged] にして保存する。
+  Future<void> saveDiaryBookPaged(bool paged) async {
+    state = state.copyWith(diaryBookPaged: paged);
+    await _store.saveDiaryBookPaged(paged);
   }
 
   /// 説明を出すかを [visible] にして保存する。

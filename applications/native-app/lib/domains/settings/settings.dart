@@ -7,6 +7,10 @@ part '_generated/settings.freezed.dart';
 @freezed
 abstract class Settings with _$Settings {
   const factory Settings({
+    /// ホームの日記帳を1冊ずつ画面いっぱいに出し、縦にスワイプして切り替えるか。
+    /// false なら表紙を横2列のグリッドで並べる。
+    required bool diaryBookPaged,
+
     /// ホームの書き込みバーに手書きの説明を出すか。
     required bool postHintVisible,
 

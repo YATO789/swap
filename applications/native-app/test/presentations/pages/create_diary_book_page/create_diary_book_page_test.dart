@@ -37,7 +37,10 @@ Future<void> _pumpHome(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
+        // 作った日記帳が一覧に足されたことを見るため、全部の表紙が並ぶグリッドにする。
+        preferencesStoreProvider.overrideWithValue(
+          FakePreferencesStore(diaryBookPaged: false),
+        ),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
         ),

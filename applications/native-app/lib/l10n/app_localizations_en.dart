@@ -696,6 +696,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t delete your account. Please try again.';
 
   @override
+  String get settingsHomeLayoutSection => 'Diary book layout on Home';
+
+  @override
   String get settingsDisplaySection => 'Display';
 
   @override
@@ -754,6 +757,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeModeDark => 'Dark';
+
+  @override
+  String get layoutGrid => 'Grid';
+
+  @override
+  String get layoutPaged => 'One at a time';
 
   @override
   String get onboardingSaveNameFailed =>

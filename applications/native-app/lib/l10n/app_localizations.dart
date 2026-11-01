@@ -1142,6 +1142,12 @@ abstract class AppLocalizations {
   /// **'アカウントを削除できませんでした。もう一度お試しください'**
   String get settingsDeleteAccountFailed;
 
+  /// No description provided for @settingsHomeLayoutSection.
+  ///
+  /// In ja, this message translates to:
+  /// **'ホームの日記帳の並べ方'**
+  String get settingsHomeLayoutSection;
+
   /// No description provided for @settingsDisplaySection.
   ///
   /// In ja, this message translates to:
@@ -1249,6 +1255,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ダーク'**
   String get themeModeDark;
+
+  /// ホームの日記帳の表紙を横2列に並べる選択肢
+  ///
+  /// In ja, this message translates to:
+  /// **'並べる'**
+  String get layoutGrid;
+
+  /// ホームの日記帳を1冊ずつ画面いっぱいに出し、縦にスワイプして切り替える選択肢
+  ///
+  /// In ja, this message translates to:
+  /// **'1冊ずつ'**
+  String get layoutPaged;
 
   /// No description provided for @onboardingSaveNameFailed.
   ///

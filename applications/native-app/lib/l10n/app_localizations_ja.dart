@@ -616,6 +616,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsDeleteAccountFailed => 'アカウントを削除できませんでした。もう一度お試しください';
 
   @override
+  String get settingsHomeLayoutSection => 'ホームの日記帳の並べ方';
+
+  @override
   String get settingsDisplaySection => '表示';
 
   @override
@@ -672,6 +675,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get themeModeDark => 'ダーク';
+
+  @override
+  String get layoutGrid => '並べる';
+
+  @override
+  String get layoutPaged => '1冊ずつ';
 
   @override
   String get onboardingSaveNameFailed => '名前を保存できませんでした。もう一度お試しください';

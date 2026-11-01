@@ -545,6 +545,7 @@
   "settingsDeleteAccountConfirmTitle": "アカウントを削除しますか？",
   "settingsDeleteAccountConfirmMessage": "プロフィール・記録・日記がすべて削除されます。日記帳からも抜け、ほかに誰もいない日記帳は削除されます。",
   "settingsDeleteAccountFailed": "アカウントを削除できませんでした。もう一度お試しください",
+  "settingsHomeLayoutSection": "ホームの日記帳の並べ方",
   "settingsDisplaySection": "表示",
   "settingsTheme": "テーマ",
   "settingsPostHint": "書き込みバーの説明",
@@ -582,6 +583,14 @@
   "themeModeSystem": "端末に合わせる",
   "themeModeLight": "ライト",
   "themeModeDark": "ダーク",
+  "layoutGrid": "並べる",
+  "@layoutGrid": {
+    "description": "ホームの日記帳の表紙を横2列に並べる選択肢"
+  },
+  "layoutPaged": "1冊ずつ",
+  "@layoutPaged": {
+    "description": "ホームの日記帳を1冊ずつ画面いっぱいに出し、縦にスワイプして切り替える選択肢"
+  },
   "onboardingSaveNameFailed": "名前を保存できませんでした。もう一度お試しください",
   "onboardingNameTitle": "なんて呼べばいい？",
   "onboardingNameDescription": "日記帳のメンバーに表示される名前です。あとから変えられます。",

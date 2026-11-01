@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +40,9 @@ class HomePage extends HookConsumerWidget {
     final profile = ref.watch(profileProvider).value;
     final showPostHint = ref.watch(
       settingsProvider.select((settings) => settings.postHintVisible),
+    );
+    final paged = ref.watch(
+      settingsProvider.select((settings) => settings.diaryBookPaged),
     );
     // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
     // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
@@ -181,7 +186,9 @@ class HomePage extends HookConsumerWidget {
         ),
         AsyncValue(hasValue: true) => RefreshIndicator(
           onRefresh: refresh,
-          child: _DiaryBookGrid(diaryBooks: diaryBooks, onTap: openDiaryBook),
+          child: paged
+              ? _DiaryBookPager(diaryBooks: diaryBooks, onTap: openDiaryBook)
+              : _DiaryBookGrid(diaryBooks: diaryBooks, onTap: openDiaryBook),
         ),
         AsyncError() => Center(
           child: Column(
@@ -231,8 +238,6 @@ class _DiaryBookGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final coverWidth =
@@ -256,29 +261,151 @@ class _DiaryBookGrid extends StatelessWidget {
           ),
           itemCount: diaryBooks.length,
           itemBuilder: (context, index) {
-            final diaryBook = diaryBooks[index];
-            final memberCount = l10n.commonMemberCount(diaryBook.memberCount);
-
-            return Semantics(
-              button: true,
-              label: l10n.homeDiaryBookSemantics(diaryBook.name, memberCount),
-              excludeSemantics: true,
-              child: GestureDetector(
-                onTap: () => onTap(diaryBook),
-                behavior: HitTestBehavior.opaque,
-                child: DiaryCover(
-                  name: diaryBook.name,
-                  color: diaryBook.coverColor == null
-                      ? null
-                      : Color(diaryBook.coverColor!),
-                  width: coverWidth,
-                  decoration: diaryBook.coverDecoration,
-                ),
-              ),
+            return _DiaryBookCover(
+              diaryBook: diaryBooks[index],
+              width: coverWidth,
+              onTap: onTap,
             );
           },
         );
       },
+    );
+  }
+}
+
+/// 日記帳を1冊ずつ画面いっぱいに出し、縦にスワイプして切り替える。
+class _DiaryBookPager extends HookWidget {
+  const _DiaryBookPager({required this.diaryBooks, required this.onTap});
+
+  final List<DiaryBook> diaryBooks;
+  final ValueChanged<DiaryBook> onTap;
+
+  static const _horizontalPadding = 40.0;
+  static const _topPadding = 16.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = usePageController();
+    final page = useState(0);
+    // 日記帳が減って、見ていたページがなくなったら最後のページにする。
+    final current = min(page.value, diaryBooks.length - 1);
+    // 下の書き込みバーに隠れないよう、バーの高さぶん下をあける。
+    final bottomPadding = 40 + MediaQuery.paddingOf(context).bottom;
+
+    return Stack(
+      children: [
+        PageView.builder(
+          controller: controller,
+          scrollDirection: Axis.vertical,
+          // 1冊でも、引っ張って読み直せるようにする。
+          physics: const AlwaysScrollableScrollPhysics(),
+          onPageChanged: (index) => page.value = index,
+          itemCount: diaryBooks.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                _horizontalPadding,
+                _topPadding,
+                _horizontalPadding,
+                bottomPadding,
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // 表紙は 3:4。幅と高さのどちらかいっぱいまで大きくする。
+                  final width = min(
+                    constraints.maxWidth,
+                    constraints.maxHeight * 3 / 4,
+                  );
+                  return Center(
+                    child: _DiaryBookCover(
+                      diaryBook: diaryBooks[index],
+                      width: width,
+                      onTap: onTap,
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+        // 何冊あって今どれを見ているかを、右の縦の点で出す。
+        if (diaryBooks.length > 1)
+          Positioned(
+            right: 16,
+            top: _topPadding,
+            bottom: bottomPadding,
+            child: ExcludeSemantics(
+              child: _PageDots(count: diaryBooks.length, current: current),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// 縦に並べた点で、[count] ページのうち [current] ページ目を見ていることを出す。
+class _PageDots extends StatelessWidget {
+  const _PageDots({required this.count, required this.current});
+
+  final int count;
+  final int current;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var i = 0; i < count; i++)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            margin: const EdgeInsets.symmetric(vertical: 3),
+            width: 6,
+            height: i == current ? 18 : 6,
+            decoration: BoxDecoration(
+              color: i == current ? colors.textPrimary : colors.disabled,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// 押すと日記帳を開く表紙。
+class _DiaryBookCover extends StatelessWidget {
+  const _DiaryBookCover({
+    required this.diaryBook,
+    required this.width,
+    required this.onTap,
+  });
+
+  final DiaryBook diaryBook;
+  final double width;
+  final ValueChanged<DiaryBook> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final memberCount = l10n.commonMemberCount(diaryBook.memberCount);
+
+    return Semantics(
+      button: true,
+      label: l10n.homeDiaryBookSemantics(diaryBook.name, memberCount),
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () => onTap(diaryBook),
+        behavior: HitTestBehavior.opaque,
+        child: DiaryCover(
+          name: diaryBook.name,
+          color: diaryBook.coverColor == null
+              ? null
+              : Color(diaryBook.coverColor!),
+          width: width,
+          decoration: diaryBook.coverDecoration,
+        ),
+      ),
     );
   }
 }

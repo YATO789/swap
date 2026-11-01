@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part '_generated/preferences_store.g.dart';
 
+const diaryBookPagedKey = 'diary_book_paged';
 const postDiaryBookIdsKey = 'post_diary_book_ids';
 const postHintVisibleKey = 'post_hint_visible';
 const themeModeKey = 'theme_mode';
@@ -27,6 +28,7 @@ class PreferencesStore {
 
   /// 読み書きするキー。SharedPreferencesWithCache の allowList に渡す。
   static const keys = {
+    diaryBookPagedKey,
     postDiaryBookIdsKey,
     postHintVisibleKey,
     themeModeKey,
@@ -34,6 +36,15 @@ class PreferencesStore {
   };
 
   final SharedPreferencesWithCache _preferences;
+
+  /// ホームの日記帳を1冊ずつ縦にスワイプして出すか。まだ選んだことがなければ1冊ずつ。
+  bool readDiaryBookPaged() {
+    return _preferences.getBool(diaryBookPagedKey) ?? true;
+  }
+
+  Future<void> saveDiaryBookPaged(bool paged) {
+    return _preferences.setBool(diaryBookPagedKey, paged);
+  }
 
   /// 投稿シートで前に選んだ共有先の日記帳の id。まだ選んだことがなければ空。
   Set<String> readPostDiaryBookIds() {
