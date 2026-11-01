@@ -150,7 +150,10 @@ class HomePage extends HookConsumerWidget {
     return Scaffold(
       // 一覧を書き込みバーの下までのばし、バーは一覧の上に浮かせる。
       extendBody: true,
+      // 一覧を AppBar の下までのばし、AppBar も書き込みバーと同じく透かして一覧の上に浮かせる。
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         // アプリアイコンから地色と星を抜いた、ロゴの文字だけを置く。
         leading: Padding(
           padding: const EdgeInsets.only(left: 20),
@@ -174,42 +177,55 @@ class HomePage extends HookConsumerWidget {
         ],
       ),
       body: switch (diaryBooksState) {
-        AsyncValue(hasValue: true) when diaryBooks.isEmpty => EmptyDiaryBooks(
-          onCreate: createDiaryBook,
-          onJoin: joinDiaryBook,
-        ),
-        AsyncValue(hasValue: true) => RefreshIndicator(
-          onRefresh: refresh,
-          child: paged
-              ? _DiaryBookPager(
-                  diaryBooks: diaryBooks,
-                  onTap: openDiaryBook,
-                  onAdd: addDiaryBook,
-                )
-              : _DiaryBookGrid(
-                  diaryBooks: diaryBooks,
-                  onTap: openDiaryBook,
-                  onAdd: addDiaryBook,
-                ),
-        ),
-        AsyncError() => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.homeLoadFailed,
-                style: TextStyle(color: colors.textSecondary),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => ref.invalidate(diaryBookProvider),
-                child: Text(l10n.commonRetry),
-              ),
-            ],
+        // 一覧のほかは AppBar の下から出す。
+        AsyncValue(hasValue: true) when diaryBooks.isEmpty => SafeArea(
+          bottom: false,
+          child: EmptyDiaryBooks(
+            onCreate: createDiaryBook,
+            onJoin: joinDiaryBook,
           ),
         ),
-        _ => Center(
-          child: CircularProgressIndicator(color: colors.textSecondary),
+        // AppBar の高さは body の中の MediaQuery にしか入らないので、Builder で読む。
+        AsyncValue(hasValue: true) => Builder(
+          builder: (context) => RefreshIndicator(
+            onRefresh: refresh,
+            // 読み直しの印は AppBar の下から出す。
+            edgeOffset: MediaQuery.paddingOf(context).top,
+            child: paged
+                ? _DiaryBookPager(
+                    diaryBooks: diaryBooks,
+                    onTap: openDiaryBook,
+                    onAdd: addDiaryBook,
+                  )
+                : _DiaryBookGrid(
+                    diaryBooks: diaryBooks,
+                    onTap: openDiaryBook,
+                    onAdd: addDiaryBook,
+                  ),
+          ),
+        ),
+        AsyncError() => SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.homeLoadFailed,
+                  style: TextStyle(color: colors.textSecondary),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => ref.invalidate(diaryBookProvider),
+                  child: Text(l10n.commonRetry),
+                ),
+              ],
+            ),
+          ),
+        ),
+        _ => SafeArea(
+          child: Center(
+            child: CircularProgressIndicator(color: colors.textSecondary),
+          ),
         ),
       },
       // 日記帳に1冊も入っていないうちは、書いても見せる相手がいないので出さない。
@@ -256,7 +272,8 @@ class _DiaryBookGrid extends StatelessWidget {
           // 下の書き込みバーに隠れないよう、バーの高さぶん下をあける。
           padding: EdgeInsets.fromLTRB(
             _padding,
-            16,
+            // AppBar に隠れないよう、AppBar の高さぶん上をあける。
+            16 + MediaQuery.paddingOf(context).top,
             _padding,
             40 + MediaQuery.paddingOf(context).bottom,
           ),
@@ -305,7 +322,8 @@ class _DiaryBookPager extends HookWidget {
     // 日記帳が減って、見ていたページがなくなったら最後のページにする。
     final pageCount = diaryBooks.length + 1;
     final current = min(page.value, pageCount - 1);
-    // 下の書き込みバーに隠れないよう、バーの高さぶん下をあける。
+    // AppBar と下の書き込みバーに隠れないよう、それぞれの高さぶん上と下をあける。
+    final topPadding = _topPadding + MediaQuery.paddingOf(context).top;
     final bottomPadding = 40 + MediaQuery.paddingOf(context).bottom;
 
     return Stack(
@@ -321,7 +339,7 @@ class _DiaryBookPager extends HookWidget {
             return Padding(
               padding: EdgeInsets.fromLTRB(
                 _horizontalPadding,
-                _topPadding,
+                topPadding,
                 _horizontalPadding,
                 bottomPadding,
               ),
@@ -350,7 +368,7 @@ class _DiaryBookPager extends HookWidget {
         if (pageCount > 1)
           Positioned(
             right: 16,
-            top: _topPadding,
+            top: topPadding,
             bottom: bottomPadding,
             child: ExcludeSemantics(
               child: _PageDots(count: pageCount, current: current),
