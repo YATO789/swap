@@ -17,16 +17,9 @@ class SettingsNotifier extends _$SettingsNotifier {
   @override
   Settings build() {
     return Settings(
-      diaryBookGrid: _store.readDiaryBookGrid(),
       postHintVisible: _store.readPostHintVisible(),
       themeMode: _store.readThemeMode(),
     );
-  }
-
-  /// グリッドで出すかを [grid] にして保存する。
-  Future<void> saveDiaryBookGrid(bool grid) async {
-    state = state.copyWith(diaryBookGrid: grid);
-    await _store.saveDiaryBookGrid(grid);
   }
 
   /// 説明を出すかを [visible] にして保存する。

@@ -98,6 +98,11 @@
   },
   "inviteSheetCopy": "招待メッセージをコピー",
   "inviteSheetLater": "あとで招待する",
+  "inviteSheetDecorate": "表紙を飾る",
+  "inviteSheetDecorateMessage": "絵文字や文字、らくがきで、表紙を自分たちらしく飾れます",
+  "@inviteSheetDecorateMessage": {
+    "description": "日記帳を作った直後の招待シートで、飾った表紙の見本の横に出す文"
+  },
   "postSheetFailed": "記録できませんでした。もう一度お試しください",
   "postSheetPosted": "記録しました",
   "postSheetPostingTo": "{name}に記録します",
@@ -300,8 +305,6 @@
     }
   },
   "diaryDetailPostsOfDay": "この日の記録",
-  "infoRenameFailed": "名前を変えられませんでした。もう一度お試しください",
-  "infoCoverColorFailed": "表紙の色を変えられませんでした。もう一度お試しください",
   "infoMemberLimitFailed": "人数の上限を変えられませんでした。もう一度お試しください",
   "infoRegenerateInviteCodeTitle": "招待コードを作り直しますか？",
   "infoRegenerateInviteCodeMessage": "今のコード（{code}）では参加できなくなります。参加しているメンバーはそのままです。",
@@ -364,11 +367,23 @@
       }
     }
   },
-  "infoCoverSection": "表紙",
-  "@infoCoverSection": {
-    "description": "日記帳の情報の見出し"
+  "infoNameHint": "日記帳の名前",
+  "@infoNameHint": {
+    "description": "日記帳の情報の、表紙の下の名前の入力欄が空のときに出す文"
   },
-  "infoRename": "名前を変える",
+  "infoRenameFailed": "名前を変えられませんでした。もう一度お試しください",
+  "infoRenamed": "名前を保存しました",
+  "@infoRenamed": {
+    "description": "日記帳の情報ページで名前を変えられたときのメッセージ"
+  },
+  "infoNameSave": "保存",
+  "@infoNameSave": {
+    "description": "日記帳の名前の入力欄の右の、名前を保存するボタン"
+  },
+  "infoNameSaveHelper": "「保存」か「完了」を押すと保存します",
+  "@infoNameSaveHelper": {
+    "description": "日記帳の名前を書いているか書き換えたままのあいだ、入力欄の下に出す、保存のしかたの説明"
+  },
   "infoMembersSection": "この日記を書く人",
   "@infoMembersSection": {
     "description": "日記帳の情報の、メンバーの見出し"
@@ -385,9 +400,9 @@
   },
   "infoRegenerateInviteCode": "招待コードを作り直す",
   "infoLeaveDiaryBook": "日記帳を退出",
-  "infoRenameSemantics": "{name}、名前を変える",
-  "@infoRenameSemantics": {
-    "description": "題名のボタンの読み上げ。name は日記帳の名前",
+  "infoEditCoverSemantics": "{name}の表紙、表紙を編集",
+  "@infoEditCoverSemantics": {
+    "description": "一番上の大きな表紙のボタンの読み上げ。name は日記帳の名前",
     "placeholders": {
       "name": {
         "type": "String"
@@ -440,8 +455,6 @@
       }
     }
   },
-  "renameTitle": "日記帳の名前",
-  "renameIconHelper": "最初の1文字がアイコンになります",
   "createDiaryBookFailed": "日記帳を作れませんでした。もう一度お試しください",
   "createDiaryBookCreate": "作成",
   "@createDiaryBookCreate": {
@@ -532,7 +545,6 @@
   "settingsDeleteAccountConfirmTitle": "アカウントを削除しますか？",
   "settingsDeleteAccountConfirmMessage": "プロフィール・記録・日記がすべて削除されます。日記帳からも抜け、ほかに誰もいない日記帳は削除されます。",
   "settingsDeleteAccountFailed": "アカウントを削除できませんでした。もう一度お試しください",
-  "settingsHomeLayoutSection": "ホームの日記帳の並べ方",
   "settingsDisplaySection": "表示",
   "settingsTheme": "テーマ",
   "settingsPostHint": "書き込みバーの説明",
@@ -570,11 +582,6 @@
   "themeModeSystem": "端末に合わせる",
   "themeModeLight": "ライト",
   "themeModeDark": "ダーク",
-  "layoutList": "リスト",
-  "layoutCover": "表紙",
-  "@layoutCover": {
-    "description": "ホームの日記帳を表紙のグリッドで並べる選択肢"
-  },
   "onboardingSaveNameFailed": "名前を保存できませんでした。もう一度お試しください",
   "onboardingNameTitle": "なんて呼べばいい？",
   "onboardingNameDescription": "日記帳のメンバーに表示される名前です。あとから変えられます。",
@@ -646,5 +653,162 @@
   "updateOptionalTitle": "新しいバージョンがあります",
   "updateOptionalMessage": "アップデートすると、新しい機能や改善を使えます。",
   "updateNow": "アップデート",
-  "updateLater": "あとで"
+  "updateLater": "あとで",
+  "coverEditTitle": "表紙を編集",
+  "coverEditUndo": "元に戻す",
+  "coverEditEmoji": "絵文字",
+  "@coverEditEmoji": {
+    "description": "表紙の編集ページの、絵文字を貼るボタン"
+  },
+  "coverEditText": "文字",
+  "@coverEditText": {
+    "description": "表紙の編集ページの、文字を置くボタン"
+  },
+  "coverEditDoodle": "らくがき",
+  "@coverEditDoodle": {
+    "description": "表紙の編集ページの、らくがきを始めるボタン"
+  },
+  "coverEditColor": "色",
+  "@coverEditColor": {
+    "description": "表紙の編集ページの、表紙の色を選ぶボタン"
+  },
+  "coverEditDone": "終わる",
+  "@coverEditDone": {
+    "description": "らくがきや色を選ぶのを終えるボタン"
+  },
+  "coverEditBringForward": "前へ",
+  "@coverEditBringForward": {
+    "description": "選んだものを1つ上の重なりへ移すボタン"
+  },
+  "coverEditSendBackward": "うしろへ",
+  "@coverEditSendBackward": {
+    "description": "選んだものを1つ下の重なりへ移すボタン"
+  },
+  "coverEditFrame": "白いふち",
+  "coverEditRemove": "消す",
+  "@coverEditRemove": {
+    "description": "選んだものを表紙から外すボタン"
+  },
+  "coverEditHint": "貼ったものはドラッグで動かし、右下のつまみか2本指で回転と拡大縮小。文字は選んでもう一度押すと書き換えられます。",
+  "coverEditStickerLimit": "貼れるのは{count}個までです",
+  "@coverEditStickerLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coverEditTextLimit": "文字は{count}個まで置けます",
+  "@coverEditTextLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "coverEditRewrite": "書き換える",
+  "@coverEditRewrite": {
+    "description": "選んだ文字を書き換えるボタン"
+  },
+  "coverEditTextColorAuto": "自動",
+  "@coverEditTextColorAuto": {
+    "description": "文字の色を表紙の色に合わせる丸の中に出す字。とても小さい丸なので短くする"
+  },
+  "coverEditTextColorAutoName": "表紙に合わせる",
+  "@coverEditTextColorAutoName": {
+    "description": "文字の色を表紙の色に合わせる丸の読み上げに使う名前"
+  },
+  "coverEditTextColorSemantics": "文字の色 {color}",
+  "@coverEditTextColorSemantics": {
+    "description": "color は色の名前",
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "colorPaletteOpen": "ほかの色を選ぶ",
+  "@colorPaletteOpen": {
+    "description": "文字・ペン・表紙の色の並びにある、色のパレットを開く虹色の丸の読み上げ"
+  },
+  "colorPaletteSemantics": "色 {color}",
+  "@colorPaletteSemantics": {
+    "description": "パレットの色の読み上げ。color は #RRGGBB",
+    "placeholders": {
+      "color": {
+        "type": "String"
+      }
+    }
+  },
+  "colorPaletteTextTitle": "文字の色",
+  "@colorPaletteTextTitle": {
+    "description": "文字の色を選ぶパレットのシートの題名"
+  },
+  "colorPalettePenTitle": "ペンの色",
+  "@colorPalettePenTitle": {
+    "description": "らくがきのペンの色を選ぶパレットのシートの題名"
+  },
+  "colorPaletteCoverTitle": "表紙の色",
+  "@colorPaletteCoverTitle": {
+    "description": "表紙の色を選ぶパレットのシートの題名"
+  },
+  "coverEditStrokeLimit": "これ以上描けません。消しゴムで消すと描けます",
+  "coverEditPenThin": "細いペン",
+  "coverEditPenMedium": "ふつうのペン",
+  "coverEditPenThick": "太いペン",
+  "coverEditEraser": "消しゴム",
+  "coverEditPenBlack": "黒",
+  "coverEditPenWhite": "白",
+  "coverEditPenRed": "赤",
+  "coverEditPenOrange": "オレンジ",
+  "coverEditPenGreen": "緑",
+  "coverEditPenBlue": "青",
+  "coverEditPenPink": "ピンク",
+  "coverEditKnob": "回転と拡大縮小",
+  "coverEditStickerSemantics": "貼った絵文字 {emoji}",
+  "@coverEditStickerSemantics": {
+    "placeholders": {
+      "emoji": {
+        "type": "String"
+      }
+    }
+  },
+  "coverEditNameSemantics": "表紙の名前 {name}",
+  "@coverEditNameSemantics": {
+    "description": "表紙に貼った日記帳の名前の読み上げ。name は日記帳の名前",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "coverEditTextSemantics": "置いた文字 {text}",
+  "@coverEditTextSemantics": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "coverTextSheetTitle": "表紙に文字を置く",
+  "coverTextSheetEditTitle": "文字を書き換える",
+  "coverTextSheetHint": "表紙に入れる文字",
+  "coverTextSheetPlace": "置く",
+  "@coverTextSheetPlace": {
+    "description": "表紙に文字を置くシートの決定ボタン"
+  },
+  "coverTextSheetPlaceName": "日記帳の名前を置く",
+  "@coverTextSheetPlaceName": {
+    "description": "表紙から外した日記帳の名前を、もう一度表紙に置くボタン"
+  },
+  "coverEditDoodleArea": "らくがきをする場所。表紙をなぞって線を描く",
+  "coverEditSaved": "表紙を保存しました",
+  "coverEditSaveFailed": "保存できませんでした。もう一度お試しください",
+  "coverEditNeedsUpdate": "表紙を編集するには、アプリをアップデートしてください",
+  "emojiSheetTitle": "絵文字を選ぶ",
+  "emojiSheetNoRecents": "まだありません",
+  "@emojiSheetNoRecents": {
+    "description": "最近使った絵文字がないときの文"
+  },
+  "emojiSheetSearch": "絵文字を検索"
 }

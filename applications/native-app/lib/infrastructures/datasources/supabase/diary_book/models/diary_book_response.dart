@@ -13,6 +13,9 @@ abstract class DiaryBookResponse with _$DiaryBookResponse {
     required int memberLimit,
     String? createdBy,
     int? coverColor,
+
+    /// 表紙の飾りの JSON。メンバーなら好きな値を書けるので、形は読むときに確かめる。
+    Object? coverDecoration,
   }) = _DiaryBookResponse;
 
   factory DiaryBookResponse.fromJson(Map<String, dynamic> json) =>

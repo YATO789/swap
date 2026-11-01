@@ -37,6 +37,7 @@ class CoverColorPicker extends StatelessWidget {
     this.choices = coverColors,
     this.defaultColor,
     this.label,
+    this.trailing,
   });
 
   final Color? selected;
@@ -51,6 +52,9 @@ class CoverColorPicker extends StatelessWidget {
 
   /// 読み上げで丸に付ける名前。なければ「表紙の色」。
   final String? label;
+
+  /// 色の丸のあとに並べる部品（パレットを開く丸など）。
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +101,8 @@ class CoverColorPicker extends StatelessWidget {
               ),
             ),
           ),
+        if (trailing case final trailing?)
+          Padding(padding: const EdgeInsets.all(6), child: trailing),
       ],
     );
   }

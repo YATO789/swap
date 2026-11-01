@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Settings {
 
-/// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
- bool get diaryBookGrid;/// ホームの書き込みバーに手書きの説明を出すか。
+/// ホームの書き込みバーに手書きの説明を出すか。
  bool get postHintVisible;/// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。
  ThemeMode get themeMode;
 /// Create a copy of Settings
@@ -30,20 +29,20 @@ $SettingsCopyWith<Settings> get copyWith => _$SettingsCopyWithImpl<Settings>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as Settings;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Settings&&(identical(other.diaryBookGrid, _this.diaryBookGrid) || other.diaryBookGrid == _this.diaryBookGrid)&&(identical(other.postHintVisible, _this.postHintVisible) || other.postHintVisible == _this.postHintVisible)&&(identical(other.themeMode, _this.themeMode) || other.themeMode == _this.themeMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Settings&&(identical(other.postHintVisible, _this.postHintVisible) || other.postHintVisible == _this.postHintVisible)&&(identical(other.themeMode, _this.themeMode) || other.themeMode == _this.themeMode));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Settings;
-  return Object.hash(runtimeType,_this.diaryBookGrid,_this.postHintVisible,_this.themeMode);
+  return Object.hash(runtimeType,_this.postHintVisible,_this.themeMode);
 }
 
 @override
 String toString() {
   final _this = this as Settings;
-  return 'Settings(diaryBookGrid: ${_this.diaryBookGrid}, postHintVisible: ${_this.postHintVisible}, themeMode: ${_this.themeMode})';
+  return 'Settings(postHintVisible: ${_this.postHintVisible}, themeMode: ${_this.themeMode})';
 }
 
 
@@ -54,7 +53,7 @@ abstract mixin class $SettingsCopyWith<$Res>  {
   factory $SettingsCopyWith(Settings value, $Res Function(Settings) _then) = _$SettingsCopyWithImpl;
 @useResult
 $Res call({
- bool diaryBookGrid, bool postHintVisible, ThemeMode themeMode
+ bool postHintVisible, ThemeMode themeMode
 });
 
 
@@ -71,10 +70,9 @@ class _$SettingsCopyWithImpl<$Res>
 
 /// Create a copy of Settings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? diaryBookGrid = null,Object? postHintVisible = null,Object? themeMode = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? postHintVisible = null,Object? themeMode = null,}) {
   return _then(Settings(
-diaryBookGrid: null == diaryBookGrid ? _self.diaryBookGrid : diaryBookGrid // ignore: cast_nullable_to_non_nullable
-as bool,postHintVisible: null == postHintVisible ? _self.postHintVisible : postHintVisible // ignore: cast_nullable_to_non_nullable
+postHintVisible: null == postHintVisible ? _self.postHintVisible : postHintVisible // ignore: cast_nullable_to_non_nullable
 as bool,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
 as ThemeMode,
   ));
@@ -161,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool diaryBookGrid,  bool postHintVisible,  ThemeMode themeMode)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool postHintVisible,  ThemeMode themeMode)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Settings() when $default != null:
-return $default(_that.diaryBookGrid,_that.postHintVisible,_that.themeMode);case _:
+return $default(_that.postHintVisible,_that.themeMode);case _:
   return orElse();
 
 }
@@ -182,10 +180,10 @@ return $default(_that.diaryBookGrid,_that.postHintVisible,_that.themeMode);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool diaryBookGrid,  bool postHintVisible,  ThemeMode themeMode)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool postHintVisible,  ThemeMode themeMode)  $default,) {final _that = this;
 switch (_that) {
 case _Settings():
-return $default(_that.diaryBookGrid,_that.postHintVisible,_that.themeMode);case _:
+return $default(_that.postHintVisible,_that.themeMode);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +200,10 @@ return $default(_that.diaryBookGrid,_that.postHintVisible,_that.themeMode);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool diaryBookGrid,  bool postHintVisible,  ThemeMode themeMode)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool postHintVisible,  ThemeMode themeMode)?  $default,) {final _that = this;
 switch (_that) {
 case _Settings() when $default != null:
-return $default(_that.diaryBookGrid,_that.postHintVisible,_that.themeMode);case _:
+return $default(_that.postHintVisible,_that.themeMode);case _:
   return null;
 
 }
@@ -217,11 +215,9 @@ return $default(_that.diaryBookGrid,_that.postHintVisible,_that.themeMode);case 
 
 
 class _Settings implements Settings {
-  const _Settings({required this.diaryBookGrid, required this.postHintVisible, required this.themeMode});
+  const _Settings({required this.postHintVisible, required this.themeMode});
   
 
-/// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
-@override final  bool diaryBookGrid;
 /// ホームの書き込みバーに手書きの説明を出すか。
 @override final  bool postHintVisible;
 /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。
@@ -237,18 +233,18 @@ _$SettingsCopyWith<_Settings> get copyWith => __$SettingsCopyWithImpl<_Settings>
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Settings&&(identical(other.diaryBookGrid, diaryBookGrid) || other.diaryBookGrid == diaryBookGrid)&&(identical(other.postHintVisible, postHintVisible) || other.postHintVisible == postHintVisible)&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Settings&&(identical(other.postHintVisible, postHintVisible) || other.postHintVisible == postHintVisible)&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,diaryBookGrid,postHintVisible,themeMode);
+    return Object.hash(runtimeType,postHintVisible,themeMode);
 }
 
 @override
 String toString() {
-    return 'Settings(diaryBookGrid: $diaryBookGrid, postHintVisible: $postHintVisible, themeMode: $themeMode)';
+    return 'Settings(postHintVisible: $postHintVisible, themeMode: $themeMode)';
 }
 
 
@@ -259,7 +255,7 @@ abstract mixin class _$SettingsCopyWith<$Res> implements $SettingsCopyWith<$Res>
   factory _$SettingsCopyWith(_Settings value, $Res Function(_Settings) _then) = __$SettingsCopyWithImpl;
 @override @useResult
 $Res call({
- bool diaryBookGrid, bool postHintVisible, ThemeMode themeMode
+ bool postHintVisible, ThemeMode themeMode
 });
 
 
@@ -276,10 +272,9 @@ class __$SettingsCopyWithImpl<$Res>
 
 /// Create a copy of Settings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? diaryBookGrid = null,Object? postHintVisible = null,Object? themeMode = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? postHintVisible = null,Object? themeMode = null,}) {
   return _then(_Settings(
-diaryBookGrid: null == diaryBookGrid ? _self.diaryBookGrid : diaryBookGrid // ignore: cast_nullable_to_non_nullable
-as bool,postHintVisible: null == postHintVisible ? _self.postHintVisible : postHintVisible // ignore: cast_nullable_to_non_nullable
+postHintVisible: null == postHintVisible ? _self.postHintVisible : postHintVisible // ignore: cast_nullable_to_non_nullable
 as bool,themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
 as ThemeMode,
   ));

@@ -14,6 +14,7 @@ _DiaryBookResponse _$DiaryBookResponseFromJson(Map<String, dynamic> json) =>
       memberLimit: (json['member_limit'] as num).toInt(),
       createdBy: json['created_by'] as String?,
       coverColor: (json['cover_color'] as num?)?.toInt(),
+      coverDecoration: json['cover_decoration'],
     );
 
 Map<String, dynamic> _$DiaryBookResponseToJson(_DiaryBookResponse instance) =>
@@ -24,4 +25,5 @@ Map<String, dynamic> _$DiaryBookResponseToJson(_DiaryBookResponse instance) =>
       'member_limit': instance.memberLimit,
       'created_by': instance.createdBy,
       'cover_color': instance.coverColor,
+      'cover_decoration': instance.coverDecoration,
     };

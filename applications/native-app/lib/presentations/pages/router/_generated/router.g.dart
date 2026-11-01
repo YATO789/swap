@@ -15,6 +15,7 @@ List<RouteBase> get $appRoutes => [
   $createDiaryBookRoute,
   $diaryBookRoute,
   $diaryBookInfoRoute,
+  $coverDecorationRoute,
   $diaryDetailRoute,
   $diaryEditorRoute,
   $myPageRoute,
@@ -225,6 +226,37 @@ mixin $DiaryBookInfoRoute on GoRouteData {
   @override
   String get location => GoRouteData.$location(
     '/diary-books/${Uri.encodeComponent(_self.id)}/info',
+  );
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $coverDecorationRoute => GoRouteData.$route(
+  path: '/diary-books/:id/cover',
+  hasOverriddenOnExit: false,
+  factory: $CoverDecorationRoute._fromState,
+);
+
+mixin $CoverDecorationRoute on GoRouteData {
+  static CoverDecorationRoute _fromState(GoRouterState state) =>
+      CoverDecorationRoute(id: state.pathParameters['id']!);
+
+  CoverDecorationRoute get _self => this as CoverDecorationRoute;
+
+  @override
+  String get location => GoRouteData.$location(
+    '/diary-books/${Uri.encodeComponent(_self.id)}/cover',
   );
 
   @override

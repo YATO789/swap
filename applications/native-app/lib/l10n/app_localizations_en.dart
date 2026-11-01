@@ -153,6 +153,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteSheetLater => 'Invite later';
 
   @override
+  String get inviteSheetDecorate => 'Decorate the cover';
+
+  @override
+  String get inviteSheetDecorateMessage =>
+      'Make the cover your own with emoji, text, and doodles.';
+
+  @override
   String get postSheetFailed => 'Couldn\'t post. Please try again.';
 
   @override
@@ -405,13 +412,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryDetailPostsOfDay => 'Posts from this day';
 
   @override
-  String get infoRenameFailed => 'Couldn\'t change the name. Please try again.';
-
-  @override
-  String get infoCoverColorFailed =>
-      'Couldn\'t change the cover color. Please try again.';
-
-  @override
   String get infoMemberLimitFailed =>
       'Couldn\'t change the member limit. Please try again.';
 
@@ -476,10 +476,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get infoCoverSection => 'Cover';
+  String get infoNameHint => 'Diary book name';
 
   @override
-  String get infoRename => 'Change name';
+  String get infoRenameFailed => 'Couldn\'t rename. Please try again.';
+
+  @override
+  String get infoRenamed => 'Name saved';
+
+  @override
+  String get infoNameSave => 'Save';
+
+  @override
+  String get infoNameSaveHelper => 'Tap Save or Done to save';
 
   @override
   String get infoMembersSection => 'Who writes this diary';
@@ -508,8 +517,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get infoLeaveDiaryBook => 'Leave diary book';
 
   @override
-  String infoRenameSemantics(String name) {
-    return '$name, change name';
+  String infoEditCoverSemantics(String name) {
+    return 'Cover of $name, edit cover';
   }
 
   @override
@@ -568,12 +577,6 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0 · $_temp1';
   }
-
-  @override
-  String get renameTitle => 'Diary book name';
-
-  @override
-  String get renameIconHelper => 'The first letter becomes the icon';
 
   @override
   String get createDiaryBookFailed =>
@@ -693,9 +696,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t delete your account. Please try again.';
 
   @override
-  String get settingsHomeLayoutSection => 'Diary book layout on Home';
-
-  @override
   String get settingsDisplaySection => 'Display';
 
   @override
@@ -754,12 +754,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeModeDark => 'Dark';
-
-  @override
-  String get layoutList => 'List';
-
-  @override
-  String get layoutCover => 'Covers';
 
   @override
   String get onboardingSaveNameFailed =>
@@ -904,4 +898,173 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateLater => 'Later';
+
+  @override
+  String get coverEditTitle => 'Edit cover';
+
+  @override
+  String get coverEditUndo => 'Undo';
+
+  @override
+  String get coverEditEmoji => 'Emoji';
+
+  @override
+  String get coverEditText => 'Text';
+
+  @override
+  String get coverEditDoodle => 'Doodle';
+
+  @override
+  String get coverEditColor => 'Color';
+
+  @override
+  String get coverEditDone => 'Done';
+
+  @override
+  String get coverEditBringForward => 'Forward';
+
+  @override
+  String get coverEditSendBackward => 'Backward';
+
+  @override
+  String get coverEditFrame => 'Border';
+
+  @override
+  String get coverEditRemove => 'Remove';
+
+  @override
+  String get coverEditHint =>
+      'Drag an item to move it, and use the corner handle or two fingers to rotate and resize. Tap selected text again to edit it.';
+
+  @override
+  String coverEditStickerLimit(int count) {
+    return 'You can add up to $count items';
+  }
+
+  @override
+  String coverEditTextLimit(int count) {
+    return 'You can add up to $count texts';
+  }
+
+  @override
+  String get coverEditRewrite => 'Edit text';
+
+  @override
+  String get coverEditTextColorAuto => 'Auto';
+
+  @override
+  String get coverEditTextColorAutoName => 'Match cover';
+
+  @override
+  String coverEditTextColorSemantics(String color) {
+    return 'Text color $color';
+  }
+
+  @override
+  String get colorPaletteOpen => 'Choose another color';
+
+  @override
+  String colorPaletteSemantics(String color) {
+    return 'Color $color';
+  }
+
+  @override
+  String get colorPaletteTextTitle => 'Text color';
+
+  @override
+  String get colorPalettePenTitle => 'Pen color';
+
+  @override
+  String get colorPaletteCoverTitle => 'Cover color';
+
+  @override
+  String get coverEditStrokeLimit =>
+      'You can\'t draw any more. Erase some lines to keep drawing.';
+
+  @override
+  String get coverEditPenThin => 'Thin pen';
+
+  @override
+  String get coverEditPenMedium => 'Medium pen';
+
+  @override
+  String get coverEditPenThick => 'Thick pen';
+
+  @override
+  String get coverEditEraser => 'Eraser';
+
+  @override
+  String get coverEditPenBlack => 'Black';
+
+  @override
+  String get coverEditPenWhite => 'White';
+
+  @override
+  String get coverEditPenRed => 'Red';
+
+  @override
+  String get coverEditPenOrange => 'Orange';
+
+  @override
+  String get coverEditPenGreen => 'Green';
+
+  @override
+  String get coverEditPenBlue => 'Blue';
+
+  @override
+  String get coverEditPenPink => 'Pink';
+
+  @override
+  String get coverEditKnob => 'Rotate and resize';
+
+  @override
+  String coverEditStickerSemantics(String emoji) {
+    return 'Emoji sticker $emoji';
+  }
+
+  @override
+  String coverEditNameSemantics(String name) {
+    return 'Cover name $name';
+  }
+
+  @override
+  String coverEditTextSemantics(String text) {
+    return 'Text $text';
+  }
+
+  @override
+  String get coverTextSheetTitle => 'Add text to the cover';
+
+  @override
+  String get coverTextSheetEditTitle => 'Edit text';
+
+  @override
+  String get coverTextSheetHint => 'Text for the cover';
+
+  @override
+  String get coverTextSheetPlace => 'Add';
+
+  @override
+  String get coverTextSheetPlaceName => 'Add the diary book name';
+
+  @override
+  String get coverEditDoodleArea => 'Drawing area. Trace on the cover to draw.';
+
+  @override
+  String get coverEditSaved => 'Cover saved';
+
+  @override
+  String get coverEditSaveFailed => 'Couldn\'t save. Please try again.';
+
+  @override
+  String get coverEditNeedsUpdate => 'Update the app to edit this cover';
+
+  @override
+  String get emojiSheetTitle => 'Choose an emoji';
+
+  @override
+  String get emojiSheetNoRecents => 'None yet';
+
+  @override
+  String get emojiSheetSearch => 'Search emoji';
 }

@@ -344,6 +344,18 @@ abstract class AppLocalizations {
   /// **'あとで招待する'**
   String get inviteSheetLater;
 
+  /// No description provided for @inviteSheetDecorate.
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙を飾る'**
+  String get inviteSheetDecorate;
+
+  /// 日記帳を作った直後の招待シートで、飾った表紙の見本の横に出す文
+  ///
+  /// In ja, this message translates to:
+  /// **'絵文字や文字、らくがきで、表紙を自分たちらしく飾れます'**
+  String get inviteSheetDecorateMessage;
+
   /// No description provided for @postSheetFailed.
   ///
   /// In ja, this message translates to:
@@ -740,18 +752,6 @@ abstract class AppLocalizations {
   /// **'この日の記録'**
   String get diaryDetailPostsOfDay;
 
-  /// No description provided for @infoRenameFailed.
-  ///
-  /// In ja, this message translates to:
-  /// **'名前を変えられませんでした。もう一度お試しください'**
-  String get infoRenameFailed;
-
-  /// No description provided for @infoCoverColorFailed.
-  ///
-  /// In ja, this message translates to:
-  /// **'表紙の色を変えられませんでした。もう一度お試しください'**
-  String get infoCoverColorFailed;
-
   /// No description provided for @infoMemberLimitFailed.
   ///
   /// In ja, this message translates to:
@@ -848,17 +848,35 @@ abstract class AppLocalizations {
   /// **'「{name}」から退出しました'**
   String infoLeft(String name);
 
-  /// 日記帳の情報の見出し
+  /// 日記帳の情報の、表紙の下の名前の入力欄が空のときに出す文
   ///
   /// In ja, this message translates to:
-  /// **'表紙'**
-  String get infoCoverSection;
+  /// **'日記帳の名前'**
+  String get infoNameHint;
 
-  /// No description provided for @infoRename.
+  /// No description provided for @infoRenameFailed.
   ///
   /// In ja, this message translates to:
-  /// **'名前を変える'**
-  String get infoRename;
+  /// **'名前を変えられませんでした。もう一度お試しください'**
+  String get infoRenameFailed;
+
+  /// 日記帳の情報ページで名前を変えられたときのメッセージ
+  ///
+  /// In ja, this message translates to:
+  /// **'名前を保存しました'**
+  String get infoRenamed;
+
+  /// 日記帳の名前の入力欄の右の、名前を保存するボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'保存'**
+  String get infoNameSave;
+
+  /// 日記帳の名前を書いているか書き換えたままのあいだ、入力欄の下に出す、保存のしかたの説明
+  ///
+  /// In ja, this message translates to:
+  /// **'「保存」か「完了」を押すと保存します'**
+  String get infoNameSaveHelper;
 
   /// 日記帳の情報の、メンバーの見出し
   ///
@@ -896,11 +914,11 @@ abstract class AppLocalizations {
   /// **'日記帳を退出'**
   String get infoLeaveDiaryBook;
 
-  /// 題名のボタンの読み上げ。name は日記帳の名前
+  /// 一番上の大きな表紙のボタンの読み上げ。name は日記帳の名前
   ///
   /// In ja, this message translates to:
-  /// **'{name}、名前を変える'**
-  String infoRenameSemantics(String name);
+  /// **'{name}の表紙、表紙を編集'**
+  String infoEditCoverSemantics(String name);
 
   /// メンバーの一覧で自分の行に添える
   ///
@@ -961,18 +979,6 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'{count}人まで・あと{left}人'**
   String memberLimitLeft(int count, int left);
-
-  /// No description provided for @renameTitle.
-  ///
-  /// In ja, this message translates to:
-  /// **'日記帳の名前'**
-  String get renameTitle;
-
-  /// No description provided for @renameIconHelper.
-  ///
-  /// In ja, this message translates to:
-  /// **'最初の1文字がアイコンになります'**
-  String get renameIconHelper;
 
   /// No description provided for @createDiaryBookFailed.
   ///
@@ -1136,12 +1142,6 @@ abstract class AppLocalizations {
   /// **'アカウントを削除できませんでした。もう一度お試しください'**
   String get settingsDeleteAccountFailed;
 
-  /// No description provided for @settingsHomeLayoutSection.
-  ///
-  /// In ja, this message translates to:
-  /// **'ホームの日記帳の並べ方'**
-  String get settingsHomeLayoutSection;
-
   /// No description provided for @settingsDisplaySection.
   ///
   /// In ja, this message translates to:
@@ -1249,18 +1249,6 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'ダーク'**
   String get themeModeDark;
-
-  /// No description provided for @layoutList.
-  ///
-  /// In ja, this message translates to:
-  /// **'リスト'**
-  String get layoutList;
-
-  /// ホームの日記帳を表紙のグリッドで並べる選択肢
-  ///
-  /// In ja, this message translates to:
-  /// **'表紙'**
-  String get layoutCover;
 
   /// No description provided for @onboardingSaveNameFailed.
   ///
@@ -1531,6 +1519,312 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'あとで'**
   String get updateLater;
+
+  /// No description provided for @coverEditTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙を編集'**
+  String get coverEditTitle;
+
+  /// No description provided for @coverEditUndo.
+  ///
+  /// In ja, this message translates to:
+  /// **'元に戻す'**
+  String get coverEditUndo;
+
+  /// 表紙の編集ページの、絵文字を貼るボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'絵文字'**
+  String get coverEditEmoji;
+
+  /// 表紙の編集ページの、文字を置くボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'文字'**
+  String get coverEditText;
+
+  /// 表紙の編集ページの、らくがきを始めるボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'らくがき'**
+  String get coverEditDoodle;
+
+  /// 表紙の編集ページの、表紙の色を選ぶボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'色'**
+  String get coverEditColor;
+
+  /// らくがきや色を選ぶのを終えるボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'終わる'**
+  String get coverEditDone;
+
+  /// 選んだものを1つ上の重なりへ移すボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'前へ'**
+  String get coverEditBringForward;
+
+  /// 選んだものを1つ下の重なりへ移すボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'うしろへ'**
+  String get coverEditSendBackward;
+
+  /// No description provided for @coverEditFrame.
+  ///
+  /// In ja, this message translates to:
+  /// **'白いふち'**
+  String get coverEditFrame;
+
+  /// 選んだものを表紙から外すボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'消す'**
+  String get coverEditRemove;
+
+  /// No description provided for @coverEditHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'貼ったものはドラッグで動かし、右下のつまみか2本指で回転と拡大縮小。文字は選んでもう一度押すと書き換えられます。'**
+  String get coverEditHint;
+
+  /// No description provided for @coverEditStickerLimit.
+  ///
+  /// In ja, this message translates to:
+  /// **'貼れるのは{count}個までです'**
+  String coverEditStickerLimit(int count);
+
+  /// No description provided for @coverEditTextLimit.
+  ///
+  /// In ja, this message translates to:
+  /// **'文字は{count}個まで置けます'**
+  String coverEditTextLimit(int count);
+
+  /// 選んだ文字を書き換えるボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'書き換える'**
+  String get coverEditRewrite;
+
+  /// 文字の色を表紙の色に合わせる丸の中に出す字。とても小さい丸なので短くする
+  ///
+  /// In ja, this message translates to:
+  /// **'自動'**
+  String get coverEditTextColorAuto;
+
+  /// 文字の色を表紙の色に合わせる丸の読み上げに使う名前
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙に合わせる'**
+  String get coverEditTextColorAutoName;
+
+  /// color は色の名前
+  ///
+  /// In ja, this message translates to:
+  /// **'文字の色 {color}'**
+  String coverEditTextColorSemantics(String color);
+
+  /// 文字・ペン・表紙の色の並びにある、色のパレットを開く虹色の丸の読み上げ
+  ///
+  /// In ja, this message translates to:
+  /// **'ほかの色を選ぶ'**
+  String get colorPaletteOpen;
+
+  /// パレットの色の読み上げ。color は #RRGGBB
+  ///
+  /// In ja, this message translates to:
+  /// **'色 {color}'**
+  String colorPaletteSemantics(String color);
+
+  /// 文字の色を選ぶパレットのシートの題名
+  ///
+  /// In ja, this message translates to:
+  /// **'文字の色'**
+  String get colorPaletteTextTitle;
+
+  /// らくがきのペンの色を選ぶパレットのシートの題名
+  ///
+  /// In ja, this message translates to:
+  /// **'ペンの色'**
+  String get colorPalettePenTitle;
+
+  /// 表紙の色を選ぶパレットのシートの題名
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙の色'**
+  String get colorPaletteCoverTitle;
+
+  /// No description provided for @coverEditStrokeLimit.
+  ///
+  /// In ja, this message translates to:
+  /// **'これ以上描けません。消しゴムで消すと描けます'**
+  String get coverEditStrokeLimit;
+
+  /// No description provided for @coverEditPenThin.
+  ///
+  /// In ja, this message translates to:
+  /// **'細いペン'**
+  String get coverEditPenThin;
+
+  /// No description provided for @coverEditPenMedium.
+  ///
+  /// In ja, this message translates to:
+  /// **'ふつうのペン'**
+  String get coverEditPenMedium;
+
+  /// No description provided for @coverEditPenThick.
+  ///
+  /// In ja, this message translates to:
+  /// **'太いペン'**
+  String get coverEditPenThick;
+
+  /// No description provided for @coverEditEraser.
+  ///
+  /// In ja, this message translates to:
+  /// **'消しゴム'**
+  String get coverEditEraser;
+
+  /// No description provided for @coverEditPenBlack.
+  ///
+  /// In ja, this message translates to:
+  /// **'黒'**
+  String get coverEditPenBlack;
+
+  /// No description provided for @coverEditPenWhite.
+  ///
+  /// In ja, this message translates to:
+  /// **'白'**
+  String get coverEditPenWhite;
+
+  /// No description provided for @coverEditPenRed.
+  ///
+  /// In ja, this message translates to:
+  /// **'赤'**
+  String get coverEditPenRed;
+
+  /// No description provided for @coverEditPenOrange.
+  ///
+  /// In ja, this message translates to:
+  /// **'オレンジ'**
+  String get coverEditPenOrange;
+
+  /// No description provided for @coverEditPenGreen.
+  ///
+  /// In ja, this message translates to:
+  /// **'緑'**
+  String get coverEditPenGreen;
+
+  /// No description provided for @coverEditPenBlue.
+  ///
+  /// In ja, this message translates to:
+  /// **'青'**
+  String get coverEditPenBlue;
+
+  /// No description provided for @coverEditPenPink.
+  ///
+  /// In ja, this message translates to:
+  /// **'ピンク'**
+  String get coverEditPenPink;
+
+  /// No description provided for @coverEditKnob.
+  ///
+  /// In ja, this message translates to:
+  /// **'回転と拡大縮小'**
+  String get coverEditKnob;
+
+  /// No description provided for @coverEditStickerSemantics.
+  ///
+  /// In ja, this message translates to:
+  /// **'貼った絵文字 {emoji}'**
+  String coverEditStickerSemantics(String emoji);
+
+  /// 表紙に貼った日記帳の名前の読み上げ。name は日記帳の名前
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙の名前 {name}'**
+  String coverEditNameSemantics(String name);
+
+  /// No description provided for @coverEditTextSemantics.
+  ///
+  /// In ja, this message translates to:
+  /// **'置いた文字 {text}'**
+  String coverEditTextSemantics(String text);
+
+  /// No description provided for @coverTextSheetTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙に文字を置く'**
+  String get coverTextSheetTitle;
+
+  /// No description provided for @coverTextSheetEditTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'文字を書き換える'**
+  String get coverTextSheetEditTitle;
+
+  /// No description provided for @coverTextSheetHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙に入れる文字'**
+  String get coverTextSheetHint;
+
+  /// 表紙に文字を置くシートの決定ボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'置く'**
+  String get coverTextSheetPlace;
+
+  /// 表紙から外した日記帳の名前を、もう一度表紙に置くボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'日記帳の名前を置く'**
+  String get coverTextSheetPlaceName;
+
+  /// No description provided for @coverEditDoodleArea.
+  ///
+  /// In ja, this message translates to:
+  /// **'らくがきをする場所。表紙をなぞって線を描く'**
+  String get coverEditDoodleArea;
+
+  /// No description provided for @coverEditSaved.
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙を保存しました'**
+  String get coverEditSaved;
+
+  /// No description provided for @coverEditSaveFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'保存できませんでした。もう一度お試しください'**
+  String get coverEditSaveFailed;
+
+  /// No description provided for @coverEditNeedsUpdate.
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙を編集するには、アプリをアップデートしてください'**
+  String get coverEditNeedsUpdate;
+
+  /// No description provided for @emojiSheetTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'絵文字を選ぶ'**
+  String get emojiSheetTitle;
+
+  /// 最近使った絵文字がないときの文
+  ///
+  /// In ja, this message translates to:
+  /// **'まだありません'**
+  String get emojiSheetNoRecents;
+
+  /// No description provided for @emojiSheetSearch.
+  ///
+  /// In ja, this message translates to:
+  /// **'絵文字を検索'**
+  String get emojiSheetSearch;
 }
 
 class _AppLocalizationsDelegate

@@ -9,7 +9,7 @@ part of '../diary_book_info_page_controller.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 名前や人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
 /// 日記帳から抜けたりする。
 
 @ProviderFor(DiaryBookInfoPageController)
@@ -17,7 +17,7 @@ final diaryBookInfoPageControllerProvider =
     DiaryBookInfoPageControllerFamily._();
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 名前や人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
 /// 日記帳から抜けたりする。
 final class DiaryBookInfoPageControllerProvider
     extends
@@ -26,7 +26,7 @@ final class DiaryBookInfoPageControllerProvider
           DiaryBookInfoPageState
         > {
   /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-  /// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+  /// 名前や人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
   /// 日記帳から抜けたりする。
   DiaryBookInfoPageControllerProvider._({
     required DiaryBookInfoPageControllerFamily super.from,
@@ -66,10 +66,10 @@ final class DiaryBookInfoPageControllerProvider
 }
 
 String _$diaryBookInfoPageControllerHash() =>
-    r'9dc0d345189189985ceee69537f09da13f5505c5';
+    r'48e8de87ece012d2fe62585ca4d5fa09dd06dc17';
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 名前や人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
 /// 日記帳から抜けたりする。
 
 final class DiaryBookInfoPageControllerFamily extends $Family
@@ -91,7 +91,7 @@ final class DiaryBookInfoPageControllerFamily extends $Family
       );
 
   /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-  /// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+  /// 名前や人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
   /// 日記帳から抜けたりする。
 
   DiaryBookInfoPageControllerProvider call(String diaryBookId) =>
@@ -102,7 +102,7 @@ final class DiaryBookInfoPageControllerFamily extends $Family
 }
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 名前や人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
 /// 日記帳から抜けたりする。
 
 abstract class _$DiaryBookInfoPageController

@@ -12,7 +12,6 @@ import '../../../utils/legal_pages.dart';
 import '../../components/confirm_sheet.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
-import 'components/diary_book_layout_picker.dart';
 import 'components/theme_mode_picker.dart';
 import 'controller/my_page_controller.dart';
 
@@ -87,11 +86,6 @@ class MyPage extends HookConsumerWidget {
             name: profile?.displayName ?? '',
             avatarUrl: profile?.avatarUrl,
             onTap: () => const ProfileEditRoute().push<void>(context),
-          ),
-          _SectionHeader(l10n.settingsHomeLayoutSection),
-          DiaryBookLayoutPicker(
-            grid: settings.diaryBookGrid,
-            onChanged: settingsNotifier.saveDiaryBookGrid,
           ),
           _SectionHeader(l10n.settingsDisplaySection),
           Padding(

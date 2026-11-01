@@ -7,9 +7,6 @@ part '_generated/settings.freezed.dart';
 @freezed
 abstract class Settings with _$Settings {
   const factory Settings({
-    /// ホームの日記帳の一覧を、表紙を大きく見せる横2列のグリッドで出すか。false ならリスト。
-    required bool diaryBookGrid,
-
     /// ホームの書き込みバーに手書きの説明を出すか。
     required bool postHintVisible,
 

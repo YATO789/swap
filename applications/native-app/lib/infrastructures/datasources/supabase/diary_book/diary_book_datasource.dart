@@ -23,8 +23,8 @@ class DiaryBookDatasource {
     final rows = await _client
         .from('diary_books')
         .select(
-          'id, name, cover_color, invite_code, member_limit, created_by, '
-          'diary_book_members(count)',
+          'id, name, cover_color, cover_decoration, invite_code, '
+          'member_limit, created_by, diary_book_members(count)',
         )
         .order('created_at');
     return rows.map(JoinedDiaryBookResponse.fromJson).toList();
@@ -67,20 +67,13 @@ class DiaryBookDatasource {
     return rows.map(DiaryBookMemberResponse.fromJson).toList();
   }
 
-  /// [diaryBookId] の日記帳の名前を [name] にする。
-  Future<void> rename(String diaryBookId, String name) async {
-    await _client
-        .from('diary_books')
-        .update({'name': name})
-        .eq('id', diaryBookId);
-  }
-
-  /// [diaryBookId] の日記帳の表紙の色を [coverColor] にする。null なら決まったグレーに戻す。
-  Future<void> setCoverColor(String diaryBookId, int? coverColor) async {
-    await _client
-        .from('diary_books')
-        .update({'cover_color': coverColor})
-        .eq('id', diaryBookId);
+  /// [diaryBookId] の日記帳の表紙（`name`・`cover_color`・`cover_decoration`）のうち、
+  /// [values] に入っている列だけを1回で書き換える。
+  Future<void> updateCover(
+    String diaryBookId,
+    Map<String, Object?> values,
+  ) async {
+    await _client.from('diary_books').update(values).eq('id', diaryBookId);
   }
 
   /// [diaryBookId] の日記帳に参加できる人数の上限を [memberLimit] 人にする。

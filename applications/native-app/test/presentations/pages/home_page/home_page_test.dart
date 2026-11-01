@@ -5,16 +5,18 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/domains/authentication/authentication.dart';
+import 'package:swap/domains/diary_book/cover_decoration.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
-import 'package:swap/presentations/providers/settings_notifier.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/l10n/l10n.dart';
+import 'package:swap/presentations/components/cover_decoration_layer.dart';
+import 'package:swap/presentations/components/diary_cover.dart';
 import 'package:swap/presentations/pages/home_page/home_page.dart';
 import 'package:swap/theme/app_theme.dart';
 
@@ -119,21 +121,20 @@ void main() {
     expect(find.byTooltip('日記帳を追加'), findsNothing);
   });
 
-  testWidgets('設定に合わせてリストかグリッドで出す', (tester) async {
-    await _pumpHome(tester, _diaryBooks);
+  testWidgets('日記帳を表紙で並べ、飾った表紙には飾りも出す', (tester) async {
+    await _pumpHome(tester, [
+      _diaryBooks.first.copyWith(
+        coverDecoration: const CoverDecoration(
+          stickers: [CoverSticker(emoji: '🌻', x: 0.5, y: 0.9, size: 0.3)],
+        ),
+      ),
+      ..._diaryBooks.skip(1),
+    ]);
 
-    // 選んだことがなければグリッド。グリッドには人数を出さない。
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byType(DiaryCover), findsNWidgets(_diaryBooks.length));
+    expect(find.byType(CoverDecorationLayer), findsOneWidget);
+    // 表紙には人数を出さない。
     expect(find.text('5人'), findsNothing);
-
-    // 設定画面で切り替えたときと同じく、保存した値を変える。
-    await ProviderScope.containerOf(tester.element(find.byType(HomePage)))
-        .read(settingsProvider.notifier)
-        .saveDiaryBookGrid(false);
-    await tester.pump();
-
-    expect(find.byIcon(Icons.chevron_right), findsWidgets);
-    expect(find.text('5人'), findsOneWidget);
   });
 
   testWidgets('新しいバージョンがあれば知らせ、あとでにすると覚えておく', (tester) async {

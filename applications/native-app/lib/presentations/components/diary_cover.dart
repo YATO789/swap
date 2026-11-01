@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../../domains/diary_book/cover_decoration.dart';
+import 'cover_decoration_layer.dart';
 import 'diary_book_icon.dart';
 
-/// 日記帳の表紙。名前があれば表紙の上のほうに [coverInkColor] で入れる。
+/// 日記帳の表紙。
+///
+/// 下から 表紙の色 → 背表紙 → 貼ったもの → らくがき の順に重ねる。
+/// 名前は飾りの貼ったものの1つとして、置いた場所に置いた形で出す（[CoverDecoration.placesName]）。
+/// 飾りがないときや、名前を貼ったものにする前（v1）の飾りでは、名前を表紙の上のほうに
+/// 白いふちを付けて入れ、飾りで隠れないよう一番上に出す。
 class DiaryCover extends StatelessWidget {
   const DiaryCover({
     super.key,
     this.name = '',
     required this.color,
     required this.width,
+    this.decoration,
+    this.decorationLayer,
   });
 
   final String name;
@@ -19,6 +28,13 @@ class DiaryCover extends StatelessWidget {
   /// 表紙の幅。高さはその 4/3 にし、中の文字や背表紙もこれに合わせて大きくする。
   final double width;
 
+  /// 表紙の飾り。null なら飾りなし。
+  final CoverDecoration? decoration;
+
+  /// [decoration] の代わりに背表紙の上に置く層。
+  /// 編集ページが、触って動かせる飾りを差し込むのに使う。名前もこの層で出す。
+  final Widget? decorationLayer;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -28,12 +44,28 @@ class DiaryCover extends StatelessWidget {
     // 幅 168 のときの大きさを基準に、表紙の大きさに合わせて伸ばす。
     final k = width / 168;
     final fontSize = (length <= 6 ? 22.0 : (length <= 12 ? 19.0 : 16.0)) * k;
+    final inkColor = coverInkColor(coverColor);
+    final decoration = this.decoration;
+    final decorationLayer =
+        this.decorationLayer ??
+        (decoration == null || decoration.isEmpty
+            ? null
+            : CoverDecorationLayer(
+                decoration: decoration,
+                coverWidth: width,
+                name: name,
+                inkColor: inkColor,
+              ));
+    final fixedName =
+        this.decorationLayer == null && !(decoration?.placesName ?? false);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
       width: width,
-      height: width * 4 / 3,
+      height: width * coverHeightRatio,
+      // 表紙からはみ出した飾りは表紙の縁で切る。
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: coverColor,
         borderRadius: BorderRadius.horizontal(
@@ -73,29 +105,28 @@ class DiaryCover extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(28 * k, 40 * k, 16 * k, 16 * k),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 150),
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w700,
-                  height: 1.3,
-                  color: coverInkColor(coverColor),
-                ),
-                child: Text(
-                  name,
-                  textAlign: TextAlign.center,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                  // 表紙の大きさは変わらないので、文字サイズ設定は効かせない。
-                  textScaler: TextScaler.noScaling,
+          if (decorationLayer != null) Positioned.fill(child: decorationLayer),
+          if (fixedName)
+            IgnorePointer(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(28 * k, 40 * k, 16 * k, 16 * k),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  // 名前を貼ったものにしたときと同じく、白いふちを付ける。
+                  child: FramedCoverText(
+                    name,
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w700,
+                      height: coverTextHeight,
+                      color: coverTextInk(inkColor, frame: true),
+                    ),
+                    frame: true,
+                    maxLines: 4,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

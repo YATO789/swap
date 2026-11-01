@@ -42,7 +42,7 @@ final class DiaryBookNotifierProvider
   DiaryBookNotifier create() => DiaryBookNotifier();
 }
 
-String _$diaryBookNotifierHash() => r'9956be68311ec2008274012bae98d1565375e64d';
+String _$diaryBookNotifierHash() => r'88cbe73c2b9b7bf95340acecd8c2de442c12ab0c';
 
 /// 自分が参加している日記帳の一覧を持つ。サインインしていなければ空。
 ///

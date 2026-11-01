@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
+import 'package:swap/domains/diary_book/diary_book_cover_field.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/infrastructures/datasources/supabase/avatar/avatar_datasource.dart';
@@ -7,6 +8,7 @@ import 'package:swap/infrastructures/datasources/supabase/diary_book/diary_book_
 import 'package:swap/infrastructures/datasources/supabase/diary_book/models/diary_book_member_response.dart';
 import 'package:swap/infrastructures/datasources/supabase/diary_book/models/diary_book_response.dart';
 import 'package:swap/infrastructures/datasources/supabase/diary_book/models/invited_diary_book_response.dart';
+import 'package:swap/infrastructures/repositories/cover_decoration_json.dart';
 
 part '_generated/diary_book_repository.g.dart';
 
@@ -59,14 +61,23 @@ class DiaryBookRepository {
     return responses.map(_toDiaryBookMember).toList();
   }
 
-  /// [diaryBookId] の日記帳の名前を [name] にする。
-  Future<void> rename(String diaryBookId, String name) {
-    return _datasource.rename(diaryBookId, name);
-  }
-
-  /// [diaryBookId] の日記帳の表紙の色を [coverColor] にする。
-  Future<void> setCoverColor(String diaryBookId, int? coverColor) {
-    return _datasource.setCoverColor(diaryBookId, coverColor);
+  /// [diaryBook] の表紙のうち、[fields] の項目だけを [diaryBook] の値で1回で書き換える。
+  Future<void> updateCover(
+    DiaryBook diaryBook,
+    Set<DiaryBookCoverField> fields,
+  ) {
+    return _datasource.updateCover(diaryBook.id, {
+      for (final field in fields)
+        ...switch (field) {
+          DiaryBookCoverField.name => {'name': diaryBook.name},
+          DiaryBookCoverField.color => {'cover_color': diaryBook.coverColor},
+          DiaryBookCoverField.decoration => {
+            'cover_decoration': coverDecorationToJson(
+              diaryBook.coverDecoration,
+            ),
+          },
+        },
+    });
   }
 
   /// [diaryBookId] の日記帳に参加できる人数の上限を [memberLimit] 人にする。
@@ -102,6 +113,7 @@ class DiaryBookRepository {
       memberLimit: response.memberLimit,
       createdBy: response.createdBy,
       coverColor: response.coverColor,
+      coverDecoration: coverDecorationFromJson(response.coverDecoration),
     );
   }
 

@@ -19,7 +19,6 @@ import 'components/join_diary_book_sheet/join_diary_book_sheet.dart';
 import 'components/post_hint.dart';
 import 'components/update_sheet.dart';
 import 'controller/home_page_controller.dart';
-import '../../components/diary_book_icon.dart';
 import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
 import '../../components/user_avatar.dart';
@@ -32,10 +31,6 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final grid = ref.watch(
-      settingsProvider.select((settings) => settings.diaryBookGrid),
-    );
-
     final colors = context.appColors;
     final l10n = context.l10n;
     final diaryBooksState = ref.watch(diaryBookProvider);
@@ -103,12 +98,19 @@ class HomePage extends HookConsumerWidget {
     }, const []);
 
     // 作ったらホームに戻り、そのまま友達を招待するシートを出す。
+    // 作った直後がいちばん飾りたくなるので、表紙を飾る入口も添える。
     Future<void> createDiaryBook() async {
       final diaryBook = await const CreateDiaryBookRoute().push<DiaryBook>(
         context,
       );
       if (diaryBook == null || !context.mounted) return;
-      await showInviteSheet(context, diaryBook, justCreated: true);
+      await showInviteSheet(
+        context,
+        diaryBook,
+        justCreated: true,
+        onDecorateCover: () =>
+            CoverDecorationRoute(id: diaryBook.id).push<void>(context),
+      );
     }
 
     Future<void> joinDiaryBook() async {
@@ -179,9 +181,7 @@ class HomePage extends HookConsumerWidget {
         ),
         AsyncValue(hasValue: true) => RefreshIndicator(
           onRefresh: refresh,
-          child: grid
-              ? _DiaryBookGrid(diaryBooks: diaryBooks, onTap: openDiaryBook)
-              : _DiaryBookList(diaryBooks: diaryBooks, onTap: openDiaryBook),
+          child: _DiaryBookGrid(diaryBooks: diaryBooks, onTap: openDiaryBook),
         ),
         AsyncError() => Center(
           child: Column(
@@ -214,39 +214,6 @@ class HomePage extends HookConsumerWidget {
                 Positioned.fill(child: PostHint(visible: showPostHint)),
               ],
             ),
-    );
-  }
-}
-
-class _DiaryBookList extends StatelessWidget {
-  const _DiaryBookList({required this.diaryBooks, required this.onTap});
-
-  final List<DiaryBook> diaryBooks;
-  final ValueChanged<DiaryBook> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      // 日記帳が少なくて画面に収まっても、引っ張って読み直せるようにする。
-      physics: const AlwaysScrollableScrollPhysics(),
-      // 下の書き込みバーに隠れないよう、バーの高さぶん下をあける。
-      padding: EdgeInsets.only(
-        top: 8,
-        bottom: 24 + MediaQuery.paddingOf(context).bottom,
-      ),
-      children: [
-        for (final diaryBook in diaryBooks)
-          _ListTile(
-            leading: DiaryBookIcon(
-              name: diaryBook.name,
-              coverColor: diaryBook.coverColor,
-              size: 60,
-            ),
-            title: diaryBook.name,
-            subtitle: context.l10n.commonMemberCount(diaryBook.memberCount),
-            onTap: () => onTap(diaryBook),
-          ),
-      ],
     );
   }
 }
@@ -305,72 +272,13 @@ class _DiaryBookGrid extends StatelessWidget {
                       ? null
                       : Color(diaryBook.coverColor!),
                   width: coverWidth,
+                  decoration: diaryBook.coverDecoration,
                 ),
               ),
             );
           },
         );
       },
-    );
-  }
-}
-
-class _ListTile extends StatelessWidget {
-  const _ListTile({
-    required this.leading,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final Widget leading;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return Semantics(
-      button: true,
-      label: context.l10n.homeDiaryBookSemantics(title, subtitle),
-      excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Row(
-            children: [
-              leading,
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: colors.textSecondary),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

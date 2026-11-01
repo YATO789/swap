@@ -77,19 +77,6 @@ Future<void> _openMyPage(
 }
 
 void main() {
-  testWidgets('日記帳の並べ方を選ぶと、保存する', (tester) async {
-    final preferencesStore = FakePreferencesStore();
-    await _openMyPage(tester, preferencesStore: preferencesStore);
-
-    await tester.tap(find.bySemanticsLabel('リスト'));
-    await tester.pumpAndSettle();
-    expect(preferencesStore.diaryBookGrid, isFalse);
-
-    await tester.tap(find.bySemanticsLabel('表紙'));
-    await tester.pumpAndSettle();
-    expect(preferencesStore.diaryBookGrid, isTrue);
-  });
-
   testWidgets('書き込みバーの説明のスイッチを切り替えると、保存する', (tester) async {
     final preferencesStore = FakePreferencesStore();
     await _openMyPage(tester, preferencesStore: preferencesStore);

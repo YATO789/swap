@@ -47,7 +47,7 @@ final class SettingsNotifierProvider
   }
 }
 
-String _$settingsNotifierHash() => r'83e6f8d29e46406b3b6ec6deb96d7c3ec2168a3e';
+String _$settingsNotifierHash() => r'529e7dce9ac6bd06f2bbdbe424222d457128b996';
 
 /// 設定画面で切り替える設定を持ち、変えたら端末に保存する。
 /// 使う側は select で必要な項目だけを見る。

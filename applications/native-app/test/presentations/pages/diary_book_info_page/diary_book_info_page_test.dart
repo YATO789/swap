@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
+import 'package:swap/domains/diary_book/cover_decoration.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/post/timeline_post.dart';
@@ -15,6 +16,7 @@ import 'package:swap/infrastructures/repositories/opened_notification_repository
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/l10n/l10n.dart';
+import 'package:swap/presentations/pages/cover_decoration_page/cover_decoration_page.dart';
 import 'package:swap/presentations/pages/diary_book_info_page/diary_book_info_page.dart';
 import 'package:swap/presentations/pages/home_page/home_page.dart';
 import 'package:swap/presentations/pages/router/router.dart';
@@ -40,10 +42,12 @@ const _members = [
 /// サインインした状態のホームから大学の日記帳を開き、情報ページを開く。
 /// [createdByMe] なら、自分が大学の日記帳を作ったことにする。
 /// [refreshed] は、読み直したときに返す日記帳の一覧。ほかの人が変えたことにする。
+/// [initial] を渡すと、大学の日記帳をそれにする。
 Future<void> _openInfo(
   WidgetTester tester, {
   bool createdByMe = false,
   List<DiaryBook>? refreshed,
+  DiaryBook initial = _university,
 }) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
@@ -69,12 +73,7 @@ Future<void> _openInfo(
         ),
         diaryBookRepositoryProvider.overrideWithValue(
           FakeDiaryBookRepository(
-            [
-              if (createdByMe)
-                _university.copyWith(createdBy: 'me')
-              else
-                _university,
-            ],
+            [if (createdByMe) initial.copyWith(createdBy: 'me') else initial],
             members: {_university.id: _members},
           )..refreshed = refreshed,
         ),
@@ -124,6 +123,14 @@ Future<void> _openInfo(
   await tester.pumpAndSettle();
 }
 
+/// 情報ページ全体のスクロール。名前の入力欄の中にもスクロールがあるので、外側を選ぶ。
+final _pageScrollable = find
+    .descendant(
+      of: find.byType(DiaryBookInfoPage),
+      matching: find.byType(Scrollable),
+    )
+    .first;
+
 void main() {
   testWidgets('日記帳のページから情報ページを開くと、メンバーと招待コードが出る', (tester) async {
     await _openInfo(tester);
@@ -138,16 +145,14 @@ void main() {
     expect(find.text('Uni4823'), findsOneWidget);
   });
 
-  testWidgets('名前を変えると、情報ページにも日記帳のページにも映る', (tester) async {
+  testWidgets('表紙の下の入力欄で名前を変えると、表紙にも日記帳のページにも映る', (tester) async {
     await _openInfo(tester);
 
-    await tester.tap(find.bySemanticsLabel(RegExp('^名前を変える')));
-    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), ' ゼミ ');
-    await tester.pump();
-    await tester.tap(find.text('保存する'));
+    await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
+    // 入力欄と表紙。
     expect(find.text('ゼミ'), findsNWidgets(2));
 
     await tester.tap(find.byType(BackButton));
@@ -155,10 +160,134 @@ void main() {
     expect(find.text('ゼミ'), findsOneWidget);
   });
 
+  testWidgets('名前を書き換えると保存ボタンが出て、押すと保存して知らせる', (tester) async {
+    await _openInfo(tester);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    expect(find.text('「保存」か「完了」を押すと保存します'), findsOneWidget);
+    // 書き換えるまでは保存ボタンを出さない。
+    expect(find.text('保存'), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'ゼミ');
+    await tester.pump();
+    await tester.tap(find.text('保存'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('名前を保存しました'), findsOneWidget);
+    expect(find.text('保存'), findsNothing);
+    expect(find.text('ゼミ'), findsNWidgets(2));
+  });
+
+  testWidgets('保存を押さずに入力欄の外を押しても保存せず、保存ボタンは残る', (tester) async {
+    await _openInfo(tester);
+
+    await tester.enterText(find.byType(TextField), 'ゼミ');
+    await tester.pump();
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+
+    expect(find.text('名前を保存しました'), findsNothing);
+    expect(find.text('保存'), findsOneWidget);
+    // 表紙はまだ元の名前。
+    expect(find.text('大学'), findsOneWidget);
+  });
+
+  testWidgets('保存を押さずに戻ると、捨ててよいか確かめ、捨てると名前は変わらない', (tester) async {
+    await _openInfo(tester);
+
+    await tester.enterText(find.byType(TextField), 'ゼミ');
+    await tester.pump();
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('入力内容を破棄しますか？'), findsOneWidget);
+    await tester.tap(find.text('破棄する'));
+    await tester.pumpAndSettle();
+
+    // 日記帳のページに戻り、名前は元のまま。
+    expect(find.text('大学'), findsOneWidget);
+    expect(find.text('ゼミ'), findsNothing);
+  });
+
+  testWidgets('名前を空にすると、元の名前に戻して何もしない', (tester) async {
+    await _openInfo(tester);
+
+    await tester.enterText(find.byType(TextField), '  ');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(find.text('大学'), findsNWidgets(2));
+  });
+
+  testWidgets('表紙に名前を貼っていれば、名前を変えると文字の大きさが変わらないよう幅も変える', (tester) async {
+    const name = CoverSticker(isName: true, x: 0.5, y: 0.3, size: 0.2);
+    await _openInfo(
+      tester,
+      initial: _university.copyWith(
+        coverDecoration: const CoverDecoration(stickers: [name]),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField), '大学のゼミ');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(DiaryBookInfoPage)),
+    );
+    final saved =
+        (await container.read(diaryBookRepositoryProvider).fetchJoined())
+            .single;
+    expect(saved.name, '大学のゼミ');
+    // 2文字から5文字になったので、幅も広がる。
+    expect(saved.coverDecoration!.stickers.single.size, greaterThan(0.4));
+  });
+
+  testWidgets('「表紙を編集」を押すと、表紙の編集ページを開く', (tester) async {
+    await _openInfo(tester);
+
+    await tester.tap(find.text('表紙を編集'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CoverDecorationPage), findsOneWidget);
+  });
+
+  testWidgets('表紙を押しても、表紙の編集ページを開く', (tester) async {
+    await _openInfo(tester);
+
+    await tester.tap(find.bySemanticsLabel('大学の表紙、表紙を編集'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CoverDecorationPage), findsOneWidget);
+  });
+
+  testWidgets('新しいアプリで飾った表紙は、編集ページを開かずにアップデートを促す', (tester) async {
+    await _openInfo(
+      tester,
+      initial: _university.copyWith(
+        coverDecoration: const CoverDecoration(
+          version: coverDecorationVersion + 1,
+          stickers: [CoverSticker(isName: true, x: 0.5, y: 0.3, size: 0.3)],
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('表紙を編集'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DiaryBookInfoPage), findsOneWidget);
+    expect(find.text('表紙を編集するには、アプリをアップデートしてください'), findsOneWidget);
+  });
+
   testWidgets('招待コードを作り直すと、新しいコードが出る', (tester) async {
     await _openInfo(tester);
 
-    await tester.scrollUntilVisible(find.text('招待コードを作り直す'), 100);
+    await tester.scrollUntilVisible(
+      find.text('招待コードを作り直す'),
+      100,
+      scrollable: _pageScrollable,
+    );
     await tester.tap(find.text('招待コードを作り直す'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('作り直す'));
@@ -225,7 +354,7 @@ void main() {
     await _openInfo(tester, refreshed: [_university.copyWith(memberLimit: 4)]);
     expect(find.text('8人まで'), findsOneWidget);
 
-    await tester.fling(find.text('表紙'), const Offset(0, 400), 1000);
+    await tester.fling(find.text('この日記を書く人'), const Offset(0, 400), 1000);
     await tester.pumpAndSettle();
 
     expect(find.text('4人まで'), findsOneWidget);
@@ -241,7 +370,11 @@ void main() {
   testWidgets('退出するとホームに戻り、一覧から日記帳が消える', (tester) async {
     await _openInfo(tester);
 
-    await tester.scrollUntilVisible(find.text('日記帳を退出'), 100);
+    await tester.scrollUntilVisible(
+      find.text('日記帳を退出'),
+      100,
+      scrollable: _pageScrollable,
+    );
     await tester.tap(find.text('日記帳を退出'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('退出する'));

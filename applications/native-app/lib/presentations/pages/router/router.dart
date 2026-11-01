@@ -7,6 +7,7 @@ import 'package:swap/presentations/providers/authentication_notifier.dart';
 import 'package:swap/presentations/providers/diary_book_notifier.dart';
 import 'package:swap/presentations/providers/profile_notifier.dart';
 
+import '../cover_decoration_page/cover_decoration_page.dart';
 import '../create_diary_book_page/create_diary_book_page.dart';
 import '../diary_book_info_page/diary_book_info_page.dart';
 import '../diary_book_page/diary_book_page.dart';
@@ -185,6 +186,25 @@ class DiaryBookInfoRoute extends GoRouteData with $DiaryBookInfoRoute {
         key: state.pageKey,
         builder: (_) => DiaryBookInfoPage(diaryBookId: id),
       );
+}
+
+/// [id] の日記帳の表紙（名前・色・飾り）を編集するページ。
+@TypedGoRoute<CoverDecorationRoute>(path: '/diary-books/:id/cover')
+class CoverDecorationRoute extends GoRouteData with $CoverDecorationRoute {
+  const CoverDecorationRoute({required this.id});
+
+  final String id;
+
+  // 表紙の上のドラッグを戻るスワイプに取られないよう、下から出てくるモーダルにする。
+  // 閉じるボタンで閉じ、書きかけなら確かめる。
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return MaterialPage(
+      key: state.pageKey,
+      fullscreenDialog: true,
+      child: CoverDecorationPage(diaryBookId: id),
+    );
+  }
 }
 
 /// [id] の日記帳の [date] の日記を読むページ。最初は [author] の日記を開く。

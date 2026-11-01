@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'cover_decoration.dart';
+
 part '_generated/diary_book.freezed.dart';
 
 /// 友達と記録や日記を見せ合うグループ。
@@ -16,6 +18,9 @@ abstract class DiaryBook with _$DiaryBook {
     /// アカウントを消していれば null。
     String? createdBy,
     int? coverColor,
+
+    /// 表紙の飾り。null なら飾りなし。
+    CoverDecoration? coverDecoration,
   }) = _DiaryBook;
 }
 

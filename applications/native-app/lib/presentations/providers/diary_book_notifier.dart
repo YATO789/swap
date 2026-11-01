@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domains/diary_book/diary_book.dart';
 import '../../infrastructures/repositories/diary_book_repository.dart';
+import '../../usecases/update_diary_book_cover_usecase.dart';
 import 'authentication_notifier.dart';
 
 part '_generated/diary_book_notifier.g.dart';
@@ -51,18 +52,17 @@ class DiaryBookNotifier extends _$DiaryBookNotifier {
     return diaryBooks.where((diaryBook) => diaryBook.id == id).firstOrNull;
   }
 
-  /// [diaryBookId] の日記帳の名前を [name] にし、一覧にも映す。
-  Future<void> rename(String diaryBookId, String name) async {
-    await _repository.rename(diaryBookId, name);
-    _replace(diaryBookId, (diaryBook) => diaryBook.copyWith(name: name));
-  }
-
-  /// [diaryBookId] の日記帳の表紙の色を [coverColor] にし、一覧にも映す。
-  Future<void> setCoverColor(String diaryBookId, int? coverColor) async {
-    await _repository.setCoverColor(diaryBookId, coverColor);
+  /// 日記帳の表紙（名前・色・飾り）を [original] から [edited] に変え、一覧にも映す。
+  /// 変わったところだけを書くので、そのあいだにほかの人が変えたところは残る。
+  Future<void> updateCover(DiaryBook original, DiaryBook edited) async {
+    await ref.read(updateDiaryBookCoverUseCaseProvider)(original, edited);
     _replace(
-      diaryBookId,
-      (diaryBook) => diaryBook.copyWith(coverColor: coverColor),
+      original.id,
+      (diaryBook) => diaryBook.copyWith(
+        name: edited.name,
+        coverColor: edited.coverColor,
+        coverDecoration: edited.coverDecoration,
+      ),
     );
   }
 

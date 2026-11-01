@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -9,21 +10,22 @@ import '../../providers/profile_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../components/confirm_sheet.dart';
-import '../../components/cover_color_picker.dart';
-import '../../components/diary_book_icon.dart';
+import '../../components/cover_decoration_layer.dart';
+import '../../components/diary_cover.dart';
+import '../../components/discard_guard.dart';
 import '../../components/invite_sheet.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
 import 'components/member_limit_sheet.dart';
-import 'components/rename_sheet.dart';
 import 'controller/diary_book_info_page_controller.dart';
 
 /// 罫線1本ぶんの高さ。どの行もこの高さで並べる。
 const _lineHeight = 56.0;
 
-/// 日記帳の情報。日記帳を開いた最初のページのように、題名・書く人を
-/// 罫線の上にまとめて記す。名前や表紙の色、人数の上限はここで書き換えられ、
-/// 友達の招待・招待コードの作り直し・メンバーを外すこと・日記帳からの退出もここから行う。
+/// 日記帳の情報。日記帳を開いた最初のページのように、表紙と書く人を
+/// 罫線の上にまとめて記す。名前は表紙の下の入力欄で、表紙の色・飾りは表紙の編集ページを開いて書き換える。
+/// 人数の上限はここで書き換えられ、友達の招待・招待コードの作り直し・メンバーを外すこと・
+/// 日記帳からの退出もここから行う。
 class DiaryBookInfoPage extends ConsumerWidget {
   const DiaryBookInfoPage({super.key, required this.diaryBookId});
 
@@ -57,22 +59,33 @@ class DiaryBookInfoPage extends ConsumerWidget {
         ..showSnackBar(SnackBar(content: Text(message)));
     }
 
-    Future<void> rename() async {
-      final name = await showRenameSheet(
-        context,
-        diaryBook.name,
-        coverColor: diaryBook.coverColor,
+    /// 名前を [name] にする。表紙に貼った名前は、文字の大きさが変わらないよう名前の長さに合わせて幅を変える。
+    /// 変えられたら true。
+    Future<bool> rename(String name) async {
+      final decoration = diaryBook.coverDecoration;
+      final edited = diaryBook.copyWith(
+        name: name,
+        // 新しいアプリで飾った表紙は、知らない飾りを消さないよう飾りには触らない。
+        coverDecoration: decoration == null || !decoration.isEditable
+            ? decoration
+            : renamedCoverDecoration(decoration, diaryBook.name, name),
       );
-      if (name == null || name == diaryBook.name) return;
-      if (!await controller().rename(name)) {
+      if (!await controller().rename(diaryBook, edited)) {
         showMessage(l10n.infoRenameFailed);
+        return false;
       }
+      showMessage(l10n.infoRenamed);
+      return true;
     }
 
-    Future<void> setCoverColor(Color? color) async {
-      if (!await controller().setCoverColor(color?.toARGB32())) {
-        showMessage(l10n.infoCoverColorFailed);
+    // 表紙の色・飾りは、表紙の編集ページで変える。
+    void editCover() {
+      // 新しいアプリで飾った表紙は、知らない飾りを消さないよう編集させない。
+      if (!(diaryBook.coverDecoration?.isEditable ?? true)) {
+        showMessage(l10n.coverEditNeedsUpdate);
+        return;
       }
+      CoverDecorationRoute(id: diaryBook.id).push<void>(context);
     }
 
     Future<void> setMemberLimit() async {
@@ -154,25 +167,10 @@ class DiaryBookInfoPage extends ConsumerWidget {
               MediaQuery.paddingOf(context).bottom + 8,
             ),
             children: [
-              _Header(diaryBook: diaryBook, onRename: rename),
-              _SectionLabel(l10n.infoCoverSection),
-              _TapLine(
-                label: l10n.commonName,
-                semanticsLabel: l10n.infoRename,
-                onTap: rename,
-                trailing: Text(diaryBook.name),
-              ),
-              _RuledLine(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: CoverColorPicker(
-                    alignment: WrapAlignment.start,
-                    selected: diaryBook.coverColor == null
-                        ? null
-                        : Color(diaryBook.coverColor!),
-                    onSelected: setCoverColor,
-                  ),
-                ),
+              _CoverHero(
+                diaryBook: diaryBook,
+                onEdit: editCover,
+                onRename: rename,
               ),
               _SectionLabel(l10n.infoMembersSection),
               _TapLine(
@@ -233,66 +231,195 @@ class DiaryBookInfoPage extends ConsumerWidget {
   }
 }
 
-/// 一番上の題名。題名を押すと名前を変えられる。
-class _Header extends StatelessWidget {
-  const _Header({required this.diaryBook, required this.onRename});
+/// 一番上に今の表紙を大きく置き、その下で日記帳の名前を書き換えられるようにする。
+/// 名前を変えられるのはここだけ。表紙か「表紙を編集」を押すと、表紙の編集ページで色・飾りを変えられる。
+class _CoverHero extends HookWidget {
+  const _CoverHero({
+    required this.diaryBook,
+    required this.onEdit,
+    required this.onRename,
+  });
+
+  static const _coverWidth = 160.0;
 
   final DiaryBook diaryBook;
-  final VoidCallback onRename;
+  final VoidCallback onEdit;
+
+  /// 名前を変える。変えられたら true。
+  final Future<bool> Function(String name) onRename;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final coverColor = diaryBook.coverColor;
+    final l10n = context.l10n;
+    final name = diaryBook.name;
+    final controller = useTextEditingController(text: name);
+    final focusNode = useFocusNode();
+    final focused = useListenableSelector(focusNode, () => focusNode.hasFocus);
+    final typed = useValueListenable(controller).text.trim();
+    final saving = useState(false);
+    // 書き換えていて、保存できる名前か。
+    final changed = typed.isNotEmpty && typed != name;
 
-    return Column(
-      children: [
-        Semantics(
-          button: true,
-          label: context.l10n.infoRenameSemantics(diaryBook.name),
-          excludeSemantics: true,
-          child: InkWell(
-            onTap: onRename,
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 鉛筆のぶんだけ左も空けて、題名を真ん中に置く。
-                  const SizedBox(width: 22),
-                  Flexible(
-                    child: Text(
-                      diaryBook.name,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Icon(
-                    Icons.edit_outlined,
-                    size: 16,
-                    color: colors.textSecondary,
-                  ),
-                ],
+    // ほかのメンバーが名前を変えたら、書き換えている途中でなければ入力欄も合わせる。
+    final previousName = usePrevious(name);
+    useEffect(() {
+      if (controller.text.trim() == (previousName ?? name)) {
+        controller.text = name;
+      }
+      return null;
+    }, [name]);
+
+    /// 書いた名前を保存する。「保存」か「完了」を押したときだけ呼ぶ。
+    /// 前後の空白は除き、空なら今の名前に戻す。変えられなかったら書いた名前を残す。
+    Future<void> submit() async {
+      final text = controller.text.trim();
+      if (text.isEmpty || text == name) {
+        controller.text = name;
+        focusNode.unfocus();
+        return;
+      }
+      controller.text = text;
+      focusNode.unfocus();
+      saving.value = true;
+      await onRename(text);
+      if (!context.mounted) return;
+      saving.value = false;
+    }
+
+    // 保存していない名前があれば、戻るときに捨ててよいか確かめる。
+    return DiscardGuard(
+      dirty: changed,
+      child: Column(
+        children: [
+          Semantics(
+            button: true,
+            label: l10n.infoEditCoverSemantics(name),
+            excludeSemantics: true,
+            child: GestureDetector(
+              onTap: onEdit,
+              child: DiaryCover(
+                name: name,
+                color: diaryBook.coverColor == null
+                    ? null
+                    : Color(diaryBook.coverColor!),
+                width: _coverWidth,
+                decoration: diaryBook.coverDecoration,
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 300,
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              enabled: !saving.value,
+              maxLength: maxDiaryBookNameLength,
+              textAlign: TextAlign.center,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => submit(),
+              onTapOutside: (_) => focusNode.unfocus(),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              decoration: InputDecoration(
+                hintText: l10n.infoNameHint,
+                // 書いているか書き換えたままのあいだは、保存のしかたを下に出す。
+                helperText: focused || changed ? l10n.infoNameSaveHelper : null,
+                helperMaxLines: 2,
+                helperStyle: TextStyle(
+                  fontSize: 12,
+                  color: colors.textSecondary,
+                ),
+                // 左にも同じ幅を空けて、名前を真ん中に保つ。
+                prefixIcon: const SizedBox(width: 56),
+                prefixIconConstraints: const BoxConstraints(minWidth: 56),
+                suffixIcon: _NameSaveButton(
+                  saving: saving.value,
+                  visible: changed,
+                  onPressed: submit,
+                ),
+                suffixIconConstraints: const BoxConstraints(minWidth: 56),
+                // 文字数は出さない。上限に届いたらそれ以上入らない。
+                counterText: '',
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: colors.border),
+                ),
+                // 保存しているあいだは書けないが、線の見た目は変えない。
+                disabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: colors.border),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: colors.textPrimary, width: 1.5),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          OutlinedButton.icon(
+            onPressed: onEdit,
+            icon: const Icon(Icons.edit_outlined, size: 16),
+            label: Text(l10n.coverEditTitle),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: colors.textPrimary,
+              side: BorderSide(color: colors.border),
+              shape: const StadiumBorder(),
+              textStyle: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 名前の入力欄の右の、保存するボタン。保存しているあいだは回る印を出す。
+class _NameSaveButton extends StatelessWidget {
+  const _NameSaveButton({
+    required this.saving,
+    required this.visible,
+    required this.onPressed,
+  });
+
+  final bool saving;
+
+  /// 書き換えていて保存できるときだけ出す。
+  final bool visible;
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    if (saving) {
+      return Center(
+        widthFactor: 1,
+        child: SizedBox.square(
+          dimension: 18,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: colors.textSecondary,
+          ),
         ),
-        const SizedBox(height: 10),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: 32,
-          height: 2,
-          color: coverColor == null
-              ? defaultCoverColor(context)
-              : Color(coverColor),
-        ),
-      ],
+      );
+    }
+    if (!visible) {
+      return const SizedBox(width: 56);
+    }
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: colors.textPrimary,
+        minimumSize: const Size(56, 36),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+      ),
+      child: Text(context.l10n.infoNameSave),
     );
   }
 }

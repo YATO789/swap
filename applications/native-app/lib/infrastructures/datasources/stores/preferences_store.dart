@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part '_generated/preferences_store.g.dart';
 
-const diaryBookGridKey = 'diary_book_grid';
 const postDiaryBookIdsKey = 'post_diary_book_ids';
 const postHintVisibleKey = 'post_hint_visible';
 const themeModeKey = 'theme_mode';
@@ -28,7 +27,6 @@ class PreferencesStore {
 
   /// 読み書きするキー。SharedPreferencesWithCache の allowList に渡す。
   static const keys = {
-    diaryBookGridKey,
     postDiaryBookIdsKey,
     postHintVisibleKey,
     themeModeKey,
@@ -36,15 +34,6 @@ class PreferencesStore {
   };
 
   final SharedPreferencesWithCache _preferences;
-
-  /// ホームの日記帳の一覧を表紙のグリッドで出すか。まだ選んだことがなければグリッド。
-  bool readDiaryBookGrid() {
-    return _preferences.getBool(diaryBookGridKey) ?? true;
-  }
-
-  Future<void> saveDiaryBookGrid(bool grid) {
-    return _preferences.setBool(diaryBookGridKey, grid);
-  }
 
   /// 投稿シートで前に選んだ共有先の日記帳の id。まだ選んだことがなければ空。
   Set<String> readPostDiaryBookIds() {

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../domains/diary_book/diary_book.dart';
 import '../../../../domains/diary_book/diary_book_member.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../providers/diary_book_notifier.dart';
@@ -19,12 +20,11 @@ abstract class DiaryBookInfoPageState with _$DiaryBookInfoPageState {
 }
 
 /// 日記帳の情報ページで、[diaryBookId] の日記帳のメンバーを読み、
-/// 名前や表紙の色、人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
+/// 名前や人数の上限を変えたり、招待コードを作り直したり、メンバーを外したり、
 /// 日記帳から抜けたりする。
 @riverpod
 class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
-  DiaryBookNotifier get _diaryBooks =>
-      ref.read(diaryBookProvider.notifier);
+  DiaryBookNotifier get _diaryBooks => ref.read(diaryBookProvider.notifier);
 
   @override
   Future<DiaryBookInfoPageState> build(String diaryBookId) async {
@@ -46,16 +46,12 @@ class DiaryBookInfoPageController extends _$DiaryBookInfoPageController {
     }
   }
 
-  /// 日記帳の名前を [name] にする。変えられたら true。
-  Future<bool> rename(String name) {
-    return _run('名前を変えられませんでした', () => _diaryBooks.rename(diaryBookId, name));
-  }
-
-  /// 表紙の色を [coverColor] にする。変えられたら true。
-  Future<bool> setCoverColor(int? coverColor) {
+  /// 日記帳の名前を変える。表紙に貼った名前の幅も変えるので、[original] から
+  /// [edited] への表紙の変更として書く。変えられたら true。
+  Future<bool> rename(DiaryBook original, DiaryBook edited) {
     return _run(
-      '表紙の色を変えられませんでした',
-      () => _diaryBooks.setCoverColor(diaryBookId, coverColor),
+      '名前を変えられませんでした',
+      () => _diaryBooks.updateCover(original, edited),
     );
   }
 

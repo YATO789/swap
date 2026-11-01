@@ -5,6 +5,7 @@ import 'package:swap/domains/app_update/app_update.dart';
 import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
+import 'package:swap/domains/diary_book/diary_book_cover_field.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/domains/post/post.dart';
@@ -380,16 +381,25 @@ class FakeDiaryBookRepository implements DiaryBookRepository {
   }
 
   @override
-  Future<void> rename(String diaryBookId, String name) async {
-    _replace(diaryBookId, (diaryBook) => diaryBook.copyWith(name: name));
-  }
-
-  @override
-  Future<void> setCoverColor(String diaryBookId, int? coverColor) async {
-    _replace(
-      diaryBookId,
-      (diaryBook) => diaryBook.copyWith(coverColor: coverColor),
-    );
+  Future<void> updateCover(
+    DiaryBook diaryBook,
+    Set<DiaryBookCoverField> fields,
+  ) async {
+    _replace(diaryBook.id, (current) {
+      var updated = current;
+      for (final field in fields) {
+        updated = switch (field) {
+          DiaryBookCoverField.name => updated.copyWith(name: diaryBook.name),
+          DiaryBookCoverField.color => updated.copyWith(
+            coverColor: diaryBook.coverColor,
+          ),
+          DiaryBookCoverField.decoration => updated.copyWith(
+            coverDecoration: diaryBook.coverDecoration,
+          ),
+        };
+      }
+      return updated;
+    });
   }
 
   @override

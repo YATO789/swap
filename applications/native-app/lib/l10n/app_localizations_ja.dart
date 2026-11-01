@@ -146,6 +146,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get inviteSheetLater => 'あとで招待する';
 
   @override
+  String get inviteSheetDecorate => '表紙を飾る';
+
+  @override
+  String get inviteSheetDecorateMessage => '絵文字や文字、らくがきで、表紙を自分たちらしく飾れます';
+
+  @override
   String get postSheetFailed => '記録できませんでした。もう一度お試しください';
 
   @override
@@ -374,12 +380,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diaryDetailPostsOfDay => 'この日の記録';
 
   @override
-  String get infoRenameFailed => '名前を変えられませんでした。もう一度お試しください';
-
-  @override
-  String get infoCoverColorFailed => '表紙の色を変えられませんでした。もう一度お試しください';
-
-  @override
   String get infoMemberLimitFailed => '人数の上限を変えられませんでした。もう一度お試しください';
 
   @override
@@ -439,10 +439,19 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get infoCoverSection => '表紙';
+  String get infoNameHint => '日記帳の名前';
 
   @override
-  String get infoRename => '名前を変える';
+  String get infoRenameFailed => '名前を変えられませんでした。もう一度お試しください';
+
+  @override
+  String get infoRenamed => '名前を保存しました';
+
+  @override
+  String get infoNameSave => '保存';
+
+  @override
+  String get infoNameSaveHelper => '「保存」か「完了」を押すと保存します';
 
   @override
   String get infoMembersSection => 'この日記を書く人';
@@ -465,8 +474,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get infoLeaveDiaryBook => '日記帳を退出';
 
   @override
-  String infoRenameSemantics(String name) {
-    return '$name、名前を変える';
+  String infoEditCoverSemantics(String name) {
+    return '$nameの表紙、表紙を編集';
   }
 
   @override
@@ -506,12 +515,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String memberLimitLeft(int count, int left) {
     return '$count人まで・あと$left人';
   }
-
-  @override
-  String get renameTitle => '日記帳の名前';
-
-  @override
-  String get renameIconHelper => '最初の1文字がアイコンになります';
 
   @override
   String get createDiaryBookFailed => '日記帳を作れませんでした。もう一度お試しください';
@@ -613,9 +616,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsDeleteAccountFailed => 'アカウントを削除できませんでした。もう一度お試しください';
 
   @override
-  String get settingsHomeLayoutSection => 'ホームの日記帳の並べ方';
-
-  @override
   String get settingsDisplaySection => '表示';
 
   @override
@@ -672,12 +672,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get themeModeDark => 'ダーク';
-
-  @override
-  String get layoutList => 'リスト';
-
-  @override
-  String get layoutCover => '表紙';
 
   @override
   String get onboardingSaveNameFailed => '名前を保存できませんでした。もう一度お試しください';
@@ -814,4 +808,172 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get updateLater => 'あとで';
+
+  @override
+  String get coverEditTitle => '表紙を編集';
+
+  @override
+  String get coverEditUndo => '元に戻す';
+
+  @override
+  String get coverEditEmoji => '絵文字';
+
+  @override
+  String get coverEditText => '文字';
+
+  @override
+  String get coverEditDoodle => 'らくがき';
+
+  @override
+  String get coverEditColor => '色';
+
+  @override
+  String get coverEditDone => '終わる';
+
+  @override
+  String get coverEditBringForward => '前へ';
+
+  @override
+  String get coverEditSendBackward => 'うしろへ';
+
+  @override
+  String get coverEditFrame => '白いふち';
+
+  @override
+  String get coverEditRemove => '消す';
+
+  @override
+  String get coverEditHint =>
+      '貼ったものはドラッグで動かし、右下のつまみか2本指で回転と拡大縮小。文字は選んでもう一度押すと書き換えられます。';
+
+  @override
+  String coverEditStickerLimit(int count) {
+    return '貼れるのは$count個までです';
+  }
+
+  @override
+  String coverEditTextLimit(int count) {
+    return '文字は$count個まで置けます';
+  }
+
+  @override
+  String get coverEditRewrite => '書き換える';
+
+  @override
+  String get coverEditTextColorAuto => '自動';
+
+  @override
+  String get coverEditTextColorAutoName => '表紙に合わせる';
+
+  @override
+  String coverEditTextColorSemantics(String color) {
+    return '文字の色 $color';
+  }
+
+  @override
+  String get colorPaletteOpen => 'ほかの色を選ぶ';
+
+  @override
+  String colorPaletteSemantics(String color) {
+    return '色 $color';
+  }
+
+  @override
+  String get colorPaletteTextTitle => '文字の色';
+
+  @override
+  String get colorPalettePenTitle => 'ペンの色';
+
+  @override
+  String get colorPaletteCoverTitle => '表紙の色';
+
+  @override
+  String get coverEditStrokeLimit => 'これ以上描けません。消しゴムで消すと描けます';
+
+  @override
+  String get coverEditPenThin => '細いペン';
+
+  @override
+  String get coverEditPenMedium => 'ふつうのペン';
+
+  @override
+  String get coverEditPenThick => '太いペン';
+
+  @override
+  String get coverEditEraser => '消しゴム';
+
+  @override
+  String get coverEditPenBlack => '黒';
+
+  @override
+  String get coverEditPenWhite => '白';
+
+  @override
+  String get coverEditPenRed => '赤';
+
+  @override
+  String get coverEditPenOrange => 'オレンジ';
+
+  @override
+  String get coverEditPenGreen => '緑';
+
+  @override
+  String get coverEditPenBlue => '青';
+
+  @override
+  String get coverEditPenPink => 'ピンク';
+
+  @override
+  String get coverEditKnob => '回転と拡大縮小';
+
+  @override
+  String coverEditStickerSemantics(String emoji) {
+    return '貼った絵文字 $emoji';
+  }
+
+  @override
+  String coverEditNameSemantics(String name) {
+    return '表紙の名前 $name';
+  }
+
+  @override
+  String coverEditTextSemantics(String text) {
+    return '置いた文字 $text';
+  }
+
+  @override
+  String get coverTextSheetTitle => '表紙に文字を置く';
+
+  @override
+  String get coverTextSheetEditTitle => '文字を書き換える';
+
+  @override
+  String get coverTextSheetHint => '表紙に入れる文字';
+
+  @override
+  String get coverTextSheetPlace => '置く';
+
+  @override
+  String get coverTextSheetPlaceName => '日記帳の名前を置く';
+
+  @override
+  String get coverEditDoodleArea => 'らくがきをする場所。表紙をなぞって線を描く';
+
+  @override
+  String get coverEditSaved => '表紙を保存しました';
+
+  @override
+  String get coverEditSaveFailed => '保存できませんでした。もう一度お試しください';
+
+  @override
+  String get coverEditNeedsUpdate => '表紙を編集するには、アプリをアップデートしてください';
+
+  @override
+  String get emojiSheetTitle => '絵文字を選ぶ';
+
+  @override
+  String get emojiSheetNoRecents => 'まだありません';
+
+  @override
+  String get emojiSheetSearch => '絵文字を検索';
 }

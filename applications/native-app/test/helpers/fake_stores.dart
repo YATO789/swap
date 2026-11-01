@@ -4,26 +4,16 @@ import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 /// 端末に保存せず、設定をメモリに覚えておく。
 class FakePreferencesStore implements PreferencesStore {
   FakePreferencesStore({
-    this.diaryBookGrid = true,
     Set<String>? postDiaryBookIds,
     this.postHintVisible = true,
     this.themeMode = ThemeMode.system,
     this.updateSkippedAt,
   }) : postDiaryBookIds = postDiaryBookIds ?? {};
 
-  bool diaryBookGrid;
   Set<String> postDiaryBookIds;
   bool postHintVisible;
   ThemeMode themeMode;
   DateTime? updateSkippedAt;
-
-  @override
-  bool readDiaryBookGrid() => diaryBookGrid;
-
-  @override
-  Future<void> saveDiaryBookGrid(bool grid) async {
-    diaryBookGrid = grid;
-  }
 
   @override
   Set<String> readPostDiaryBookIds() => postDiaryBookIds;
