@@ -39,25 +39,8 @@ class DiaryCover extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final coverColor = color ?? defaultCoverColor(context);
-    final length = name.runes.length;
-    // 長い名前でも表紙に収まるよう、文字数で大きさを変える。
     // 幅 168 のときの大きさを基準に、表紙の大きさに合わせて伸ばす。
     final k = width / 168;
-    final fontSize = (length <= 6 ? 22.0 : (length <= 12 ? 19.0 : 16.0)) * k;
-    final inkColor = coverInkColor(coverColor);
-    final decoration = this.decoration;
-    final decorationLayer =
-        this.decorationLayer ??
-        (decoration == null || decoration.isEmpty
-            ? null
-            : CoverDecorationLayer(
-                decoration: decoration,
-                coverWidth: width,
-                name: name,
-                inkColor: inkColor,
-              ));
-    final fixedName =
-        this.decorationLayer == null && !(decoration?.placesName ?? false);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -80,7 +63,60 @@ class DiaryCover extends StatelessWidget {
           ),
         ],
       ),
-      child: Stack(
+      child: DiaryCoverFace(
+        name: name,
+        coverColor: coverColor,
+        width: width,
+        decoration: decoration,
+        decorationLayer: decorationLayer,
+      ),
+    );
+  }
+}
+
+/// 表紙の地の色の上に重ねるもの（背表紙・貼ったもの・らくがき・名前）。
+///
+/// どれも表紙の幅 [width] を基準に、上から測って置く。表紙より縦に長い場所に置くと、
+/// 上は表紙と同じに並び、下に地の色が続く。
+class DiaryCoverFace extends StatelessWidget {
+  const DiaryCoverFace({
+    super.key,
+    required this.name,
+    required this.coverColor,
+    required this.width,
+    this.decoration,
+    this.decorationLayer,
+  });
+
+  final String name;
+  final Color coverColor;
+  final double width;
+  final CoverDecoration? decoration;
+  final Widget? decorationLayer;
+
+  @override
+  Widget build(BuildContext context) {
+    final length = name.runes.length;
+    // 長い名前でも表紙に収まるよう、文字数で大きさを変える。
+    // 幅 168 のときの大きさを基準に、表紙の大きさに合わせて伸ばす。
+    final k = width / 168;
+    final fontSize = (length <= 6 ? 22.0 : (length <= 12 ? 19.0 : 16.0)) * k;
+    final inkColor = coverInkColor(coverColor);
+    final decoration = this.decoration;
+    final decorationLayer =
+        this.decorationLayer ??
+        (decoration == null || decoration.isEmpty
+            ? null
+            : CoverDecorationLayer(
+                decoration: decoration,
+                coverWidth: width,
+                name: name,
+                inkColor: inkColor,
+              ));
+    final fixedName =
+        this.decorationLayer == null && !(decoration?.placesName ?? false);
+
+    return Stack(
         children: [
           // 背表紙。光の当たる明るい帯と、折り目の暗い線で本らしく見せる。
           Positioned(
@@ -128,7 +164,6 @@ class DiaryCover extends StatelessWidget {
               ),
             ),
         ],
-      ),
     );
   }
 }

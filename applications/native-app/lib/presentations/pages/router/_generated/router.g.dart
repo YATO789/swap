@@ -188,8 +188,10 @@ RouteBase get $diaryBookRoute => GoRouteData.$route(
 );
 
 mixin $DiaryBookRoute on GoRouteData {
-  static DiaryBookRoute _fromState(GoRouterState state) =>
-      DiaryBookRoute(id: state.pathParameters['id']!);
+  static DiaryBookRoute _fromState(GoRouterState state) => DiaryBookRoute(
+    id: state.pathParameters['id']!,
+    $extra: state.extra as DiaryBookOrigin?,
+  );
 
   DiaryBookRoute get _self => this as DiaryBookRoute;
 
@@ -198,17 +200,19 @@ mixin $DiaryBookRoute on GoRouteData {
       GoRouteData.$location('/diary-books/${Uri.encodeComponent(_self.id)}');
 
   @override
-  void go(BuildContext context) => context.go(location);
+  void go(BuildContext context) => context.go(location, extra: _self.$extra);
 
   @override
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+  Future<T?> push<T>(BuildContext context) =>
+      context.push<T>(location, extra: _self.$extra);
 
   @override
   void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
+      context.pushReplacement(location, extra: _self.$extra);
 
   @override
-  void replace(BuildContext context) => context.replace(location);
+  void replace(BuildContext context) =>
+      context.replace(location, extra: _self.$extra);
 }
 
 RouteBase get $diaryBookInfoRoute => GoRouteData.$route(

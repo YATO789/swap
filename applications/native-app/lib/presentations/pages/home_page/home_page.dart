@@ -26,6 +26,7 @@ import '../../components/diary_cover.dart';
 import '../../components/post_button.dart';
 import '../../components/user_avatar.dart';
 import '../../providers/app_update_notifier.dart';
+import '../router/open_book_page.dart';
 import '../router/router.dart';
 
 /// ホーム。日記帳の一覧と、下に「今なにしてる？」と日記を書くバーを置く。
@@ -84,8 +85,16 @@ class HomePage extends HookConsumerWidget {
       return subscription.close;
     }, const []);
 
-    void openDiaryBook(DiaryBook diaryBook) =>
-        DiaryBookRoute(id: diaryBook.id).push<void>(context);
+    // 表紙を押して開くときは、その表紙をめくって開く。
+    void openDiaryBook(DiaryBook diaryBook, {Rect? coverRect}) =>
+        DiaryBookRoute(
+          id: diaryBook.id,
+          $extra: coverRect == null
+              ? null
+              : DiaryBookOrigin(diaryBook: diaryBook, rect: coverRect),
+        ).push<void>(context);
+    void openFromCover(DiaryBook diaryBook, Rect coverRect) =>
+        openDiaryBook(diaryBook, coverRect: coverRect);
 
     // 記録の通知をタップしたら、その日記帳を開く。ホームはサインインしている間ずっと
     // 一番下にあるので、ほかのページを開いていても、その上に重ねる。
@@ -194,12 +203,12 @@ class HomePage extends HookConsumerWidget {
             child: paged
                 ? _DiaryBookPager(
                     diaryBooks: diaryBooks,
-                    onTap: openDiaryBook,
+                    onTap: openFromCover,
                     onAdd: addDiaryBook,
                   )
                 : _DiaryBookGrid(
                     diaryBooks: diaryBooks,
-                    onTap: openDiaryBook,
+                    onTap: openFromCover,
                     onAdd: addDiaryBook,
                   ),
           ),
@@ -252,7 +261,7 @@ class _DiaryBookGrid extends StatelessWidget {
   });
 
   final List<DiaryBook> diaryBooks;
-  final ValueChanged<DiaryBook> onTap;
+  final void Function(DiaryBook diaryBook, Rect coverRect) onTap;
   final VoidCallback onAdd;
 
   static const _padding = 24.0;
@@ -309,7 +318,7 @@ class _DiaryBookPager extends HookWidget {
   });
 
   final List<DiaryBook> diaryBooks;
-  final ValueChanged<DiaryBook> onTap;
+  final void Function(DiaryBook diaryBook, Rect coverRect) onTap;
   final VoidCallback onAdd;
 
   static const _horizontalPadding = 40.0;
@@ -419,7 +428,7 @@ class _DiaryBookCover extends StatelessWidget {
 
   final DiaryBook diaryBook;
   final double width;
-  final ValueChanged<DiaryBook> onTap;
+  final void Function(DiaryBook diaryBook, Rect coverRect) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -431,7 +440,11 @@ class _DiaryBookCover extends StatelessWidget {
       label: l10n.homeDiaryBookSemantics(diaryBook.name, memberCount),
       excludeSemantics: true,
       child: GestureDetector(
-        onTap: () => onTap(diaryBook),
+        // 開くページに、画面の中での表紙の位置と大きさを渡す。
+        onTap: () {
+          final box = context.findRenderObject()! as RenderBox;
+          onTap(diaryBook, box.localToGlobal(Offset.zero) & box.size);
+        },
         behavior: HitTestBehavior.opaque,
         child: DiaryCover(
           name: diaryBook.name,

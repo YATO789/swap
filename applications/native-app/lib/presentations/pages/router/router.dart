@@ -21,6 +21,7 @@ import '../profile_edit_page/profile_edit_page.dart';
 import '../splash_page/splash_page.dart';
 import '../update_page/update_page.dart';
 import '../welcome_page/welcome_page.dart';
+import 'open_book_page.dart';
 import '../../providers/app_update_notifier.dart';
 
 part '_generated/router.g.dart';
@@ -160,15 +161,22 @@ class CreateDiaryBookRoute extends GoRouteData with $CreateDiaryBookRoute {
 // /diary-books/new に当たらないよう、日記帳を作るページより後に置く。
 @TypedGoRoute<DiaryBookRoute>(path: '/diary-books/:id')
 class DiaryBookRoute extends GoRouteData with $DiaryBookRoute {
-  const DiaryBookRoute({required this.id});
+  const DiaryBookRoute({required this.id, this.$extra});
 
   final String id;
 
+  /// ホームで押した表紙。あれば、その表紙をめくって開く。
+  final DiaryBookOrigin? $extra;
+
   // 画面の中ほどの左右スワイプは日付の移動に使うので、戻るのは画面の端からだけにする。
-  // 端から戻れるよう、iOS の標準の画面遷移で開く（_materialPage を参照）。
+  // 表紙から開かないとき（通知から開いたときなど）は、端から戻れるよう iOS の標準の画面遷移で開く
+  // （_materialPage を参照）。
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return _materialPage(state, DiaryBookPage(diaryBookId: id));
+    final page = DiaryBookPage(diaryBookId: id);
+    final origin = $extra;
+    if (origin == null) return _materialPage(state, page);
+    return openBookPage(key: state.pageKey, origin: origin, child: page);
   }
 }
 
