@@ -56,11 +56,14 @@
   "discardGuardMessage": "保存していない内容は失われます。",
   "discardGuardKeepEditing": "編集を続ける",
   "discardGuardDiscard": "破棄する",
-  "inviteSheetMessage": "Swap!で「{name}」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\n招待コード: {code}",
+  "inviteSheetMessage": "Swap!で「{name}」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\nアプリはこちら: {url}\n招待コード: {code}",
   "@inviteSheetMessage": {
-    "description": "友達に送る招待メッセージ。参加するシートは最後に見つかったコードを使うので、コードは必ず最後に置く",
+    "description": "友達に送る招待メッセージ。参加するシートは最後に見つかったコードを使うので、コードは必ず最後に置く。url はアプリを入れていない友達のための App Store のページ",
     "placeholders": {
       "name": {
+        "type": "String"
+      },
+      "url": {
         "type": "String"
       },
       "code": {

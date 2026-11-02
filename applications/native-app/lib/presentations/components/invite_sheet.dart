@@ -5,12 +5,17 @@ import '../../domains/diary_book/cover_decoration.dart';
 import '../../domains/diary_book/diary_book.dart';
 import '../../l10n/l10n.dart';
 import '../../theme/app_theme.dart';
+import '../../utils/store_pages.dart';
 import 'diary_cover.dart';
 
-/// 友達に送る招待メッセージ。
+/// 友達に送る招待メッセージ。アプリを入れていない友達のために、App Store のページも添える。
 /// 参加するシートは最後に見つかったコードを使うので、どの言語でもコードを最後に置く。
 String inviteMessage(AppLocalizations l10n, DiaryBook diaryBook) {
-  return l10n.inviteSheetMessage(diaryBook.name, diaryBook.inviteCode);
+  return l10n.inviteSheetMessage(
+    diaryBook.name,
+    appStoreUrl.toString(),
+    diaryBook.inviteCode,
+  );
 }
 
 /// 「表紙を飾る」の横に出す見本の飾り。作ったばかりの日記帳の名前と色の表紙に重ねて、

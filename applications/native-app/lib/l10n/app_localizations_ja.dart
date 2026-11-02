@@ -110,8 +110,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get discardGuardDiscard => '破棄する';
 
   @override
-  String inviteSheetMessage(String name, String code) {
-    return 'Swap!で「$name」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\n招待コード: $code';
+  String inviteSheetMessage(String name, String url, String code) {
+    return 'Swap!で「$name」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\nアプリはこちら: $url\n招待コード: $code';
   }
 
   @override

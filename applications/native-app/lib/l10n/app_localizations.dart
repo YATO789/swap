@@ -290,11 +290,11 @@ abstract class AppLocalizations {
   /// **'破棄する'**
   String get discardGuardDiscard;
 
-  /// 友達に送る招待メッセージ。参加するシートは最後に見つかったコードを使うので、コードは必ず最後に置く
+  /// 友達に送る招待メッセージ。参加するシートは最後に見つかったコードを使うので、コードは必ず最後に置く。url はアプリを入れていない友達のための App Store のページ
   ///
   /// In ja, this message translates to:
-  /// **'Swap!で「{name}」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\n招待コード: {code}'**
-  String inviteSheetMessage(String name, String code);
+  /// **'Swap!で「{name}」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\nアプリはこちら: {url}\n招待コード: {code}'**
+  String inviteSheetMessage(String name, String url, String code);
 
   /// No description provided for @inviteSheetCopied.
   ///

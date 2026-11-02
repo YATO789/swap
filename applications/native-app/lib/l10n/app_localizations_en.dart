@@ -116,8 +116,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discardGuardDiscard => 'Discard';
 
   @override
-  String inviteSheetMessage(String name, String code) {
-    return 'Join “$name” on Swap!\nIn the app, tap “Join with invite code” and enter this code.\nInvite code: $code';
+  String inviteSheetMessage(String name, String url, String code) {
+    return 'Join “$name” on Swap!\nIn the app, tap “Join with invite code” and enter this code.\nGet the app: $url\nInvite code: $code';
   }
 
   @override
