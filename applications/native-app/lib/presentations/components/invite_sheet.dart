@@ -18,26 +18,88 @@ String inviteMessage(AppLocalizations l10n, DiaryBook diaryBook) {
   );
 }
 
-/// 「表紙を飾る」の横に出す見本の飾り。作ったばかりの日記帳の名前と色の表紙に重ねて、
-/// 飾るとどうなるかを見せる。名前はどの長さでも収まるよう、v1 の決まった形で出す。
+/// 「表紙を飾る」の横に出す見本の飾り。作ったばかりの日記帳の色の表紙に重ねて、
+/// 飾るとどうなるかを見せる。名前は貼らず、どの日記帳でも「Diary」と出す。
 const _sampleDecoration = CoverDecoration(
-  version: 1,
   stickers: [
-    CoverSticker(emoji: '🌷', x: 0.74, y: 0.98, size: 0.38, rotation: 0.2),
-    CoverSticker(emoji: '⭐️', x: 0.34, y: 1.14, size: 0.28, rotation: -0.25),
+    CoverSticker(emoji: '😎', x: 0.298, y: 0.242, size: 0.22, rotation: -0.13),
+    CoverSticker(emoji: '❤️', x: 0.802, y: 0.301, size: 0.22, rotation: 0.169),
+    CoverSticker(emoji: '🐰', x: 0.3, y: 1.096, size: 0.277, rotation: -0.182),
+    CoverSticker(emoji: '🎀', x: 0.651, y: 1.144, size: 0.217, rotation: -0.12),
+    CoverSticker(
+      emoji: '💌',
+      x: 0.836,
+      y: 0.788,
+      size: 0.213,
+      rotation: -0.185,
+    ),
+    CoverSticker(emoji: '🍓', x: 0.185, y: 0.719, size: 0.181, rotation: 0.465),
+    CoverSticker(
+      text: '2026',
+      x: 0.53,
+      y: 0.791,
+      size: 0.171,
+      rotation: -0.033,
+    ),
+    CoverSticker(
+      text: 'Diary',
+      x: 0.512,
+      y: 0.588,
+      size: 0.419,
+      rotation: 0.013,
+      color: 0xFF111111,
+    ),
   ],
+  // 「😎」と「🐰」のまわりの、きらっとした白い線。
   strokes: [
     CoverStroke(
-      color: 0xFF3E63DD,
-      width: 0.03,
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.119, 0.102), Offset(0.152, 0.162)],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.145, 0.073), Offset(0.196, 0.141)],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.197, 0.041), Offset(0.212, 0.093), Offset(0.222, 0.11)],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.43, 0.085), Offset(0.384, 0.109), Offset(0.368, 0.122)],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.448, 0.119), Offset(0.376, 0.158)],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.463, 0.16), Offset(0.407, 0.177), Offset(0.402, 0.182)],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.142, 0.908), Offset(0.199, 0.974)],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
       points: [
-        Offset(0.26, 0.66),
-        Offset(0.37, 0.61),
-        Offset(0.48, 0.66),
-        Offset(0.59, 0.61),
-        Offset(0.7, 0.66),
-        Offset(0.81, 0.61),
+        Offset(0.213, 0.846),
+        Offset(0.233, 0.902),
+        Offset(0.248, 0.932),
       ],
+    ),
+    CoverStroke(
+      color: 0xFFFFFFFF,
+      width: 0.012,
+      points: [Offset(0.332, 0.864), Offset(0.297, 0.92)],
     ),
   ],
 );
@@ -203,7 +265,7 @@ class _DecorateCoverCard extends StatelessWidget {
             child: DiaryCover(
               name: diaryBook.name,
               color: coverColor == null ? null : Color(coverColor),
-              width: 72,
+              width: 96,
               decoration: _sampleDecoration,
             ),
           ),
