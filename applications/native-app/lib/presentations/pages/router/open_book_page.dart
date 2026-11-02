@@ -3,7 +3,6 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:swipeable_page_route/swipeable_page_route.dart';
 
 import '../../../domains/diary_book/diary_book.dart';
 import '../../components/diary_book_icon.dart';
@@ -47,33 +46,199 @@ class _OpenBookPage extends Page<void> {
   }
 }
 
-class _OpenBookRoute extends SwipeablePageRoute<void> {
+class _OpenBookRoute extends PageRoute<void> {
   _OpenBookRoute({
     required super.settings,
-    required DiaryBookOrigin origin,
-    required Widget child,
-  }) : super(
-         canOnlySwipeFromEdge: true,
-         // iOS の標準の画面遷移と同じ幅。
-         backGestureDetectionWidth: 20,
-         transitionDuration: const Duration(milliseconds: 1000),
-         reverseTransitionDuration: const Duration(milliseconds: 800),
-         transitionBuilder: (context, animation, secondaryAnimation, _, child) {
-           return _OpenBookTransition(
-             animation: animation,
-             secondaryAnimation: secondaryAnimation,
-             origin: origin,
-             child: child,
-           );
-         },
-         builder: (_) => child,
-       );
+    required this.origin,
+    required this.child,
+  });
+
+  final DiaryBookOrigin origin;
+  final Widget child;
+
+  @override
+  Color? get barrierColor {
+    return null;
+  }
+
+  @override
+  String? get barrierLabel {
+    return null;
+  }
+
+  @override
+  bool get maintainState {
+    return true;
+  }
+
+  @override
+  Duration get transitionDuration {
+    return const Duration(milliseconds: 1000);
+  }
+
+  @override
+  Duration get reverseTransitionDuration {
+    return const Duration(milliseconds: 800);
+  }
 
   // 後ろのホームは iOS の標準の画面遷移のように左へずらさず、その場で暗くするだけにする。
   // ずらすと、開いていく表紙の横からホームの表紙がのぞく。
   @override
   bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) {
     return false;
+  }
+
+  // 上に開いたページが横から入ってくるときは、iOS の標準の画面遷移と同じく左へ少しずれる。
+  // 下から出てくるページのときは動かない。
+  @override
+  bool canTransitionTo(TransitionRoute<dynamic> nextRoute) {
+    return nextRoute is PageRoute && !nextRoute.fullscreenDialog;
+  }
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return child;
+  }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return _OpenBookTransition(
+      animation: animation,
+      secondaryAnimation: secondaryAnimation,
+      origin: origin,
+      child: _BackSwipe(route: this, child: child),
+    );
+  }
+
+  /// 画面の端から引いて戻れるか。開ききっていて、上にほかのページがないときだけ戻れる。
+  bool get _canSwipeBack {
+    return !isFirst &&
+        !willHandlePopInternally &&
+        popDisposition != RoutePopDisposition.doNotPop &&
+        animation!.status == AnimationStatus.completed &&
+        secondaryAnimation!.status == AnimationStatus.dismissed &&
+        !navigator!.userGestureInProgress;
+  }
+
+  void _startSwipeBack() {
+    navigator!.didStartUserGesture();
+  }
+
+  /// 指が画面の幅の [delta] だけ右へ動いたぶん、表紙を閉じる。
+  void _updateSwipeBack(double delta) {
+    controller!.value -= delta;
+  }
+
+  /// 指を離したとき。素早く払ったらその向きに、そうでなければ半分より閉じていれば戻る。
+  /// [velocity] は1秒に画面の幅のいくつぶん右へ動いていたか。
+  ///
+  /// 残りは、戻るボタンで閉じるときと同じ速さで動かす。
+  void _endSwipeBack(double velocity) {
+    final controller = this.controller!;
+    final pop = velocity.abs() >= 1 ? velocity > 0 : controller.value < 0.5;
+    if (pop) {
+      navigator!.pop();
+    } else {
+      controller.forward();
+    }
+
+    if (!controller.isAnimating) {
+      navigator!.didStopUserGesture();
+      return;
+    }
+    late final AnimationStatusListener listener;
+    listener = (_) {
+      if (controller.isAnimating) return;
+      controller.removeStatusListener(listener);
+      navigator?.didStopUserGesture();
+    };
+    controller.addStatusListener(listener);
+  }
+}
+
+/// 画面の左端から右へ引いて、[route] を閉じる。
+/// 画面の中ほどの左右スワイプはページの中で使うので、端だけで受ける。
+class _BackSwipe extends StatefulWidget {
+  const _BackSwipe({required this.route, required this.child});
+
+  final _OpenBookRoute route;
+  final Widget child;
+
+  // iOS の標準の画面遷移と同じ幅。
+  static const _edgeWidth = 20.0;
+
+  @override
+  State<_BackSwipe> createState() {
+    return _BackSwipeState();
+  }
+}
+
+class _BackSwipeState extends State<_BackSwipe> {
+  bool _swiping = false;
+
+  void _start(DragStartDetails _) {
+    if (!widget.route._canSwipeBack) return;
+    _swiping = true;
+    widget.route._startSwipeBack();
+  }
+
+  void _update(DragUpdateDetails details) {
+    if (!_swiping) return;
+    widget.route._updateSwipeBack(
+      details.primaryDelta! / MediaQuery.sizeOf(context).width,
+    );
+  }
+
+  void _end(DragEndDetails details) {
+    if (!_swiping) return;
+    _swiping = false;
+    widget.route._endSwipeBack(
+      details.velocity.pixelsPerSecond.dx / MediaQuery.sizeOf(context).width,
+    );
+  }
+
+  void _cancel() {
+    if (!_swiping) return;
+    _swiping = false;
+    widget.route._endSwipeBack(0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ノッチのある端末を横にしたときは、ノッチのぶん広くする。
+    final edgeWidth = max(
+      MediaQuery.paddingOf(context).left,
+      _BackSwipe._edgeWidth,
+    );
+
+    return Stack(
+      fit: StackFit.passthrough,
+      children: [
+        widget.child,
+        Positioned(
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: edgeWidth,
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onHorizontalDragStart: _start,
+            onHorizontalDragUpdate: _update,
+            onHorizontalDragEnd: _end,
+            onHorizontalDragCancel: _cancel,
+          ),
+        ),
+      ],
+    );
   }
 }
 
