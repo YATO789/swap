@@ -1,4 +1,4 @@
-// 記録と日記の通知（notify-post・notify-diary）で共通の、FCM でプッシュ通知を送る部分。
+// 記録・日記・参加の通知（notify-post・notify-diary・notify-member-joined）で共通の、FCM でプッシュ通知を送る部分。
 //
 // 環境変数 FIREBASE_SERVICE_ACCOUNT に、Firebase コンソールの「プロジェクトの設定 > サービス アカウント」で
 // 作った秘密鍵の JSON を1行にして（jq -c .）入れておく。

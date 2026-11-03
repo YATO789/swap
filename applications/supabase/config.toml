@@ -396,6 +396,10 @@ verify_jwt = false
 [functions.notify-diary]
 verify_jwt = false
 
+# 日記帳に人が参加したときの通知。記録と同じく DB のトリガーから pg_net で呼ぶ。
+[functions.notify-member-joined]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
