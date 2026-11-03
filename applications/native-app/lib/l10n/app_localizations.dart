@@ -1250,18 +1250,6 @@ abstract class AppLocalizations {
   /// **'アカウントを削除'**
   String get settingsDeleteAccount;
 
-  /// No description provided for @settingsEditProfile.
-  ///
-  /// In ja, this message translates to:
-  /// **'プロフィールを編集'**
-  String get settingsEditProfile;
-
-  /// 設定のプロフィール行の読み上げ
-  ///
-  /// In ja, this message translates to:
-  /// **'{name}、プロフィールを編集'**
-  String settingsProfileTileSemantics(String name);
-
   /// No description provided for @themeModeSystem.
   ///
   /// In ja, this message translates to:
@@ -1417,18 +1405,6 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'フィードバックを送りました。ありがとうございます'**
   String get feedbackSent;
-
-  /// No description provided for @profileEditTitle.
-  ///
-  /// In ja, this message translates to:
-  /// **'プロフィール'**
-  String get profileEditTitle;
-
-  /// No description provided for @profileEditSave.
-  ///
-  /// In ja, this message translates to:
-  /// **'保存'**
-  String get profileEditSave;
 
   /// No description provided for @profileEditSaveFailed.
   ///

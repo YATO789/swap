@@ -3,20 +3,22 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../providers/profile_notifier.dart';
 
-part '_generated/profile_edit_page_controller.g.dart';
+part '_generated/profile_controller.g.dart';
 
-/// プロフィール編集ページの保存処理を受け持つ。状態は保存の進み具合。
+/// 設定画面でのプロフィールの保存を受け持つ。状態は保存の進み具合。
 @riverpod
-class ProfileEditPageController extends _$ProfileEditPageController {
+class ProfileController extends _$ProfileController {
   @override
-  AsyncValue<void> build() => const AsyncData(null);
+  AsyncValue<void> build() {
+    return const AsyncData(null);
+  }
 
   /// 表示名とアイコンの画像を保存し、成功したかを返す。失敗したときは状態にエラーが入る。
   /// [newAvatar] があれば画像を替え、[removesAvatar] が true なら外す。
   Future<bool> save({
     required String name,
-    required Uint8List? newAvatar,
-    required bool removesAvatar,
+    Uint8List? newAvatar,
+    bool removesAvatar = false,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(

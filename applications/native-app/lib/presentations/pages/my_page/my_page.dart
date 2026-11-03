@@ -4,25 +4,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../domains/diary/diary.dart';
-import '../../providers/profile_notifier.dart';
 import '../../providers/settings_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/legal_pages.dart';
 import '../../components/confirm_sheet.dart';
-import '../../components/user_avatar.dart';
 import '../router/router.dart';
 import 'components/diary_book_layout_picker.dart';
+import 'components/profile_section.dart';
 import 'components/theme_mode_picker.dart';
 import 'controller/my_page_controller.dart';
 
 /// ホームの AppBar 右のアイコンから開く、プロフィールとその他の設定のページ。
+/// プロフィールはいちばん上で、そのまま編集できる。
 class MyPage extends HookConsumerWidget {
   const MyPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profile = ref.watch(profileProvider).value;
     // 設定画面なので、どの項目が変わっても作り直してよい。
     final settings = ref.watch(settingsProvider);
     final settingsNotifier = ref.read(settingsProvider.notifier);
@@ -83,11 +82,7 @@ class MyPage extends HookConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.only(top: 8, bottom: 32),
         children: [
-          _ProfileTile(
-            name: profile?.displayName ?? '',
-            avatarUrl: profile?.avatarUrl,
-            onTap: () => const ProfileEditRoute().push<void>(context),
-          ),
+          const ProfileSection(),
           _SectionHeader(l10n.settingsHomeLayoutSection),
           DiaryBookLayoutPicker(
             paged: settings.diaryBookPaged,
@@ -160,64 +155,6 @@ class MyPage extends HookConsumerWidget {
             onTap: deleteAccount,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ProfileTile extends StatelessWidget {
-  const _ProfileTile({
-    required this.name,
-    required this.avatarUrl,
-    required this.onTap,
-  });
-
-  final String name;
-  final String? avatarUrl;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-
-    return Semantics(
-      button: true,
-      label: context.l10n.settingsProfileTileSemantics(name),
-      excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Row(
-            children: [
-              UserAvatar(imageUrl: avatarUrl, size: 56),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      context.l10n.settingsEditProfile,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: colors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: colors.textSecondary),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -19,7 +19,6 @@ List<RouteBase> get $appRoutes => [
   $diaryDetailRoute,
   $diaryEditorRoute,
   $myPageRoute,
-  $profileEditRoute,
   $feedbackRoute,
 ];
 
@@ -360,33 +359,6 @@ mixin $MyPageRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/me');
-
-  @override
-  void go(BuildContext context) => context.go(location);
-
-  @override
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  @override
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  @override
-  void replace(BuildContext context) => context.replace(location);
-}
-
-RouteBase get $profileEditRoute => GoRouteData.$route(
-  path: '/me/profile',
-  hasOverriddenOnExit: false,
-  factory: $ProfileEditRoute._fromState,
-);
-
-mixin $ProfileEditRoute on GoRouteData {
-  static ProfileEditRoute _fromState(GoRouterState state) =>
-      const ProfileEditRoute();
-
-  @override
-  String get location => GoRouteData.$location('/me/profile');
 
   @override
   void go(BuildContext context) => context.go(location);

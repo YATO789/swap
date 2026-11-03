@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of '../profile_edit_page_controller.dart';
+part of '../profile_controller.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -8,32 +8,32 @@ part of '../profile_edit_page_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// プロフィール編集ページの保存処理を受け持つ。状態は保存の進み具合。
+/// 設定画面でのプロフィールの保存を受け持つ。状態は保存の進み具合。
 
-@ProviderFor(ProfileEditPageController)
-final profileEditPageControllerProvider = ProfileEditPageControllerProvider._();
+@ProviderFor(ProfileController)
+final profileControllerProvider = ProfileControllerProvider._();
 
-/// プロフィール編集ページの保存処理を受け持つ。状態は保存の進み具合。
-final class ProfileEditPageControllerProvider
-    extends $NotifierProvider<ProfileEditPageController, AsyncValue<void>> {
-  /// プロフィール編集ページの保存処理を受け持つ。状態は保存の進み具合。
-  ProfileEditPageControllerProvider._()
+/// 設定画面でのプロフィールの保存を受け持つ。状態は保存の進み具合。
+final class ProfileControllerProvider
+    extends $NotifierProvider<ProfileController, AsyncValue<void>> {
+  /// 設定画面でのプロフィールの保存を受け持つ。状態は保存の進み具合。
+  ProfileControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'profileEditPageControllerProvider',
+        name: r'profileControllerProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$profileEditPageControllerHash();
+  String debugGetCreateSourceHash() => _$profileControllerHash();
 
   @$internal
   @override
-  ProfileEditPageController create() => ProfileEditPageController();
+  ProfileController create() => ProfileController();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(AsyncValue<void> value) {
@@ -44,12 +44,11 @@ final class ProfileEditPageControllerProvider
   }
 }
 
-String _$profileEditPageControllerHash() =>
-    r'22a3c6bd0a88546d51416ca286fd2a9d9746ea72';
+String _$profileControllerHash() => r'6a2a03b00d63c4354618e947e909fb575231b8e9';
 
-/// プロフィール編集ページの保存処理を受け持つ。状態は保存の進み具合。
+/// 設定画面でのプロフィールの保存を受け持つ。状態は保存の進み具合。
 
-abstract class _$ProfileEditPageController extends $Notifier<AsyncValue<void>> {
+abstract class _$ProfileController extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();
   @$mustCallSuper
   @override

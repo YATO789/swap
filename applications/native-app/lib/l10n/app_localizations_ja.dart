@@ -672,14 +672,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsDeleteAccount => 'アカウントを削除';
 
   @override
-  String get settingsEditProfile => 'プロフィールを編集';
-
-  @override
-  String settingsProfileTileSemantics(String name) {
-    return '$name、プロフィールを編集';
-  }
-
-  @override
   String get themeModeSystem => '端末に合わせる';
 
   @override
@@ -757,12 +749,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get feedbackSent => 'フィードバックを送りました。ありがとうございます';
-
-  @override
-  String get profileEditTitle => 'プロフィール';
-
-  @override
-  String get profileEditSave => '保存';
 
   @override
   String get profileEditSaveFailed => 'プロフィールを保存できませんでした。もう一度お試しください';

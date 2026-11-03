@@ -17,7 +17,6 @@ import '../feedback_page/feedback_page.dart';
 import '../home_page/home_page.dart';
 import '../my_page/my_page.dart';
 import '../onboarding_page/onboarding_page.dart';
-import '../profile_edit_page/profile_edit_page.dart';
 import '../splash_page/splash_page.dart';
 import '../update_page/update_page.dart';
 import '../welcome_page/welcome_page.dart';
@@ -269,16 +268,6 @@ class MyPageRoute extends GoRouteData with $MyPageRoute {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
       SwipeablePage(key: state.pageKey, builder: (_) => const MyPage());
-}
-
-@TypedGoRoute<ProfileEditRoute>(path: '/me/profile')
-class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
-  const ProfileEditRoute();
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return _materialPage(state, const ProfileEditPage());
-  }
 }
 
 @TypedGoRoute<FeedbackRoute>(path: '/me/feedback')

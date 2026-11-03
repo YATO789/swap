@@ -20,6 +20,9 @@ import 'package:swap/theme/app_theme.dart';
 import '../../../helpers/fake_repositories.dart';
 import '../../../helpers/fake_stores.dart';
 
+/// 設定画面の一覧。名前の入力欄もスクロールできるので、一覧を名指しして送る。
+final _settingsList = find.byType(Scrollable).first;
+
 /// サインインした状態でルーターごとアプリを出し、ホームからマイページを開く。
 Future<void> _openMyPage(
   WidgetTester tester, {
@@ -27,6 +30,7 @@ Future<void> _openMyPage(
   FakeAuthenticationRepository? authenticationRepository,
   FakePushTokenRepository? pushTokenRepository,
   FakeFeedbackRepository? feedbackRepository,
+  FakeProfileRepository? profileRepository,
 }) async {
   final authentication =
       authenticationRepository ??
@@ -44,9 +48,10 @@ Future<void> _openMyPage(
         ),
         authenticationRepositoryProvider.overrideWithValue(authentication),
         profileRepositoryProvider.overrideWithValue(
-          FakeProfileRepository(
-            profile: const Profile(id: 'me', displayName: '彩人'),
-          ),
+          profileRepository ??
+              FakeProfileRepository(
+                profile: const Profile(id: 'me', displayName: '彩人'),
+              ),
         ),
         pushTokenRepositoryProvider.overrideWithValue(
           pushTokenRepository ?? FakePushTokenRepository(authentication),
@@ -77,6 +82,41 @@ Future<void> _openMyPage(
 }
 
 void main() {
+  testWidgets('設定画面の中で名前を変えて完了を押すと、保存する', (tester) async {
+    final profileRepository = FakeProfileRepository(
+      profile: const Profile(id: 'me', displayName: '彩人'),
+    );
+    await _openMyPage(tester, profileRepository: profileRepository);
+    final nameField = find.widgetWithText(TextField, '彩人');
+    expect(nameField, findsOneWidget);
+
+    await tester.enterText(nameField, '  あやと  ');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(profileRepository.profile?.displayName, 'あやと');
+    expect(find.text('プロフィールを保存しました'), findsOneWidget);
+  });
+
+  testWidgets('名前を空にして欄を離れると、保存せずに元の名前に戻す', (tester) async {
+    final profileRepository = FakeProfileRepository(
+      profile: const Profile(id: 'me', displayName: '彩人'),
+    );
+    await _openMyPage(tester, profileRepository: profileRepository);
+    final nameField = find.widgetWithText(TextField, '彩人');
+
+    await tester.enterText(nameField, '');
+    await tester.pump();
+    expect(find.text('名前を入力してください'), findsOneWidget);
+
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(profileRepository.profile?.displayName, '彩人');
+    expect(find.widgetWithText(TextField, '彩人'), findsOneWidget);
+    expect(find.text('名前を入力してください'), findsNothing);
+  });
+
   testWidgets('日記帳の並べ方を選ぶと、保存する', (tester) async {
     final preferencesStore = FakePreferencesStore();
     await _openMyPage(tester, preferencesStore: preferencesStore);
@@ -94,7 +134,7 @@ void main() {
     final preferencesStore = FakePreferencesStore();
     await _openMyPage(tester, preferencesStore: preferencesStore);
     final hintSwitch = find.widgetWithText(SwitchListTile, '書き込みバーの説明');
-    await tester.scrollUntilVisible(hintSwitch, 200);
+    await tester.scrollUntilVisible(hintSwitch, 200, scrollable: _settingsList);
 
     await tester.tap(hintSwitch);
     await tester.pumpAndSettle();
@@ -109,7 +149,11 @@ void main() {
     final feedbackRepository = FakeFeedbackRepository();
     await _openMyPage(tester, feedbackRepository: feedbackRepository);
     // すぐ下の行まで送って、フィードバックの行を画面に収める。
-    await tester.scrollUntilVisible(find.text('バージョン'), 200);
+    await tester.scrollUntilVisible(
+      find.text('バージョン'),
+      200,
+      scrollable: _settingsList,
+    );
 
     await tester.tap(find.text('フィードバックを送る'));
     await tester.pumpAndSettle();
@@ -132,7 +176,11 @@ void main() {
   testWidgets('フィードバックを送れなかったら、書いた内容を残してページに残る', (tester) async {
     final feedbackRepository = FakeFeedbackRepository()..fails = true;
     await _openMyPage(tester, feedbackRepository: feedbackRepository);
-    await tester.scrollUntilVisible(find.text('バージョン'), 200);
+    await tester.scrollUntilVisible(
+      find.text('バージョン'),
+      200,
+      scrollable: _settingsList,
+    );
     await tester.tap(find.text('フィードバックを送る'));
     await tester.pumpAndSettle();
 
@@ -158,7 +206,11 @@ void main() {
       authenticationRepository: authenticationRepository,
       pushTokenRepository: pushTokenRepository,
     );
-    await tester.scrollUntilVisible(find.text('ログアウト'), 200);
+    await tester.scrollUntilVisible(
+      find.text('ログアウト'),
+      200,
+      scrollable: _settingsList,
+    );
 
     await tester.tap(find.text('ログアウト'));
     await tester.pumpAndSettle();
@@ -174,7 +226,11 @@ void main() {
 
   testWidgets('キャンセルすると、ログアウトせずにマイページに残る', (tester) async {
     await _openMyPage(tester);
-    await tester.scrollUntilVisible(find.text('ログアウト'), 200);
+    await tester.scrollUntilVisible(
+      find.text('ログアウト'),
+      200,
+      scrollable: _settingsList,
+    );
 
     await tester.tap(find.text('ログアウト'));
     await tester.pumpAndSettle();

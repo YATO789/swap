@@ -754,14 +754,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDeleteAccount => 'Delete account';
 
   @override
-  String get settingsEditProfile => 'Edit profile';
-
-  @override
-  String settingsProfileTileSemantics(String name) {
-    return '$name, edit profile';
-  }
-
-  @override
   String get themeModeSystem => 'System';
 
   @override
@@ -843,12 +835,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedbackSent => 'Feedback sent. Thank you!';
-
-  @override
-  String get profileEditTitle => 'Profile';
-
-  @override
-  String get profileEditSave => 'Save';
 
   @override
   String get profileEditSaveFailed =>

@@ -577,16 +577,6 @@
   "settingsVersion": "バージョン",
   "settingsAccountSection": "アカウント",
   "settingsDeleteAccount": "アカウントを削除",
-  "settingsEditProfile": "プロフィールを編集",
-  "settingsProfileTileSemantics": "{name}、プロフィールを編集",
-  "@settingsProfileTileSemantics": {
-    "description": "設定のプロフィール行の読み上げ",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "themeModeSystem": "端末に合わせる",
   "themeModeLight": "ライト",
   "themeModeDark": "ダーク",
@@ -634,8 +624,6 @@
   "feedbackHint": "ご意見・ご要望を入力",
   "feedbackSendFailed": "送信できませんでした。もう一度お試しください",
   "feedbackSent": "フィードバックを送りました。ありがとうございます",
-  "profileEditTitle": "プロフィール",
-  "profileEditSave": "保存",
   "profileEditSaveFailed": "プロフィールを保存できませんでした。もう一度お試しください",
   "profileEditSaved": "プロフィールを保存しました",
   "profileEditNameRequired": "名前を入力してください",
