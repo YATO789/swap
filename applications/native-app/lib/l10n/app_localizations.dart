@@ -347,13 +347,13 @@ abstract class AppLocalizations {
   /// No description provided for @inviteSheetDecorate.
   ///
   /// In ja, this message translates to:
-  /// **'表紙を飾る'**
+  /// **'表紙をデコる'**
   String get inviteSheetDecorate;
 
   /// 日記帳を作った直後の招待シートで、飾った表紙の見本の横に出す文
   ///
   /// In ja, this message translates to:
-  /// **'絵文字や文字、らくがきで、表紙を自分たちらしく飾れます'**
+  /// **'絵文字や文字、らくがきで、表紙を自分たちらしくデコれます'**
   String get inviteSheetDecorateMessage;
 
   /// No description provided for @postSheetFailed.

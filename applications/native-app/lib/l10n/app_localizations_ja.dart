@@ -146,10 +146,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get inviteSheetLater => 'あとで招待する';
 
   @override
-  String get inviteSheetDecorate => '表紙を飾る';
+  String get inviteSheetDecorate => '表紙をデコる';
 
   @override
-  String get inviteSheetDecorateMessage => '絵文字や文字、らくがきで、表紙を自分たちらしく飾れます';
+  String get inviteSheetDecorateMessage => '絵文字や文字、らくがきで、表紙を自分たちらしくデコれます';
 
   @override
   String get postSheetFailed => '記録できませんでした。もう一度お試しください';

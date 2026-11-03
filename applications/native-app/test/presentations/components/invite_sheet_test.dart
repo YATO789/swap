@@ -42,20 +42,20 @@ void main() {
     var decorated = 0;
     await _pumpOpener(tester, onDecorateCover: () => decorated++);
 
-    expect(find.text('絵文字や文字、らくがきで、表紙を自分たちらしく飾れます'), findsOneWidget);
+    expect(find.text('絵文字や文字、らくがきで、表紙を自分たちらしくデコれます'), findsOneWidget);
     expect(find.byType(CoverDecorationLayer), findsOneWidget);
 
-    await tester.tap(find.text('表紙を飾る'));
+    await tester.tap(find.text('表紙をデコる'));
     await tester.pumpAndSettle();
 
     expect(decorated, 1);
-    expect(find.text('表紙を飾る'), findsNothing);
+    expect(find.text('表紙をデコる'), findsNothing);
   });
 
   testWidgets('表紙を飾る入口がなければ、見本も出さない', (tester) async {
     await _pumpOpener(tester);
 
-    expect(find.text('表紙を飾る'), findsNothing);
+    expect(find.text('表紙をデコる'), findsNothing);
     expect(find.byType(CoverDecorationLayer), findsNothing);
   });
 }

@@ -101,8 +101,8 @@
   },
   "inviteSheetCopy": "招待メッセージをコピー",
   "inviteSheetLater": "あとで招待する",
-  "inviteSheetDecorate": "表紙を飾る",
-  "inviteSheetDecorateMessage": "絵文字や文字、らくがきで、表紙を自分たちらしく飾れます",
+  "inviteSheetDecorate": "表紙をデコる",
+  "inviteSheetDecorateMessage": "絵文字や文字、らくがきで、表紙を自分たちらしくデコれます",
   "@inviteSheetDecorateMessage": {
     "description": "日記帳を作った直後の招待シートで、飾った表紙の見本の横に出す文"
   },
