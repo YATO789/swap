@@ -169,6 +169,21 @@ void main() {
     expect(find.text('記録しました'), findsOneWidget);
   });
 
+  testWidgets('下の書き込みバーのペンから日記を書くと、戻ったときに自分の日記が出る', (tester) async {
+    await _openDiaryBook(tester);
+    expect(find.text('ゼミの発表だった'), findsNothing);
+
+    await tester.tap(find.byTooltip('今日の日記を書く'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, 'ゼミの発表だった');
+    await tester.pump();
+    await tester.tap(find.text('投稿'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DiaryBookPage), findsOneWidget);
+    expect(find.text('ゼミの発表だった'), findsOneWidget);
+  });
+
   testWidgets('カレンダーでほかの日を選ぶと、その日を表示する', (tester) async {
     await _openDiaryBook(
       tester,
