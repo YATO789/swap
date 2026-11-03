@@ -193,6 +193,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeProfileAndSettings => 'Profile and settings';
 
   @override
+  String get homeMenuInfo => 'Diary book info';
+
+  @override
+  String get homeMenuInvite => 'Invite friends';
+
+  @override
+  String get homeMenuDecorate => 'Decorate the cover';
+
+  @override
+  String get homeDiaryBookLongPressHint => 'Open menu';
+
+  @override
   String get homeLoadFailed => 'Couldn\'t load diary books';
 
   @override

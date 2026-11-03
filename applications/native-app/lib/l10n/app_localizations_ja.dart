@@ -184,6 +184,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homeProfileAndSettings => 'プロフィールと設定';
 
   @override
+  String get homeMenuInfo => '日記帳の情報';
+
+  @override
+  String get homeMenuInvite => '友達を招待する';
+
+  @override
+  String get homeMenuDecorate => '表紙をデコる';
+
+  @override
+  String get homeDiaryBookLongPressHint => 'メニューを開く';
+
+  @override
   String get homeLoadFailed => '日記帳を読み込めませんでした';
 
   @override

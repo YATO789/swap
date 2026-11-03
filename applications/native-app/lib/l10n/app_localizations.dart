@@ -416,6 +416,30 @@ abstract class AppLocalizations {
   /// **'プロフィールと設定'**
   String get homeProfileAndSettings;
 
+  /// No description provided for @homeMenuInfo.
+  ///
+  /// In ja, this message translates to:
+  /// **'日記帳の情報'**
+  String get homeMenuInfo;
+
+  /// No description provided for @homeMenuInvite.
+  ///
+  /// In ja, this message translates to:
+  /// **'友達を招待する'**
+  String get homeMenuInvite;
+
+  /// No description provided for @homeMenuDecorate.
+  ///
+  /// In ja, this message translates to:
+  /// **'表紙をデコる'**
+  String get homeMenuDecorate;
+
+  /// No description provided for @homeDiaryBookLongPressHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'メニューを開く'**
+  String get homeDiaryBookLongPressHint;
+
   /// No description provided for @homeLoadFailed.
   ///
   /// In ja, this message translates to:

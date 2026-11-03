@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,6 +17,7 @@ import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import 'components/add_diary_book_cover.dart';
 import 'components/add_diary_book_sheet.dart';
+import 'components/diary_book_menu_sheet.dart';
 import 'components/empty_diary_books.dart';
 import '../../components/invite_sheet.dart';
 import 'components/join_diary_book_sheet/join_diary_book_sheet.dart';
@@ -95,6 +97,22 @@ class HomePage extends HookConsumerWidget {
         ).push<void>(context);
     void openFromCover(DiaryBook diaryBook, Rect coverRect) =>
         openDiaryBook(diaryBook, coverRect: coverRect);
+    // 表紙を長押ししたら、日記帳を開かずに、その日記帳でできることを選ばせる。
+    Future<void> openMenu(DiaryBook diaryBook) async {
+      HapticFeedback.mediumImpact();
+      final action = await showDiaryBookMenuSheet(context, diaryBook);
+      if (!context.mounted) return;
+      switch (action) {
+        case DiaryBookMenuAction.info:
+          DiaryBookInfoRoute(id: diaryBook.id).push<void>(context);
+        case DiaryBookMenuAction.invite:
+          showInviteSheet(context, diaryBook);
+        case DiaryBookMenuAction.decorate:
+          CoverDecorationRoute(id: diaryBook.id).push<void>(context);
+        case null:
+          break;
+      }
+    }
 
     // 記録の通知をタップしたら、その日記帳を開く。ホームはサインインしている間ずっと
     // 一番下にあるので、ほかのページを開いていても、その上に重ねる。
@@ -204,11 +222,13 @@ class HomePage extends HookConsumerWidget {
                 ? _DiaryBookPager(
                     diaryBooks: diaryBooks,
                     onTap: openFromCover,
+                    onLongPress: openMenu,
                     onAdd: addDiaryBook,
                   )
                 : _DiaryBookGrid(
                     diaryBooks: diaryBooks,
                     onTap: openFromCover,
+                    onLongPress: openMenu,
                     onAdd: addDiaryBook,
                   ),
           ),
@@ -257,11 +277,13 @@ class _DiaryBookGrid extends StatelessWidget {
   const _DiaryBookGrid({
     required this.diaryBooks,
     required this.onTap,
+    required this.onLongPress,
     required this.onAdd,
   });
 
   final List<DiaryBook> diaryBooks;
   final void Function(DiaryBook diaryBook, Rect coverRect) onTap;
+  final ValueChanged<DiaryBook> onLongPress;
   final VoidCallback onAdd;
 
   static const _padding = 24.0;
@@ -301,6 +323,7 @@ class _DiaryBookGrid extends StatelessWidget {
               diaryBook: diaryBooks[index],
               width: coverWidth,
               onTap: onTap,
+              onLongPress: onLongPress,
             );
           },
         );
@@ -314,11 +337,13 @@ class _DiaryBookPager extends HookWidget {
   const _DiaryBookPager({
     required this.diaryBooks,
     required this.onTap,
+    required this.onLongPress,
     required this.onAdd,
   });
 
   final List<DiaryBook> diaryBooks;
   final void Function(DiaryBook diaryBook, Rect coverRect) onTap;
+  final ValueChanged<DiaryBook> onLongPress;
   final VoidCallback onAdd;
 
   static const _horizontalPadding = 40.0;
@@ -366,6 +391,7 @@ class _DiaryBookPager extends HookWidget {
                             diaryBook: diaryBooks[index],
                             width: width,
                             onTap: onTap,
+                            onLongPress: onLongPress,
                           ),
                   );
                 },
@@ -418,17 +444,19 @@ class _PageDots extends StatelessWidget {
   }
 }
 
-/// 押すと日記帳を開く表紙。
+/// 押すと日記帳を開き、長押しするとその日記帳のメニューを開く表紙。
 class _DiaryBookCover extends StatelessWidget {
   const _DiaryBookCover({
     required this.diaryBook,
     required this.width,
     required this.onTap,
+    required this.onLongPress,
   });
 
   final DiaryBook diaryBook;
   final double width;
   final void Function(DiaryBook diaryBook, Rect coverRect) onTap;
+  final ValueChanged<DiaryBook> onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -438,6 +466,8 @@ class _DiaryBookCover extends StatelessWidget {
     return Semantics(
       button: true,
       label: l10n.homeDiaryBookSemantics(diaryBook.name, memberCount),
+      onLongPressHint: l10n.homeDiaryBookLongPressHint,
+      onLongPress: () => onLongPress(diaryBook),
       excludeSemantics: true,
       child: GestureDetector(
         // 開くページに、画面の中での表紙の位置と大きさを渡す。
@@ -445,6 +475,7 @@ class _DiaryBookCover extends StatelessWidget {
           final box = context.findRenderObject()! as RenderBox;
           onTap(diaryBook, box.localToGlobal(Offset.zero) & box.size);
         },
+        onLongPress: () => onLongPress(diaryBook),
         behavior: HitTestBehavior.opaque,
         child: DiaryCover(
           name: diaryBook.name,

@@ -86,6 +86,11 @@ Future<void> _pumpHomeWithRouter(
         builder: (_, state) =>
             Scaffold(body: Text('日記帳 ${state.pathParameters['id']}')),
       ),
+      GoRoute(
+        path: '/diary-books/:id/info',
+        builder: (_, state) =>
+            Scaffold(body: Text('日記帳の情報 ${state.pathParameters['id']}')),
+      ),
     ],
   );
   addTearDown(router.dispose);
@@ -236,6 +241,26 @@ void main() {
 
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('日記帳を読み込めませんでした。もう一度お試しください'), findsOneWidget);
+  });
+
+  testWidgets('表紙を長押しするとメニューが出て、日記帳の情報を選ぶと開く', (tester) async {
+    await _pumpHomeWithRouter(tester, FakeOpenedNotificationRepository());
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('大学'));
+    await tester.pumpAndSettle();
+
+    // いきなり移らず、できることを選ばせる。
+    expect(find.text('日記帳の情報 university'), findsNothing);
+    expect(find.text('日記帳の情報'), findsOneWidget);
+    expect(find.text('友達を招待する'), findsOneWidget);
+    expect(find.text('表紙をデコる'), findsOneWidget);
+
+    await tester.tap(find.text('日記帳の情報'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('日記帳の情報 university'), findsOneWidget);
+    expect(find.text('日記帳 university'), findsNothing);
   });
 
   testWidgets('記録の通知をタップすると、その日記帳を開く', (tester) async {

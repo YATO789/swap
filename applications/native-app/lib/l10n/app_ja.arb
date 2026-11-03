@@ -123,6 +123,10 @@
   "homeRefreshFailed": "日記帳を読み込めませんでした。もう一度お試しください",
   "homeAddDiaryBook": "日記帳を追加",
   "homeProfileAndSettings": "プロフィールと設定",
+  "homeMenuInfo": "日記帳の情報",
+  "homeMenuInvite": "友達を招待する",
+  "homeMenuDecorate": "表紙をデコる",
+  "homeDiaryBookLongPressHint": "メニューを開く",
   "homeLoadFailed": "日記帳を読み込めませんでした",
   "homeDiaryBookSemantics": "{name}、{memberCount}",
   "@homeDiaryBookSemantics": {
