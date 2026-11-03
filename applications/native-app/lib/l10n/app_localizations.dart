@@ -659,20 +659,25 @@ abstract class AppLocalizations {
   /// No description provided for @diarySectionLockedToday.
   ///
   /// In ja, this message translates to:
-  /// **'この日記帳に今日の日記を書くと読めます'**
+  /// **'今日の日記を書くと読めます'**
   String get diarySectionLockedToday;
 
   /// No description provided for @diarySectionLockedYesterday.
   ///
   /// In ja, this message translates to:
-  /// **'この日記帳に昨日の日記を書くと読めます'**
+  /// **'昨日の日記を書くと読めます'**
   String get diarySectionLockedYesterday;
 
-  /// 読めない日記のカードの読み上げ。time は書いた時刻、hint は読めるようにする方法
+  /// 読めない日記のカードの読み上げ。time は書いた時刻、title はタイトル（なければ「タイトルなし」）、hint は読めるようにする方法
   ///
   /// In ja, this message translates to:
-  /// **'{name}の日記（{time}）。まだ読めません。{hint}'**
-  String diarySectionLockedSemantics(String name, String time, String hint);
+  /// **'{name}の日記（{time}）。{title}。本文はまだ読めません。{hint}'**
+  String diarySectionLockedSemantics(
+    String name,
+    String time,
+    String title,
+    String hint,
+  );
 
   /// No description provided for @calendarPreviousMonth.
   ///

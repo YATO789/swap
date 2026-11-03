@@ -142,7 +142,7 @@ void main() {
     );
 
     expect(find.text('今日はゼミの発表だった'), findsOneWidget);
-    expect(find.text('この日記帳に今日の日記を書くと読めます'), findsOneWidget);
+    expect(find.text('今日の日記を書くと読めます'), findsOneWidget);
     expect(find.text('図書館で勉強中'), findsOneWidget);
   });
 

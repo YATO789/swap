@@ -258,9 +258,9 @@
     }
   },
   "diarySectionLockedPast": "この日に日記を書いていないので読めません",
-  "diarySectionLockedToday": "この日記帳に今日の日記を書くと読めます",
-  "diarySectionLockedYesterday": "この日記帳に昨日の日記を書くと読めます",
-  "diarySectionLockedSemantics": "{name}の日記（{time}）。まだ読めません。{hint}",
+  "diarySectionLockedToday": "今日の日記を書くと読めます",
+  "diarySectionLockedYesterday": "昨日の日記を書くと読めます",
+  "diarySectionLockedSemantics": "{name}の日記（{time}）。{title}。本文はまだ読めません。{hint}",
   "@diarySectionLockedSemantics": {
     "placeholders": {
       "name": {
@@ -269,11 +269,14 @@
       "time": {
         "type": "String"
       },
+      "title": {
+        "type": "String"
+      },
       "hint": {
         "type": "String"
       }
     },
-    "description": "読めない日記のカードの読み上げ。time は書いた時刻、hint は読めるようにする方法"
+    "description": "読めない日記のカードの読み上げ。time は書いた時刻、title はタイトル（なければ「タイトルなし」）、hint は読めるようにする方法"
   },
   "calendarPreviousMonth": "前の月",
   "calendarNextMonth": "次の月",

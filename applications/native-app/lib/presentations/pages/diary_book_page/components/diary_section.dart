@@ -97,7 +97,6 @@ class _DiaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final title = diary.title ?? '';
     final body = diary.body ?? '';
 
     return Padding(
@@ -123,17 +122,7 @@ class _DiaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 // 冒頭だけ見せて、続きはタップした詳細で読む。
-                // タイトルがなければ「タイトルなし」を灰色で出して見た目を揃える。
-                Text(
-                  title.isNotEmpty ? title : context.l10n.diarySectionUntitled,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: title.isNotEmpty ? null : colors.disabled,
-                  ),
-                ),
+                _DiaryTitle(title: diary.title),
                 // 本文は1行だけ。本文がなくても1行ぶんの高さを取り、カードの高さを揃える。
                 const SizedBox(height: 6),
                 Text(
@@ -155,7 +144,7 @@ class _DiaryCard extends StatelessWidget {
   }
 }
 
-/// まだ読めない日記。誰の日記かだけを出し、本文は伏せる。
+/// まだ読めない日記。誰の日記かとタイトルだけを出し、本文は伏せる。
 /// タップすると、読めるようにするための日記の画面を開く。
 /// [onTap] が null なら、その日の日記はもう書けないので読めないことだけを伝える。
 class _LockedDiaryCard extends StatelessWidget {
@@ -190,6 +179,9 @@ class _LockedDiaryCard extends StatelessWidget {
         label: context.l10n.diarySectionLockedSemantics(
           name,
           formatTime(diary.writtenAt),
+          diary.title.isNotEmpty
+              ? diary.title
+              : context.l10n.diarySectionUntitled,
           hint,
         ),
         excludeSemantics: true,
@@ -212,12 +204,11 @@ class _LockedDiaryCard extends StatelessWidget {
                     avatarUrl: avatarUrl,
                     isMine: false,
                   ),
-                  const SizedBox(height: 12),
-                  // 本文の代わりに、伏せてあることが分かる帯を出す。
-                  const _PlaceholderBar(widthFactor: 1),
-                  const SizedBox(height: 6),
-                  const _PlaceholderBar(widthFactor: 0.6),
                   const SizedBox(height: 10),
+                  // タイトルは続きを読みたくなる予告として見せる。
+                  _DiaryTitle(title: diary.title),
+                  // 本文の1行目の場所に、読めるようにする方法を出す。
+                  const SizedBox(height: 6),
                   Row(
                     children: [
                       Icon(
@@ -227,8 +218,11 @@ class _LockedDiaryCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Expanded(
+                        // 本文の1行ぶんに収め、読めるカードと高さを揃える。
                         child: Text(
                           hint,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
                             color: colors.textSecondary,
@@ -291,22 +285,23 @@ class _CardHeader extends StatelessWidget {
   }
 }
 
-class _PlaceholderBar extends StatelessWidget {
-  const _PlaceholderBar({required this.widthFactor});
+/// カードの日記のタイトル。1行に収める。
+/// タイトルがなければ「タイトルなし」を灰色で出して見た目を揃える。
+class _DiaryTitle extends StatelessWidget {
+  const _DiaryTitle({required this.title});
 
-  final double widthFactor;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      widthFactor: widthFactor,
-      alignment: Alignment.centerLeft,
-      child: Container(
-        height: 12,
-        decoration: BoxDecoration(
-          color: context.appColors.placeholder,
-          borderRadius: BorderRadius.circular(6),
-        ),
+    return Text(
+      title.isNotEmpty ? title : context.l10n.diarySectionUntitled,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        color: title.isNotEmpty ? null : context.appColors.disabled,
       ),
     );
   }

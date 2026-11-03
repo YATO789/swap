@@ -16,7 +16,7 @@ class DiaryDatasource {
   final SupabaseClient _client;
 
   /// [diaryBookId] の日記帳に書かれた [date] の日記を、書いた時刻の新しい順に返す。
-  /// 本文（diary_contents）は RLS で読めるものだけが返り、読めない日記は本文が null になる。
+  /// タイトルは常に返る。本文（diary_contents）は RLS で読めるものだけが返り、読めない日記は本文が null になる。
   Future<List<DiaryResponse>> fetchOn(String diaryBookId, DateTime date) async {
     final rows = await _client
         .from('diaries')
@@ -77,8 +77,8 @@ class DiaryDatasource {
   }
 
   static const _columns =
-      'id, diary_book_id, author_id, date, written_at, '
-      'diary_contents(title, body)';
+      'id, diary_book_id, author_id, date, written_at, title, '
+      'diary_contents(body)';
 
   String _toDateString(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-'

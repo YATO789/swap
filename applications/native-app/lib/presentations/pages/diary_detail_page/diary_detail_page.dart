@@ -360,7 +360,7 @@ class _DiaryBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final diaryTitle = diary.title ?? '';
+    final diaryTitle = diary.title;
     final body = diary.body ?? '';
 
     final header = [

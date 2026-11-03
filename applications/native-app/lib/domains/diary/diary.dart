@@ -17,8 +17,10 @@ abstract class Diary with _$Diary {
     /// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
     required DateTime writtenAt,
 
-    /// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
-    String? title,
+    /// 空ならタイトルなし。まだ読めない日記でも見える。
+    @Default('') String title,
+
+    /// 本文。まだ読めない日記（自分がその日に書いていない）なら null。
     String? body,
   }) = _Diary;
 

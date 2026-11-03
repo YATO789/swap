@@ -65,7 +65,7 @@ class DiaryRepository {
       authorId: response.authorId,
       date: response.date,
       writtenAt: response.writtenAt,
-      title: response.content?.title,
+      title: response.title,
       body: response.content?.body,
     );
   }

@@ -326,14 +326,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diarySectionLockedPast => 'この日に日記を書いていないので読めません';
 
   @override
-  String get diarySectionLockedToday => 'この日記帳に今日の日記を書くと読めます';
+  String get diarySectionLockedToday => '今日の日記を書くと読めます';
 
   @override
-  String get diarySectionLockedYesterday => 'この日記帳に昨日の日記を書くと読めます';
+  String get diarySectionLockedYesterday => '昨日の日記を書くと読めます';
 
   @override
-  String diarySectionLockedSemantics(String name, String time, String hint) {
-    return '$nameの日記（$time）。まだ読めません。$hint';
+  String diarySectionLockedSemantics(
+    String name,
+    String time,
+    String title,
+    String hint,
+  ) {
+    return '$nameの日記（$time）。$title。本文はまだ読めません。$hint';
   }
 
   @override

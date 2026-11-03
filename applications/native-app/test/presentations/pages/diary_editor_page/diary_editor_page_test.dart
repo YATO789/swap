@@ -194,7 +194,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('美緒の日記'), findsNothing);
 
-    await tester.tap(find.text('この日記帳に今日の日記を書くと読めます'));
+    await tester.tap(find.text('今日の日記を書くと読めます'));
     await tester.pumpAndSettle();
     // 1冊しかないので、日記帳は選べない。
     expect(find.bySemanticsLabel('日記を書く日記帳: 大学'), findsOneWidget);

@@ -251,7 +251,7 @@ class FakeDiaryRepository implements DiaryRepository {
       for (final diary in onDate)
         diary.authorId == 'me' || wroteToday
             ? diary
-            : diary.copyWith(title: null, body: null),
+            : diary.copyWith(body: null),
     ];
   }
 

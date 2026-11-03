@@ -355,16 +355,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'You can\'t read this because you didn\'t write a diary that day';
 
   @override
-  String get diarySectionLockedToday =>
-      'Write today\'s diary in this diary book to read it';
+  String get diarySectionLockedToday => 'Write today\'s diary to read it';
 
   @override
   String get diarySectionLockedYesterday =>
-      'Write yesterday\'s diary in this diary book to read it';
+      'Write yesterday\'s diary to read it';
 
   @override
-  String diarySectionLockedSemantics(String name, String time, String hint) {
-    return '$name\'s diary ($time). You can\'t read it yet. $hint';
+  String diarySectionLockedSemantics(
+    String name,
+    String time,
+    String title,
+    String hint,
+  ) {
+    return '$name\'s diary ($time). $title. You can\'t read the body yet. $hint';
   }
 
   @override

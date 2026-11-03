@@ -17,8 +17,9 @@ mixin _$Diary {
 
  String get id; String get authorId;/// どの日の日記か（年月日のみ）。朝4時区切りなので、深夜に書いたものは前日になる。
  DateTime get date;/// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
- DateTime get writtenAt;/// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
- String? get title; String? get body;
+ DateTime get writtenAt;/// 空ならタイトルなし。まだ読めない日記でも見える。
+ String get title;/// 本文。まだ読めない日記（自分がその日に書いていない）なら null。
+ String? get body;
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -54,7 +55,7 @@ abstract mixin class $DiaryCopyWith<$Res>  {
   factory $DiaryCopyWith(Diary value, $Res Function(Diary) _then) = _$DiaryCopyWithImpl;
 @useResult
 $Res call({
- String id, String authorId, DateTime date, DateTime writtenAt, String? title, String? body
+ String id, String authorId, DateTime date, DateTime writtenAt, String title, String? body
 });
 
 
@@ -71,14 +72,14 @@ class _$DiaryCopyWithImpl<$Res>
 
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = freezed,Object? body = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? body = freezed,}) {
   return _then(Diary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
-as DateTime,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -164,7 +165,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String? title,  String? body)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Diary() when $default != null:
 return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body);case _:
@@ -185,7 +186,7 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String? title,  String? body)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body)  $default,) {final _that = this;
 switch (_that) {
 case _Diary():
 return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body);case _:
@@ -205,7 +206,7 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String? title,  String? body)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body)?  $default,) {final _that = this;
 switch (_that) {
 case _Diary() when $default != null:
 return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body);case _:
@@ -220,7 +221,7 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 
 
 class _Diary extends Diary {
-  const _Diary({required this.id, required this.authorId, required this.date, required this.writtenAt, this.title, this.body}): super._();
+  const _Diary({required this.id, required this.authorId, required this.date, required this.writtenAt, this.title = '', this.body}): super._();
   
 
 @override final  String id;
@@ -229,8 +230,9 @@ class _Diary extends Diary {
 @override final  DateTime date;
 /// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
 @override final  DateTime writtenAt;
-/// タイトルと本文。まだ読めない日記（自分がその日に書いていない）なら null。
-@override final  String? title;
+/// 空ならタイトルなし。まだ読めない日記でも見える。
+@override@JsonKey() final  String title;
+/// 本文。まだ読めない日記（自分がその日に書いていない）なら null。
 @override final  String? body;
 
 /// Create a copy of Diary
@@ -265,7 +267,7 @@ abstract mixin class _$DiaryCopyWith<$Res> implements $DiaryCopyWith<$Res> {
   factory _$DiaryCopyWith(_Diary value, $Res Function(_Diary) _then) = __$DiaryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String authorId, DateTime date, DateTime writtenAt, String? title, String? body
+ String id, String authorId, DateTime date, DateTime writtenAt, String title, String? body
 });
 
 
@@ -282,14 +284,14 @@ class __$DiaryCopyWithImpl<$Res>
 
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = freezed,Object? body = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? body = freezed,}) {
   return _then(_Diary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
-as DateTime,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String?,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DiaryResponse {
 
- String get id; String get diaryBookId; String get authorId; DateTime get date;@LocalDateTimeConverter() DateTime get writtenAt;/// diary_id が主キーなので1対1になる。RLS で読めなければ null。
+ String get id; String get diaryBookId; String get authorId; DateTime get date;@LocalDateTimeConverter() DateTime get writtenAt;/// 空ならタイトルなし。まだ読めない日記でも返る。
+ String get title;/// diary_id が主キーなので1対1になる。RLS で読めなければ null。
 @JsonKey(name: 'diary_contents') DiaryContentResponse? get content;
 /// Create a copy of DiaryResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -31,20 +32,20 @@ $DiaryResponseCopyWith<DiaryResponse> get copyWith => _$DiaryResponseCopyWithImp
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.diaryBookId, _this.diaryBookId) || other.diaryBookId == _this.diaryBookId)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.writtenAt, _this.writtenAt) || other.writtenAt == _this.writtenAt)&&(identical(other.content, _this.content) || other.content == _this.content));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.diaryBookId, _this.diaryBookId) || other.diaryBookId == _this.diaryBookId)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.writtenAt, _this.writtenAt) || other.writtenAt == _this.writtenAt)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.content, _this.content) || other.content == _this.content));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as DiaryResponse;
-  return Object.hash(runtimeType,_this.id,_this.diaryBookId,_this.authorId,_this.date,_this.writtenAt,_this.content);
+  return Object.hash(runtimeType,_this.id,_this.diaryBookId,_this.authorId,_this.date,_this.writtenAt,_this.title,_this.content);
 }
 
 @override
 String toString() {
   final _this = this as DiaryResponse;
-  return 'DiaryResponse(id: ${_this.id}, diaryBookId: ${_this.diaryBookId}, authorId: ${_this.authorId}, date: ${_this.date}, writtenAt: ${_this.writtenAt}, content: ${_this.content})';
+  return 'DiaryResponse(id: ${_this.id}, diaryBookId: ${_this.diaryBookId}, authorId: ${_this.authorId}, date: ${_this.date}, writtenAt: ${_this.writtenAt}, title: ${_this.title}, content: ${_this.content})';
 }
 
 
@@ -55,7 +56,7 @@ abstract mixin class $DiaryResponseCopyWith<$Res>  {
   factory $DiaryResponseCopyWith(DiaryResponse value, $Res Function(DiaryResponse) _then) = _$DiaryResponseCopyWithImpl;
 @useResult
 $Res call({
- String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt,@JsonKey(name: 'diary_contents') DiaryContentResponse? content
+ String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String title,@JsonKey(name: 'diary_contents') DiaryContentResponse? content
 });
 
 
@@ -72,14 +73,15 @@ class _$DiaryResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? content = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? content = freezed,}) {
   return _then(DiaryResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,diaryBookId: null == diaryBookId ? _self.diaryBookId : diaryBookId // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
-as DateTime,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as DiaryContentResponse?,
   ));
 }
@@ -177,10 +179,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryResponse() when $default != null:
-return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.content);case _:
+return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.content);case _:
   return orElse();
 
 }
@@ -198,10 +200,10 @@ return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryResponse():
-return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.content);case _:
+return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.content);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -218,10 +220,10 @@ return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryResponse() when $default != null:
-return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.content);case _:
+return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.content);case _:
   return null;
 
 }
@@ -233,7 +235,7 @@ return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writt
 @JsonSerializable()
 
 class _DiaryResponse implements DiaryResponse {
-  const _DiaryResponse({required this.id, required this.diaryBookId, required this.authorId, required this.date, @LocalDateTimeConverter() required this.writtenAt, @JsonKey(name: 'diary_contents') this.content});
+  const _DiaryResponse({required this.id, required this.diaryBookId, required this.authorId, required this.date, @LocalDateTimeConverter() required this.writtenAt, required this.title, @JsonKey(name: 'diary_contents') this.content});
   factory _DiaryResponse.fromJson(Map<String, dynamic> json) => _$DiaryResponseFromJson(json);
 
 @override final  String id;
@@ -241,6 +243,8 @@ class _DiaryResponse implements DiaryResponse {
 @override final  String authorId;
 @override final  DateTime date;
 @override@LocalDateTimeConverter() final  DateTime writtenAt;
+/// 空ならタイトルなし。まだ読めない日記でも返る。
+@override final  String title;
 /// diary_id が主キーなので1対1になる。RLS で読めなければ null。
 @override@JsonKey(name: 'diary_contents') final  DiaryContentResponse? content;
 
@@ -257,18 +261,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.diaryBookId, diaryBookId) || other.diaryBookId == diaryBookId)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.date, date) || other.date == date)&&(identical(other.writtenAt, writtenAt) || other.writtenAt == writtenAt)&&(identical(other.content, content) || other.content == content));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.diaryBookId, diaryBookId) || other.diaryBookId == diaryBookId)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.date, date) || other.date == date)&&(identical(other.writtenAt, writtenAt) || other.writtenAt == writtenAt)&&(identical(other.title, title) || other.title == title)&&(identical(other.content, content) || other.content == content));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,diaryBookId,authorId,date,writtenAt,content);
+    return Object.hash(runtimeType,id,diaryBookId,authorId,date,writtenAt,title,content);
 }
 
 @override
 String toString() {
-    return 'DiaryResponse(id: $id, diaryBookId: $diaryBookId, authorId: $authorId, date: $date, writtenAt: $writtenAt, content: $content)';
+    return 'DiaryResponse(id: $id, diaryBookId: $diaryBookId, authorId: $authorId, date: $date, writtenAt: $writtenAt, title: $title, content: $content)';
 }
 
 
@@ -279,7 +283,7 @@ abstract mixin class _$DiaryResponseCopyWith<$Res> implements $DiaryResponseCopy
   factory _$DiaryResponseCopyWith(_DiaryResponse value, $Res Function(_DiaryResponse) _then) = __$DiaryResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt,@JsonKey(name: 'diary_contents') DiaryContentResponse? content
+ String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String title,@JsonKey(name: 'diary_contents') DiaryContentResponse? content
 });
 
 
@@ -296,14 +300,15 @@ class __$DiaryResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? content = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? content = freezed,}) {
   return _then(_DiaryResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,diaryBookId: null == diaryBookId ? _self.diaryBookId : diaryBookId // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
-as DateTime,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as DiaryContentResponse?,
   ));
 }
@@ -327,7 +332,7 @@ $DiaryContentResponseCopyWith<$Res>? get content {
 /// @nodoc
 mixin _$DiaryContentResponse {
 
- String get title; String get body;
+ String get body;
 /// Create a copy of DiaryContentResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -341,20 +346,20 @@ $DiaryContentResponseCopyWith<DiaryContentResponse> get copyWith => _$DiaryConte
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryContentResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryContentResponse&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.body, _this.body) || other.body == _this.body));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryContentResponse&&(identical(other.body, _this.body) || other.body == _this.body));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as DiaryContentResponse;
-  return Object.hash(runtimeType,_this.title,_this.body);
+  return Object.hash(runtimeType,_this.body);
 }
 
 @override
 String toString() {
   final _this = this as DiaryContentResponse;
-  return 'DiaryContentResponse(title: ${_this.title}, body: ${_this.body})';
+  return 'DiaryContentResponse(body: ${_this.body})';
 }
 
 
@@ -365,7 +370,7 @@ abstract mixin class $DiaryContentResponseCopyWith<$Res>  {
   factory $DiaryContentResponseCopyWith(DiaryContentResponse value, $Res Function(DiaryContentResponse) _then) = _$DiaryContentResponseCopyWithImpl;
 @useResult
 $Res call({
- String title, String body
+ String body
 });
 
 
@@ -382,10 +387,9 @@ class _$DiaryContentResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryContentResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? body = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? body = null,}) {
   return _then(DiaryContentResponse(
-title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -471,10 +475,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String body)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String body)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryContentResponse() when $default != null:
-return $default(_that.title,_that.body);case _:
+return $default(_that.body);case _:
   return orElse();
 
 }
@@ -492,10 +496,10 @@ return $default(_that.title,_that.body);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String body)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String body)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryContentResponse():
-return $default(_that.title,_that.body);case _:
+return $default(_that.body);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -512,10 +516,10 @@ return $default(_that.title,_that.body);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String body)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String body)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryContentResponse() when $default != null:
-return $default(_that.title,_that.body);case _:
+return $default(_that.body);case _:
   return null;
 
 }
@@ -527,10 +531,9 @@ return $default(_that.title,_that.body);case _:
 @JsonSerializable()
 
 class _DiaryContentResponse implements DiaryContentResponse {
-  const _DiaryContentResponse({required this.title, required this.body});
+  const _DiaryContentResponse({required this.body});
   factory _DiaryContentResponse.fromJson(Map<String, dynamic> json) => _$DiaryContentResponseFromJson(json);
 
-@override final  String title;
 @override final  String body;
 
 /// Create a copy of DiaryContentResponse
@@ -546,18 +549,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryContentResponse&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryContentResponse&&(identical(other.body, body) || other.body == body));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,title,body);
+    return Object.hash(runtimeType,body);
 }
 
 @override
 String toString() {
-    return 'DiaryContentResponse(title: $title, body: $body)';
+    return 'DiaryContentResponse(body: $body)';
 }
 
 
@@ -568,7 +571,7 @@ abstract mixin class _$DiaryContentResponseCopyWith<$Res> implements $DiaryConte
   factory _$DiaryContentResponseCopyWith(_DiaryContentResponse value, $Res Function(_DiaryContentResponse) _then) = __$DiaryContentResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String body
+ String body
 });
 
 
@@ -585,10 +588,9 @@ class __$DiaryContentResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryContentResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? body = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? body = null,}) {
   return _then(_DiaryContentResponse(
-title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
