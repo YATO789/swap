@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// ColorScheme だけでは表せない、アプリ固有の色。
 /// `context.appColors` で取り出す。
@@ -142,6 +143,11 @@ ThemeData _buildTheme(Brightness brightness, AppColors colors) {
       displayColor: colors.textPrimary,
     ),
     appBarTheme: AppBarTheme(
+      // 背景を透明にした AppBar では、Flutter が透明を暗い色とみなして
+      // ステータスバーの文字を白にしてしまう。地色に合わせて決めておく。
+      systemOverlayStyle: brightness == Brightness.light
+          ? SystemUiOverlayStyle.dark
+          : SystemUiOverlayStyle.light,
       backgroundColor: colors.surface,
       foregroundColor: colors.textPrimary,
       surfaceTintColor: Colors.transparent,
