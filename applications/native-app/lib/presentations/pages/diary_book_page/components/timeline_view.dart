@@ -422,7 +422,7 @@ class _PostCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              UserAvatar(imageUrl: avatarUrl),
+              UserAvatar(imageUrl: avatarUrl, size: 36),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -435,8 +435,8 @@ class _PostCard extends StatelessWidget {
                             name,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -444,13 +444,13 @@ class _PostCard extends StatelessWidget {
                         Text(
                           formatTime(post.postedAt),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 14,
                             color: colors.textSecondary,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(post.message, style: const TextStyle(fontSize: 15)),
                   ],
                 ),
