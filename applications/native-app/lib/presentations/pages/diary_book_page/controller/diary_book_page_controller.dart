@@ -100,6 +100,61 @@ class DiaryBookPageController extends _$DiaryBookPageController {
     return true;
   }
 
+  /// 自分（[myId]）のリアクションを、[postId] の記録に [emoji] で付ける。同じ絵文字なら取り消す。
+  /// 待たずにすぐ画面に映し、保存できなかったら元に戻して false を返す。
+  Future<bool> react(String postId, String myId, String emoji) async {
+    final before = _postOf(postId);
+    if (before == null) return false;
+    final removing = before.reactionOf(myId) == emoji;
+    _replacePost(before.reactedBy(myId, emoji));
+
+    final repository = ref.read(postRepositoryProvider);
+    try {
+      if (removing) {
+        await repository.removeReaction(postId, diaryBookId);
+      } else {
+        await repository.react(postId, diaryBookId, emoji);
+      }
+    } catch (error, stackTrace) {
+      debugPrint('リアクションを保存できませんでした: $error\n$stackTrace');
+      // 待っている間にほかの絵文字を選んでいても、自分のリアクションだけをこの前に戻す。
+      final latest = _postOf(postId);
+      if (latest != null) {
+        _replacePost(
+          latest.copyWith(
+            reactions: [
+              for (final reaction in latest.reactions)
+                if (reaction.userId != myId) reaction,
+              for (final reaction in before.reactions)
+                if (reaction.userId == myId) reaction,
+            ],
+          ),
+        );
+      }
+      return false;
+    }
+    return true;
+  }
+
+  //日記帳ページのコントローラーが今持っている記録の一覧から、ID が postId の記録を1件探して返す
+  TimelinePost? _postOf(String postId) {
+    return state.value?.posts.where((post) => post.id == postId).firstOrNull;
+  }
+
+  //画面の状態を更新するヘルパー
+  void _replacePost(TimelinePost replaced) {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(
+      current.copyWith(
+        posts: [
+          for (final post in current.posts)
+            if (post.id == replaced.id) replaced else post,
+        ],
+      ),
+    );
+  }
+
   /// [month] の月で、日記がある日と記録がある日。カレンダーの印に使う。
   Future<MarkedDates> fetchMarkedDates(DateTime month) async {
     final (diaryDates, postDates) = await (

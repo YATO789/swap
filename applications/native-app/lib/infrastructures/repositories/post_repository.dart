@@ -31,7 +31,19 @@ class PostRepository {
     return _datasource.removeFromDiaryBook(postId, diaryBookId);
   }
 
+  /// 自分のリアクションを、[diaryBookId] の日記帳に出た [postId] の記録に [emoji] で付ける。
+  /// もう付けていれば付け替える。
+  Future<void> react(String postId, String diaryBookId, String emoji) {
+    return _datasource.react(postId, diaryBookId, emoji);
+  }
+
+  /// [diaryBookId] の日記帳に出た [postId] の記録から、自分のリアクションを取り消す。
+  Future<void> removeReaction(String postId, String diaryBookId) {
+    return _datasource.removeReaction(postId, diaryBookId);
+  }
+
   /// [diaryBookId] の日記帳に出された、日記の [date]（朝4時区切り）に当たる記録を古い順に返す。
+  /// その日記帳で付いたリアクションも付ける。
   Future<List<TimelinePost>> fetchInDiaryBook(
     String diaryBookId,
     DateTime date,
@@ -72,11 +84,19 @@ class PostRepository {
   }
 
   TimelinePost _toTimelinePost(PostResponse response) {
+    final reactions = [
+      for (final diaryBook in response.postDiaryBooks)
+        ...diaryBook.postReactions,
+    ]..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return TimelinePost(
       id: response.id,
       authorId: response.authorId,
       message: response.message,
       postedAt: response.postedAt,
+      reactions: [
+        for (final reaction in reactions)
+          PostReaction(userId: reaction.userId, emoji: reaction.emoji),
+      ],
     );
   }
 }

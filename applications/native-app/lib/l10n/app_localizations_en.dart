@@ -317,6 +317,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diaryBookLoadFailed => 'Couldn\'t load the diary book';
 
   @override
+  String get diaryBookReactionFailed =>
+      'Couldn\'t save your reaction. Please try again.';
+
+  @override
+  String get reactionAdd => 'Add a reaction';
+
+  @override
+  String reactionChange(String emoji) {
+    return 'Change your reaction. Currently $emoji';
+  }
+
+  @override
+  String reactionUndo(String emoji) {
+    return 'Remove $emoji';
+  }
+
+  @override
+  String get reactionMoreEmojis => 'More emojis';
+
+  @override
+  String get reactionYou => 'You';
+
+  @override
+  String get reactionNameSeparator => ', ';
+
+  @override
+  String reactionChipLabel(String names, String emoji) {
+    return '$names reacted with $emoji';
+  }
+
+  @override
   String timelineNowHour(String time) {
     return '$time · Now';
   }

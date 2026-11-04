@@ -11,6 +11,7 @@ import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 import '../../../components/user_avatar.dart';
 import 'diary_section.dart';
+import 'reactions.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
 /// 今日を表示しているときは、今の時間にまだ記録していないほかのメンバーを一番上に出す。
@@ -29,6 +30,7 @@ class TimelineView extends HookWidget {
     required this.onOpenDiary,
     required this.onWriteDiary,
     required this.onDeletePost,
+    required this.onReact,
   });
 
   /// いちばん上に置く見出し。上に浮かせたボタンの高さぶんを自分で占め、記録と一緒にスクロールする。
@@ -51,6 +53,9 @@ class TimelineView extends HookWidget {
 
   /// 自分の記録を長押ししたとき。
   final ValueChanged<TimelinePost> onDeletePost;
+
+  /// ほかの人の記録に、自分のリアクションを絵文字で付けたとき。同じ絵文字なら取り消す。
+  final void Function(TimelinePost post, String emoji) onReact;
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +162,7 @@ class TimelineView extends HookWidget {
                   nameOf: nameOf,
                   avatarUrlOf: avatarUrlOf,
                   onDeletePost: onDeletePost,
+                  onReact: onReact,
                 ),
                 separatorBuilder: (context, index) => const Divider(),
               ),
@@ -236,6 +242,7 @@ class _HourSection extends StatelessWidget {
     required this.nameOf,
     required this.avatarUrlOf,
     required this.onDeletePost,
+    required this.onReact,
   });
 
   final _TimelineHour hour;
@@ -243,6 +250,7 @@ class _HourSection extends StatelessWidget {
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;
   final ValueChanged<TimelinePost> onDeletePost;
+  final void Function(TimelinePost post, String emoji) onReact;
 
   @override
   Widget build(BuildContext context) {
@@ -258,10 +266,11 @@ class _HourSection extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 6),
               child: _PostCard(
                 post: post,
-                name: nameOf(post.authorId),
-                avatarUrl: avatarUrlOf(post.authorId),
-                isMine: post.authorId == myId,
+                myId: myId,
+                nameOf: nameOf,
+                avatarUrlOf: avatarUrlOf,
                 onDelete: () => onDeletePost(post),
+                onReact: (emoji) => onReact(post, emoji),
               ),
             ),
         ],
@@ -393,70 +402,147 @@ class _PendingOthersRow extends StatelessWidget {
 class _PostCard extends StatelessWidget {
   const _PostCard({
     required this.post,
-    required this.name,
-    required this.avatarUrl,
-    required this.isMine,
+    required this.myId,
+    required this.nameOf,
+    required this.avatarUrlOf,
     required this.onDelete,
+    required this.onReact,
+    this.lifted = false,
   });
 
   final TimelinePost post;
-  final String name;
-  final String? avatarUrl;
-  final bool isMine;
+  final String? myId;
+  final String Function(String userId) nameOf;
+  final String? Function(String userId) avatarUrlOf;
   final VoidCallback onDelete;
+  final ValueChanged<String> onReact;
+
+  /// 絵文字を選ぶときに浮かせて出す見本か。押せるところを出さない。
+  final bool lifted;
+
+  static const _nameStyle = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
+
+  /// 名前の行と本文のあいだ。
+  static const double _headerGap = 4;
+
+  Future<void> _pickReaction(BuildContext context) async {
+    final emoji = await showReactionPicker(
+      context,
+      target: context,
+      current: post.reactionOf(myId),
+      liftedBuilder: (_) => _PostCard(
+        post: post,
+        myId: myId,
+        nameOf: nameOf,
+        avatarUrlOf: avatarUrlOf,
+        onDelete: onDelete,
+        onReact: onReact,
+        lifted: true,
+      ),
+    );
+    if (emoji == null) return;
+    onReact(emoji);
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
+    final isMine = post.authorId == myId;
+    // 自分の記録には付けない。
+    final canReact = !isMine && !lifted;
+    // ハートの中心を、名前の行と本文のあいだのちょうど真ん中に合わせる。
+    // 名前の行の高さは文字の大きさの設定で変わるので、実際に測る。
+    final nameLine = TextPainter(
+      text: TextSpan(
+        text: nameOf(post.authorId),
+        style: DefaultTextStyle.of(context).style.merge(_nameStyle),
+      ),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout();
+    final buttonTop =
+        nameLine.height + _headerGap / 2 - ReactionButton.size / 2;
+    nameLine.dispose();
 
-    return MergeSemantics(
-      // 自分の記録は長押しで削除できる。
-      child: InkWell(
-        onLongPress: isMine ? onDelete : null,
-        borderRadius: BorderRadius.circular(12),
-        // 記録は枠で囲まず、アイコンの色で誰のものかを見せる。枠は日記のカードだけに付ける。
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          // 記録が長くても、アイコンは左上に置いたままにする。
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              UserAvatar(imageUrl: avatarUrl, size: 36),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+    // 自分の記録は長押しで削除できる。
+    return InkWell(
+      onLongPress: isMine && !lifted ? onDelete : null,
+      borderRadius: BorderRadius.circular(12),
+      // 記録は枠で囲まず、アイコンの色で誰のものかを見せる。枠は日記のカードだけに付ける。
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        // 記録が長くても、アイコンは左上に置いたままにする。
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            UserAvatar(imageUrl: avatarUrlOf(post.authorId), size: 36),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 名前・時刻・本文は1つにまとめて読み上げる。リアクションは押せるので分けておく。
+                  MergeSemantics(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
-                          child: Text(
-                            name,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                nameOf(post.authorId),
+                                overflow: TextOverflow.ellipsis,
+                                style: _nameStyle,
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 6),
+                            Text(
+                              formatTime(post.postedAt),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: colors.textSecondary,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(height: _headerGap),
                         Text(
-                          formatTime(post.postedAt),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: colors.textSecondary,
-                          ),
+                          post.message,
+                          style: const TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(post.message, style: const TextStyle(fontSize: 15)),
+                  ),
+                  if (post.reactions.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    ReactionChips(
+                      reactions: post.reactions,
+                      myId: myId,
+                      nameOf: nameOf,
+                      avatarUrlOf: avatarUrlOf,
+                      onTap: canReact ? onReact : null,
+                    ),
                   ],
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+            if (canReact)
+              Transform.translate(
+                offset: Offset(0, buttonTop),
+                child: ReactionButton(
+                  current: post.reactionOf(myId),
+                  onPressed: () => _pickReaction(context),
+                ),
+              )
+            else if (lifted && !isMine)
+              // 浮かせた見本でも、ボタンの場所は空けて元の並びと揃える。
+              const SizedBox(width: ReactionButton.size),
+          ],
         ),
       ),
     );

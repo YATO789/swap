@@ -42,6 +42,7 @@ Future<void> _openDiaryBook(
   List<Diary> diaries = const [],
   List<TimelinePost> posts = const [],
   Map<String, List<DiaryBookMember>>? members,
+  FakePostRepository? postRepository,
 }) async {
   // タイムラインが画面に収まるよう、縦長の画面にする。
   tester.view.physicalSize = const Size(1170, 2532);
@@ -74,11 +75,12 @@ Future<void> _openDiaryBook(
           FakeDiaryRepository({_university.id: diaries}),
         ),
         postRepositoryProvider.overrideWithValue(
-          FakePostRepository(
-            timelinePosts: {
-              _university.id: [...posts],
-            },
-          ),
+          postRepository ??
+              FakePostRepository(
+                timelinePosts: {
+                  _university.id: [...posts],
+                },
+              ),
         ),
       ],
       child: Consumer(
@@ -214,6 +216,83 @@ void main() {
     expect(find.text('昨日の記録'), findsOneWidget);
     // 今日ではないので、今の時間の欄は出ない。
     expect(find.text('美緒・健太はまだ'), findsNothing);
+  });
+
+  group('記録のリアクション', () {
+    final kenPost = TimelinePost(
+      id: 'p1',
+      authorId: 'ken',
+      message: '図書館で勉強中',
+      postedAt: diaryDayStartOf(today),
+    );
+
+    testWidgets('ほかの人の記録にはハートが出て、自分の記録には出ない', (tester) async {
+      await _openDiaryBook(
+        tester,
+        posts: [
+          kenPost,
+          TimelinePost(
+            id: 'p2',
+            authorId: 'me',
+            message: 'カフェで勉強中',
+            postedAt: diaryDayStartOf(today),
+          ),
+        ],
+      );
+
+      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+    });
+
+    testWidgets('ハートから絵文字を選ぶと、チップが出てハートがその絵文字になる', (tester) async {
+      await _openDiaryBook(tester, posts: [kenPost]);
+
+      await tester.tap(find.byTooltip('リアクションを付ける'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('❤️'));
+      await tester.pumpAndSettle();
+
+      expect(find.bySemanticsLabel('あなたが❤️'), findsOneWidget);
+      expect(find.byTooltip('リアクションを変える。今は❤️'), findsOneWidget);
+    });
+
+    testWidgets('チップを押すと、その絵文字で付けられて、もう一度押すと取り消せる', (tester) async {
+      await _openDiaryBook(
+        tester,
+        posts: [
+          kenPost.copyWith(
+            reactions: const [PostReaction(userId: 'mio', emoji: '😂')],
+          ),
+        ],
+      );
+      expect(find.bySemanticsLabel('美緒が😂'), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('美緒が😂'));
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('美緒、あなたが😂'), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('美緒、あなたが😂'));
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('美緒が😂'), findsOneWidget);
+      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+    });
+
+    testWidgets('保存できなかったら、元に戻して知らせる', (tester) async {
+      final repository = FakePostRepository(
+        timelinePosts: {
+          _university.id: [kenPost],
+        },
+      )..failsReactions = true;
+      await _openDiaryBook(tester, postRepository: repository);
+
+      await tester.tap(find.byTooltip('リアクションを付ける'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('❤️'));
+      await tester.pumpAndSettle();
+
+      expect(find.bySemanticsLabel('あなたが❤️'), findsNothing);
+      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+      expect(find.text('リアクションを保存できませんでした。もう一度お試しください'), findsOneWidget);
+    });
   });
 
   testWidgets('開いている間に外されたら、読み直したときに知らせてホームに戻る', (tester) async {

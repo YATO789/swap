@@ -192,6 +192,48 @@ class FakePostRepository implements PostRepository {
     timelinePosts[diaryBookId]?.removeWhere((post) => post.id == postId);
   }
 
+  /// true なら、リアクションの保存に失敗する。
+  bool failsReactions = false;
+
+  @override
+  Future<void> react(String postId, String diaryBookId, String emoji) async {
+    if (failsReactions) throw Exception('リアクションを保存できない');
+    _updatePost(diaryBookId, postId, (post) {
+      return post.copyWith(
+        reactions: [
+          for (final reaction in post.reactions)
+            if (reaction.userId != 'me') reaction,
+          PostReaction(userId: 'me', emoji: emoji),
+        ],
+      );
+    });
+  }
+
+  @override
+  Future<void> removeReaction(String postId, String diaryBookId) async {
+    if (failsReactions) throw Exception('リアクションを保存できない');
+    _updatePost(diaryBookId, postId, (post) {
+      return post.copyWith(
+        reactions: [
+          for (final reaction in post.reactions)
+            if (reaction.userId != 'me') reaction,
+        ],
+      );
+    });
+  }
+
+  void _updatePost(
+    String diaryBookId,
+    String postId,
+    TimelinePost Function(TimelinePost post) update,
+  ) {
+    final posts = timelinePosts[diaryBookId];
+    if (posts == null) return;
+    for (final (index, post) in posts.indexed) {
+      if (post.id == postId) posts[index] = update(post);
+    }
+  }
+
   @override
   Future<List<TimelinePost>> fetchInDiaryBook(
     String diaryBookId,

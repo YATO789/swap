@@ -151,6 +151,19 @@ class DiaryBookPage extends HookConsumerWidget {
       );
     }
 
+    // 押したらすぐ映し、保存できなかったら元に戻して知らせる。
+    Future<void> react(TimelinePost post, String emoji) async {
+      if (myId == null) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final l10n = context.l10n;
+      final saved = await controller().react(post.id, myId, emoji);
+      if (saved) return;
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.diaryBookReactionFailed)),
+      );
+    }
+
     // 名前や表紙を変えても、日記帳の一覧から読んでいるのでそのまま映る。
     void openInfo() => DiaryBookInfoRoute(id: diaryBookId).push<void>(context);
 
@@ -196,6 +209,7 @@ class DiaryBookPage extends HookConsumerWidget {
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
           onDeletePost: confirmDeletePost,
+          onReact: react,
         ),
       ),
       // 開いている日記帳に、そのまま記録を書けるようにする。
@@ -222,6 +236,7 @@ class _DayTimeline extends ConsumerWidget {
     required this.onOpenDiary,
     required this.onWriteDiary,
     required this.onDeletePost,
+    required this.onReact,
   });
 
   final String diaryBookId;
@@ -232,6 +247,7 @@ class _DayTimeline extends ConsumerWidget {
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
   final ValueChanged<TimelinePost> onDeletePost;
+  final void Function(TimelinePost post, String emoji) onReact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -254,6 +270,7 @@ class _DayTimeline extends ConsumerWidget {
         onOpenDiary: onOpenDiary,
         onWriteDiary: onWriteDiary,
         onDeletePost: onDeletePost,
+        onReact: onReact,
       ),
       // 知らせるダイアログの後ろには、もう読めないことだけを出す。
       AsyncError(error: RemovedFromDiaryBookException()) => _Headed(
@@ -265,9 +282,7 @@ class _DayTimeline extends ConsumerWidget {
       ),
       AsyncError() => _Headed(
         heading: heading,
-        child: _LoadError(
-          onRetry: () => ref.read(provider.notifier).refresh(),
-        ),
+        child: _LoadError(onRetry: () => ref.read(provider.notifier).refresh()),
       ),
       _ => _Headed(
         heading: heading,

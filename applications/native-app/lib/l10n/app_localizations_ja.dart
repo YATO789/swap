@@ -289,6 +289,36 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diaryBookLoadFailed => '日記帳を読み込めませんでした';
 
   @override
+  String get diaryBookReactionFailed => 'リアクションを保存できませんでした。もう一度お試しください';
+
+  @override
+  String get reactionAdd => 'リアクションを付ける';
+
+  @override
+  String reactionChange(String emoji) {
+    return 'リアクションを変える。今は$emoji';
+  }
+
+  @override
+  String reactionUndo(String emoji) {
+    return '$emoji を取り消す';
+  }
+
+  @override
+  String get reactionMoreEmojis => 'ほかの絵文字';
+
+  @override
+  String get reactionYou => 'あなた';
+
+  @override
+  String get reactionNameSeparator => '、';
+
+  @override
+  String reactionChipLabel(String names, String emoji) {
+    return '$namesが$emoji';
+  }
+
+  @override
   String timelineNowHour(String time) {
     return '$time ・ いま';
   }

@@ -36,7 +36,29 @@ class PostDatasource {
     );
   }
 
+  /// 自分のリアクションを、[diaryBookId] の日記帳に出た [postId] の記録に [emoji] で付ける。
+  /// もう付けていれば [emoji] に付け替える。付けた時刻は DB が決める。
+  Future<void> react(String postId, String diaryBookId, String emoji) async {
+    // user_id は DB の既定値（auth.uid()）で入る。
+    await _client.from('post_reactions').upsert({
+      'post_id': postId,
+      'diary_book_id': diaryBookId,
+      'emoji': emoji,
+    }, onConflict: 'post_id,diary_book_id,user_id');
+  }
+
+  /// [diaryBookId] の日記帳に出た [postId] の記録から、自分のリアクションを取り消す。
+  Future<void> removeReaction(String postId, String diaryBookId) async {
+    // RLS で消せるのは自分のリアクションだけ。
+    await _client
+        .from('post_reactions')
+        .delete()
+        .eq('post_id', postId)
+        .eq('diary_book_id', diaryBookId);
+  }
+
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録を古い順に返す。
+  /// その日記帳で付いたリアクションも一緒に返す。
   Future<List<PostResponse>> fetchInDiaryBook(
     String diaryBookId, {
     required DateTime from,
@@ -46,7 +68,8 @@ class PostDatasource {
         .from('posts')
         .select(
           'id, author_id, message, posted_at, '
-          'post_diary_books!inner(diary_book_id)',
+          'post_diary_books!inner(diary_book_id, '
+          'post_reactions(user_id, emoji, created_at))',
         )
         .eq('post_diary_books.diary_book_id', diaryBookId)
         .gte('posted_at', from.toUtc().toIso8601String())

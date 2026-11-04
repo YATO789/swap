@@ -1,8 +1,8 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../l10n/l10n.dart';
-import '../../../../theme/app_theme.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/app_theme.dart';
 
 /// 全部の絵文字から1つ選ぶシートを開く。選んだ絵文字を返す。閉じたら null。
 Future<String?> showEmojiSheet(BuildContext context) {

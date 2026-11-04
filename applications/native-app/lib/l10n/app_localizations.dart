@@ -602,6 +602,54 @@ abstract class AppLocalizations {
   /// **'日記帳を読み込めませんでした'**
   String get diaryBookLoadFailed;
 
+  /// No description provided for @diaryBookReactionFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'リアクションを保存できませんでした。もう一度お試しください'**
+  String get diaryBookReactionFailed;
+
+  /// No description provided for @reactionAdd.
+  ///
+  /// In ja, this message translates to:
+  /// **'リアクションを付ける'**
+  String get reactionAdd;
+
+  /// もうリアクションを付けた記録のハートボタンの読み上げ。emoji は今付けている絵文字
+  ///
+  /// In ja, this message translates to:
+  /// **'リアクションを変える。今は{emoji}'**
+  String reactionChange(String emoji);
+
+  /// 絵文字の吹き出しで、今付けている絵文字のボタンのツールチップ
+  ///
+  /// In ja, this message translates to:
+  /// **'{emoji} を取り消す'**
+  String reactionUndo(String emoji);
+
+  /// No description provided for @reactionMoreEmojis.
+  ///
+  /// In ja, this message translates to:
+  /// **'ほかの絵文字'**
+  String get reactionMoreEmojis;
+
+  /// No description provided for @reactionYou.
+  ///
+  /// In ja, this message translates to:
+  /// **'あなた'**
+  String get reactionYou;
+
+  /// リアクションを付けた人の名前を並べるときの区切り
+  ///
+  /// In ja, this message translates to:
+  /// **'、'**
+  String get reactionNameSeparator;
+
+  /// リアクションのチップの読み上げ。names は付けた人の名前を並べたもの
+  ///
+  /// In ja, this message translates to:
+  /// **'{names}が{emoji}'**
+  String reactionChipLabel(String names, String emoji);
+
   /// 今の時間の欄の見出し。time は「14:00」
   ///
   /// In ja, this message translates to:
