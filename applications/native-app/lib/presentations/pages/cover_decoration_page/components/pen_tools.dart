@@ -16,8 +16,12 @@ const penColors = [
   0xFFD6409F,
 ];
 
-/// らくがきのペンの太さ（表紙の幅との割合）。細い・ふつう・太い。
-const penWidths = [0.012, 0.024, 0.045];
+/// らくがきのペンの太さ（表紙の幅との割合）。極細・細い・ふつう・太い。
+/// 極細は、表紙を拡大して細かく描くためのもの。
+const penWidths = [0.006, 0.012, 0.024, 0.045];
+
+/// はじめに選んでいるペンの太さ（ふつう）。
+const defaultPenWidth = 0.024;
 
 /// [penColors] と同じ順の、読み上げる色の名前。
 List<String> penColorNames(AppLocalizations l10n) {
@@ -35,6 +39,7 @@ List<String> penColorNames(AppLocalizations l10n) {
 /// [penWidths] と同じ順の、読み上げるペンの名前。
 List<String> _penWidthNames(AppLocalizations l10n) {
   return [
+    l10n.coverEditPenExtraThin,
     l10n.coverEditPenThin,
     l10n.coverEditPenMedium,
     l10n.coverEditPenThick,
@@ -44,9 +49,17 @@ List<String> _penWidthNames(AppLocalizations l10n) {
 /// らくがきのあいだの、ペンの色を選ぶ帯。先頭の虹色の丸でパレットから選べる。
 /// 消しゴムのときは [color] が null。
 class PenColorBar extends StatelessWidget {
-  const PenColorBar({super.key, required this.color, required this.onSelected});
+  const PenColorBar({
+    super.key,
+    required this.color,
+    required this.custom,
+    required this.onSelected,
+  });
 
   final int? color;
+
+  /// パレットで選んだ色。ほかの色に変えても、虹色の丸の中に出しておく。
+  final int? custom;
   final ValueChanged<int> onSelected;
 
   @override
@@ -64,7 +77,8 @@ class PenColorBar extends StatelessWidget {
           PaletteDot(
             title: l10n.colorPalettePenTitle,
             size: 30,
-            custom: color == null || penColors.contains(color) ? null : color,
+            custom: custom,
+            selected: custom != null && custom == color,
             onSelected: onSelected,
           ),
           for (final (index, penColor) in penColors.indexed) ...[

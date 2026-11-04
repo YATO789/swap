@@ -948,6 +948,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coverEditUndo => 'Undo';
 
   @override
+  String get coverEditRedo => 'Redo';
+
+  @override
   String get coverEditEmoji => 'Emoji';
 
   @override
@@ -960,7 +963,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coverEditColor => 'Color';
 
   @override
-  String get coverEditDone => 'Done';
+  String get coverEditDone => 'Close';
 
   @override
   String get coverEditBringForward => 'Forward';
@@ -1022,6 +1025,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get coverEditStrokeLimit =>
       'You can\'t draw any more. Erase some lines to keep drawing.';
+
+  @override
+  String get coverEditPenExtraThin => 'Extra-thin pen';
 
   @override
   String get coverEditPenThin => 'Thin pen';
@@ -1090,7 +1096,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coverTextSheetPlaceName => 'Add the diary book name';
 
   @override
-  String get coverEditDoodleArea => 'Drawing area. Trace on the cover to draw.';
+  String get coverEditDoodleArea =>
+      'Drawing area. Trace on the cover to draw, and use two fingers to zoom.';
+
+  @override
+  String get coverEditResetZoom => 'Reset zoom';
 
   @override
   String get coverEditSaved => 'Cover saved';

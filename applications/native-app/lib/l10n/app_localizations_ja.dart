@@ -858,6 +858,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get coverEditUndo => '元に戻す';
 
   @override
+  String get coverEditRedo => 'やり直す';
+
+  @override
   String get coverEditEmoji => '絵文字';
 
   @override
@@ -870,7 +873,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get coverEditColor => '色';
 
   @override
-  String get coverEditDone => '終わる';
+  String get coverEditDone => '閉じる';
 
   @override
   String get coverEditBringForward => '前へ';
@@ -931,6 +934,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get coverEditStrokeLimit => 'これ以上描けません。消しゴムで消すと描けます';
+
+  @override
+  String get coverEditPenExtraThin => '極細のペン';
 
   @override
   String get coverEditPenThin => '細いペン';
@@ -999,7 +1005,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get coverTextSheetPlaceName => '日記帳の名前を置く';
 
   @override
-  String get coverEditDoodleArea => 'らくがきをする場所。表紙をなぞって線を描く';
+  String get coverEditDoodleArea => 'らくがきをする場所。表紙をなぞって線を描き、2本指で拡大する';
+
+  @override
+  String get coverEditResetZoom => '等倍に戻す';
 
   @override
   String get coverEditSaved => '表紙を保存しました';

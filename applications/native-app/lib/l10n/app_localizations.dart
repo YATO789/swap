@@ -1603,6 +1603,12 @@ abstract class AppLocalizations {
   /// **'元に戻す'**
   String get coverEditUndo;
 
+  /// 表紙の編集ページの、元に戻した操作をもう一度するボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'やり直す'**
+  String get coverEditRedo;
+
   /// 表紙の編集ページの、絵文字を貼るボタン
   ///
   /// In ja, this message translates to:
@@ -1630,7 +1636,7 @@ abstract class AppLocalizations {
   /// らくがきや色を選ぶのを終えるボタン
   ///
   /// In ja, this message translates to:
-  /// **'終わる'**
+  /// **'閉じる'**
   String get coverEditDone;
 
   /// 選んだものを1つ上の重なりへ移すボタン
@@ -1734,6 +1740,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'これ以上描けません。消しゴムで消すと描けます'**
   String get coverEditStrokeLimit;
+
+  /// No description provided for @coverEditPenExtraThin.
+  ///
+  /// In ja, this message translates to:
+  /// **'極細のペン'**
+  String get coverEditPenExtraThin;
 
   /// No description provided for @coverEditPenThin.
   ///
@@ -1858,8 +1870,14 @@ abstract class AppLocalizations {
   /// No description provided for @coverEditDoodleArea.
   ///
   /// In ja, this message translates to:
-  /// **'らくがきをする場所。表紙をなぞって線を描く'**
+  /// **'らくがきをする場所。表紙をなぞって線を描き、2本指で拡大する'**
   String get coverEditDoodleArea;
+
+  /// 表紙の編集ページで、らくがきのために拡大した表紙を元の大きさに戻すボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'等倍に戻す'**
+  String get coverEditResetZoom;
 
   /// No description provided for @coverEditSaved.
   ///

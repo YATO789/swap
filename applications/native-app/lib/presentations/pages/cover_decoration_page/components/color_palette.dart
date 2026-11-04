@@ -109,14 +109,16 @@ class _ColorPaletteSheet extends StatelessWidget {
 
 /// パレットを開く虹色の丸。押すとパレットのシートを開き、選んだ色を [onSelected] に渡す。
 ///
-/// [custom] はパレットで選んでいる色。並んでいる決まった色のどれでもないときに渡す。
-/// あれば虹色の輪の中にその色を出し、選んでいる形にする。
+/// [custom] はパレットで選んだ色。並んでいる決まった色のどれでもないときに渡す。
+/// あれば虹色の輪の中にその色を出す。[selected] なら選んでいる形にする。
+/// 選んでいないときに押すと、パレットを開かずに [custom] を選び直す。
 class PaletteDot extends StatelessWidget {
   const PaletteDot({
     super.key,
     required this.title,
     required this.custom,
     required this.onSelected,
+    this.selected,
     this.size = 26,
   });
 
@@ -126,6 +128,9 @@ class PaletteDot extends StatelessWidget {
   final int? custom;
   final ValueChanged<int> onSelected;
 
+  /// [custom] を選んでいるか。なければ [custom] があるときに選んでいるとする。
+  final bool? selected;
+
   /// 丸の直径。
   final double size;
 
@@ -133,7 +138,7 @@ class PaletteDot extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final custom = this.custom;
-    final selected = custom != null;
+    final selected = custom != null && (this.selected ?? true);
 
     return Semantics(
       button: true,
@@ -142,6 +147,10 @@ class PaletteDot extends StatelessWidget {
       excludeSemantics: true,
       child: GestureDetector(
         onTap: () async {
+          if (custom != null && !selected) {
+            onSelected(custom);
+            return;
+          }
           final color = await showColorPaletteSheet(
             context,
             title: title,
@@ -154,7 +163,7 @@ class PaletteDot extends StatelessWidget {
         child: Container(
           width: size,
           height: size,
-          padding: EdgeInsets.all(selected ? size * 0.2 : 0),
+          padding: EdgeInsets.all(custom != null ? size * 0.2 : 0),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const SweepGradient(
@@ -174,7 +183,7 @@ class PaletteDot extends StatelessWidget {
                 BoxShadow(color: colors.textPrimary, spreadRadius: 2),
             ],
           ),
-          child: selected
+          child: custom != null
               ? DecoratedBox(
                   decoration: BoxDecoration(
                     color: Color(custom),

@@ -701,6 +701,10 @@
   "updateLater": "あとで",
   "coverEditTitle": "表紙を編集",
   "coverEditUndo": "元に戻す",
+  "coverEditRedo": "やり直す",
+  "@coverEditRedo": {
+    "description": "表紙の編集ページの、元に戻した操作をもう一度するボタン"
+  },
   "coverEditEmoji": "絵文字",
   "@coverEditEmoji": {
     "description": "表紙の編集ページの、絵文字を貼るボタン"
@@ -717,7 +721,7 @@
   "@coverEditColor": {
     "description": "表紙の編集ページの、表紙の色を選ぶボタン"
   },
-  "coverEditDone": "終わる",
+  "coverEditDone": "閉じる",
   "@coverEditDone": {
     "description": "らくがきや色を選ぶのを終えるボタン"
   },
@@ -798,6 +802,7 @@
     "description": "表紙の色を選ぶパレットのシートの題名"
   },
   "coverEditStrokeLimit": "これ以上描けません。消しゴムで消すと描けます",
+  "coverEditPenExtraThin": "極細のペン",
   "coverEditPenThin": "細いペン",
   "coverEditPenMedium": "ふつうのペン",
   "coverEditPenThick": "太いペン",
@@ -846,7 +851,11 @@
   "@coverTextSheetPlaceName": {
     "description": "表紙から外した日記帳の名前を、もう一度表紙に置くボタン"
   },
-  "coverEditDoodleArea": "らくがきをする場所。表紙をなぞって線を描く",
+  "coverEditDoodleArea": "らくがきをする場所。表紙をなぞって線を描き、2本指で拡大する",
+  "coverEditResetZoom": "等倍に戻す",
+  "@coverEditResetZoom": {
+    "description": "表紙の編集ページで、らくがきのために拡大した表紙を元の大きさに戻すボタン"
+  },
   "coverEditSaved": "表紙を保存しました",
   "coverEditSaveFailed": "保存できませんでした。もう一度お試しください",
   "coverEditNeedsUpdate": "表紙を編集するには、アプリをアップデートしてください",

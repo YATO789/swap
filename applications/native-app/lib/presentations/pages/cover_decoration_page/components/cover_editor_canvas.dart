@@ -9,10 +9,12 @@ import '../../../components/cover_decoration_layer.dart';
 /// 選んでいるもののつまみの半径。つまみを触れるよう、貼ったもののまわりをこのぶん空ける。
 const _knobRadius = 14.0;
 
-/// 前の点からこれより近い点は足さない（表紙の幅との割合）。保存する点を減らすため。
+/// 前の点からこれより近い点は足さない（等倍のときの、表紙の幅との割合）。保存する点を減らすため。
+/// 拡大しているときは、画面の上で同じ間隔になるよう倍率で割る。
 const _minPointGap = 0.004;
 
-/// 消しゴムが線に届く距離（線の太さの半分に足す、表紙の幅との割合）。
+/// 消しゴムが線に届く距離（線の太さの半分に足す、等倍のときの表紙の幅との割合）。
+/// 拡大しているときは、画面の上で同じ範囲に届くよう倍率で割る。
 const _eraserReach = 0.025;
 
 /// 表紙の編集ページで今していること。
@@ -31,7 +33,9 @@ enum CoverEditMode {
 ///
 /// 貼ったもの（絵文字・文字・名前）はドラッグで動かし、右下のつまみか2本指で回転と拡大縮小をする。
 /// 選んでいる文字をもう一度押すと [onEditText] を呼ぶ。
-/// らくがきのモードでは、なぞって線を描くか、消しゴムで線を消す。
+/// らくがきのモードでは、1本指でなぞって線を描くか、消しゴムで線を消す。
+/// 2本指で触れると [onPinchStart]・[onPinchUpdate] を呼び、表紙の拡大と移動をしてもらう。
+/// 描いている途中で2本目の指が触れたら、描きかけの線は捨てる。
 /// 変えるたびに [onChanged] で新しい飾りを渡す。1回の操作の始まりには [onEditStart] を呼ぶ。
 class CoverEditorCanvas extends HookWidget {
   const CoverEditorCanvas({
@@ -45,11 +49,14 @@ class CoverEditorCanvas extends HookWidget {
     required this.penColor,
     required this.penWidth,
     required this.erasing,
+    required this.zoom,
     required this.onSelect,
     required this.onEditStart,
     required this.onChanged,
     required this.onEditText,
     required this.onStrokeLimit,
+    required this.onPinchStart,
+    required this.onPinchUpdate,
   });
 
   final CoverDecoration decoration;
@@ -67,6 +74,9 @@ class CoverEditorCanvas extends HookWidget {
   final int penColor;
   final double penWidth;
   final bool erasing;
+
+  /// 表紙を拡大している倍率。等倍なら 1。
+  final double zoom;
   final ValueChanged<int?> onSelect;
 
   /// ドラッグや線を描くなど、1回の操作を始めた。元に戻すときはこの前まで戻る。
@@ -78,6 +88,12 @@ class CoverEditorCanvas extends HookWidget {
 
   /// 描ける線の数か点の数の上限に届いていて、描き始められなかった。
   final VoidCallback onStrokeLimit;
+
+  /// らくがきのモードで、2本指で触れて動かし始めた。
+  final GestureScaleStartCallback onPinchStart;
+
+  /// らくがきのモードで、2本指を動かした。拡大の倍率と指の真ん中は [onPinchStart] のときとの比べ。
+  final GestureScaleUpdateCallback onPinchUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +109,22 @@ class CoverEditorCanvas extends HookWidget {
 
     /// 今描いている線。描き終えたら飾りに足す。
     final drawing = useState<CoverStroke?>(null);
+
+    /// らくがきのモードで、表紙に触れている指。
+    final pointers = useRef(<int>{});
+
+    /// 1本目の指が触れた場所（画面の座標）。線はなぞり始めたと分かる前のここから描く。
+    final downAt = useRef(Offset.zero);
+
+    /// 今の操作で2本目の指が触れたか。すべての指を離すまでは線を描かず、拡大と移動だけをする。
+    final pinching = useRef(false);
+
+    // 触れたままモードを変えると、らくがきの場所が消えて離した指が届かないので、数え直す。
+    useEffect(() {
+      pointers.value.clear();
+      pinching.value = false;
+      return null;
+    }, [mode]);
 
     Offset toCanvas(Offset global) {
       final box = canvasKey.currentContext!.findRenderObject()! as RenderBox;
@@ -160,7 +192,10 @@ class CoverEditorCanvas extends HookWidget {
     }
 
     void eraseAt(Offset point) {
-      final erased = decoration.eraseStrokesAt(point, reach: _eraserReach);
+      final erased = decoration.eraseStrokesAt(
+        point,
+        reach: _eraserReach / zoom,
+      );
       if (!identical(erased, decoration)) onChanged(erased);
     }
 
@@ -191,7 +226,7 @@ class CoverEditorCanvas extends HookWidget {
       }
       final stroke = drawing.value;
       if (stroke == null ||
-          (point - stroke.points.last).distance < _minPointGap) {
+          (point - stroke.points.last).distance < _minPointGap / zoom) {
         return;
       }
       drawing.value = stroke.copyWith(points: [...stroke.points, point]);
@@ -202,6 +237,45 @@ class CoverEditorCanvas extends HookWidget {
       if (stroke == null) return;
       drawing.value = null;
       onChanged(decoration.addStroke(stroke));
+    }
+
+    // 指の数は Listener で数える。Listener は指が触れたり離れたりしたとき、
+    // 下の GestureDetector より先に呼ばれるので、2本目の指で描きかけの線が確定する前に捨てられる。
+    void onPointerDown(PointerDownEvent event) {
+      pointers.value.add(event.pointer);
+      if (pointers.value.length == 1) {
+        downAt.value = event.position;
+        return;
+      }
+      pinching.value = true;
+      drawing.value = null;
+    }
+
+    void onPointerUp(PointerEvent event) {
+      pointers.value.remove(event.pointer);
+      if (pointers.value.isEmpty) pinching.value = false;
+    }
+
+    void onDoodleStart(ScaleStartDetails details) {
+      if (pinching.value) {
+        if (details.pointerCount >= 2) onPinchStart(details);
+        return;
+      }
+      onDrawStart(toCanvas(downAt.value));
+    }
+
+    void onDoodleUpdate(ScaleUpdateDetails details) {
+      if (pinching.value) {
+        // 2本のうち1本を離したあとは、指を足すまで動かさない。
+        if (details.pointerCount >= 2) onPinchUpdate(details);
+        return;
+      }
+      onDrawUpdate(toCanvas(details.focalPoint));
+    }
+
+    void onDoodleEnd(ScaleEndDetails details) {
+      if (pinching.value) return;
+      onDrawEnd();
     }
 
     final current = drawing.value;
@@ -273,18 +347,21 @@ class CoverEditorCanvas extends HookWidget {
             child: Semantics(
               container: true,
               label: l10n.coverEditDoodleArea,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                dragStartBehavior: DragStartBehavior.down,
-                // 動かさずに離したら点を打つ（消しゴムならそこの線を消す）。
-                onTapUp: (details) {
-                  onDrawStart(details.localPosition);
-                  onDrawEnd();
-                },
-                onPanStart: (details) => onDrawStart(details.localPosition),
-                onPanUpdate: (details) => onDrawUpdate(details.localPosition),
-                onPanEnd: (_) => onDrawEnd(),
-                onPanCancel: onDrawEnd,
+              child: Listener(
+                onPointerDown: onPointerDown,
+                onPointerUp: onPointerUp,
+                onPointerCancel: onPointerUp,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  // 動かさずに離したら点を打つ（消しゴムならそこの線を消す）。
+                  onTapUp: (details) {
+                    onDrawStart(details.localPosition);
+                    onDrawEnd();
+                  },
+                  onScaleStart: onDoodleStart,
+                  onScaleUpdate: onDoodleUpdate,
+                  onScaleEnd: onDoodleEnd,
+                ),
               ),
             ),
           ),

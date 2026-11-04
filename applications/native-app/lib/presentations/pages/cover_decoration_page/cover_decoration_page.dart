@@ -27,12 +27,25 @@ import 'controller/cover_decoration_page_controller.dart';
 /// 元に戻すために覚えておく、変える前の色・飾り。
 typedef _Snapshot = ({int? coverColor, CoverDecoration decoration});
 
+/// らくがきのために表紙を拡大している倍率と、ずらしている量（表紙を置いている場所の座標）。
+/// 等倍のときの場所 p は、画面では p * [scale] + [offset] に出る。
+typedef _Zoom = ({double scale, Offset offset});
+
+const _noZoom = (scale: 1.0, offset: Offset.zero);
+
+/// らくがきのときに拡大できる倍率の上限。
+const _maxZoom = 4.0;
+
+/// 表紙の下のボタンの高さ（画面の下の安全な余白は除く）。
+/// 一番高い、貼ったもののモードの説明の帯（60）と、絵文字・文字などのボタン（60）と上下の余白（4・12）に合わせる。
+const _toolsHeight = 136.0;
+
 /// 日記帳の表紙を編集するページ。色を変え、絵文字・文字を貼り、らくがきをする。
 ///
 /// 名前も貼ったものの1つで、動かしたり表紙から外したりできる。名前そのものは
 /// 日記帳の情報ページでしか変えない。選んでいる文字をもう一度押すと書き換えられる。
 /// 貼ったものはドラッグで動かし、右下のつまみか2本指で回転と拡大縮小をする。
-/// 「らくがき」を押すと表紙をなぞって線を描け、「色」を押すと表紙の色を選べる。
+/// 「らくがき」を押すと表紙をなぞって線を描け、2本指で表紙を拡大できる。「色」を押すと表紙の色を選べる。
 /// 「保存」を押すまでは日記帳に反映しない。
 class CoverDecorationPage extends ConsumerWidget {
   const CoverDecorationPage({super.key, required this.diaryBookId});
@@ -99,11 +112,27 @@ class _CoverEditor extends HookConsumerWidget {
     });
     final decoration = useState(initialDecoration);
     final history = useState(const <_Snapshot>[]);
+
+    /// 元に戻した変更。やり直すと history に戻す。新しく変えたら捨てる。
+    final future = useState(const <_Snapshot>[]);
     final selected = useState<int?>(null);
     final mode = useState(CoverEditMode.stickers);
     final penColor = useState(penColors.first);
-    final penWidth = useState(penWidths[1]);
+
+    /// らくがき・表紙の色を開いているあいだにパレットで選んだ色。
+    /// 決まった色に変えても虹色の丸の中に残し、押せば戻せるようにする。「閉じる」で忘れる。
+    final customPenColor = useState<int?>(null);
+    final customCoverColor = useState<int?>(null);
+    final penWidth = useState(defaultPenWidth);
     final erasing = useState(false);
+    final zoom = useState<_Zoom>(_noZoom);
+
+    /// 2本指で触れたときの拡大と、指の真ん中（表紙を置いている場所の座標）。
+    final pinchStart = useRef<({_Zoom zoom, Offset focal})?>(null);
+    final areaKey = useMemoized(GlobalKey.new);
+
+    /// 表紙を置いている場所の大きさと、等倍のときの表紙の幅。拡大したときに動かせる範囲を決める。
+    final layout = useRef((area: Size.zero, coverWidth: 0.0));
 
     /// 今の操作を始めてから、元に戻す履歴をもう足したか。
     final remembered = useRef(false);
@@ -134,11 +163,13 @@ class _CoverEditor extends HookConsumerWidget {
         ..showSnackBar(SnackBar(content: Text(message)));
     }
 
+    _Snapshot current() {
+      return (coverColor: coverColor.value, decoration: decoration.value);
+    }
+
     void remember() {
-      history.value = [
-        ...history.value,
-        (coverColor: coverColor.value, decoration: decoration.value),
-      ];
+      history.value = [...history.value, current()];
+      future.value = const [];
     }
 
     /// 1回で戻せる変更をする。
@@ -147,12 +178,24 @@ class _CoverEditor extends HookConsumerWidget {
       change();
     }
 
+    void restore(_Snapshot snapshot) {
+      coverColor.value = snapshot.coverColor;
+      decoration.value = snapshot.decoration;
+      selected.value = null;
+    }
+
     void undo() {
       final previous = history.value.last;
       history.value = history.value.sublist(0, history.value.length - 1);
-      coverColor.value = previous.coverColor;
-      decoration.value = previous.decoration;
-      selected.value = null;
+      future.value = [...future.value, current()];
+      restore(previous);
+    }
+
+    void redo() {
+      final next = future.value.last;
+      future.value = future.value.sublist(0, future.value.length - 1);
+      history.value = [...history.value, current()];
+      restore(next);
     }
 
     /// ドラッグや線を描くあいだの変更。1回の操作のあいだは最初の1回だけ履歴を足す。
@@ -167,6 +210,33 @@ class _CoverEditor extends HookConsumerWidget {
     void setMode(CoverEditMode value) {
       mode.value = value;
       selected.value = null;
+      // 拡大はらくがきのあいだだけ。
+      zoom.value = _noZoom;
+      customPenColor.value = null;
+      customCoverColor.value = null;
+    }
+
+    /// 表紙を置いている場所の座標にする。
+    Offset toArea(Offset global) {
+      final box = areaKey.currentContext!.findRenderObject()! as RenderBox;
+      return box.globalToLocal(global);
+    }
+
+    void onPinchStart(ScaleStartDetails details) {
+      pinchStart.value = (zoom: zoom.value, focal: toArea(details.focalPoint));
+    }
+
+    // 指の真ん中にある表紙の場所が、指について動くように拡大してずらす。
+    void onPinchUpdate(ScaleUpdateDetails details) {
+      final start = pinchStart.value;
+      if (start == null) return;
+      final scale = (start.zoom.scale * details.scale).clamp(1.0, _maxZoom);
+      final pinned = (start.focal - start.zoom.offset) / start.zoom.scale;
+      zoom.value = _clampZoom(
+        (scale: scale, offset: toArea(details.focalPoint) - pinned * scale),
+        area: layout.value.area,
+        coverWidth: layout.value.coverWidth,
+      );
     }
 
     /// -[range]/2〜[range]/2 のどれか。まっすぐより少し傾いているほうが、貼ったように見える。
@@ -289,6 +359,11 @@ class _CoverEditor extends HookConsumerWidget {
               tooltip: l10n.coverEditUndo,
               icon: const Icon(Icons.undo),
             ),
+            IconButton(
+              onPressed: future.value.isEmpty || saving ? null : redo,
+              tooltip: l10n.coverEditRedo,
+              icon: const Icon(Icons.redo),
+            ),
             // 保存中は二度押しできないようにして、待っていることを見せる。
             if (saving)
               Padding(
@@ -318,134 +393,203 @@ class _CoverEditor extends HookConsumerWidget {
                 child: GestureDetector(
                   onTap: () => selected.value = null,
                   behavior: HitTestBehavior.opaque,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = min(
-                        constraints.maxWidth - 40,
-                        (constraints.maxHeight - 40) / coverHeightRatio,
-                      );
-                      return Center(
-                        child: DiaryCover(
-                          name: name,
-                          color: coverColor.value == null
-                              ? null
-                              : Color(coverColor.value!),
-                          width: width,
-                          decorationLayer: CoverEditorCanvas(
-                            decoration: decoration.value,
-                            coverWidth: width,
-                            name: name,
-                            inkColor: inkColor,
-                            mode: mode.value,
-                            selected: selectedIndex,
-                            penColor: penColor.value,
-                            penWidth: penWidth.value,
-                            erasing: erasing.value,
-                            onSelect: (index) => selected.value = index,
-                            onEditStart: () => remembered.value = false,
-                            onChanged: changeDecoration,
-                            onEditText: editText,
-                            onStrokeLimit: () =>
-                                showMessage(l10n.coverEditStrokeLimit),
-                          ),
+                  // 拡大した表紙が、下のボタンの上にはみ出して見えないよう切る。
+                  child: ClipRect(
+                    key: areaKey,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final width = min(
+                              constraints.maxWidth - 40,
+                              (constraints.maxHeight - 40) / coverHeightRatio,
+                            );
+                            layout.value = (
+                              area: constraints.biggest,
+                              coverWidth: width,
+                            );
+                            return Transform(
+                              transform:
+                                  Matrix4.translationValues(
+                                    zoom.value.offset.dx,
+                                    zoom.value.offset.dy,
+                                    0,
+                                  )..multiply(
+                                    Matrix4.diagonal3Values(
+                                      zoom.value.scale,
+                                      zoom.value.scale,
+                                      1,
+                                    ),
+                                  ),
+                              child: Center(
+                                child: DiaryCover(
+                                  name: name,
+                                  color: coverColor.value == null
+                                      ? null
+                                      : Color(coverColor.value!),
+                                  width: width,
+                                  decorationLayer: CoverEditorCanvas(
+                                    decoration: decoration.value,
+                                    coverWidth: width,
+                                    name: name,
+                                    inkColor: inkColor,
+                                    mode: mode.value,
+                                    selected: selectedIndex,
+                                    penColor: penColor.value,
+                                    penWidth: penWidth.value,
+                                    erasing: erasing.value,
+                                    zoom: zoom.value.scale,
+                                    onSelect: (index) => selected.value = index,
+                                    onEditStart: () => remembered.value = false,
+                                    onChanged: changeDecoration,
+                                    onEditText: editText,
+                                    onStrokeLimit: () =>
+                                        showMessage(l10n.coverEditStrokeLimit),
+                                    onPinchStart: onPinchStart,
+                                    onPinchUpdate: onPinchUpdate,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                        if (zoom.value.scale > 1)
+                          Positioned(
+                            right: 12,
+                            bottom: 12,
+                            child: FilledButton.tonalIcon(
+                              onPressed: () => zoom.value = _noZoom,
+                              icon: const Icon(Icons.zoom_out_map, size: 18),
+                              label: Text(l10n.coverEditResetZoom),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-            switch (mode.value) {
-              CoverEditMode.doodle => PenColorBar(
-                color: erasing.value ? null : penColor.value,
-                onSelected: (color) {
-                  penColor.value = color;
-                  erasing.value = false;
-                },
-              ),
-              CoverEditMode.stickers => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (selectedSticker != null && selectedSticker.isText)
-                    TextStyleBar(
-                      sticker: selectedSticker,
-                      onEdit: selectedSticker.text == null
-                          ? null
-                          : () => editText(selectedIndex!),
-                      onColor: (color) => edit(() {
-                        decoration.value = decoration.value.replaceSticker(
-                          selectedIndex!,
-                          selectedSticker.copyWith(color: color),
-                        );
-                      }),
-                    ),
-                  SelectionBar(
-                    sticker: selectedSticker,
-                    hint: decoration.value.canAddSticker
-                        ? l10n.coverEditHint
-                        : l10n.coverEditStickerLimit(maxCoverStickers),
-                    canMoveUp:
-                        selectedIndex != null &&
-                        selectedIndex < decoration.value.stickers.length - 1,
-                    canMoveDown: selectedIndex != null && selectedIndex > 0,
-                    onMoveUp: () => moveSelected(1),
-                    onMoveDown: () => moveSelected(-1),
-                    onToggleFrame: () => edit(() {
-                      decoration.value = decoration.value.replaceSticker(
-                        selectedIndex!,
-                        selectedSticker!.copyWith(
-                          frame: !selectedSticker.frame,
-                        ),
-                      );
-                    }),
-                    onRemove: () => edit(() {
-                      decoration.value = decoration.value.removeSticker(
-                        selectedIndex!,
-                      );
-                      selected.value = null;
-                    }),
-                  ),
-                ],
-              ),
-              CoverEditMode.color => const SizedBox.shrink(),
-            },
+            // モードを変えても表紙の大きさと位置が変わらないよう、下のボタンの高さをそろえる。
+            // 文字を選んだときの文字の帯だけは、そのぶん表紙を小さくする。
             SafeArea(
               top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 4, 24, 12),
-                child: switch (mode.value) {
-                  CoverEditMode.stickers => _ModeButtons(
-                    enabled: !saving,
-                    canAddSticker: decoration.value.canAddSticker,
-                    // 文字を置けなくても、外した名前は置き直せるようにする。
-                    canAddText:
-                        decoration.value.canAddText ||
-                        (decoration.value.canAddSticker &&
-                            !decoration.value.hasName),
-                    onEmoji: pickEmoji,
-                    onText: pickText,
-                    onDoodle: () => setMode(CoverEditMode.doodle),
-                    onColor: () => setMode(CoverEditMode.color),
-                  ),
-                  CoverEditMode.doodle => PenTools(
-                    width: penWidth.value,
-                    erasing: erasing.value,
-                    onWidthSelected: (width) {
-                      penWidth.value = width;
-                      erasing.value = false;
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: _toolsHeight),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    switch (mode.value) {
+                      CoverEditMode.doodle => PenColorBar(
+                        color: erasing.value ? null : penColor.value,
+                        // 今の色がパレットの色ならそれを、決まった色なら前に選んだパレットの色を出す。
+                        custom: penColors.contains(penColor.value)
+                            ? customPenColor.value
+                            : penColor.value,
+                        onSelected: (color) {
+                          if (!penColors.contains(color)) {
+                            customPenColor.value = color;
+                          }
+                          penColor.value = color;
+                          erasing.value = false;
+                        },
+                      ),
+                      CoverEditMode.stickers => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (selectedSticker != null && selectedSticker.isText)
+                            TextStyleBar(
+                              sticker: selectedSticker,
+                              onEdit: selectedSticker.text == null
+                                  ? null
+                                  : () => editText(selectedIndex!),
+                              onColor: (color) => edit(() {
+                                decoration.value = decoration.value
+                                    .replaceSticker(
+                                      selectedIndex!,
+                                      selectedSticker.copyWith(color: color),
+                                    );
+                              }),
+                            ),
+                          SelectionBar(
+                            sticker: selectedSticker,
+                            hint: decoration.value.canAddSticker
+                                ? l10n.coverEditHint
+                                : l10n.coverEditStickerLimit(maxCoverStickers),
+                            canMoveUp:
+                                selectedIndex != null &&
+                                selectedIndex <
+                                    decoration.value.stickers.length - 1,
+                            canMoveDown:
+                                selectedIndex != null && selectedIndex > 0,
+                            onMoveUp: () => moveSelected(1),
+                            onMoveDown: () => moveSelected(-1),
+                            onToggleFrame: () => edit(() {
+                              decoration.value = decoration.value
+                                  .replaceSticker(
+                                    selectedIndex!,
+                                    selectedSticker!.copyWith(
+                                      frame: !selectedSticker.frame,
+                                    ),
+                                  );
+                            }),
+                            onRemove: () => edit(() {
+                              decoration.value = decoration.value.removeSticker(
+                                selectedIndex!,
+                              );
+                              selected.value = null;
+                            }),
+                          ),
+                        ],
+                      ),
+                      CoverEditMode.color => const SizedBox.shrink(),
                     },
-                    onEraserToggled: () => erasing.value = !erasing.value,
-                    onDone: () => setMode(CoverEditMode.stickers),
-                  ),
-                  CoverEditMode.color => _ColorTools(
-                    selected: coverColor.value,
-                    onSelected: (color) {
-                      if (color == coverColor.value) return;
-                      edit(() => coverColor.value = color);
-                    },
-                    onDone: () => setMode(CoverEditMode.stickers),
-                  ),
-                },
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 4, 24, 12),
+                      child: switch (mode.value) {
+                        CoverEditMode.stickers => _ModeButtons(
+                          enabled: !saving,
+                          canAddSticker: decoration.value.canAddSticker,
+                          // 文字を置けなくても、外した名前は置き直せるようにする。
+                          canAddText:
+                              decoration.value.canAddText ||
+                              (decoration.value.canAddSticker &&
+                                  !decoration.value.hasName),
+                          onEmoji: pickEmoji,
+                          onText: pickText,
+                          onDoodle: () => setMode(CoverEditMode.doodle),
+                          onColor: () => setMode(CoverEditMode.color),
+                        ),
+                        CoverEditMode.doodle => PenTools(
+                          width: penWidth.value,
+                          erasing: erasing.value,
+                          onWidthSelected: (width) {
+                            penWidth.value = width;
+                            erasing.value = false;
+                          },
+                          onEraserToggled: () => erasing.value = !erasing.value,
+                          onDone: () => setMode(CoverEditMode.stickers),
+                        ),
+                        CoverEditMode.color => _ColorTools(
+                          selected: coverColor.value,
+                          // 今の色がパレットの色ならそれを、決まった色なら前に選んだパレットの色を出す。
+                          custom: _isPresetCoverColor(coverColor.value)
+                              ? customCoverColor.value
+                              : coverColor.value,
+                          onSelected: (color) {
+                            if (!_isPresetCoverColor(color)) {
+                              customCoverColor.value = color;
+                            }
+                            if (color == coverColor.value) return;
+                            edit(() => coverColor.value = color);
+                          },
+                          onDone: () => setMode(CoverEditMode.stickers),
+                        ),
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -538,6 +682,35 @@ CoverSticker _fixedNameSticker(String name) {
   );
 }
 
+/// [zoom] を、表紙の外が見えすぎないようにおさめる。
+///
+/// 表紙は [area] の真ん中に、幅 [coverWidth] で置いている。拡大した表紙が [area] より大きい向きは
+/// [area] に表紙の外が見えない範囲でだけずらし、小さい向きは真ん中に置く。
+_Zoom _clampZoom(_Zoom zoom, {required Size area, required double coverWidth}) {
+  final scale = zoom.scale;
+  final cover = Size(coverWidth, coverWidth * coverHeightRatio);
+
+  double clampAxis(double offset, double areaLength, double coverLength) {
+    // 等倍のときの表紙の端。
+    final start = (areaLength - coverLength) / 2;
+    if (coverLength * scale <= areaLength) {
+      return areaLength / 2 * (1 - scale);
+    }
+    return offset.clamp(
+      areaLength - (start + coverLength) * scale,
+      -start * scale,
+    );
+  }
+
+  return (
+    scale: scale,
+    offset: Offset(
+      clampAxis(zoom.offset.dx, area.width, cover.width),
+      clampAxis(zoom.offset.dy, area.height, cover.height),
+    ),
+  );
+}
+
 /// [color] が決まった表紙の色（[coverColors]）のどれかか。null は決まったグレー。
 bool _isPresetCoverColor(int? color) {
   return coverColors.any((preset) => preset?.toARGB32() == color);
@@ -548,12 +721,16 @@ bool _isPresetCoverColor(int? color) {
 class _ColorTools extends StatelessWidget {
   const _ColorTools({
     required this.selected,
+    required this.custom,
     required this.onSelected,
     required this.onDone,
   });
 
   /// 選んでいる表紙の色（0xAARRGGBB）。null なら決まったグレー。
   final int? selected;
+
+  /// パレットで選んだ色。決まった色に変えても、虹色の丸の中に出しておく。
+  final int? custom;
   final ValueChanged<int?> onSelected;
   final VoidCallback onDone;
 
@@ -569,12 +746,13 @@ class _ColorTools extends StatelessWidget {
           selected: selected == null ? null : Color(selected),
           onSelected: (color) => onSelected(color?.toARGB32()),
           // 決まった色の丸と同じ 32 の枠に、中の丸と同じ大きさで置く。
-          trailing: SizedBox.square(
+          leading: SizedBox.square(
             dimension: 32,
             child: Center(
               child: PaletteDot(
                 title: context.l10n.colorPaletteCoverTitle,
-                custom: _isPresetCoverColor(selected) ? null : selected,
+                custom: custom,
+                selected: custom != null && custom == selected,
                 onSelected: onSelected,
               ),
             ),
