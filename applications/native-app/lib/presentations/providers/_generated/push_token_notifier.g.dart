@@ -1,0 +1,75 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of '../push_token_notifier.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
+///
+/// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
+/// サインアウトしたらトークンも無効にして、前のアカウントの通知が届かないようにする。
+/// サインイン状態を追い続けるので、一度読んだら破棄しない。
+
+@ProviderFor(PushTokenNotifier)
+final pushTokenProvider = PushTokenNotifierProvider._();
+
+/// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
+///
+/// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
+/// サインアウトしたらトークンも無効にして、前のアカウントの通知が届かないようにする。
+/// サインイン状態を追い続けるので、一度読んだら破棄しない。
+final class PushTokenNotifierProvider
+    extends $AsyncNotifierProvider<PushTokenNotifier, void> {
+  /// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
+  ///
+  /// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
+  /// サインアウトしたらトークンも無効にして、前のアカウントの通知が届かないようにする。
+  /// サインイン状態を追い続けるので、一度読んだら破棄しない。
+  PushTokenNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'pushTokenProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$pushTokenNotifierHash();
+
+  @$internal
+  @override
+  PushTokenNotifier create() => PushTokenNotifier();
+}
+
+String _$pushTokenNotifierHash() => r'40f477dc087af1a57e39458fc9a7504c2f8c64e8';
+
+/// サインインしている間、この端末を自分のプッシュ通知の送り先にしておく。
+///
+/// サインインのたびに通知の許可を聞いて FCM トークンを保存し、トークンが替わったら保存し直す。
+/// サインアウトしたらトークンも無効にして、前のアカウントの通知が届かないようにする。
+/// サインイン状態を追い続けるので、一度読んだら破棄しない。
+
+abstract class _$PushTokenNotifier extends $AsyncNotifier<void> {
+  FutureOr<void> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<void>, void>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, void>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

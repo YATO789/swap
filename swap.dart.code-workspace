@@ -1,0 +1,22 @@
+  {
+      "folders": [
+          {
+              "name": "root",
+              "path": "."
+          },
+          {
+              "name": "native-app",
+              "path": "applications/native-app"
+          }
+      ],
+      "settings": {
+          "dart.closingLabels": true,
+          "dart.projectSearchDepth": 10,
+          "dart.forceFlutterWorkspace": true,
+          "makefile.configureOnOpen": false,
+          "deno.enablePaths": ["applications/supabase/functions"]
+      },
+      "extensions": {
+          "recommendations": ["denoland.vscode-deno"]
+      }
+  }

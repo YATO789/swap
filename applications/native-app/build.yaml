@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      source_gen:combining_builder:
+        options:
+          build_extensions:
+            '{{dir}}/{{file}}.dart': '{{dir}}/_generated/{{file}}.g.dart'
+      # Supabase の列名は snake_case なので、フィールド名を snake_case に読み替える。
+      json_serializable:
+        options:
+          field_rename: snake
+      freezed:
+        options:
+          build_extensions:
+            '{{dir}}/{{file}}.dart': '{{dir}}/_generated/{{file}}.freezed.dart'

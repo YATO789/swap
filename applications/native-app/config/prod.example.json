@@ -1,0 +1,6 @@
+{
+  "SUPABASE_URL": "https://<project-ref>.supabase.co",
+  "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_xxxxx",
+  "FEEDBACK_FORM_URL": "https://docs.google.com/forms/d/e/<form-id>/formResponse",
+  "FEEDBACK_FORM_KEY": "entry.<number>"
+}

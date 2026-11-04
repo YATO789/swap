@@ -1,0 +1,48 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Local-iOS",
+            "program": "lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "toolArgs": [
+                "--flavor=dev",
+                "--dart-define-from-file=config/debug.json",
+                "--dart-define=SUPABASE_URL=http://127.0.0.1:54321",
+                "--dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
+            ]
+        },
+        {
+            "name": "Local-Android",
+            "program": "lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "toolArgs": [
+                "--flavor=dev",
+                "--dart-define-from-file=config/debug.json",
+                "--dart-define=SUPABASE_URL=http://10.0.2.2:54321",
+                "--dart-define=SUPABASE_PUBLISHABLE_KEY=sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
+            ]
+        },
+        {
+            "name": "Production-iOS",
+            "program": "lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "toolArgs": ["--flavor=prod", "--dart-define-from-file=config/prod.json"]
+        },
+        {
+            "name": "Production-Android",
+            "program": "lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "toolArgs": ["--flavor=prod", "--dart-define-from-file=config/prod.json"]
+        }
+    ]
+}

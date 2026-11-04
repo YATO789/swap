@@ -1,0 +1,30 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import 'diary_book.dart';
+
+part '_generated/invited_diary_book.freezed.dart';
+
+/// 招待コードで見つけた日記帳。参加する前に、どんな日記帳かを見せるのに使う。
+@freezed
+abstract class InvitedDiaryBook with _$InvitedDiaryBook {
+  const factory InvitedDiaryBook({
+    required String id,
+    required String name,
+    required List<String> memberNames,
+
+    /// メンバーのアイコンの画像の URL。[memberNames] と同じ順。画像のない人は null。
+    @Default([]) List<String?> memberAvatarUrls,
+
+    /// 自分がもう参加しているか。
+    required bool alreadyJoined,
+
+    /// 参加できる人数の上限。
+    @Default(maxDiaryBookMembers) int memberLimit,
+    int? coverColor,
+  }) = _InvitedDiaryBook;
+
+  const InvitedDiaryBook._();
+
+  /// 人数が上限に達しているか。
+  bool get isFull => memberNames.length >= memberLimit;
+}
