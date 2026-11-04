@@ -57,9 +57,8 @@ void main() {
 
     test('案内を出す日時より前なら、必須でも促さない', () {
       expect(
-        _info(
-          enabledAt: DateTime(2026, 10, 21),
-        ).evaluate(current: _version('1.0.0'), now: _now),
+        _info(enabledAt: DateTime(2026, 10, 21))
+            .evaluate(current: _version('1.0.0'), now: _now),
         AppUpdate.none,
       );
     });

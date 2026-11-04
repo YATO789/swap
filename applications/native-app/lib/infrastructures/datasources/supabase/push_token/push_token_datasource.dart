@@ -16,10 +16,7 @@ class PushTokenDatasource {
 
   /// [token] を自分の送り先として保存する。
   Future<void> register(String token) async {
-    await _client.rpc<void>(
-      'register_push_token',
-      params: {'p_token': token},
-    );
+    await _client.rpc<void>('register_push_token', params: {'p_token': token});
   }
 
   /// [token] を自分の送り先から外す。

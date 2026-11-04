@@ -35,9 +35,7 @@ class JoinDiaryBookSheetController extends _$JoinDiaryBookSheetController {
     state = const AsyncLoading();
     DiaryBook? diaryBook;
     state = await AsyncValue.guard(() async {
-      diaryBook = await ref
-          .read(diaryBookProvider.notifier)
-          .join(code);
+      diaryBook = await ref.read(diaryBookProvider.notifier).join(code);
       if (diaryBook == null) throw StateError('招待コードの日記帳が見つかりません');
     });
     if (state case AsyncError(:final error, :final stackTrace)) {

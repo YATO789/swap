@@ -4,8 +4,10 @@ part '_generated/app_update.freezed.dart';
 
 enum AppUpdate {
   none,
+
   /// アプリを使い続けられる。
   optional,
+
   /// アップデートするまでアプリを使えない。
   required,
 }

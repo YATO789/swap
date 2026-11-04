@@ -9,6 +9,7 @@ abstract class ProfileResponse with _$ProfileResponse {
   const factory ProfileResponse({
     required String id,
     required String displayName,
+
     /// avatars バケットの中のパス。null なら画像なし。
     String? avatarPath,
   }) = _ProfileResponse;

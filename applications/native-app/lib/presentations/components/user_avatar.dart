@@ -7,12 +7,7 @@ import '../../theme/app_theme.dart';
 /// 丸いアイコン。画像がなければ、人のシルエットを出す。
 /// 名前はいつも横に並べて出すので、読み上げでは飾りとして扱う。
 class UserAvatar extends StatelessWidget {
-  const UserAvatar({
-    super.key,
-    this.imageUrl,
-    this.imageBytes,
-    this.size = 34,
-  });
+  const UserAvatar({super.key, this.imageUrl, this.imageBytes, this.size = 34});
 
   /// アイコンの画像の URL。読み込み中や読めなかったときはシルエットを出す。
   final String? imageUrl;
@@ -98,7 +93,6 @@ class _SilhouettePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SilhouettePainter oldDelegate) {
-    return background != oldDelegate.background ||
-        figure != oldDelegate.figure;
+    return background != oldDelegate.background || figure != oldDelegate.figure;
   }
 }

@@ -28,9 +28,8 @@ abstract class DiaryResponse with _$DiaryResponse {
 /// diary_contents の1行。
 @freezed
 abstract class DiaryContentResponse with _$DiaryContentResponse {
-  const factory DiaryContentResponse({
-    required String body,
-  }) = _DiaryContentResponse;
+  const factory DiaryContentResponse({required String body}) =
+      _DiaryContentResponse;
 
   factory DiaryContentResponse.fromJson(Map<String, dynamic> json) =>
       _$DiaryContentResponseFromJson(json);

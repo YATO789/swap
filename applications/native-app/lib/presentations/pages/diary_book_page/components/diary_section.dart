@@ -115,11 +115,7 @@ class _DiaryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _CardHeader(
-                  name: name,
-                  avatarUrl: avatarUrl,
-                  isMine: isMine,
-                ),
+                _CardHeader(name: name, avatarUrl: avatarUrl, isMine: isMine),
                 const SizedBox(height: 10),
                 // 冒頭だけ見せて、続きはタップした詳細で読む。
                 _DiaryTitle(title: diary.title),
@@ -199,11 +195,7 @@ class _LockedDiaryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _CardHeader(
-                    name: name,
-                    avatarUrl: avatarUrl,
-                    isMine: false,
-                  ),
+                  _CardHeader(name: name, avatarUrl: avatarUrl, isMine: false),
                   const SizedBox(height: 10),
                   // タイトルは続きを読みたくなる予告として見せる。
                   _DiaryTitle(title: diary.title),

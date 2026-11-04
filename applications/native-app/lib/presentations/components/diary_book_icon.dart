@@ -7,9 +7,8 @@ Color defaultCoverColor(BuildContext context) =>
     : const Color(0xFFECECEF);
 
 /// 表紙 [cover] の上に載せる文字の色。明るい表紙には黒、暗い表紙には白を使う。
-Color coverInkColor(Color cover) => cover.computeLuminance() > 0.38
-    ? const Color(0xFF1D1D1F)
-    : Colors.white;
+Color coverInkColor(Color cover) =>
+    cover.computeLuminance() > 0.38 ? const Color(0xFF1D1D1F) : Colors.white;
 
 /// 日記帳のアイコン。表紙の色の小さな本に、名前の1文字目を [coverInkColor] で入れて出す。
 class DiaryBookIcon extends StatelessWidget {

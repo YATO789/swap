@@ -117,53 +117,53 @@ class DiaryCoverFace extends StatelessWidget {
         this.decorationLayer == null && !(decoration?.placesName ?? false);
 
     return Stack(
-        children: [
-          // 背表紙。光の当たる明るい帯と、折り目の暗い線で本らしく見せる。
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 14 * k,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.horizontal(
-                  left: Radius.circular(2),
-                ),
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.35),
-                    Colors.white.withValues(alpha: 0.6),
-                    Colors.black.withValues(alpha: 0.08),
-                    Colors.transparent,
-                  ],
-                  stops: const [0, 0.35, 0.75, 1],
+      children: [
+        // 背表紙。光の当たる明るい帯と、折り目の暗い線で本らしく見せる。
+        Positioned(
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 14 * k,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(2),
+              ),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withValues(alpha: 0.35),
+                  Colors.white.withValues(alpha: 0.6),
+                  Colors.black.withValues(alpha: 0.08),
+                  Colors.transparent,
+                ],
+                stops: const [0, 0.35, 0.75, 1],
+              ),
+            ),
+          ),
+        ),
+        if (decorationLayer != null) Positioned.fill(child: decorationLayer),
+        if (fixedName)
+          IgnorePointer(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(28 * k, 40 * k, 16 * k, 16 * k),
+              child: Align(
+                alignment: Alignment.topCenter,
+                // 名前を貼ったものにしたときと同じく、白いふちを付ける。
+                child: FramedCoverText(
+                  name,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w700,
+                    height: coverTextHeight,
+                    color: coverTextInk(inkColor, frame: true),
+                  ),
+                  frame: true,
+                  maxLines: 4,
                 ),
               ),
             ),
           ),
-          if (decorationLayer != null) Positioned.fill(child: decorationLayer),
-          if (fixedName)
-            IgnorePointer(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(28 * k, 40 * k, 16 * k, 16 * k),
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  // 名前を貼ったものにしたときと同じく、白いふちを付ける。
-                  child: FramedCoverText(
-                    name,
-                    style: TextStyle(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.w700,
-                      height: coverTextHeight,
-                      color: coverTextInk(inkColor, frame: true),
-                    ),
-                    frame: true,
-                    maxLines: 4,
-                  ),
-                ),
-              ),
-            ),
-        ],
+      ],
     );
   }
 }
