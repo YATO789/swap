@@ -44,9 +44,11 @@ class DiaryBookPage extends HookConsumerWidget {
     // カレンダーで選んだ日。null なら今日を見ていて、日付が変わったら新しい今日に移る。
     final pickedDate = useState<DateTime?>(null);
     final date = pickedDate.value ?? today;
+    //「この日記帳はもう見られません」というシートをもう出したかどうか
     final notifiedRemoval = useRef(false);
 
     final diaryBooksState = ref.watch(diaryBookProvider);
+    //自分の日記帳の一覧から、今開いている日記帳を1冊探し出す
     final diaryBook = diaryBooksState.value
         ?.where((diaryBook) => diaryBook.id == diaryBookId)
         .firstOrNull;
@@ -69,7 +71,7 @@ class DiaryBookPage extends HookConsumerWidget {
     final provider = diaryBookPageControllerProvider(diaryBookId, date);
     DiaryBookPageController controller() => ref.read(provider.notifier);
 
-    // 開いている間に外されたら、もう見られないことを知らせてホームに戻る。読み直すたびに出さないよう1回だけ。
+    // 日記帳を開いている間にほかの人に外されたとき、それを知らせてホームに戻す処理
     // 外されたと分かると気まずいので、外されたとは書かない。
     ref.listen(provider, (_, next) async {
       if (next.error is! RemovedFromDiaryBookException) return;
@@ -88,6 +90,11 @@ class DiaryBookPage extends HookConsumerWidget {
       diaryBooks.forget(diaryBookId);
     });
 
+    // 見る日を変える。今日なら null にして、日付が変わったら新しい今日に移るようにする。
+    void showDay(DateTime day) {
+      pickedDate.value = day == today ? null : day;
+    }
+
     Future<void> pickDate() async {
       final picked = await showTimelineCalendar(
         context,
@@ -95,12 +102,8 @@ class DiaryBookPage extends HookConsumerWidget {
         fetchMarkedDates: controller().fetchMarkedDates,
       );
       if (picked == null) return;
-      pickedDate.value = picked == today ? null : picked;
+      showDay(picked);
     }
-
-    // ページをめくって、ほかの日に移ったとき。
-    void turnTo(DateTime turned) =>
-        pickedDate.value = turned == today ? null : turned;
 
     // 引っ張って読み直したとき、今日を見ていて日付が変わっていれば、新しい今日を読む。
     Future<void> refresh() async {
@@ -201,7 +204,8 @@ class DiaryBookPage extends HookConsumerWidget {
           final next = DateTime(day.year, day.month, day.day + 1);
           return next.isAfter(today) ? null : next;
         },
-        onChanged: turnTo,
+        // ページをめくって、ほかの日に移ったとき。
+        onChanged: showDay,
         builder: (day) => _DayTimeline(
           diaryBookId: diaryBookId,
           diaryBookName: diaryBook.name,
