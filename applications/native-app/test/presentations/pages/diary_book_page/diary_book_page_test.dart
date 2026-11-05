@@ -157,7 +157,7 @@ void main() {
     // 誰も記録していないので、白紙のページを出す。
     expect(find.text('今日のページはまだ白紙です'), findsOneWidget);
 
-    await tester.tap(find.text('今なにしてる？'));
+    await tester.tap(find.text('ひとこと'));
     await tester.pumpAndSettle();
     expect(find.text('大学に記録します'), findsOneWidget);
     expect(find.text('共有する日記帳'), findsNothing);

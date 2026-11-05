@@ -6,7 +6,7 @@ import '../../../../infrastructures/repositories/post_repository.dart';
 
 part '_generated/post_sheet_controller.g.dart';
 
-/// 「今なにしてる？」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
+/// 「ひとこと」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
 @riverpod
 class PostSheetController extends _$PostSheetController {
   @override

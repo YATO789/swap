@@ -12,7 +12,7 @@ PostRepository postRepository(Ref ref) {
   return PostRepository(ref.watch(postDatasourceProvider));
 }
 
-/// 記録（「今なにしてる？」）を読み書きする。
+/// 記録（「ひとこと」）を読み書きする。
 class PostRepository {
   const PostRepository(this._datasource);
 

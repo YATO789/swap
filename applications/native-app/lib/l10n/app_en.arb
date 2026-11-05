@@ -20,7 +20,7 @@
   "commonDiaryBookUnavailable": "This diary book can't be shown",
   "commonWriteDiary": "Write diary",
   "commonPost": "Post",
-  "commonWhatAreYouDoing": "What are you up to?",
+  "commonSaySomething": "Say something",
   "commonTermsOfService": "Terms of Service",
   "commonPrivacyPolicy": "Privacy Policy",
   "commonMemberCount": "{count, plural, =1{1 member} other{{count} members}}",

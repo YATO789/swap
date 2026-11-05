@@ -218,11 +218,11 @@ abstract class AppLocalizations {
   /// **'記録する'**
   String get commonPost;
 
-  /// No description provided for @commonWhatAreYouDoing.
+  /// No description provided for @commonSaySomething.
   ///
   /// In ja, this message translates to:
-  /// **'今なにしてる？'**
-  String get commonWhatAreYouDoing;
+  /// **'ひとこと'**
+  String get commonSaySomething;
 
   /// No description provided for @commonTermsOfService.
   ///

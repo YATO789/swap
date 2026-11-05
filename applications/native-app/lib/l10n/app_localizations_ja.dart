@@ -70,7 +70,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonPost => '記録する';
 
   @override
-  String get commonWhatAreYouDoing => '今なにしてる？';
+  String get commonSaySomething => 'ひとこと';
 
   @override
   String get commonTermsOfService => '利用規約';

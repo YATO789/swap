@@ -21,7 +21,7 @@ const _lines = 3;
 const _fontSize = 16.0;
 const _lineHeight = 2.2;
 
-/// 「今なにしてる？」の投稿シートを開く。記録したら true を返す。
+/// 「ひとこと」の投稿シートを開く。記録したら true を返す。
 /// [diaryBook] を渡すとその日記帳にだけ投稿し、日記帳の選択は出さない。
 /// 渡さなければ前に選んだ日記帳（今も参加しているもの）が選ばれた状態で、投稿先を選べる。
 Future<bool> showPostSheet(BuildContext context, {DiaryBook? diaryBook}) async {
@@ -143,7 +143,7 @@ class _PostSheet extends HookConsumerWidget {
                           // 行の高さいっぱいだと罫線をはみ出すので、文字の高さに合わせる。
                           cursorHeight: _fontSize * 1.4,
                           decoration: InputDecoration(
-                            hintText: l10n.commonWhatAreYouDoing,
+                            hintText: l10n.commonSaySomething,
                             border: InputBorder.none,
                             isDense: true,
                             contentPadding: EdgeInsets.zero,

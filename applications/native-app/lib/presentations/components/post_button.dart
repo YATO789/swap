@@ -8,7 +8,7 @@ import '../pages/router/router.dart';
 import 'floating_surface.dart';
 import 'post_sheet/post_sheet.dart';
 
-/// 画面の下に浮かせる書き込みバー。左は「今なにしてる？」の入力欄風の欄で、
+/// 画面の下に浮かせる書き込みバー。左は「ひとこと」の入力欄風の欄で、
 /// 押すと投稿シートを開く。右のペンは日記を書くページを開く。
 /// 背景は持たないので、Scaffold の extendBody と合わせて一覧の上に重ね、一覧はこの下をくぐらせる。
 /// [diaryBook] を渡すと、記録も日記もその日記帳に入れる前提で開く。
@@ -72,7 +72,7 @@ class PostButton extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        l10n.commonWhatAreYouDoing,
+                        l10n.commonSaySomething,
                         style: TextStyle(
                           fontSize: 17,
                           color: colors.textSecondary,

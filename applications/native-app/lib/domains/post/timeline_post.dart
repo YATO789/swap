@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part '_generated/timeline_post.freezed.dart';
 
-/// 日記帳のタイムラインに並ぶ、誰かが書いた記録（「今なにしてる？」）。
+/// 日記帳のタイムラインに並ぶ、誰かが書いた記録（「ひとこと」）。
 @freezed
 abstract class TimelinePost with _$TimelinePost {
   const TimelinePost._();

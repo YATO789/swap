@@ -70,7 +70,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonPost => 'Post';
 
   @override
-  String get commonWhatAreYouDoing => 'What are you up to?';
+  String get commonSaySomething => 'Say something';
 
   @override
   String get commonTermsOfService => 'Terms of Service';

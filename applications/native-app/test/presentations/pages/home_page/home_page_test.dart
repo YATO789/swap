@@ -118,7 +118,7 @@ void main() {
 
     expect(find.text('大学'), findsOneWidget);
     expect(find.text('会社'), findsOneWidget);
-    expect(find.text('今なにしてる？'), findsOneWidget);
+    expect(find.text('ひとこと'), findsOneWidget);
     // 追加は AppBar ではなく、一覧の最後の日記帳の形のボタンから。
     expect(find.byIcon(Icons.add), findsOneWidget);
     expect(find.text('日記帳を追加'), findsOneWidget);
@@ -129,7 +129,7 @@ void main() {
 
     expect(find.text('日記帳を作る'), findsOneWidget);
     expect(find.text('招待コードで参加'), findsOneWidget);
-    expect(find.text('今なにしてる？'), findsNothing);
+    expect(find.text('ひとこと'), findsNothing);
     expect(find.text('日記帳を追加'), findsNothing);
   });
 

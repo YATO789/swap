@@ -31,7 +31,7 @@ import '../../providers/app_update_notifier.dart';
 import '../router/open_book_page.dart';
 import '../router/router.dart';
 
-/// ホーム。日記帳の一覧と、下に「今なにしてる？」と日記を書くバーを置く。
+/// ホーム。日記帳の一覧と、下に「ひとこと」と日記を書くバーを置く。
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 

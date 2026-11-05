@@ -9,7 +9,7 @@ PostDatasource postDatasource(Ref ref) {
   return PostDatasource(Supabase.instance.client);
 }
 
-/// Supabase の posts テーブルに記録（「今なにしてる？」）を読み書きする。
+/// Supabase の posts テーブルに記録（「ひとこと」）を読み書きする。
 class PostDatasource {
   const PostDatasource(this._client);
 
