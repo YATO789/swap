@@ -215,7 +215,7 @@ class _DiaryPages extends HookConsumerWidget {
                     itemBuilder: (context) => [
                       if (isEditableDiaryDate(
                         diary.date,
-                        today: diaryDateOf(DateTime.now()),
+                        today: diaryToday(),
                       ))
                         PopupMenuItem(
                           value: edit,

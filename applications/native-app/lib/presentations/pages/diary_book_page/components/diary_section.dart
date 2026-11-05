@@ -47,7 +47,7 @@ class DiarySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final mine = diaries.where((diary) => diary.authorId == myId).firstOrNull;
     final others = diaries.where((diary) => diary.authorId != myId);
-    final today = diaryDateOf(DateTime.now());
+    final today = diaryToday();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

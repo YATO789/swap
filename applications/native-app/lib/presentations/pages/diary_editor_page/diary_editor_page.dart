@@ -150,7 +150,7 @@ class _DiaryEditor extends HookWidget {
   /// 書いている日記の日。今日なら 'today'、昨日なら 'yesterday'。
   /// 文言の中で「今日」「昨日」を選び分けるのに使う。
   String get _day =>
-      date == diaryDateOf(DateTime.now()) ? 'today' : 'yesterday';
+      date == diaryToday() ? 'today' : 'yesterday';
 
   @override
   Widget build(BuildContext context) {

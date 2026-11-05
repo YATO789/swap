@@ -57,6 +57,11 @@ DateTime diaryDateOf(DateTime time) {
   return DateTime(shifted.year, shifted.month, shifted.day);
 }
 
+/// 今の日記の日付（朝4時区切り）。呼ぶたびに今の時刻から計算する。
+DateTime diaryToday() {
+  return diaryDateOf(DateTime.now());
+}
+
 /// 日記の [date] が始まる時刻（その日の朝4時）。
 DateTime diaryDayStartOf(DateTime date) =>
     DateTime(date.year, date.month, date.day, diaryDayStartHour);

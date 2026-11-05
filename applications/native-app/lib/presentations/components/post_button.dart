@@ -50,7 +50,7 @@ class PostButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final l10n = context.l10n;
-    final today = diaryDateOf(DateTime.now());
+    final today = diaryToday();
     final date = diaryDate ?? today;
 
     return SafeArea(

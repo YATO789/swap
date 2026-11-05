@@ -33,9 +33,11 @@ class DiaryBookPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     // 開いたまま朝4時を過ぎても今日が変わるよう、読み直したときとアプリに戻ったときに今日を確かめ直す。
-    final todayState = useState(diaryDateOf(DateTime.now()));
+    final todayState = useState(diaryToday());
     final today = todayState.value;
-    void catchUpToday() => todayState.value = diaryDateOf(DateTime.now());
+    void catchUpToday() {
+      todayState.value = diaryToday();
+    }
     useOnAppLifecycleStateChange((_, state) {
       if (state == AppLifecycleState.resumed) catchUpToday();
     });
