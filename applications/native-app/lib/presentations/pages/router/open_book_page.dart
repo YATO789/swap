@@ -20,29 +20,55 @@ class DiaryBookOrigin {
   final Rect rect;
 }
 
-/// [origin] の表紙を少し浮かせて手に取り、その大きさのまま背表紙を軸に左へめくって
-/// 中の [child] を見せ、それから [child] を画面いっぱいに広げて開くページ。
-/// 戻るときは同じ動きを逆にたどって閉じる。
+/// 日記帳のページ。
 ///
+/// [origin] があれば、その表紙を少し浮かせて手に取り、その大きさのまま背表紙を軸に左へめくって
+/// 中の [child] を見せ、それから [child] を画面いっぱいに広げて開く。
+/// 戻るときは同じ動きを逆にたどって閉じる。
 /// 画面の中ほどの左右スワイプはページの中で使うので、戻るのは画面の左端からだけにする。
 /// 端から引くと、指に合わせて表紙が閉じていく。
+///
+/// [origin] がなければ（通知から開いたときなど）、iOS の標準の画面遷移で開く。
+///
+/// どちらで開くかは、最初にページを開いたときだけで決める。
+/// go_router は、ルーターの refresh などで画面を組み直すとき、[origin] を保存できずに null にする。
+/// 開き方ごとに Page の型を分けると、組み直したときに型が変わって、同じページが上から開き直されてしまう。
+/// そのため、どちらで開いても同じ型の Page にし、開いたあとは最初のルートを使い続ける。
 Page<void> openBookPage({
   required LocalKey key,
-  required DiaryBookOrigin origin,
+  required DiaryBookOrigin? origin,
   required Widget child,
 }) {
-  return _OpenBookPage(key: key, origin: origin, child: child);
+  return _BookPage(key: key, origin: origin, child: child);
 }
 
-class _OpenBookPage extends Page<void> {
-  const _OpenBookPage({super.key, required this.origin, required this.child});
+class _BookPage extends Page<void> {
+  const _BookPage({super.key, required this.origin, required this.child});
 
-  final DiaryBookOrigin origin;
+  final DiaryBookOrigin? origin;
   final Widget child;
 
   @override
   Route<void> createRoute(BuildContext context) {
+    final origin = this.origin;
+    if (origin == null) return _StandardBookRoute(page: this);
     return _OpenBookRoute(settings: this, origin: origin, child: child);
+  }
+}
+
+/// 表紙からではなく開いた日記帳のページ。MaterialPage と同じく、iOS の標準の画面遷移で開く。
+class _StandardBookRoute extends PageRoute<void>
+    with MaterialRouteTransitionMixin<void> {
+  _StandardBookRoute({required _BookPage page}) : super(settings: page);
+
+  @override
+  Widget buildContent(BuildContext context) {
+    return (settings as _BookPage).child;
+  }
+
+  @override
+  bool get maintainState {
+    return true;
   }
 }
 
