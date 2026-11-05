@@ -401,6 +401,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diaryDetailDeleteFailed => '日記を削除できませんでした。もう一度お試しください';
 
   @override
+  String get diaryDetailReactionFailed => 'リアクションを保存できませんでした。もう一度お試しください';
+
+  @override
   String get diaryDetailDeleted => '日記を削除しました';
 
   @override

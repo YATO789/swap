@@ -433,6 +433,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t delete the diary. Please try again.';
 
   @override
+  String get diaryDetailReactionFailed =>
+      'Couldn\'t save your reaction. Please try again.';
+
+  @override
   String get diaryDetailDeleted => 'Diary deleted';
 
   @override

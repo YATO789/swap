@@ -10,6 +10,7 @@ import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
@@ -203,7 +204,7 @@ class FakePostRepository implements PostRepository {
         reactions: [
           for (final reaction in post.reactions)
             if (reaction.userId != 'me') reaction,
-          PostReaction(userId: 'me', emoji: emoji),
+          Reaction(userId: 'me', emoji: emoji),
         ],
       );
     });
@@ -348,6 +349,44 @@ class FakeDiaryRepository implements DiaryRepository {
     return {
       for (final diary in diaries[diaryBookId] ?? const <Diary>[]) diary.date,
     };
+  }
+
+  /// true なら、リアクションの保存に失敗する。
+  bool failsReactions = false;
+
+  @override
+  Future<void> react(String diaryId, String emoji) async {
+    if (failsReactions) throw Exception('リアクションを保存できない');
+    _updateDiary(diaryId, (diary) {
+      return diary.copyWith(
+        reactions: [
+          for (final reaction in diary.reactions)
+            if (reaction.userId != 'me') reaction,
+          Reaction(userId: 'me', emoji: emoji),
+        ],
+      );
+    });
+  }
+
+  @override
+  Future<void> removeReaction(String diaryId) async {
+    if (failsReactions) throw Exception('リアクションを保存できない');
+    _updateDiary(diaryId, (diary) {
+      return diary.copyWith(
+        reactions: [
+          for (final reaction in diary.reactions)
+            if (reaction.userId != 'me') reaction,
+        ],
+      );
+    });
+  }
+
+  void _updateDiary(String diaryId, Diary Function(Diary diary) update) {
+    for (final list in diaries.values) {
+      for (final (index, diary) in list.indexed) {
+        if (diary.id == diaryId) list[index] = update(diary);
+      }
+    }
   }
 }
 

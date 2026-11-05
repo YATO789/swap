@@ -2,11 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../../../domains/post/timeline_post.dart';
-import '../../../../l10n/l10n.dart';
-import '../../../../theme/app_theme.dart';
-import '../../../components/emoji_sheet.dart';
-import '../../../components/user_avatar.dart';
+import '../../domains/reaction/reaction.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/app_theme.dart';
+import 'emoji_sheet.dart';
+import 'floating_surface.dart';
+import 'user_avatar.dart';
 
 /// ハートを押したときに並べる、よく使う絵文字。❤️ を先頭に置いて、いつもの良いねは2タップで付けられるようにする。
 const quickReactions = ['❤️', '😂', '😮', '😢', '👏'];
@@ -28,19 +29,25 @@ const _barWidth =
 const _barHeight = _barButtonSize + _barPadding * 2;
 
 /// リアクションを付けるボタン。まだ付けていなければハート、付けていればその絵文字を出す。
+/// [floating] は日記の詳細で、画面の右下に浮かせておく大きいボタン。
 class ReactionButton extends StatelessWidget {
   const ReactionButton({
     super.key,
     required this.current,
     required this.onPressed,
+    this.floating = false,
   });
 
   /// 自分が付けた絵文字。付けていなければ null。
   final String? current;
   final VoidCallback onPressed;
+  final bool floating;
 
   /// ボタン全体（押せる範囲）の一辺。中の丸は 34。
   static const double size = 48;
+
+  /// 右下に浮かせるボタンの一辺。
+  static const double floatingSize = 56;
 
   @override
   Widget build(BuildContext context) {
@@ -51,15 +58,34 @@ class ReactionButton extends StatelessWidget {
         ? l10n.reactionAdd
         : l10n.reactionChange(current);
     final content = current == null
-        ? Icon(Icons.favorite_border, size: 18, color: colors.textSecondary)
-        : _Emoji(current, size: 18);
+        ? Icon(
+            Icons.favorite_border,
+            size: floating ? 24 : 18,
+            color: floating ? colors.textPrimary : colors.textSecondary,
+          )
+        : _Emoji(current, size: floating ? 26 : 18);
 
-    return IconButton(
-      onPressed: onPressed,
-      tooltip: label,
-      padding: const EdgeInsets.all((size - 34) / 2),
-      constraints: const BoxConstraints.tightFor(width: size, height: size),
-      icon: _GlassCircle(size: 34, child: content),
+    if (!floating) {
+      return IconButton(
+        onPressed: onPressed,
+        tooltip: label,
+        padding: const EdgeInsets.all((size - 34) / 2),
+        constraints: const BoxConstraints.tightFor(width: size, height: size),
+        icon: _GlassCircle(size: 34, child: content),
+      );
+    }
+    // 上の戻るボタンと同じ、紙の色の丸に影を付けた台に載せる。
+    return Tooltip(
+      message: label,
+      child: FloatingSurface(
+        child: InkWell(
+          onTap: onPressed,
+          child: SizedBox.square(
+            dimension: floatingSize,
+            child: Center(child: content),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -173,7 +199,7 @@ class ReactionChips extends StatelessWidget {
   });
 
   /// 付いたリアクション。付けた順。
-  final List<PostReaction> reactions;
+  final List<Reaction> reactions;
   final String? myId;
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;

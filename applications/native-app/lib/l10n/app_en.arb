@@ -113,6 +113,7 @@
   "diaryDetailDeleteTitle": "Delete this diary?",
   "diaryDetailDeleteMessage": "This diary will be deleted from “{diaryBookName}”.",
   "diaryDetailDeleteFailed": "Couldn't delete the diary. Please try again.",
+  "diaryDetailReactionFailed": "Couldn't save your reaction. Please try again.",
   "diaryDetailDeleted": "Diary deleted",
   "diaryDetailMenu": "Menu",
   "diaryDetailEdit": "Edit",

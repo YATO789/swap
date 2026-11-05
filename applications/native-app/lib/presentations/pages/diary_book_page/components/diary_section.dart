@@ -4,6 +4,7 @@ import '../../../../domains/diary/diary.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
+import '../../../components/reactions.dart';
 import '../../../components/user_avatar.dart';
 
 /// タイムラインの上に出す、その日の日記のまとまり。
@@ -51,6 +52,9 @@ class DiarySection extends StatelessWidget {
             name: nameOf(mine.authorId),
             avatarUrl: avatarUrlOf(mine.authorId),
             isMine: true,
+            myId: myId,
+            nameOf: nameOf,
+            avatarUrlOf: avatarUrlOf,
             onTap: () => onOpen(mine),
           ),
         for (final diary in others)
@@ -71,6 +75,9 @@ class DiarySection extends StatelessWidget {
                   name: nameOf(diary.authorId),
                   avatarUrl: avatarUrlOf(diary.authorId),
                   isMine: false,
+                  myId: myId,
+                  nameOf: nameOf,
+                  avatarUrlOf: avatarUrlOf,
                   onTap: () => onOpen(diary),
                 ),
       ],
@@ -79,12 +86,16 @@ class DiarySection extends StatelessWidget {
 }
 
 /// 日記の冒頭を表示するカード。タップで全文を開く。
+/// 付いたリアクションはカードの下に並べて見せるだけ。付けるのは開いた日記のページから。
 class _DiaryCard extends StatelessWidget {
   const _DiaryCard({
     required this.diary,
     required this.name,
     required this.avatarUrl,
     required this.isMine,
+    required this.myId,
+    required this.nameOf,
+    required this.avatarUrlOf,
     required this.onTap,
   });
 
@@ -92,6 +103,9 @@ class _DiaryCard extends StatelessWidget {
   final String name;
   final String? avatarUrl;
   final bool isMine;
+  final String? myId;
+  final String Function(String userId) nameOf;
+  final String? Function(String userId) avatarUrlOf;
   final VoidCallback onTap;
 
   @override
@@ -131,6 +145,16 @@ class _DiaryCard extends StatelessWidget {
                     color: colors.textSecondary,
                   ),
                 ),
+                if (diary.reactions.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  // チップは押せない。押すとカードと同じく日記を開く。
+                  ReactionChips(
+                    reactions: diary.reactions,
+                    myId: myId,
+                    nameOf: nameOf,
+                    avatarUrlOf: avatarUrlOf,
+                  ),
+                ],
               ],
             ),
           ),

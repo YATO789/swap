@@ -11,7 +11,7 @@ import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 import '../../../components/user_avatar.dart';
 import 'diary_section.dart';
-import 'reactions.dart';
+import '../../../components/reactions.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
 /// 今日を表示しているときは、今の時間にまだ記録していないほかのメンバーを一番上に出す。

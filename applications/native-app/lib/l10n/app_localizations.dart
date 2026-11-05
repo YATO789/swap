@@ -781,6 +781,12 @@ abstract class AppLocalizations {
   /// **'日記を削除できませんでした。もう一度お試しください'**
   String get diaryDetailDeleteFailed;
 
+  /// No description provided for @diaryDetailReactionFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'リアクションを保存できませんでした。もう一度お試しください'**
+  String get diaryDetailReactionFailed;
+
   /// No description provided for @diaryDetailDeleted.
   ///
   /// In ja, this message translates to:

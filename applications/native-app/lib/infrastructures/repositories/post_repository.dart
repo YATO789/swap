@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/infrastructures/datasources/supabase/post/models/post_response.dart';
 import 'package:swap/infrastructures/datasources/supabase/post/post_datasource.dart';
 
@@ -95,7 +96,7 @@ class PostRepository {
       postedAt: response.postedAt,
       reactions: [
         for (final reaction in reactions)
-          PostReaction(userId: reaction.userId, emoji: reaction.emoji),
+          Reaction(userId: reaction.userId, emoji: reaction.emoji),
       ],
     );
   }

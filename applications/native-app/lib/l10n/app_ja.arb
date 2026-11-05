@@ -338,6 +338,7 @@
     }
   },
   "diaryDetailDeleteFailed": "日記を削除できませんでした。もう一度お試しください",
+  "diaryDetailReactionFailed": "リアクションを保存できませんでした。もう一度お試しください",
   "diaryDetailDeleted": "日記を削除しました",
   "diaryDetailMenu": "メニュー",
   "diaryDetailEdit": "編集",

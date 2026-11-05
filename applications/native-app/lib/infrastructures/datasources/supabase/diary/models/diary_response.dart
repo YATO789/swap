@@ -19,6 +19,9 @@ abstract class DiaryResponse with _$DiaryResponse {
 
     /// diary_id が主キーなので1対1になる。RLS で読めなければ null。
     @JsonKey(name: 'diary_contents') DiaryContentResponse? content,
+
+    /// 付いたリアクション。
+    @Default([]) List<DiaryReactionResponse> diaryReactions,
   }) = _DiaryResponse;
 
   factory DiaryResponse.fromJson(Map<String, dynamic> json) =>
@@ -33,4 +36,17 @@ abstract class DiaryContentResponse with _$DiaryContentResponse {
 
   factory DiaryContentResponse.fromJson(Map<String, dynamic> json) =>
       _$DiaryContentResponseFromJson(json);
+}
+
+/// diary_reactions の1行。
+@freezed
+abstract class DiaryReactionResponse with _$DiaryReactionResponse {
+  const factory DiaryReactionResponse({
+    required String userId,
+    required String emoji,
+    @LocalDateTimeConverter() required DateTime createdAt,
+  }) = _DiaryReactionResponse;
+
+  factory DiaryReactionResponse.fromJson(Map<String, dynamic> json) =>
+      _$DiaryReactionResponseFromJson(json);
 }

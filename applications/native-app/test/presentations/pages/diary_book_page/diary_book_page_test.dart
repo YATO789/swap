@@ -6,6 +6,7 @@ import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
@@ -260,7 +261,7 @@ void main() {
         tester,
         posts: [
           kenPost.copyWith(
-            reactions: const [PostReaction(userId: 'mio', emoji: '😂')],
+            reactions: const [Reaction(userId: 'mio', emoji: '😂')],
           ),
         ],
       );

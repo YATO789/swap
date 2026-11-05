@@ -21,6 +21,14 @@ _DiaryResponse _$DiaryResponseFromJson(Map<String, dynamic> json) =>
           : DiaryContentResponse.fromJson(
               json['diary_contents'] as Map<String, dynamic>,
             ),
+      diaryReactions:
+          (json['diary_reactions'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    DiaryReactionResponse.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$DiaryResponseToJson(_DiaryResponse instance) =>
@@ -32,6 +40,7 @@ Map<String, dynamic> _$DiaryResponseToJson(_DiaryResponse instance) =>
       'written_at': const LocalDateTimeConverter().toJson(instance.writtenAt),
       'title': instance.title,
       'diary_contents': instance.content,
+      'diary_reactions': instance.diaryReactions,
     };
 
 _DiaryContentResponse _$DiaryContentResponseFromJson(
@@ -41,3 +50,21 @@ _DiaryContentResponse _$DiaryContentResponseFromJson(
 Map<String, dynamic> _$DiaryContentResponseToJson(
   _DiaryContentResponse instance,
 ) => <String, dynamic>{'body': instance.body};
+
+_DiaryReactionResponse _$DiaryReactionResponseFromJson(
+  Map<String, dynamic> json,
+) => _DiaryReactionResponse(
+  userId: json['user_id'] as String,
+  emoji: json['emoji'] as String,
+  createdAt: const LocalDateTimeConverter().fromJson(
+    json['created_at'] as String,
+  ),
+);
+
+Map<String, dynamic> _$DiaryReactionResponseToJson(
+  _DiaryReactionResponse instance,
+) => <String, dynamic>{
+  'user_id': instance.userId,
+  'emoji': instance.emoji,
+  'created_at': const LocalDateTimeConverter().toJson(instance.createdAt),
+};
