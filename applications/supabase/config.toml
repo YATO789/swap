@@ -404,6 +404,10 @@ verify_jwt = false
 [functions.notify-reaction]
 verify_jwt = false
 
+# 日記にリアクションが付いたときの通知。記録と同じく DB のトリガーから pg_net で呼ぶ。
+[functions.notify-diary-reaction]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
