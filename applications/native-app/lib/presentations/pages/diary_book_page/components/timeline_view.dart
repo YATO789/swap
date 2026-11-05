@@ -428,6 +428,9 @@ class _PostCard extends StatelessWidget {
   /// 名前の行と本文のあいだ。
   static const double _headerGap = 4;
 
+  /// 左に出す、書いた人のアイコンの大きさ。
+  static const double _avatarSize = 36;
+
   Future<void> _pickReaction(BuildContext context) async {
     final emoji = await showReactionPicker(
       context,
@@ -453,20 +456,8 @@ class _PostCard extends StatelessWidget {
     final isMine = post.authorId == myId;
     // 自分の記録には付けない。
     final canReact = !isMine && !lifted;
-    // ハートの中心を、名前の行と本文のあいだのちょうど真ん中に合わせる。
-    // 名前の行の高さは文字の大きさの設定で変わるので、実際に測る。
-    final nameLine = TextPainter(
-      text: TextSpan(
-        text: nameOf(post.authorId),
-        style: DefaultTextStyle.of(context).style.merge(_nameStyle),
-      ),
-      textDirection: Directionality.of(context),
-      textScaler: MediaQuery.textScalerOf(context),
-      maxLines: 1,
-    )..layout();
-    final buttonTop =
-        nameLine.height + _headerGap / 2 - ReactionButton.size / 2;
-    nameLine.dispose();
+    // ハートの中心を、左のアイコンの中心に合わせる。本文が何行あっても動かさない。
+    const buttonTop = (_avatarSize - ReactionButton.size) / 2;
 
     // 自分の記録は長押しで削除できる。
     return InkWell(
@@ -480,7 +471,7 @@ class _PostCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserAvatar(imageUrl: avatarUrlOf(post.authorId), size: 36),
+            UserAvatar(imageUrl: avatarUrlOf(post.authorId), size: _avatarSize),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -533,7 +524,7 @@ class _PostCard extends StatelessWidget {
             ),
             if (canReact)
               Transform.translate(
-                offset: Offset(0, buttonTop),
+                offset: const Offset(0, buttonTop),
                 child: ReactionButton(
                   current: post.reactionOf(myId),
                   onPressed: () => _pickReaction(context),
