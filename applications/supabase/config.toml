@@ -400,6 +400,10 @@ verify_jwt = false
 [functions.notify-member-joined]
 verify_jwt = false
 
+# 記録にリアクションが付いたときの通知。記録と同じく DB のトリガーから pg_net で呼ぶ。
+[functions.notify-reaction]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
