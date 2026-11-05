@@ -348,11 +348,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diarySectionUntitled => 'タイトルなし';
 
   @override
-  String diarySectionAuthor(String name) {
-    return '$name の日記';
-  }
-
-  @override
   String get diarySectionLockedPast => 'この日に日記を書いていないので読めません';
 
   @override

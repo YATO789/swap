@@ -196,6 +196,7 @@ class ReactionChips extends StatelessWidget {
     required this.nameOf,
     required this.avatarUrlOf,
     this.onTap,
+    this.filled = false,
   });
 
   /// 付いたリアクション。付けた順。
@@ -204,6 +205,9 @@ class ReactionChips extends StatelessWidget {
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;
   final ValueChanged<String>? onTap;
+
+  /// 地を薄い灰色で塗る。枠は自分が入っている絵文字にだけ付ける。日記のカードで使う。
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
@@ -226,6 +230,7 @@ class ReactionChips extends StatelessWidget {
             nameOf: nameOf,
             avatarUrlOf: avatarUrlOf,
             onTap: onTap == null ? null : () => onTap(entry.key),
+            filled: filled,
           ),
       ],
     );
@@ -240,6 +245,7 @@ class _ReactionChip extends StatelessWidget {
     required this.nameOf,
     required this.avatarUrlOf,
     required this.onTap,
+    required this.filled,
   });
 
   final String emoji;
@@ -248,13 +254,19 @@ class _ReactionChip extends StatelessWidget {
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;
   final VoidCallback? onTap;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final l10n = context.l10n;
     final isMine = reactors.contains(myId);
-    final background = isMine ? colors.placeholder : colors.surface;
+    final background = isMine || filled ? colors.placeholder : colors.surface;
+    final border = isMine
+        ? BorderSide(color: colors.textPrimary)
+        : filled
+        ? BorderSide.none
+        : BorderSide(color: colors.border);
     final names = [
       for (final reactor in reactors)
         reactor == myId ? l10n.reactionYou : nameOf(reactor),
@@ -269,14 +281,12 @@ class _ReactionChip extends StatelessWidget {
       excludeSemantics: true,
       child: Material(
         color: background,
-        shape: StadiumBorder(
-          side: BorderSide(color: isMine ? colors.textPrimary : colors.border),
-        ),
+        shape: StadiumBorder(side: border),
         child: InkWell(
           onTap: onTap,
           customBorder: const StadiumBorder(),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(6, 3, 8, 3),
+            padding: EdgeInsets.fromLTRB(6, filled ? 4 : 3, 8, filled ? 4 : 3),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

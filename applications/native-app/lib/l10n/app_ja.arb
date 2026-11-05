@@ -287,14 +287,6 @@
   "timelineBlankTitle": "今日のページはまだ白紙です",
   "timelineBlankMessage": "最初に書いた人の一言から、今日が始まります",
   "diarySectionUntitled": "タイトルなし",
-  "diarySectionAuthor": "{name} の日記",
-  "@diarySectionAuthor": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "diarySectionLockedPast": "この日に日記を書いていないので読めません",
   "diarySectionLockedToday": "今日の日記を書くと読めます",
   "diarySectionLockedYesterday": "昨日の日記を書くと読めます",

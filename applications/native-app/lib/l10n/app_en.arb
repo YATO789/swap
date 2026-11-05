@@ -99,7 +99,6 @@
   "timelineBlankTitle": "Today's page is still blank",
   "timelineBlankMessage": "Today starts with the first post",
   "diarySectionUntitled": "Untitled",
-  "diarySectionAuthor": "{name}'s diary",
   "diarySectionLockedPast": "You can't read this because you didn't write a diary that day",
   "diarySectionLockedToday": "Write today's diary to read it",
   "diarySectionLockedYesterday": "Write yesterday's diary to read it",

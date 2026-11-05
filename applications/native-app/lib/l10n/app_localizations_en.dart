@@ -377,11 +377,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diarySectionUntitled => 'Untitled';
 
   @override
-  String diarySectionAuthor(String name) {
-    return '$name\'s diary';
-  }
-
-  @override
   String get diarySectionLockedPast =>
       'You can\'t read this because you didn\'t write a diary that day';
 
