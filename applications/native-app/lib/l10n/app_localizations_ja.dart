@@ -111,7 +111,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String inviteSheetMessage(String name, String url, String code) {
-    return 'Swap!で「$name」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\nアプリはこちら: $url\n招待コード: $code';
+    return 'Swap!で「$name」に参加しよう！\n\nアプリはこちら\n$url\n\nアプリの「招待コードで参加」から、このコードを入力してね\n\n【招待コード】\n$code';
   }
 
   @override

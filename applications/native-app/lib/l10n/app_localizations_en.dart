@@ -117,7 +117,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String inviteSheetMessage(String name, String url, String code) {
-    return 'Join “$name” on Swap!\nIn the app, tap “Join with invite code” and enter this code.\nGet the app: $url\nInvite code: $code';
+    return 'Join “$name” on Swap!\n\nGet the app\n$url\n\nIn the app, tap “Join with invite code” and enter this code.\n\n【Invite code】\n$code';
   }
 
   @override

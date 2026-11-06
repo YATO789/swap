@@ -112,7 +112,7 @@ void main() {
     await tester.tap(find.text('招待メッセージをコピー'));
     await tester.pumpAndSettle();
     expect(find.text('招待メッセージをコピーしました'), findsOneWidget);
-    expect(copied, contains('招待コード: New2345'));
+    expect(copied, endsWith('【招待コード】\nNew2345'));
     expect(find.text('「大学」を作りました'), findsNothing);
     expect(find.text('大学'), findsOneWidget);
   });

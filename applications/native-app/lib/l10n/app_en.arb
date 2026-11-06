@@ -32,7 +32,7 @@
   "discardGuardMessage": "Anything you haven't saved will be lost.",
   "discardGuardKeepEditing": "Keep editing",
   "discardGuardDiscard": "Discard",
-  "inviteSheetMessage": "Join “{name}” on Swap!\nIn the app, tap “Join with invite code” and enter this code.\nGet the app: {url}\nInvite code: {code}",
+  "inviteSheetMessage": "Join “{name}” on Swap!\n\nGet the app\n{url}\n\nIn the app, tap “Join with invite code” and enter this code.\n\n【Invite code】\n{code}",
   "inviteSheetCopied": "Invite message copied",
   "inviteSheetCreatedTitle": "Created “{name}”",
   "inviteSheetTitle": "Invite to “{name}”",
