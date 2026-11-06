@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../infrastructures/repositories/notification_permission_repository.dart';
 import '../../infrastructures/repositories/push_token_repository.dart';
 import 'authentication_notifier.dart';
 
@@ -32,7 +33,7 @@ class PushTokenNotifier extends _$PushTokenNotifier {
       unawaited(repository.deleteToken().catchError(_logFailure));
     });
 
-    await repository.showNotificationsInForeground();
+    await ref.read(notificationPermissionRepositoryProvider).showInForeground();
     final token = await repository.fetchToken();
     if (token != null) await _register(repository, token);
   }

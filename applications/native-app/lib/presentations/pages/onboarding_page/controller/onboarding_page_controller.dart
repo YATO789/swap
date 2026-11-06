@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../infrastructures/repositories/push_token_repository.dart';
+import '../../../../infrastructures/repositories/notification_permission_repository.dart';
 import '../../../providers/profile_notifier.dart';
 
 part '_generated/onboarding_page_controller.g.dart';
@@ -22,11 +22,11 @@ class OnboardingPageController extends _$OnboardingPageController {
     // 断られたり失敗したりしても、そのまま始められるようにする。
     // この端末を送り先にするのは、許可とは別にホームで行う（pushTokenProvider）。
     try {
-      final pushTokens = ref.read(pushTokenRepositoryProvider);
+      final permission = ref.read(notificationPermissionRepositoryProvider);
       if (requestsNotification) {
-        await pushTokens.requestPermission();
+        await permission.request();
       } else {
-        await pushTokens.skipPermission();
+        await permission.skip();
       }
     } on Object catch (e, stackTrace) {
       debugPrint('通知の許可を聞けませんでした: $e\n$stackTrace');

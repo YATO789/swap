@@ -446,7 +446,7 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'4aff468052bf89fa59d94375711e0884b3a3bef7';
+String _$routerHash() => r'9615159c83b8bafc651f33ec5aec828c2d6e535d';
 
 /// 起動直後の画面を消して、最初の画面を見せてよいか。
 

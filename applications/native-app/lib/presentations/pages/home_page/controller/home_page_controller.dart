@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../infrastructures/repositories/push_token_repository.dart';
+import '../../../../infrastructures/repositories/notification_permission_repository.dart';
 import '../../../providers/app_update_notifier.dart';
 import '../../../providers/diary_book_notifier.dart';
 import '../../../providers/push_token_notifier.dart';
@@ -26,9 +26,9 @@ class HomePageController extends _$HomePageController {
   /// 失敗しても画面には出さない。
   Future<void> requestNotificationPermission() async {
     try {
-      final pushTokens = ref.read(pushTokenRepositoryProvider);
-      if (pushTokens.permissionSkipped) return;
-      await pushTokens.requestPermission();
+      final permission = ref.read(notificationPermissionRepositoryProvider);
+      if (permission.skipped) return;
+      await permission.request();
     } on Object catch (e, stackTrace) {
       debugPrint('通知の許可を聞けませんでした: $e\n$stackTrace');
     }
