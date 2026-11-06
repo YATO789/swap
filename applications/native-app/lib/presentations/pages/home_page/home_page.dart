@@ -48,13 +48,18 @@ class HomePage extends HookConsumerWidget {
     final paged = ref.watch(
       settingsProvider.select((settings) => settings.diaryBookPaged),
     );
-    // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末
-    // （別の端末でサインインし直したときなど）では、ここで聞く。結果は画面に出さない。
+    // サインインしている間、この端末を通知の送り先にしておく。結果は画面に出さない。
     ref.listen(pushTokenProvider, (_, _) {});
 
     // コントローラーは見ていないと捨てられ、読み直しの途中で状態を書けなくなるので見ておく。
     ref.watch(homePageControllerProvider);
     final controller = ref.read(homePageControllerProvider.notifier);
+
+    // 通知の許可はふつうオンボーディングで聞く。オンボーディングを通らずに来た端末では、ここで聞く。
+    useEffect(() {
+      controller.requestNotificationPermission();
+      return null;
+    }, const []);
 
     // アプリを開いたら、通知の未読数を 0 に戻す。ホームはサインインしている間ずっと一番下にある。
     void resetUnreadCount() => controller.resetUnreadCount();

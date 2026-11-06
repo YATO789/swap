@@ -9,9 +9,11 @@ class FakePreferencesStore implements PreferencesStore {
     this.postHintVisible = true,
     this.themeMode = ThemeMode.system,
     this.updateSkippedAt,
+    this.notificationPermissionSkipped = false,
   }) : postDiaryBookIds = postDiaryBookIds ?? {};
 
   bool diaryBookPaged;
+  bool notificationPermissionSkipped;
   Set<String> postDiaryBookIds;
   bool postHintVisible;
   ThemeMode themeMode;
@@ -55,5 +57,13 @@ class FakePreferencesStore implements PreferencesStore {
   @override
   Future<void> saveUpdateSkippedAt(DateTime skippedAt) async {
     updateSkippedAt = skippedAt;
+  }
+
+  @override
+  bool readNotificationPermissionSkipped() => notificationPermissionSkipped;
+
+  @override
+  Future<void> saveNotificationPermissionSkipped(bool skipped) async {
+    notificationPermissionSkipped = skipped;
   }
 }

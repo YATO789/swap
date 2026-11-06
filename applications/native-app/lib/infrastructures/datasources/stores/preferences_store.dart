@@ -9,6 +9,7 @@ const postDiaryBookIdsKey = 'post_diary_book_ids';
 const postHintVisibleKey = 'post_hint_visible';
 const themeModeKey = 'theme_mode';
 const updateSkippedAtKey = 'update_skipped_at';
+const notificationPermissionSkippedKey = 'notification_permission_skipped';
 
 /// 端末に保存する値の読み書きに使う SharedPreferences。
 /// 読み込みを待ってから使いたいので、main で作ったものに差し替える。
@@ -33,6 +34,7 @@ class PreferencesStore {
     postHintVisibleKey,
     themeModeKey,
     updateSkippedAtKey,
+    notificationPermissionSkippedKey,
   };
 
   final SharedPreferencesWithCache _preferences;
@@ -86,5 +88,14 @@ class PreferencesStore {
       updateSkippedAtKey,
       skippedAt.millisecondsSinceEpoch,
     );
+  }
+
+  /// オンボーディングで通知の許可を聞かずに「あとで」で始めたか。まだ選んだことがなければ false。
+  bool readNotificationPermissionSkipped() {
+    return _preferences.getBool(notificationPermissionSkippedKey) ?? false;
+  }
+
+  Future<void> saveNotificationPermissionSkipped(bool skipped) {
+    return _preferences.setBool(notificationPermissionSkippedKey, skipped);
   }
 }

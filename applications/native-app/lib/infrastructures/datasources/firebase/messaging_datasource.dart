@@ -16,10 +16,12 @@ class MessagingDatasource {
   final FirebaseMessaging _messaging;
 
   /// 通知を出してよいか利用者に聞く。一度答えたあとは何も出さない。
-  ///
-  /// アプリを開いているときに届いた通知も、iOS で出すようにする。
   Future<void> requestPermission() async {
     await _messaging.requestPermission();
+  }
+
+  /// アプリを開いているときに届いた通知も、iOS で出すようにする。許可は聞かない。
+  Future<void> showNotificationsInForeground() async {
     await _messaging.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,

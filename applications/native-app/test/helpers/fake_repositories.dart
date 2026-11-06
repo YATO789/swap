@@ -87,7 +87,18 @@ class FakePushTokenRepository implements PushTokenRepository {
   }
 
   @override
+  bool get permissionSkipped {
+    return false;
+  }
+
+  @override
   Future<void> requestPermission() async {}
+
+  @override
+  Future<void> skipPermission() async {}
+
+  @override
+  Future<void> showNotificationsInForeground() async {}
 
   @override
   Future<String?> fetchToken() async {
