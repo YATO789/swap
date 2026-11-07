@@ -100,6 +100,28 @@ class DiaryBookPageController extends _$DiaryBookPageController {
     return true;
   }
 
+  /// 自分の日記 [diary] を消す。消せたらページからも外す。
+  Future<bool> deleteDiary(Diary diary) async {
+    try {
+      await ref.read(diaryRepositoryProvider).delete(diary.id);
+    } catch (error, stackTrace) {
+      debugPrint('日記を消せませんでした: $error\n$stackTrace');
+      return false;
+    }
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(
+        current.copyWith(
+          diaries: [
+            for (final other in current.diaries)
+              if (other.id != diary.id) other,
+          ],
+        ),
+      );
+    }
+    return true;
+  }
+
   /// 自分（[myId]）のリアクションを、[postId] の記録に [emoji] で付ける。同じ絵文字なら取り消す。
   /// 待たずにすぐ画面に映し、保存できなかったら元に戻して false を返す。
   Future<bool> react(String postId, String myId, String emoji) async {

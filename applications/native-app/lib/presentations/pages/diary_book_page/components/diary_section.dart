@@ -25,6 +25,7 @@ class DiarySection extends StatelessWidget {
     required this.avatarUrlOf,
     required this.onOpen,
     required this.onWrite,
+    required this.onLongPressMine,
   });
 
   /// その日の日記。書いた時刻の新しい順。
@@ -42,6 +43,9 @@ class DiarySection extends StatelessWidget {
 
   /// 伏せてある日記を押したとき。その日の自分の日記を書く。
   final ValueChanged<Diary> onWrite;
+
+  /// 自分の日記を長押ししたとき。編集や削除のメニューを出す。
+  final ValueChanged<Diary> onLongPressMine;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +65,7 @@ class DiarySection extends StatelessWidget {
             nameOf: nameOf,
             avatarUrlOf: avatarUrlOf,
             onTap: () => onOpen(mine),
+            onLongPress: () => onLongPressMine(mine),
           ),
         for (final diary in others)
           diary.isLocked
@@ -100,6 +105,7 @@ class _DiaryCard extends StatelessWidget {
     required this.nameOf,
     required this.avatarUrlOf,
     required this.onTap,
+    this.onLongPress,
   });
 
   final Diary diary;
@@ -109,6 +115,7 @@ class _DiaryCard extends StatelessWidget {
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +132,7 @@ class _DiaryCard extends StatelessWidget {
         ),
         child: InkWell(
           onTap: onTap,
+          onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: _cardPadding,

@@ -18,6 +18,7 @@ import '../../components/page_turn_view.dart';
 import '../../components/paper_title.dart';
 import '../../components/post_button.dart';
 import '../router/router.dart';
+import 'components/diary_actions_sheet.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
 import 'controller/diary_book_page_controller.dart';
@@ -38,6 +39,7 @@ class DiaryBookPage extends HookConsumerWidget {
     void catchUpToday() {
       todayState.value = diaryToday();
     }
+
     useOnAppLifecycleStateChange((_, state) {
       if (state == AppLifecycleState.resumed) catchUpToday();
     });
@@ -130,6 +132,50 @@ class DiaryBookPage extends HookConsumerWidget {
       await controller().refresh();
     }
 
+    Future<void> confirmDeleteDiary(Diary diary) async {
+      final l10n = context.l10n;
+      final confirmed = await showConfirmSheet(
+        context,
+        title: l10n.diaryDetailDeleteTitle,
+        message: l10n.diaryDetailDeleteMessage(diaryBook.name),
+        irreversible: true,
+        confirmLabel: l10n.commonDelete,
+        destructive: true,
+      );
+      if (!confirmed || !context.mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final deleted = await ref
+          .read(
+            diaryBookPageControllerProvider(diaryBookId, diary.date).notifier,
+          )
+          .deleteDiary(diary);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            deleted ? l10n.diaryDetailDeleted : l10n.diaryDetailDeleteFailed,
+          ),
+        ),
+      );
+    }
+
+    // 自分の日記を長押ししたら、編集と削除を選べるようにする。
+    Future<void> showMyDiaryActions(Diary diary) async {
+      final action = await showDiaryActionsSheet(
+        context,
+        canEdit: isEditableDiaryDate(diary.date, today: diaryToday()),
+      );
+      if (!context.mounted) return;
+      switch (action) {
+        case DiaryAction.edit:
+          await writeDiary(diary);
+        case DiaryAction.delete:
+          await confirmDeleteDiary(diary);
+        case null:
+          return;
+      }
+    }
+
     Future<void> confirmDeletePost(TimelinePost post) async {
       final confirmed = await showConfirmSheet(
         context,
@@ -214,6 +260,7 @@ class DiaryBookPage extends HookConsumerWidget {
           onRefresh: refresh,
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
+          onLongPressMyDiary: showMyDiaryActions,
           onDeletePost: confirmDeletePost,
           onReact: react,
         ),
@@ -241,6 +288,7 @@ class _DayTimeline extends ConsumerWidget {
     required this.onRefresh,
     required this.onOpenDiary,
     required this.onWriteDiary,
+    required this.onLongPressMyDiary,
     required this.onDeletePost,
     required this.onReact,
   });
@@ -252,6 +300,7 @@ class _DayTimeline extends ConsumerWidget {
   final Future<void> Function() onRefresh;
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
+  final ValueChanged<Diary> onLongPressMyDiary;
   final ValueChanged<TimelinePost> onDeletePost;
   final void Function(TimelinePost post, String emoji) onReact;
 
@@ -275,6 +324,7 @@ class _DayTimeline extends ConsumerWidget {
         onRefresh: onRefresh,
         onOpenDiary: onOpenDiary,
         onWriteDiary: onWriteDiary,
+        onLongPressMyDiary: onLongPressMyDiary,
         onDeletePost: onDeletePost,
         onReact: onReact,
       ),

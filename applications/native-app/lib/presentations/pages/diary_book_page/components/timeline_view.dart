@@ -29,6 +29,7 @@ class TimelineView extends HookWidget {
     required this.onRefresh,
     required this.onOpenDiary,
     required this.onWriteDiary,
+    required this.onLongPressMyDiary,
     required this.onDeletePost,
     required this.onReact,
   });
@@ -50,6 +51,9 @@ class TimelineView extends HookWidget {
   final Future<void> Function() onRefresh;
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
+
+  /// 自分の日記を長押ししたとき。
+  final ValueChanged<Diary> onLongPressMyDiary;
 
   /// 自分の記録を長押ししたとき。
   final ValueChanged<TimelinePost> onDeletePost;
@@ -123,6 +127,7 @@ class TimelineView extends HookWidget {
                 avatarUrlOf: avatarUrlOf,
                 onOpen: onOpenDiary,
                 onWrite: onWriteDiary,
+                onLongPressMine: onLongPressMyDiary,
               ),
             ),
           ),
