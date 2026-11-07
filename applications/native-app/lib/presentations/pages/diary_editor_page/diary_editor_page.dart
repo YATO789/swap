@@ -35,7 +35,8 @@ const _bodyMinLines = 8;
 const _fadingLines = 6;
 
 /// 日記を書くページ。もう書いていれば編集になる。
-/// 日記は日記帳ごとに書き、投稿を押したときにどの日記帳に書くかを選ぶ（何冊でも選べる）。
+/// 日記は日記帳ごとに書く。日記帳から開いたときはその日記帳に書き、
+/// そうでなければ投稿を押したときにどの日記帳に書くかを選ぶ（何冊でも選べる）。
 class DiaryEditorPage extends HookConsumerWidget {
   const DiaryEditorPage({
     super.key,
@@ -46,7 +47,7 @@ class DiaryEditorPage extends HookConsumerWidget {
 
   final DateTime date;
 
-  /// 開いた日記帳。投稿先として最初から選んでおく。null なら全冊を選んでおく。
+  /// 開いた日記帳。あれば投稿先を聞かずにこの日記帳に書く。null なら投稿するときに聞く。
   final String? diaryBookId;
 
   /// true なら、もう書いた日記があっても読み込まずに白紙で開く。
@@ -167,11 +168,9 @@ class _DiaryEditor extends HookWidget {
     });
 
     /// 投稿先を聞くシートで、最初から選んでおく日記帳。
-    /// 前に選んだものがあればそれを使う。
+    /// 最初は全冊を選んでおき、前に選んだものがあればそれを使う。
     final pickedIds = useState<Set<String>>({
-      for (final diaryBook in diaryBooks)
-        if (initialDiaryBookId == null || diaryBook.id == initialDiaryBookId)
-          diaryBook.id,
+      for (final diaryBook in diaryBooks) diaryBook.id,
     });
 
     /// 参加している日記帳すべてに、もう書いてあるか。
@@ -201,9 +200,14 @@ class _DiaryEditor extends HookWidget {
         (isDirty || !allWritten) &&
         !submitting.value;
 
-    /// 投稿する日記帳を聞く。1冊しかなければ聞かずにその日記帳にする。
-    /// やめたら null。
+    /// 投稿する日記帳を聞く。日記帳から開いたときはその日記帳に、
+    /// 1冊しかなければその日記帳に、聞かずに決める。やめたら null。
     Future<List<String>?> askDiaryBookIds() async {
+      final initialId = initialDiaryBookId;
+      if (initialId != null &&
+          diaryBooks.any((diaryBook) => diaryBook.id == initialId)) {
+        return [initialId];
+      }
       if (diaryBooks.length == 1) return [diaryBooks.single.id];
       final picked = await showDiaryBookPicker(
         context,

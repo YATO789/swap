@@ -244,7 +244,7 @@ class DiaryDetailRoute extends GoRouteData with $DiaryDetailRoute {
   }
 }
 
-/// 自分の [date] の日記を書くページ。[diaryBook] は投稿先として最初から選んでおく日記帳。
+/// 自分の [date] の日記を書くページ。[diaryBook] があれば、投稿先を聞かずにその日記帳に書く。
 /// [blank] なら、もう書いた日記があっても読み込まずに白紙で開く。
 @TypedGoRoute<DiaryEditorRoute>(path: '/diaries/write')
 class DiaryEditorRoute extends GoRouteData with $DiaryEditorRoute {
