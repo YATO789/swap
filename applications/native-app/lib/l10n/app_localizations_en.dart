@@ -639,16 +639,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editorLoadFailed => 'Couldn\'t load the diary';
 
   @override
-  String get editorPickerTitle => 'Diary book to write in';
-
-  @override
-  String editorAllStatus(String day, int total, int written) {
-    String _temp0 = intl.Intl.selectLogic(day, {
-      'today': 'Today\'s',
-      'other': 'Yesterday\'s',
-    });
-    return '$_temp0 diary: written in $written of $total';
-  }
+  String get editorPickerTitle => 'Which diary books to post to?';
 
   @override
   String editorStatusWritten(String day) {
@@ -667,6 +658,21 @@ class AppLocalizationsEn extends AppLocalizations {
     });
     return '$_temp0 diary: not yet';
   }
+
+  @override
+  String get editorOverwriteTitle => 'Overwrite?';
+
+  @override
+  String editorOverwriteMessage(String names, String day) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Today\'s',
+      'other': 'Yesterday\'s',
+    });
+    return '$_temp0 diary in $names will be replaced with this one.';
+  }
+
+  @override
+  String get editorOverwriteConfirm => 'Overwrite';
 
   @override
   String get editorSaveFailed => 'Couldn\'t save the diary. Please try again.';
@@ -706,17 +712,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editorNoDiaryBook => 'Create a diary book to start writing';
-
-  @override
-  String editorDiaryBookSemantics(String name) {
-    return 'Diary book to write in: $name';
-  }
-
-  @override
-  String get editorChangeDiaryBook => 'Change diary book';
-
-  @override
-  String get diaryBookPickerAll => 'All diary books';
 
   @override
   String get settingsTitle => 'Settings';

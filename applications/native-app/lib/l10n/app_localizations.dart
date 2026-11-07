@@ -1084,14 +1084,8 @@ abstract class AppLocalizations {
   /// No description provided for @editorPickerTitle.
   ///
   /// In ja, this message translates to:
-  /// **'日記を書く日記帳'**
+  /// **'どの日記帳に投稿しますか？'**
   String get editorPickerTitle;
-
-  /// 「すべての日記帳」の下に添える。day は today か yesterday
-  ///
-  /// In ja, this message translates to:
-  /// **'{day, select, today{今日} other{昨日}}の日記: {total}冊中{written}冊に書いた'**
-  String editorAllStatus(String day, int total, int written);
 
   /// 日記帳の名前の下に添える。day は today か yesterday
   ///
@@ -1104,6 +1098,24 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'{day, select, today{今日} other{昨日}}の日記: まだ'**
   String editorStatusNotYet(String day);
+
+  /// No description provided for @editorOverwriteTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'上書きしますか？'**
+  String get editorOverwriteTitle;
+
+  /// names はもう書いてある日記帳の名前を「」で囲んで並べたもの。day は today か yesterday
+  ///
+  /// In ja, this message translates to:
+  /// **'{names}の{day, select, today{今日} other{昨日}}の日記は、この内容で上書きされます。'**
+  String editorOverwriteMessage(String names, String day);
+
+  /// No description provided for @editorOverwriteConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'上書きする'**
+  String get editorOverwriteConfirm;
 
   /// No description provided for @editorSaveFailed.
   ///
@@ -1158,24 +1170,6 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'日記帳を作ると書けます'**
   String get editorNoDiaryBook;
-
-  /// name は日記帳の名前か「すべての日記帳」
-  ///
-  /// In ja, this message translates to:
-  /// **'日記を書く日記帳: {name}'**
-  String editorDiaryBookSemantics(String name);
-
-  /// No description provided for @editorChangeDiaryBook.
-  ///
-  /// In ja, this message translates to:
-  /// **'日記帳を選び直す'**
-  String get editorChangeDiaryBook;
-
-  /// No description provided for @diaryBookPickerAll.
-  ///
-  /// In ja, this message translates to:
-  /// **'すべての日記帳'**
-  String get diaryBookPickerAll;
 
   /// No description provided for @settingsTitle.
   ///

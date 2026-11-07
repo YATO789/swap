@@ -503,22 +503,7 @@
   },
   "createDiaryBookIconHint": "名前の最初の1文字がアイコンになります",
   "editorLoadFailed": "日記を読み込めませんでした",
-  "editorPickerTitle": "日記を書く日記帳",
-  "editorAllStatus": "{day, select, today{今日} other{昨日}}の日記: {total}冊中{written}冊に書いた",
-  "@editorAllStatus": {
-    "description": "「すべての日記帳」の下に添える。day は today か yesterday",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "total": {
-        "type": "int"
-      },
-      "written": {
-        "type": "int"
-      }
-    }
-  },
+  "editorPickerTitle": "どの日記帳に投稿しますか？",
   "editorStatusWritten": "{day, select, today{今日} other{昨日}}の日記: 書いた",
   "@editorStatusWritten": {
     "description": "日記帳の名前の下に添える。day は today か yesterday",
@@ -537,6 +522,20 @@
       }
     }
   },
+  "editorOverwriteTitle": "上書きしますか？",
+  "editorOverwriteMessage": "{names}の{day, select, today{今日} other{昨日}}の日記は、この内容で上書きされます。",
+  "@editorOverwriteMessage": {
+    "description": "names はもう書いてある日記帳の名前を「」で囲んで並べたもの。day は today か yesterday",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "editorOverwriteConfirm": "上書きする",
   "editorSaveFailed": "日記を書けませんでした。もう一度お試しください",
   "editorPosted": "日記を投稿しました",
   "editorUpdated": "日記を更新しました",
@@ -568,17 +567,6 @@
     }
   },
   "editorNoDiaryBook": "日記帳を作ると書けます",
-  "editorDiaryBookSemantics": "日記を書く日記帳: {name}",
-  "@editorDiaryBookSemantics": {
-    "description": "name は日記帳の名前か「すべての日記帳」",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "editorChangeDiaryBook": "日記帳を選び直す",
-  "diaryBookPickerAll": "すべての日記帳",
   "settingsTitle": "設定",
   "settingsSignOutConfirmTitle": "ログアウトしますか？",
   "settingsSignOut": "ログアウト",

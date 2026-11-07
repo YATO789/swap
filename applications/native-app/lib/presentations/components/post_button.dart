@@ -12,7 +12,7 @@ import 'post_sheet/post_sheet.dart';
 /// 押すと投稿シートを開く。右のペンは日記を書くページを開く。
 /// 背景は持たないので、Scaffold の extendBody と合わせて一覧の上に重ね、一覧はこの下をくぐらせる。
 /// [diaryBook] を渡すと、記録も日記もその日記帳に入れる前提で開く。
-/// 渡さなければ、日記は参加している日記帳すべてに書く（書くページで選び直せる）。
+/// どの日記帳に日記を書くかは、書くページで投稿するときに選ぶ。
 class PostButton extends StatelessWidget {
   const PostButton({
     super.key,
@@ -42,6 +42,8 @@ class PostButton extends StatelessWidget {
     await DiaryEditorRoute(
       date: date,
       diaryBook: diaryBook?.id,
+      // 書いた日記を直すのは日記の詳細からなので、ここからは白紙で開く。
+      blank: true,
     ).push<void>(context);
     onDiaryClosed?.call();
   }

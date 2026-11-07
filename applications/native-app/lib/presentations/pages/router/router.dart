@@ -244,17 +244,20 @@ class DiaryDetailRoute extends GoRouteData with $DiaryDetailRoute {
   }
 }
 
-/// 自分の [date] の日記を書くページ。[diaryBook] が null なら参加している日記帳すべてに書く。
+/// 自分の [date] の日記を書くページ。[diaryBook] は投稿先として最初から選んでおく日記帳。
+/// [blank] なら、もう書いた日記があっても読み込まずに白紙で開く。
 @TypedGoRoute<DiaryEditorRoute>(path: '/diaries/write')
 class DiaryEditorRoute extends GoRouteData with $DiaryEditorRoute {
   const DiaryEditorRoute({
     @TypedQueryParameter(encoder: _encodeDate, decoder: _decodeDate)
     required this.date,
     this.diaryBook,
+    this.blank = false,
   });
 
   final DateTime date;
   final String? diaryBook;
+  final bool blank;
 
   // 下から出てくるモーダルにして、閉じるボタンで閉じる。
   @override
@@ -262,7 +265,11 @@ class DiaryEditorRoute extends GoRouteData with $DiaryEditorRoute {
       MaterialPage(
         key: state.pageKey,
         fullscreenDialog: true,
-        child: DiaryEditorPage(date: date, diaryBookId: diaryBook),
+        child: DiaryEditorPage(
+          date: date,
+          diaryBookId: diaryBook,
+          blank: blank,
+        ),
       );
 }
 

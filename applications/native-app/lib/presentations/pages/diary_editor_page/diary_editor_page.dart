@@ -10,7 +10,7 @@ import '../../providers/diary_book_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
-import '../../components/diary_book_icon.dart';
+import '../../components/confirm_sheet.dart';
 import '../../components/discard_guard.dart';
 import '../../components/post_line.dart';
 import '../../components/ruled_lines.dart';
@@ -35,15 +35,22 @@ const _bodyMinLines = 8;
 const _fadingLines = 6;
 
 /// 日記を書くページ。もう書いていれば編集になる。
-/// 日記は日記帳ごとに書き、書く日記帳はページの上で選び直せる。
-/// 「すべての日記帳」を選ぶと、参加している日記帳すべてに同じ日記を書く。
+/// 日記は日記帳ごとに書き、投稿を押したときにどの日記帳に書くかを選ぶ（何冊でも選べる）。
 class DiaryEditorPage extends HookConsumerWidget {
-  const DiaryEditorPage({super.key, required this.date, this.diaryBookId});
+  const DiaryEditorPage({
+    super.key,
+    required this.date,
+    this.diaryBookId,
+    this.blank = false,
+  });
 
   final DateTime date;
 
-  /// 書く日記帳。null ならすべての日記帳。
+  /// 開いた日記帳。投稿先として最初から選んでおく。null なら全冊を選んでおく。
   final String? diaryBookId;
+
+  /// true なら、もう書いた日記があっても読み込まずに白紙で開く。
+  final bool blank;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,6 +82,7 @@ class DiaryEditorPage extends HookConsumerWidget {
         _DiaryEditor(
           date: date,
           initialDiaryBookId: diaryBookId,
+          blank: blank,
           diaryBooks: diaryBooks,
           state: value,
           onSave: ({required diaryBookIds, required title, required body}) =>
@@ -112,11 +120,12 @@ class DiaryEditorPage extends HookConsumerWidget {
   }
 }
 
-/// 日記を書く欄。保存済みの日記は、最初に作ったときと日記帳を選び直したときに読み込む。
+/// 日記を書く欄。保存済みの日記は、最初に作ったときに読み込む。
 class _DiaryEditor extends HookWidget {
   const _DiaryEditor({
     required this.date,
     required this.initialDiaryBookId,
+    required this.blank,
     required this.diaryBooks,
     required this.state,
     required this.onSave,
@@ -124,6 +133,7 @@ class _DiaryEditor extends HookWidget {
 
   final DateTime date;
   final String? initialDiaryBookId;
+  final bool blank;
   final List<DiaryBook> diaryBooks;
   final DiaryEditorPageState state;
 
@@ -135,102 +145,117 @@ class _DiaryEditor extends HookWidget {
   })
   onSave;
 
-  /// [diaryBookId] を選んだときに日記を書き込む日記帳の id。null ならすべての日記帳。
-  /// 抜けた日記帳を選んでいたら空。
-  List<String> _targetIdsOf(String? diaryBookId) => [
-    for (final diaryBook in diaryBooks)
-      if (diaryBookId == null || diaryBook.id == diaryBookId) diaryBook.id,
-  ];
-
-  /// 書き込む日記帳のうち、もう書いてある日記。
-  List<Diary> _writtenIn(List<String> targetIds) => [
-    for (final id in targetIds) ?state.diaries[id],
-  ];
-
   /// 書いている日記の日。今日なら 'today'、昨日なら 'yesterday'。
   /// 文言の中で「今日」「昨日」を選び分けるのに使う。
-  String get _day =>
-      date == diaryToday() ? 'today' : 'yesterday';
+  String get _day {
+    return date == diaryToday() ? 'today' : 'yesterday';
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final l10n = context.l10n;
 
-    /// 書く日記帳。null ならすべての日記帳。
-    final diaryBookId = useState(initialDiaryBookId);
-    final targetIds = _targetIdsOf(diaryBookId.value);
-    final written = _writtenIn(targetIds);
+    /// 入力欄に読み込む日記。開いた日記帳にもう書いていればその日記、
+    /// 日記帳を決めずに開いたときは、どれか1冊に書いたものを出す。白紙で開くときは null。
+    final existing = useMemoized(() {
+      if (blank) return null;
+      final id = initialDiaryBookId;
+      if (id != null) return state.diaries[id];
+      return [for (final diaryBook in diaryBooks) ?state.diaries[diaryBook.id]]
+          .firstOrNull;
+    });
 
-    /// 入力欄に読み込む日記。すべての日記帳のときは、どれか1冊に書いたものを出す。
-    final existing = written.firstOrNull;
+    /// 投稿先を聞くシートで、最初から選んでおく日記帳。
+    /// 前に選んだものがあればそれを使う。
+    final pickedIds = useState<Set<String>>({
+      for (final diaryBook in diaryBooks)
+        if (initialDiaryBookId == null || diaryBook.id == initialDiaryBookId)
+          diaryBook.id,
+    });
 
-    /// 書き込む日記帳すべてに、もう書いてあるか。
+    /// 参加している日記帳すべてに、もう書いてあるか。
     final allWritten =
-        targetIds.isNotEmpty && written.length == targetIds.length;
+        diaryBooks.isNotEmpty &&
+        diaryBooks.every(
+          (diaryBook) => state.diaries.containsKey(diaryBook.id),
+        );
 
-    final initial = useMemoized(
-      () => _writtenIn(_targetIdsOf(initialDiaryBookId)).firstOrNull,
-    );
     final titleController = useTextEditingController(
-      text: initial?.title ?? '',
+      text: existing?.title ?? '',
     );
-    final bodyController = useTextEditingController(text: initial?.body ?? '');
+    final bodyController = useTextEditingController(text: existing?.body ?? '');
     useListenable(titleController);
     useListenable(bodyController);
-
-    /// 保存済みのタイトルと本文。書きかけかどうかを比べるのに使う。
-    final savedTitle = useState(initial?.title ?? '');
-    final savedBody = useState(initial?.body ?? '');
     final submitting = useState(false);
 
     final title = titleController.text.trim();
     final body = bodyController.text.trim();
-    final isDirty = title != savedTitle.value || body != savedBody.value;
+    final isDirty =
+        title != (existing?.title ?? '') || body != (existing?.body ?? '');
     // 書いたままの日記は送り直さなくてよいので、変えたときか、
     // まだ書いていない日記帳があるときだけ押せる。
     final canSubmit =
-        targetIds.isNotEmpty &&
+        diaryBooks.isNotEmpty &&
         body.isNotEmpty &&
         (isDirty || !allWritten) &&
         !submitting.value;
 
-    /// 保存済みの日記を入力欄に読み込む。
-    void loadSaved(Diary? diary) {
-      savedTitle.value = diary?.title ?? '';
-      savedBody.value = diary?.body ?? '';
-      titleController.text = savedTitle.value;
-      bodyController.text = savedBody.value;
-    }
-
-    /// 書く日記帳を選び直す。その日記帳にもう書いていれば、その日記を読み込む。
-    Future<void> pickDiaryBook() async {
-      final writtenCount = _writtenIn(_targetIdsOf(null)).length;
+    /// 投稿する日記帳を聞く。1冊しかなければ聞かずにその日記帳にする。
+    /// やめたら null。
+    Future<List<String>?> askDiaryBookIds() async {
+      if (diaryBooks.length == 1) return [diaryBooks.single.id];
       final picked = await showDiaryBookPicker(
         context,
         title: l10n.editorPickerTitle,
+        confirmLabel: existing == null ? l10n.editorPost : l10n.editorUpdate,
         diaryBooks: diaryBooks,
-        selectedId: diaryBookId.value ?? allDiaryBooks,
-        allStatus: l10n.editorAllStatus(_day, diaryBooks.length, writtenCount),
-        statusOf: (diaryBook) => state.diaries.containsKey(diaryBook.id)
-            ? l10n.editorStatusWritten(_day)
-            : l10n.editorStatusNotYet(_day),
+        initialIds: pickedIds.value,
+        statusOf: (diaryBook) {
+          return state.diaries.containsKey(diaryBook.id)
+              ? l10n.editorStatusWritten(_day)
+              : l10n.editorStatusNotYet(_day);
+        },
       );
-      if (picked == null || !context.mounted) return;
-      final id = picked == allDiaryBooks ? null : picked;
-      if (id == diaryBookId.value) return;
-      // 書きかけは日記帳を変えると消えるので、確かめてから切り替える。
-      if (isDirty && !await confirmDiscard(context)) return;
-      diaryBookId.value = id;
-      loadSaved(_writtenIn(_targetIdsOf(id)).firstOrNull);
+      if (picked != null) pickedIds.value = picked.toSet();
+      return picked;
+    }
+
+    /// [diaryBookIds] のうち、ほかの日記がもう書いてある日記帳があれば、上書きしてよいかを聞く。
+    /// 読み込んで直している日記そのものは、上書きするのが当たり前なので聞かない。
+    Future<bool> confirmOverwrite(List<String> diaryBookIds) async {
+      final overwritten = [
+        for (final diaryBook in diaryBooks)
+          if (diaryBookIds.contains(diaryBook.id) &&
+              state.diaries[diaryBook.id] != null &&
+              state.diaries[diaryBook.id] != existing)
+            diaryBook,
+      ];
+      if (overwritten.isEmpty) return true;
+      final isJa = Localizations.localeOf(context).languageCode == 'ja';
+      final names = isJa
+          ? overwritten.map((diaryBook) => '「${diaryBook.name}」').join()
+          : overwritten.map((diaryBook) => '"${diaryBook.name}"').join(', ');
+      return showConfirmSheet(
+        context,
+        title: l10n.editorOverwriteTitle,
+        message: l10n.editorOverwriteMessage(names, _day),
+        confirmLabel: l10n.editorOverwriteConfirm,
+        destructive: true,
+      );
     }
 
     Future<void> submit() async {
       if (!canSubmit) return;
+      final diaryBookIds = await askDiaryBookIds();
+      if (diaryBookIds == null || diaryBookIds.isEmpty || !context.mounted) {
+        return;
+      }
+      if (!await confirmOverwrite(diaryBookIds) || !context.mounted) return;
       final isNew = existing == null;
       submitting.value = true;
       final ok = await onSave(
-        diaryBookIds: targetIds,
+        diaryBookIds: diaryBookIds,
         title: title,
         body: body,
       );
@@ -277,23 +302,26 @@ class _DiaryEditor extends HookWidget {
             ),
             const SizedBox(width: 8),
           ],
-          // 書く日記帳は日付の下に小さく出す。タイトルの位置は動かさないよう、
-          // ツールバーの下に足す。
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(20),
-            // ツールバーの余白に食い込ませて、日付のすぐ下に寄せる。
-            child: Transform.translate(
-              offset: const Offset(0, -10),
-              // 押せる範囲を文字の幅だけにするため、真ん中に寄せて置く。
-              child: Center(
-                child: _DiaryBookSelector(
-                  diaryBooks: diaryBooks,
-                  diaryBookId: diaryBookId.value,
-                  onTap: diaryBooks.length > 1 ? pickDiaryBook : null,
-                ),
-              ),
-            ),
-          ),
+          // 日記帳がないと書けないので、日付の下に小さく知らせる。
+          // タイトルの位置は動かさないよう、ツールバーの下に足す。
+          bottom: diaryBooks.isEmpty
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(20),
+                  // ツールバーの余白に食い込ませて、日付のすぐ下に寄せる。
+                  child: Transform.translate(
+                    offset: const Offset(0, -10),
+                    child: Text(
+                      l10n.editorNoDiaryBook,
+                      // DatedTitle の日付と同じ大きさにする。
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                  ),
+                )
+              : null,
         ),
         body: ListView(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
@@ -322,7 +350,7 @@ class _DiaryEditor extends HookWidget {
             // まだ書いていない日を開いたときは、タイトルから書き始められるようにする。
             TextField(
               controller: titleController,
-              autofocus: initial == null,
+              autofocus: existing == null,
               maxLength: maxDiaryTitleLength,
               textInputAction: TextInputAction.next,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
@@ -380,87 +408,6 @@ class _DiaryEditor extends HookWidget {
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// タイトルの下に小さく出す、日記を書く日記帳。[onTap] があれば押して選び直せる。
-/// [diaryBookId] が null ならすべての日記帳（1冊だけならその日記帳）を出す。
-class _DiaryBookSelector extends StatelessWidget {
-  const _DiaryBookSelector({
-    required this.diaryBooks,
-    required this.diaryBookId,
-    required this.onTap,
-  });
-
-  final List<DiaryBook> diaryBooks;
-  final String? diaryBookId;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    // DatedTitle の日付と同じ大きさにする。
-    final style = TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.w500,
-      color: colors.textSecondary,
-    );
-    final id = diaryBookId;
-    final diaryBook = id != null
-        ? diaryBooks.where((diaryBook) => diaryBook.id == id).firstOrNull
-        : diaryBooks.length == 1
-        ? diaryBooks.single
-        : null;
-    final isAll = id == null && diaryBooks.length > 1;
-    if (diaryBook == null && !isAll) {
-      return Text(context.l10n.editorNoDiaryBook, style: style);
-    }
-    final name = isAll ? context.l10n.diaryBookPickerAll : diaryBook!.name;
-
-    return Semantics(
-      button: onTap != null,
-      label: context.l10n.editorDiaryBookSemantics(name),
-      hint: onTap == null ? null : context.l10n.editorChangeDiaryBook,
-      excludeSemantics: true,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isAll)
-                Icon(
-                  Icons.library_books_outlined,
-                  size: 14,
-                  color: colors.textSecondary,
-                )
-              else
-                DiaryBookIcon(
-                  name: diaryBook!.name,
-                  coverColor: diaryBook.coverColor,
-                  size: 14,
-                ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  name,
-                  overflow: TextOverflow.ellipsis,
-                  style: style,
-                ),
-              ),
-              if (onTap != null)
-                Icon(
-                  Icons.arrow_drop_down,
-                  size: 16,
-                  color: colors.textSecondary,
-                ),
-            ],
-          ),
         ),
       ),
     );

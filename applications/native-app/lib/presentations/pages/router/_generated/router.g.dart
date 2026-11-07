@@ -321,6 +321,13 @@ mixin $DiaryEditorRoute on GoRouteData {
   static DiaryEditorRoute _fromState(GoRouterState state) => DiaryEditorRoute(
     date: _decodeDate(state.uri.queryParameters['date']!),
     diaryBook: state.uri.queryParameters['diary-book'],
+    blank:
+        _$convertMapValue(
+          'blank',
+          state.uri.queryParameters,
+          _$boolConverter,
+        ) ??
+        false,
   );
 
   DiaryEditorRoute get _self => this as DiaryEditorRoute;
@@ -331,6 +338,7 @@ mixin $DiaryEditorRoute on GoRouteData {
     queryParams: {
       'date': _encodeDate(_self.date),
       if (_self.diaryBook != null) 'diary-book': _self.diaryBook,
+      if (_self.blank != false) 'blank': _self.blank.toString(),
     },
   );
 
@@ -346,6 +354,26 @@ mixin $DiaryEditorRoute on GoRouteData {
 
   @override
   void replace(BuildContext context) => context.replace(location);
+}
+
+T? _$convertMapValue<T>(
+  String key,
+  Map<String, String> map,
+  T? Function(String) converter,
+) {
+  final value = map[key];
+  return value == null ? null : converter(value);
+}
+
+bool _$boolConverter(String value) {
+  switch (value) {
+    case 'true':
+      return true;
+    case 'false':
+      return false;
+    default:
+      throw UnsupportedError('Cannot convert "$value" into a bool.');
+  }
 }
 
 RouteBase get $myPageRoute => GoRouteData.$route(

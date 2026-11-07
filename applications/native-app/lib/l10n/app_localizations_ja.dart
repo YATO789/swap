@@ -574,13 +574,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get editorLoadFailed => '日記を読み込めませんでした';
 
   @override
-  String get editorPickerTitle => '日記を書く日記帳';
-
-  @override
-  String editorAllStatus(String day, int total, int written) {
-    String _temp0 = intl.Intl.selectLogic(day, {'today': '今日', 'other': '昨日'});
-    return '$_temp0の日記: $total冊中$written冊に書いた';
-  }
+  String get editorPickerTitle => 'どの日記帳に投稿しますか？';
 
   @override
   String editorStatusWritten(String day) {
@@ -593,6 +587,18 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(day, {'today': '今日', 'other': '昨日'});
     return '$_temp0の日記: まだ';
   }
+
+  @override
+  String get editorOverwriteTitle => '上書きしますか？';
+
+  @override
+  String editorOverwriteMessage(String names, String day) {
+    String _temp0 = intl.Intl.selectLogic(day, {'today': '今日', 'other': '昨日'});
+    return '$namesの$_temp0の日記は、この内容で上書きされます。';
+  }
+
+  @override
+  String get editorOverwriteConfirm => '上書きする';
 
   @override
   String get editorSaveFailed => '日記を書けませんでした。もう一度お試しください';
@@ -626,17 +632,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get editorNoDiaryBook => '日記帳を作ると書けます';
-
-  @override
-  String editorDiaryBookSemantics(String name) {
-    return '日記を書く日記帳: $name';
-  }
-
-  @override
-  String get editorChangeDiaryBook => '日記帳を選び直す';
-
-  @override
-  String get diaryBookPickerAll => 'すべての日記帳';
 
   @override
   String get settingsTitle => '設定';
