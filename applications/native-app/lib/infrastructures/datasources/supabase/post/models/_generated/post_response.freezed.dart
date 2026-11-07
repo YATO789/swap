@@ -307,7 +307,7 @@ as List<PostDiaryBookResponse>,
 /// @nodoc
 mixin _$PostDiaryBookResponse {
 
- List<PostReactionResponse> get postReactions;
+ List<PostReactionResponse> get postReactions; List<PostCommentResponse> get postComments;
 /// Create a copy of PostDiaryBookResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -321,20 +321,20 @@ $PostDiaryBookResponseCopyWith<PostDiaryBookResponse> get copyWith => _$PostDiar
 @override
 bool operator ==(Object other) {
   final _this = this as PostDiaryBookResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostDiaryBookResponse&&const DeepCollectionEquality().equals(other.postReactions, _this.postReactions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostDiaryBookResponse&&const DeepCollectionEquality().equals(other.postReactions, _this.postReactions)&&const DeepCollectionEquality().equals(other.postComments, _this.postComments));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PostDiaryBookResponse;
-  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.postReactions));
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.postReactions),const DeepCollectionEquality().hash(_this.postComments));
 }
 
 @override
 String toString() {
   final _this = this as PostDiaryBookResponse;
-  return 'PostDiaryBookResponse(postReactions: ${_this.postReactions})';
+  return 'PostDiaryBookResponse(postReactions: ${_this.postReactions}, postComments: ${_this.postComments})';
 }
 
 
@@ -345,7 +345,7 @@ abstract mixin class $PostDiaryBookResponseCopyWith<$Res>  {
   factory $PostDiaryBookResponseCopyWith(PostDiaryBookResponse value, $Res Function(PostDiaryBookResponse) _then) = _$PostDiaryBookResponseCopyWithImpl;
 @useResult
 $Res call({
- List<PostReactionResponse> postReactions
+ List<PostReactionResponse> postReactions, List<PostCommentResponse> postComments
 });
 
 
@@ -362,10 +362,11 @@ class _$PostDiaryBookResponseCopyWithImpl<$Res>
 
 /// Create a copy of PostDiaryBookResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? postReactions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? postReactions = null,Object? postComments = null,}) {
   return _then(PostDiaryBookResponse(
 postReactions: null == postReactions ? _self.postReactions : postReactions // ignore: cast_nullable_to_non_nullable
-as List<PostReactionResponse>,
+as List<PostReactionResponse>,postComments: null == postComments ? _self.postComments : postComments // ignore: cast_nullable_to_non_nullable
+as List<PostCommentResponse>,
   ));
 }
 
@@ -450,10 +451,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<PostReactionResponse> postReactions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<PostReactionResponse> postReactions,  List<PostCommentResponse> postComments)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PostDiaryBookResponse() when $default != null:
-return $default(_that.postReactions);case _:
+return $default(_that.postReactions,_that.postComments);case _:
   return orElse();
 
 }
@@ -471,10 +472,10 @@ return $default(_that.postReactions);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<PostReactionResponse> postReactions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<PostReactionResponse> postReactions,  List<PostCommentResponse> postComments)  $default,) {final _that = this;
 switch (_that) {
 case _PostDiaryBookResponse():
-return $default(_that.postReactions);case _:
+return $default(_that.postReactions,_that.postComments);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -491,10 +492,10 @@ return $default(_that.postReactions);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<PostReactionResponse> postReactions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<PostReactionResponse> postReactions,  List<PostCommentResponse> postComments)?  $default,) {final _that = this;
 switch (_that) {
 case _PostDiaryBookResponse() when $default != null:
-return $default(_that.postReactions);case _:
+return $default(_that.postReactions,_that.postComments);case _:
   return null;
 
 }
@@ -506,7 +507,7 @@ return $default(_that.postReactions);case _:
 @JsonSerializable()
 
 class _PostDiaryBookResponse implements PostDiaryBookResponse {
-  const _PostDiaryBookResponse({ List<PostReactionResponse> postReactions = const []}): _postReactions = postReactions;
+  const _PostDiaryBookResponse({ List<PostReactionResponse> postReactions = const [],  List<PostCommentResponse> postComments = const []}): _postReactions = postReactions,_postComments = postComments;
   factory _PostDiaryBookResponse.fromJson(Map<String, dynamic> json) => _$PostDiaryBookResponseFromJson(json);
 
  final  List<PostReactionResponse> _postReactions;
@@ -514,6 +515,13 @@ class _PostDiaryBookResponse implements PostDiaryBookResponse {
   if (_postReactions is EqualUnmodifiableListView) return _postReactions;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_postReactions);
+}
+
+ final  List<PostCommentResponse> _postComments;
+@override@JsonKey() List<PostCommentResponse> get postComments {
+  if (_postComments is EqualUnmodifiableListView) return _postComments;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_postComments);
 }
 
 
@@ -530,18 +538,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostDiaryBookResponse&&const DeepCollectionEquality().equals(other.postReactions, _postReactions));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostDiaryBookResponse&&const DeepCollectionEquality().equals(other.postReactions, _postReactions)&&const DeepCollectionEquality().equals(other.postComments, _postComments));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_postReactions));
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_postReactions),const DeepCollectionEquality().hash(_postComments));
 }
 
 @override
 String toString() {
-    return 'PostDiaryBookResponse(postReactions: $postReactions)';
+    return 'PostDiaryBookResponse(postReactions: $postReactions, postComments: $postComments)';
 }
 
 
@@ -552,7 +560,7 @@ abstract mixin class _$PostDiaryBookResponseCopyWith<$Res> implements $PostDiary
   factory _$PostDiaryBookResponseCopyWith(_PostDiaryBookResponse value, $Res Function(_PostDiaryBookResponse) _then) = __$PostDiaryBookResponseCopyWithImpl;
 @override @useResult
 $Res call({
- List<PostReactionResponse> postReactions
+ List<PostReactionResponse> postReactions, List<PostCommentResponse> postComments
 });
 
 
@@ -569,10 +577,11 @@ class __$PostDiaryBookResponseCopyWithImpl<$Res>
 
 /// Create a copy of PostDiaryBookResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? postReactions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? postReactions = null,Object? postComments = null,}) {
   return _then(_PostDiaryBookResponse(
 postReactions: null == postReactions ? _self._postReactions : postReactions // ignore: cast_nullable_to_non_nullable
-as List<PostReactionResponse>,
+as List<PostReactionResponse>,postComments: null == postComments ? _self._postComments : postComments // ignore: cast_nullable_to_non_nullable
+as List<PostCommentResponse>,
   ));
 }
 
@@ -847,6 +856,285 @@ class __$PostReactionResponseCopyWithImpl<$Res>
   return _then(_PostReactionResponse(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,emoji: null == emoji ? _self.emoji : emoji // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$PostCommentResponse {
+
+ String get id; String get userId; String get message;@LocalDateTimeConverter() DateTime get createdAt;
+/// Create a copy of PostCommentResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PostCommentResponseCopyWith<PostCommentResponse> get copyWith => _$PostCommentResponseCopyWithImpl<PostCommentResponse>(this as PostCommentResponse, _$identity);
+
+  /// Serializes this PostCommentResponse to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as PostCommentResponse;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostCommentResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as PostCommentResponse;
+  return Object.hash(runtimeType,_this.id,_this.userId,_this.message,_this.createdAt);
+}
+
+@override
+String toString() {
+  final _this = this as PostCommentResponse;
+  return 'PostCommentResponse(id: ${_this.id}, userId: ${_this.userId}, message: ${_this.message}, createdAt: ${_this.createdAt})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PostCommentResponseCopyWith<$Res>  {
+  factory $PostCommentResponseCopyWith(PostCommentResponse value, $Res Function(PostCommentResponse) _then) = _$PostCommentResponseCopyWithImpl;
+@useResult
+$Res call({
+ String id, String userId, String message,@LocalDateTimeConverter() DateTime createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$PostCommentResponseCopyWithImpl<$Res>
+    implements $PostCommentResponseCopyWith<$Res> {
+  _$PostCommentResponseCopyWithImpl(this._self, this._then);
+
+  final PostCommentResponse _self;
+  final $Res Function(PostCommentResponse) _then;
+
+/// Create a copy of PostCommentResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? message = null,Object? createdAt = null,}) {
+  return _then(PostCommentResponse(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PostCommentResponse].
+extension PostCommentResponsePatterns on PostCommentResponse {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PostCommentResponse value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PostCommentResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PostCommentResponse value)  $default,){
+final _that = this;
+switch (_that) {
+case _PostCommentResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PostCommentResponse value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PostCommentResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String message, @LocalDateTimeConverter()  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PostCommentResponse() when $default != null:
+return $default(_that.id,_that.userId,_that.message,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String message, @LocalDateTimeConverter()  DateTime createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _PostCommentResponse():
+return $default(_that.id,_that.userId,_that.message,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String message, @LocalDateTimeConverter()  DateTime createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _PostCommentResponse() when $default != null:
+return $default(_that.id,_that.userId,_that.message,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PostCommentResponse implements PostCommentResponse {
+  const _PostCommentResponse({required this.id, required this.userId, required this.message, @LocalDateTimeConverter() required this.createdAt});
+  factory _PostCommentResponse.fromJson(Map<String, dynamic> json) => _$PostCommentResponseFromJson(json);
+
+@override final  String id;
+@override final  String userId;
+@override final  String message;
+@override@LocalDateTimeConverter() final  DateTime createdAt;
+
+/// Create a copy of PostCommentResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PostCommentResponseCopyWith<_PostCommentResponse> get copyWith => __$PostCommentResponseCopyWithImpl<_PostCommentResponse>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PostCommentResponseToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostCommentResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.message, message) || other.message == message)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,userId,message,createdAt);
+}
+
+@override
+String toString() {
+    return 'PostCommentResponse(id: $id, userId: $userId, message: $message, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PostCommentResponseCopyWith<$Res> implements $PostCommentResponseCopyWith<$Res> {
+  factory _$PostCommentResponseCopyWith(_PostCommentResponse value, $Res Function(_PostCommentResponse) _then) = __$PostCommentResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String userId, String message,@LocalDateTimeConverter() DateTime createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$PostCommentResponseCopyWithImpl<$Res>
+    implements _$PostCommentResponseCopyWith<$Res> {
+  __$PostCommentResponseCopyWithImpl(this._self, this._then);
+
+  final _PostCommentResponse _self;
+  final $Res Function(_PostCommentResponse) _then;
+
+/// Create a copy of PostCommentResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? message = null,Object? createdAt = null,}) {
+  return _then(_PostCommentResponse(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,
   ));

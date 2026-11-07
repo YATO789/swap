@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../reaction/reaction.dart';
+import 'post_comment.dart';
 
 part '_generated/timeline_post.freezed.dart';
 
@@ -17,6 +18,9 @@ abstract class TimelinePost with _$TimelinePost {
 
     /// この日記帳で付いたリアクション。付けた順。1人1つ。
     @Default([]) List<Reaction> reactions,
+
+    /// この日記帳で付いたコメント。古い順。
+    @Default([]) List<PostComment> comments,
   }) = _TimelinePost;
 
   /// [userId] の人が付けた絵文字。付けていなければ null。

@@ -49,7 +49,7 @@ final class DiaryReminderNotifierProvider
 }
 
 String _$diaryReminderNotifierHash() =>
-    r'9b1505ccbf52ddcf1150d91d0559fcc11c47b3c7';
+    r'd5f8fd8916073a1b55ebac6f5380b0c7a22de7e9';
 
 /// サインインしている間、日記のリマインダーの予約を設定と今日の日記に合わせておく。
 ///

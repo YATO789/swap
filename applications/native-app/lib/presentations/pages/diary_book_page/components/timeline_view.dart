@@ -12,6 +12,7 @@ import '../../../../utils/format.dart';
 import '../../../components/dismissible_selectable_text.dart';
 import '../../../components/user_avatar.dart';
 import 'diary_section.dart';
+import 'post_responder.dart';
 import '../../../components/reactions.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
@@ -22,6 +23,7 @@ class TimelineView extends HookWidget {
   const TimelineView({
     super.key,
     required this.heading,
+    required this.diaryBookId,
     required this.date,
     required this.myId,
     required this.members,
@@ -38,6 +40,7 @@ class TimelineView extends HookWidget {
   /// いちばん上に置く見出し。上に浮かせたボタンの高さぶんを自分で占め、記録と一緒にスクロールする。
   final Widget heading;
 
+  final String diaryBookId;
   final DateTime date;
   final String? myId;
   final List<DiaryBookMember> members;
@@ -163,6 +166,8 @@ class TimelineView extends HookWidget {
               sliver: SliverList.separated(
                 itemCount: hours.length,
                 itemBuilder: (context, index) => _HourSection(
+                  diaryBookId: diaryBookId,
+                  date: date,
                   hour: hours[index],
                   myId: myId,
                   nameOf: nameOf,
@@ -243,6 +248,8 @@ class _BlankPage extends StatelessWidget {
 
 class _HourSection extends StatelessWidget {
   const _HourSection({
+    required this.diaryBookId,
+    required this.date,
     required this.hour,
     required this.myId,
     required this.nameOf,
@@ -251,6 +258,8 @@ class _HourSection extends StatelessWidget {
     required this.onReact,
   });
 
+  final String diaryBookId;
+  final DateTime date;
   final _TimelineHour hour;
   final String? myId;
   final String Function(String userId) nameOf;
@@ -271,6 +280,8 @@ class _HourSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: _PostCard(
+                diaryBookId: diaryBookId,
+                date: date,
                 post: post,
                 myId: myId,
                 nameOf: nameOf,
@@ -407,6 +418,8 @@ class _PendingOthersRow extends StatelessWidget {
 
 class _PostCard extends StatelessWidget {
   const _PostCard({
+    required this.diaryBookId,
+    required this.date,
     required this.post,
     required this.myId,
     required this.nameOf,
@@ -416,6 +429,9 @@ class _PostCard extends StatelessWidget {
     this.lifted = false,
   });
 
+  /// コメントを読み書きする、日記帳の id とページの日付。
+  final String diaryBookId;
+  final DateTime date;
   final TimelinePost post;
   final String? myId;
   final String Function(String userId) nameOf;
@@ -437,12 +453,24 @@ class _PostCard extends StatelessWidget {
   /// 左に出す、書いた人のアイコンの大きさ。
   static const double _avatarSize = 36;
 
-  Future<void> _pickReaction(BuildContext context) async {
-    final emoji = await showReactionPicker(
+  /// リアクションとコメントの画面を開く。自分の記録では付いたコメントを読むだけにする。
+  Future<void> _respond(BuildContext context) async {
+    final canReact = post.authorId != myId;
+    final emoji = await showPostResponder(
       context,
       target: context,
+      diaryBookId: diaryBookId,
+      date: date,
+      postId: post.id,
+      myId: myId,
+      canReact: canReact,
       current: post.reactionOf(myId),
+      hintText: context.l10n.commentHintTo(nameOf(post.authorId)),
+      nameOf: nameOf,
+      avatarUrlOf: avatarUrlOf,
       liftedBuilder: (_) => _PostCard(
+        diaryBookId: diaryBookId,
+        date: date,
         post: post,
         myId: myId,
         nameOf: nameOf,
@@ -452,7 +480,7 @@ class _PostCard extends StatelessWidget {
         lifted: true,
       ),
     );
-    if (emoji == null) return;
+    if (emoji == null || !canReact) return;
     onReact(emoji);
   }
 
@@ -460,9 +488,9 @@ class _PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final isMine = post.authorId == myId;
-    // 自分の記録には付けない。
+    // リアクションは自分の記録には付けない。コメントは自分の記録にも書ける。
     final canReact = !isMine && !lifted;
-    // ハートの中心を、左のアイコンの中心に合わせる。本文が何行あっても動かさない。
+    // ボタンの中心を、左のアイコンの中心に合わせる。本文が何行あっても動かさない。
     const buttonTop = (_avatarSize - ReactionButton.size) / 2;
 
     // 自分の記録は長押しで削除できる。
@@ -536,15 +564,18 @@ class _PostCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (canReact)
+            // 自分の記録にはリアクションもコメントも付けないので、付いたコメントを読むときだけ出す。
+            if (!lifted && (!isMine || post.comments.isNotEmpty))
               Transform.translate(
                 offset: const Offset(0, buttonTop),
                 child: ReactionButton(
                   current: post.reactionOf(myId),
-                  onPressed: () => _pickReaction(context),
+                  withComments: true,
+                  commentCount: post.comments.length,
+                  onPressed: () => _respond(context),
                 ),
               )
-            else if (lifted && !isMine)
+            else if (lifted)
               // 浮かせた見本でも、ボタンの場所は空けて元の並びと揃える。
               const SizedBox(width: ReactionButton.size),
           ],

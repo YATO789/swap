@@ -214,10 +214,7 @@ class _DiaryPages extends HookConsumerWidget {
                     icon: const Icon(Icons.more_horiz),
                     onSelected: (action) => action(),
                     itemBuilder: (context) => [
-                      if (isEditableDiaryDate(
-                        diary.date,
-                        today: diaryToday(),
-                      ))
+                      if (isEditableDiaryDate(diary.date, today: diaryToday()))
                         PopupMenuItem(
                           value: edit,
                           child: ListTile(

@@ -5,6 +5,7 @@ import 'package:swap/domains/authentication/authentication.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
+import 'package:swap/domains/post/post_comment.dart';
 import 'package:swap/domains/post/timeline_post.dart';
 import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/domains/profile/profile.dart';
@@ -231,7 +232,7 @@ void main() {
       postedAt: diaryDayStartOf(today),
     );
 
-    testWidgets('ほかの人の記録にはハートが出て、自分の記録には出ない', (tester) async {
+    testWidgets('ほかの人の記録だけボタンが出て、絵文字の吹き出しと入力欄がある', (tester) async {
       await _openDiaryBook(
         tester,
         posts: [
@@ -240,24 +241,59 @@ void main() {
             id: 'p2',
             authorId: 'me',
             message: 'カフェで勉強中',
-            postedAt: diaryDayStartOf(today),
+            postedAt: diaryDayStartOf(today).add(const Duration(minutes: 1)),
           ),
         ],
       );
 
-      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+      // コメントのない自分の記録にはボタンを出さない。
+      expect(find.byTooltip('リアクションとコメント'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('リアクションとコメント'));
+      await tester.pumpAndSettle();
+      expect(find.text('❤️'), findsOneWidget);
+      expect(find.text('健太にコメント'), findsOneWidget);
     });
 
-    testWidgets('ハートから絵文字を選ぶと、チップが出てハートがその絵文字になる', (tester) async {
+    testWidgets('自分の記録はコメントがあるときだけボタンが出て、読むだけの画面になる', (tester) async {
+      await _openDiaryBook(
+        tester,
+        posts: [
+          TimelinePost(
+            id: 'p2',
+            authorId: 'me',
+            message: 'カフェで勉強中',
+            postedAt: diaryDayStartOf(today),
+            comments: [
+              PostComment(
+                id: 'c1',
+                userId: 'mio',
+                message: 'いいね',
+                createdAt: diaryDayStartOf(today),
+              ),
+            ],
+          ),
+        ],
+      );
+
+      await tester.tap(find.byTooltip('リアクションとコメント。コメント1件'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('いいね'), findsOneWidget);
+      expect(find.text('❤️'), findsNothing);
+      expect(find.byType(TextField), findsNothing);
+    });
+
+    testWidgets('反応する画面で絵文字を選ぶと、チップが出てボタンがその絵文字になる', (tester) async {
       await _openDiaryBook(tester, posts: [kenPost]);
 
-      await tester.tap(find.byTooltip('リアクションを付ける'));
+      await tester.tap(find.byTooltip('リアクションとコメント'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('❤️'));
       await tester.pumpAndSettle();
 
       expect(find.bySemanticsLabel('あなたが❤️'), findsOneWidget);
-      expect(find.byTooltip('リアクションを変える。今は❤️'), findsOneWidget);
+      expect(find.byTooltip('リアクションとコメント。自分のリアクションは❤️'), findsOneWidget);
     });
 
     testWidgets('チップを押すと、その絵文字で付けられて、もう一度押すと取り消せる', (tester) async {
@@ -278,7 +314,7 @@ void main() {
       await tester.tap(find.bySemanticsLabel('美緒、あなたが😂'));
       await tester.pumpAndSettle();
       expect(find.bySemanticsLabel('美緒が😂'), findsOneWidget);
-      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+      expect(find.byTooltip('リアクションとコメント'), findsOneWidget);
     });
 
     testWidgets('保存できなかったら、元に戻して知らせる', (tester) async {
@@ -289,14 +325,104 @@ void main() {
       )..failsReactions = true;
       await _openDiaryBook(tester, postRepository: repository);
 
-      await tester.tap(find.byTooltip('リアクションを付ける'));
+      await tester.tap(find.byTooltip('リアクションとコメント'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('❤️'));
       await tester.pumpAndSettle();
 
       expect(find.bySemanticsLabel('あなたが❤️'), findsNothing);
-      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+      expect(find.byTooltip('リアクションとコメント'), findsOneWidget);
       expect(find.text('リアクションを保存できませんでした。もう一度お試しください'), findsOneWidget);
+    });
+  });
+
+  group('記録のコメント', () {
+    final kenPost = TimelinePost(
+      id: 'p1',
+      authorId: 'ken',
+      message: '図書館で勉強中',
+      postedAt: diaryDayStartOf(today),
+    );
+
+    testWidgets('コメントを送ると一覧に出て、閉じるとボタンに件数が出る', (tester) async {
+      await _openDiaryBook(tester, posts: [kenPost]);
+
+      await tester.tap(find.byTooltip('リアクションとコメント'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'がんばって');
+      await tester.pump();
+      await tester.tap(find.byTooltip('送る'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('がんばって'), findsOneWidget);
+      // 送っても画面は閉じず、入力欄は空になる。
+      expect(find.text('健太にコメント'), findsOneWidget);
+
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('リアクションとコメント。コメント1件'), findsOneWidget);
+    });
+
+    testWidgets('送れなかったら、書いた文字を残して知らせる', (tester) async {
+      final repository = FakePostRepository(
+        timelinePosts: {
+          _university.id: [kenPost],
+        },
+      )..failsComments = true;
+      await _openDiaryBook(tester, postRepository: repository);
+
+      await tester.tap(find.byTooltip('リアクションとコメント'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'がんばって');
+      await tester.pump();
+      await tester.tap(find.byTooltip('送る'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('コメントを送れませんでした。もう一度お試しください'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller!.text,
+        'がんばって',
+      );
+    });
+
+    testWidgets('自分のコメントは長押しで消せて、ほかの人のコメントは消せない', (tester) async {
+      await _openDiaryBook(
+        tester,
+        posts: [
+          kenPost.copyWith(
+            comments: [
+              PostComment(
+                id: 'c1',
+                userId: 'mio',
+                message: 'えらい',
+                createdAt: diaryDayStartOf(today),
+              ),
+              PostComment(
+                id: 'c2',
+                userId: 'me',
+                message: 'がんばって',
+                createdAt: diaryDayStartOf(today),
+              ),
+            ],
+          ),
+        ],
+      );
+
+      await tester.tap(find.byTooltip('リアクションとコメント。コメント2件'));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.text('えらい'));
+      await tester.pumpAndSettle();
+      expect(find.text('コメントを削除しますか？'), findsNothing);
+
+      await tester.longPress(find.text('がんばって'));
+      await tester.pumpAndSettle();
+      expect(find.text('コメントを削除しますか？'), findsOneWidget);
+      await tester.tap(find.text('削除する'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('がんばって'), findsNothing);
+      expect(find.text('えらい'), findsOneWidget);
     });
   });
 

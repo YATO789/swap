@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 mixin _$TimelinePost {
 
  String get id; String get authorId; String get message; DateTime get postedAt;/// この日記帳で付いたリアクション。付けた順。1人1つ。
- List<Reaction> get reactions;
+ List<Reaction> get reactions;/// この日記帳で付いたコメント。古い順。
+ List<PostComment> get comments;
 /// Create a copy of TimelinePost
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,20 +29,20 @@ $TimelinePostCopyWith<TimelinePost> get copyWith => _$TimelinePostCopyWithImpl<T
 @override
 bool operator ==(Object other) {
   final _this = this as TimelinePost;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TimelinePost&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.postedAt, _this.postedAt) || other.postedAt == _this.postedAt)&&const DeepCollectionEquality().equals(other.reactions, _this.reactions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TimelinePost&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.postedAt, _this.postedAt) || other.postedAt == _this.postedAt)&&const DeepCollectionEquality().equals(other.reactions, _this.reactions)&&const DeepCollectionEquality().equals(other.comments, _this.comments));
 }
 
 
 @override
 int get hashCode {
   final _this = this as TimelinePost;
-  return Object.hash(runtimeType,_this.id,_this.authorId,_this.message,_this.postedAt,const DeepCollectionEquality().hash(_this.reactions));
+  return Object.hash(runtimeType,_this.id,_this.authorId,_this.message,_this.postedAt,const DeepCollectionEquality().hash(_this.reactions),const DeepCollectionEquality().hash(_this.comments));
 }
 
 @override
 String toString() {
   final _this = this as TimelinePost;
-  return 'TimelinePost(id: ${_this.id}, authorId: ${_this.authorId}, message: ${_this.message}, postedAt: ${_this.postedAt}, reactions: ${_this.reactions})';
+  return 'TimelinePost(id: ${_this.id}, authorId: ${_this.authorId}, message: ${_this.message}, postedAt: ${_this.postedAt}, reactions: ${_this.reactions}, comments: ${_this.comments})';
 }
 
 
@@ -52,7 +53,7 @@ abstract mixin class $TimelinePostCopyWith<$Res>  {
   factory $TimelinePostCopyWith(TimelinePost value, $Res Function(TimelinePost) _then) = _$TimelinePostCopyWithImpl;
 @useResult
 $Res call({
- String id, String authorId, String message, DateTime postedAt, List<Reaction> reactions
+ String id, String authorId, String message, DateTime postedAt, List<Reaction> reactions, List<PostComment> comments
 });
 
 
@@ -69,14 +70,15 @@ class _$TimelinePostCopyWithImpl<$Res>
 
 /// Create a copy of TimelinePost
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? reactions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? reactions = null,Object? comments = null,}) {
   return _then(TimelinePost(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,postedAt: null == postedAt ? _self.postedAt : postedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,reactions: null == reactions ? _self.reactions : reactions // ignore: cast_nullable_to_non_nullable
-as List<Reaction>,
+as List<Reaction>,comments: null == comments ? _self.comments : comments // ignore: cast_nullable_to_non_nullable
+as List<PostComment>,
   ));
 }
 
@@ -161,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  String message,  DateTime postedAt,  List<Reaction> reactions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  String message,  DateTime postedAt,  List<Reaction> reactions,  List<PostComment> comments)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TimelinePost() when $default != null:
-return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.reactions);case _:
+return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.reactions,_that.comments);case _:
   return orElse();
 
 }
@@ -182,10 +184,10 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.react
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  String message,  DateTime postedAt,  List<Reaction> reactions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  String message,  DateTime postedAt,  List<Reaction> reactions,  List<PostComment> comments)  $default,) {final _that = this;
 switch (_that) {
 case _TimelinePost():
-return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.reactions);case _:
+return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.reactions,_that.comments);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +204,10 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.react
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  String message,  DateTime postedAt,  List<Reaction> reactions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  String message,  DateTime postedAt,  List<Reaction> reactions,  List<PostComment> comments)?  $default,) {final _that = this;
 switch (_that) {
 case _TimelinePost() when $default != null:
-return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.reactions);case _:
+return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.reactions,_that.comments);case _:
   return null;
 
 }
@@ -217,7 +219,7 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.react
 
 
 class _TimelinePost extends TimelinePost {
-  const _TimelinePost({required this.id, required this.authorId, required this.message, required this.postedAt,  List<Reaction> reactions = const []}): _reactions = reactions,super._();
+  const _TimelinePost({required this.id, required this.authorId, required this.message, required this.postedAt,  List<Reaction> reactions = const [],  List<PostComment> comments = const []}): _reactions = reactions,_comments = comments,super._();
   
 
 @override final  String id;
@@ -233,6 +235,15 @@ class _TimelinePost extends TimelinePost {
   return EqualUnmodifiableListView(_reactions);
 }
 
+/// この日記帳で付いたコメント。古い順。
+ final  List<PostComment> _comments;
+/// この日記帳で付いたコメント。古い順。
+@override@JsonKey() List<PostComment> get comments {
+  if (_comments is EqualUnmodifiableListView) return _comments;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_comments);
+}
+
 
 /// Create a copy of TimelinePost
 /// with the given fields replaced by the non-null parameter values.
@@ -244,18 +255,18 @@ _$TimelinePostCopyWith<_TimelinePost> get copyWith => __$TimelinePostCopyWithImp
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TimelinePost&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.message, message) || other.message == message)&&(identical(other.postedAt, postedAt) || other.postedAt == postedAt)&&const DeepCollectionEquality().equals(other.reactions, _reactions));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TimelinePost&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.message, message) || other.message == message)&&(identical(other.postedAt, postedAt) || other.postedAt == postedAt)&&const DeepCollectionEquality().equals(other.reactions, _reactions)&&const DeepCollectionEquality().equals(other.comments, _comments));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,authorId,message,postedAt,const DeepCollectionEquality().hash(_reactions));
+    return Object.hash(runtimeType,id,authorId,message,postedAt,const DeepCollectionEquality().hash(_reactions),const DeepCollectionEquality().hash(_comments));
 }
 
 @override
 String toString() {
-    return 'TimelinePost(id: $id, authorId: $authorId, message: $message, postedAt: $postedAt, reactions: $reactions)';
+    return 'TimelinePost(id: $id, authorId: $authorId, message: $message, postedAt: $postedAt, reactions: $reactions, comments: $comments)';
 }
 
 
@@ -266,7 +277,7 @@ abstract mixin class _$TimelinePostCopyWith<$Res> implements $TimelinePostCopyWi
   factory _$TimelinePostCopyWith(_TimelinePost value, $Res Function(_TimelinePost) _then) = __$TimelinePostCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String authorId, String message, DateTime postedAt, List<Reaction> reactions
+ String id, String authorId, String message, DateTime postedAt, List<Reaction> reactions, List<PostComment> comments
 });
 
 
@@ -283,14 +294,15 @@ class __$TimelinePostCopyWithImpl<$Res>
 
 /// Create a copy of TimelinePost
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? reactions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? reactions = null,Object? comments = null,}) {
   return _then(_TimelinePost(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,postedAt: null == postedAt ? _self.postedAt : postedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,reactions: null == reactions ? _self._reactions : reactions // ignore: cast_nullable_to_non_nullable
-as List<Reaction>,
+as List<Reaction>,comments: null == comments ? _self._comments : comments // ignore: cast_nullable_to_non_nullable
+as List<PostComment>,
   ));
 }
 

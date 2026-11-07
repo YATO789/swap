@@ -292,6 +292,44 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diaryBookReactionFailed => 'リアクションを保存できませんでした。もう一度お試しください';
 
   @override
+  String get respondLabel => 'リアクションとコメント';
+
+  @override
+  String respondMyReaction(String emoji) {
+    return '自分のリアクションは$emoji';
+  }
+
+  @override
+  String respondCommentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'コメント$count件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get respondLabelSeparator => '。';
+
+  @override
+  String commentHintTo(String name) {
+    return '$nameにコメント';
+  }
+
+  @override
+  String get commentSend => '送る';
+
+  @override
+  String get commentSendFailed => 'コメントを送れませんでした。もう一度お試しください';
+
+  @override
+  String get commentDeleteTitle => 'コメントを削除しますか？';
+
+  @override
+  String get commentDeleteFailed => 'コメントを削除できませんでした。もう一度お試しください';
+
+  @override
   String get reactionAdd => 'リアクションを付ける';
 
   @override

@@ -57,8 +57,41 @@ class PostDatasource {
         .eq('diary_book_id', diaryBookId);
   }
 
+  /// 自分のコメント [message] を、[diaryBookId] の日記帳に出た [postId] の記録に書き、書いた行を返す。
+  /// 書いた時刻は DB が決める。
+  Future<PostCommentResponse> addComment(
+    String postId,
+    String diaryBookId,
+    String message,
+  ) async {
+    // user_id は DB の既定値（auth.uid()）で入る。
+    final row = await _client
+        .from('post_comments')
+        .insert({
+          'post_id': postId,
+          'diary_book_id': diaryBookId,
+          'message': message,
+        })
+        .select('id, user_id, message, created_at')
+        .single();
+    return PostCommentResponse.fromJson(row);
+  }
+
+  /// 自分のコメント [commentId] を消す。
+  Future<void> deleteComment(String commentId) async {
+    // RLS で消せるのは自分のコメントだけ。消せなくても例外にならないので、消えた行で確かめる。
+    final rows = await _client
+        .from('post_comments')
+        .delete()
+        .eq('id', commentId)
+        .select('id');
+    if (rows.isEmpty) {
+      throw StateError('コメント $commentId を消せませんでした');
+    }
+  }
+
   /// [diaryBookId] の日記帳に出された、[from] 以降 [to] より前の記録を古い順に返す。
-  /// その日記帳で付いたリアクションも一緒に返す。
+  /// その日記帳で付いたリアクションとコメントも一緒に返す。
   Future<List<PostResponse>> fetchInDiaryBook(
     String diaryBookId, {
     required DateTime from,
@@ -69,7 +102,8 @@ class PostDatasource {
         .select(
           'id, author_id, message, posted_at, '
           'post_diary_books!inner(diary_book_id, '
-          'post_reactions(user_id, emoji, created_at))',
+          'post_reactions(user_id, emoji, created_at), '
+          'post_comments(id, user_id, message, created_at))',
         )
         .eq('post_diary_books.diary_book_id', diaryBookId)
         .gte('posted_at', from.toUtc().toIso8601String())

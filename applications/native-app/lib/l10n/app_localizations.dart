@@ -608,6 +608,60 @@ abstract class AppLocalizations {
   /// **'リアクションを保存できませんでした。もう一度お試しください'**
   String get diaryBookReactionFailed;
 
+  /// 記録の「反応する」ボタンの読み上げの先頭
+  ///
+  /// In ja, this message translates to:
+  /// **'リアクションとコメント'**
+  String get respondLabel;
+
+  /// 「反応する」ボタンの読み上げに添える、今付けている絵文字
+  ///
+  /// In ja, this message translates to:
+  /// **'自分のリアクションは{emoji}'**
+  String respondMyReaction(String emoji);
+
+  /// 「反応する」ボタンの読み上げに添える、付いているコメントの数
+  ///
+  /// In ja, this message translates to:
+  /// **'{count, plural, other{コメント{count}件}}'**
+  String respondCommentCount(int count);
+
+  /// 「反応する」ボタンの読み上げをつなぐ区切り
+  ///
+  /// In ja, this message translates to:
+  /// **'。'**
+  String get respondLabelSeparator;
+
+  /// ほかの人の記録にコメントするときの入力欄のヒント。name は記録を書いた人の名前
+  ///
+  /// In ja, this message translates to:
+  /// **'{name}にコメント'**
+  String commentHintTo(String name);
+
+  /// No description provided for @commentSend.
+  ///
+  /// In ja, this message translates to:
+  /// **'送る'**
+  String get commentSend;
+
+  /// No description provided for @commentSendFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを送れませんでした。もう一度お試しください'**
+  String get commentSendFailed;
+
+  /// No description provided for @commentDeleteTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを削除しますか？'**
+  String get commentDeleteTitle;
+
+  /// No description provided for @commentDeleteFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを削除できませんでした。もう一度お試しください'**
+  String get commentDeleteFailed;
+
   /// No description provided for @reactionAdd.
   ///
   /// In ja, this message translates to:

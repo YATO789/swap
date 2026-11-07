@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../domains/diary/diary.dart';
 import '../../../../domains/diary_book/diary_book_member.dart';
+import '../../../../domains/post/post_comment.dart';
 import '../../../../domains/post/timeline_post.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
@@ -157,6 +158,46 @@ class DiaryBookPageController extends _$DiaryBookPageController {
         );
       }
       return false;
+    }
+    return true;
+  }
+
+  /// 自分のコメント [message] を [postId] の記録に書く。書けたら記録のコメントの最後に足して true を返す。
+  Future<bool> addComment(String postId, String message) async {
+    final PostComment comment;
+    try {
+      comment = await ref
+          .read(postRepositoryProvider)
+          .addComment(postId, diaryBookId, message);
+    } catch (error, stackTrace) {
+      debugPrint('コメントを書けませんでした: $error\n$stackTrace');
+      return false;
+    }
+    final latest = _postOf(postId);
+    if (latest != null) {
+      _replacePost(latest.copyWith(comments: [...latest.comments, comment]));
+    }
+    return true;
+  }
+
+  /// 自分のコメント [comment] を [postId] の記録から消す。消せたら記録からも外して true を返す。
+  Future<bool> deleteComment(String postId, PostComment comment) async {
+    try {
+      await ref.read(postRepositoryProvider).deleteComment(comment.id);
+    } catch (error, stackTrace) {
+      debugPrint('コメントを消せませんでした: $error\n$stackTrace');
+      return false;
+    }
+    final latest = _postOf(postId);
+    if (latest != null) {
+      _replacePost(
+        latest.copyWith(
+          comments: [
+            for (final other in latest.comments)
+              if (other.id != comment.id) other,
+          ],
+        ),
+      );
     }
     return true;
   }

@@ -316,6 +316,7 @@ class _DayTimeline extends ConsumerWidget {
     return switch (ref.watch(provider)) {
       AsyncValue(:final value?, hasError: false) => TimelineView(
         heading: heading,
+        diaryBookId: diaryBookId,
         date: date,
         myId: myId,
         members: value.members,

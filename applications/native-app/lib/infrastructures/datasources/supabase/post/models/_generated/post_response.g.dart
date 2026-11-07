@@ -41,11 +41,19 @@ _PostDiaryBookResponse _$PostDiaryBookResponseFromJson(
           ?.map((e) => PostReactionResponse.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  postComments:
+      (json['post_comments'] as List<dynamic>?)
+          ?.map((e) => PostCommentResponse.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$PostDiaryBookResponseToJson(
   _PostDiaryBookResponse instance,
-) => <String, dynamic>{'post_reactions': instance.postReactions};
+) => <String, dynamic>{
+  'post_reactions': instance.postReactions,
+  'post_comments': instance.postComments,
+};
 
 _PostReactionResponse _$PostReactionResponseFromJson(
   Map<String, dynamic> json,
@@ -62,5 +70,24 @@ Map<String, dynamic> _$PostReactionResponseToJson(
 ) => <String, dynamic>{
   'user_id': instance.userId,
   'emoji': instance.emoji,
+  'created_at': const LocalDateTimeConverter().toJson(instance.createdAt),
+};
+
+_PostCommentResponse _$PostCommentResponseFromJson(Map<String, dynamic> json) =>
+    _PostCommentResponse(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      message: json['message'] as String,
+      createdAt: const LocalDateTimeConverter().fromJson(
+        json['created_at'] as String,
+      ),
+    );
+
+Map<String, dynamic> _$PostCommentResponseToJson(
+  _PostCommentResponse instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'user_id': instance.userId,
+  'message': instance.message,
   'created_at': const LocalDateTimeConverter().toJson(instance.createdAt),
 };

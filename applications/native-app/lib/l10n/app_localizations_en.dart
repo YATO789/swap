@@ -321,6 +321,47 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t save your reaction. Please try again.';
 
   @override
+  String get respondLabel => 'Reactions and comments';
+
+  @override
+  String respondMyReaction(String emoji) {
+    return 'Your reaction is $emoji';
+  }
+
+  @override
+  String respondCommentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comments',
+      one: '1 comment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get respondLabelSeparator => '. ';
+
+  @override
+  String commentHintTo(String name) {
+    return 'Comment to $name';
+  }
+
+  @override
+  String get commentSend => 'Send';
+
+  @override
+  String get commentSendFailed =>
+      'Couldn\'t send your comment. Please try again.';
+
+  @override
+  String get commentDeleteTitle => 'Delete this comment?';
+
+  @override
+  String get commentDeleteFailed =>
+      'Couldn\'t delete your comment. Please try again.';
+
+  @override
   String get reactionAdd => 'Add a reaction';
 
   @override

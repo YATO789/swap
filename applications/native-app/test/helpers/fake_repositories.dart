@@ -9,6 +9,7 @@ import 'package:swap/domains/diary_book/diary_book_cover_field.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/domains/post/post.dart';
+import 'package:swap/domains/post/post_comment.dart';
 import 'package:swap/domains/post/timeline_post.dart';
 import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/domains/profile/profile.dart';
@@ -86,7 +87,6 @@ class FakePushTokenRepository implements PushTokenRepository {
   Stream<String> get onTokenRefresh {
     return const Stream.empty();
   }
-
 
   @override
   Future<String?> fetchToken() async {
@@ -242,6 +242,43 @@ class FakePostRepository implements PostRepository {
         ],
       );
     });
+  }
+
+  /// true なら、コメントを書くのも消すのも失敗する。
+  bool failsComments = false;
+
+  @override
+  Future<PostComment> addComment(
+    String postId,
+    String diaryBookId,
+    String message,
+  ) async {
+    if (failsComments) throw Exception('コメントを書けない');
+    final comment = PostComment(
+      id: 'comment${DateTime.now().microsecondsSinceEpoch}',
+      userId: 'me',
+      message: message,
+      createdAt: DateTime.now(),
+    );
+    _updatePost(diaryBookId, postId, (post) {
+      return post.copyWith(comments: [...post.comments, comment]);
+    });
+    return comment;
+  }
+
+  @override
+  Future<void> deleteComment(String commentId) async {
+    if (failsComments) throw Exception('コメントを消せない');
+    for (final posts in timelinePosts.values) {
+      for (final (index, post) in posts.indexed) {
+        posts[index] = post.copyWith(
+          comments: [
+            for (final comment in post.comments)
+              if (comment.id != commentId) comment,
+          ],
+        );
+      }
+    }
   }
 
   void _updatePost(
