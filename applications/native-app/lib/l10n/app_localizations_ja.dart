@@ -313,6 +313,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get respondLabelSeparator => '。';
 
   @override
+  String get commentHintMine => 'コメントを書く';
+
+  @override
   String commentHintTo(String name) {
     return '$nameにコメント';
   }

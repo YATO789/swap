@@ -228,6 +228,7 @@
   "@respondLabelSeparator": {
     "description": "「反応する」ボタンの読み上げをつなぐ区切り"
   },
+  "commentHintMine": "コメントを書く",
   "commentHintTo": "{name}にコメント",
   "@commentHintTo": {
     "description": "ほかの人の記録にコメントするときの入力欄のヒント。name は記録を書いた人の名前",

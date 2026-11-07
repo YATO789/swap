@@ -16,7 +16,7 @@ import '../controller/diary_book_page_controller.dart';
 
 /// 記録の「反応する」ボタンを押したときに出す画面。リアクションの吹き出しを広げたもの。
 /// 暗くした画面の上に、上から絵文字の吹き出し・浮かせた記録・これまでのコメントを重ね、いちばん下に入力欄を置く。
-/// [canReact] が false（自分の記録）なら絵文字の吹き出しも入力欄も出さず、付いたコメントを読むだけにする。
+/// [canReact] が false（自分の記録）なら絵文字の吹き出しは出さず、コメントだけにする。
 /// 選んだ絵文字を返す（「＋」なら全部の絵文字のシートから選んだもの）。絵文字を選ばずに閉じたら null。
 /// コメントはこの画面の中で送ったり消したりし、送っても画面は閉じない。
 /// コメントは [diaryBookId] の日記帳の [date] のページのコントローラーから読み書きする。
@@ -29,7 +29,7 @@ Future<String?> showPostResponder(
   required String? myId,
   required bool canReact,
   required String? current,
-  String? hintText,
+  required String hintText,
   required String Function(String userId) nameOf,
   required String? Function(String userId) avatarUrlOf,
   required WidgetBuilder liftedBuilder,
@@ -93,8 +93,8 @@ class _PostResponderOverlay extends HookConsumerWidget {
   final bool canReact;
   final String? current;
 
-  /// 入力欄のヒント。[canReact] のときだけ使う。
-  final String? hintText;
+  /// 入力欄のヒント。
+  final String hintText;
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;
   final WidgetBuilder liftedBuilder;
@@ -123,11 +123,10 @@ class _PostResponderOverlay extends HookConsumerWidget {
     final error = useState<String?>(null);
 
     // 入力欄の高さ。浮かせた部分をこの上までに収める。複数行になったら測り直す。
-    // 入力欄を出さない（自分の記録の）ときは、画面の下の余白まで使う。
     final inputKey = useMemoized(GlobalKey.new);
-    final inputHeight = useState(canReact ? 72.0 : media.padding.bottom);
+    final inputHeight = useState(72.0);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!context.mounted || !canReact) return;
+      if (!context.mounted) return;
       final height = inputKey.currentContext?.size?.height;
       if (height != null && height != inputHeight.value) {
         inputHeight.value = height;
@@ -274,28 +273,28 @@ class _PostResponderOverlay extends HookConsumerWidget {
             ),
           ),
         ),
-        // 自分の記録にはコメントを書かないので、入力欄を出さない。
-        if (canReact)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: media.viewInsets.bottom,
-            child: SlideTransition(
-              position: Tween(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(animation),
-              child: _CommentInput(
-                key: inputKey,
-                controller: controller,
-                // 絵文字だけ付けたいときに邪魔にならないよう、入力欄を押すまでキーボードを出さない。
-                hintText: hintText ?? '',
-                sending: sending.value,
-                error: error.value,
-                onSend: send,
-              ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: media.viewInsets.bottom,
+          child: SlideTransition(
+            position: Tween(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(animation),
+            child: _CommentInput(
+              key: inputKey,
+              controller: controller,
+              // 自分の記録では絵文字を選ばないので、すぐ書けるようにキーボードを出す。
+              // ほかの人の記録では、絵文字だけ付けたいときに邪魔にならないよう、入力欄を押すまで出さない。
+              autofocus: !canReact,
+              hintText: hintText,
+              sending: sending.value,
+              error: error.value,
+              onSend: send,
             ),
           ),
+        ),
       ],
     );
   }
@@ -429,6 +428,7 @@ class _CommentInput extends StatelessWidget {
   const _CommentInput({
     super.key,
     required this.controller,
+    required this.autofocus,
     required this.hintText,
     required this.sending,
     required this.error,
@@ -436,6 +436,7 @@ class _CommentInput extends StatelessWidget {
   });
 
   final TextEditingController controller;
+  final bool autofocus;
   final String hintText;
   final bool sending;
   final String? error;
@@ -478,6 +479,7 @@ class _CommentInput extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       controller: controller,
+                      autofocus: autofocus,
                       // 送っている間は書き換えさせない。
                       readOnly: sending,
                       maxLength: maxCommentMessageLength,

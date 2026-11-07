@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'。'**
   String get respondLabelSeparator;
 
+  /// No description provided for @commentHintMine.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを書く'**
+  String get commentHintMine;
+
   /// ほかの人の記録にコメントするときの入力欄のヒント。name は記録を書いた人の名前
   ///
   /// In ja, this message translates to:

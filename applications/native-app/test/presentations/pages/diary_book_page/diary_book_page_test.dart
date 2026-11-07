@@ -232,7 +232,7 @@ void main() {
       postedAt: diaryDayStartOf(today),
     );
 
-    testWidgets('ほかの人の記録だけボタンが出て、絵文字の吹き出しと入力欄がある', (tester) async {
+    testWidgets('ほかの人の記録だけ、反応する画面に絵文字の吹き出しが出る', (tester) async {
       await _openDiaryBook(
         tester,
         posts: [
@@ -246,16 +246,24 @@ void main() {
         ],
       );
 
-      // コメントのない自分の記録にはボタンを出さない。
-      expect(find.byTooltip('リアクションとコメント'), findsOneWidget);
+      // 自分の記録にもボタンは出る。
+      expect(find.byTooltip('リアクションとコメント'), findsNWidgets(2));
 
-      await tester.tap(find.byTooltip('リアクションとコメント'));
+      // 新しい記録が上に来るので、最初のボタンが自分の記録。
+      await tester.tap(find.byTooltip('リアクションとコメント').first);
+      await tester.pumpAndSettle();
+      expect(find.text('❤️'), findsNothing);
+      expect(find.text('コメントを書く'), findsOneWidget);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('リアクションとコメント').last);
       await tester.pumpAndSettle();
       expect(find.text('❤️'), findsOneWidget);
       expect(find.text('健太にコメント'), findsOneWidget);
     });
 
-    testWidgets('自分の記録はコメントがあるときだけボタンが出て、読むだけの画面になる', (tester) async {
+    testWidgets('自分の記録にもコメントを書ける', (tester) async {
       await _openDiaryBook(
         tester,
         posts: [
@@ -264,24 +272,18 @@ void main() {
             authorId: 'me',
             message: 'カフェで勉強中',
             postedAt: diaryDayStartOf(today),
-            comments: [
-              PostComment(
-                id: 'c1',
-                userId: 'mio',
-                message: 'いいね',
-                createdAt: diaryDayStartOf(today),
-              ),
-            ],
           ),
         ],
       );
 
-      await tester.tap(find.byTooltip('リアクションとコメント。コメント1件'));
+      await tester.tap(find.byTooltip('リアクションとコメント'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '追記です');
+      await tester.pump();
+      await tester.tap(find.byTooltip('送る'));
       await tester.pumpAndSettle();
 
-      expect(find.text('いいね'), findsOneWidget);
-      expect(find.text('❤️'), findsNothing);
-      expect(find.byType(TextField), findsNothing);
+      expect(find.text('追記です'), findsOneWidget);
     });
 
     testWidgets('反応する画面で絵文字を選ぶと、チップが出てボタンがその絵文字になる', (tester) async {

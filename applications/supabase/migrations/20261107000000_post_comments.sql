@@ -1,4 +1,4 @@
--- 記録に付けるコメント。自分の記録には書けない。
+-- 記録に付けるコメント。自分の記録にも書ける。
 -- 記録は複数の日記帳に出せるので、ほかの日記帳の人のコメントが見えないよう、リアクションと同じく日記帳ごとに分ける。
 -- 出し先（post_diary_books）に外部キーを向け、記録をその日記帳から外したらコメントも消えるようにする。
 -- 日記帳を抜けた人のコメントは、抜けた人の記録やリアクションと同じく残す。
@@ -40,16 +40,11 @@ create policy "見える記録のコメントを読める" on public.post_commen
 for select to authenticated
 using (public.is_post_visible_in(post_id, diary_book_id));
 
--- 自分の記録には書かない。
-create policy "見えるほかの人の記録にコメントを書ける" on public.post_comments
+create policy "見える記録にコメントを書ける" on public.post_comments
 for insert to authenticated
 with check (
   user_id = (select auth.uid())
   and public.is_post_visible_in(post_id, diary_book_id)
-  and not exists (
-    select 1 from public.posts
-    where id = post_id and author_id = (select auth.uid())
-  )
 );
 
 create policy "自分のコメントを消せる" on public.post_comments

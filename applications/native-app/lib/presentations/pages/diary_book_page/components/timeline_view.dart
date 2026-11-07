@@ -453,8 +453,9 @@ class _PostCard extends StatelessWidget {
   /// 左に出す、書いた人のアイコンの大きさ。
   static const double _avatarSize = 36;
 
-  /// リアクションとコメントの画面を開く。自分の記録では付いたコメントを読むだけにする。
+  /// リアクションとコメントの画面を開く。自分の記録ではコメントだけにする。
   Future<void> _respond(BuildContext context) async {
+    final l10n = context.l10n;
     final canReact = post.authorId != myId;
     final emoji = await showPostResponder(
       context,
@@ -465,7 +466,9 @@ class _PostCard extends StatelessWidget {
       myId: myId,
       canReact: canReact,
       current: post.reactionOf(myId),
-      hintText: context.l10n.commentHintTo(nameOf(post.authorId)),
+      hintText: canReact
+          ? l10n.commentHintTo(nameOf(post.authorId))
+          : l10n.commentHintMine,
       nameOf: nameOf,
       avatarUrlOf: avatarUrlOf,
       liftedBuilder: (_) => _PostCard(
@@ -564,8 +567,7 @@ class _PostCard extends StatelessWidget {
                 ],
               ),
             ),
-            // 自分の記録にはリアクションもコメントも付けないので、付いたコメントを読むときだけ出す。
-            if (!lifted && (!isMine || post.comments.isNotEmpty))
+            if (!lifted)
               Transform.translate(
                 offset: const Offset(0, buttonTop),
                 child: ReactionButton(
@@ -575,7 +577,7 @@ class _PostCard extends StatelessWidget {
                   onPressed: () => _respond(context),
                 ),
               )
-            else if (lifted)
+            else
               // 浮かせた見本でも、ボタンの場所は空けて元の並びと揃える。
               const SizedBox(width: ReactionButton.size),
           ],

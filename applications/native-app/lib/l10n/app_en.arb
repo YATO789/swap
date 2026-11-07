@@ -89,6 +89,7 @@
   "respondMyReaction": "Your reaction is {emoji}",
   "respondCommentCount": "{count, plural, =1{1 comment} other{{count} comments}}",
   "respondLabelSeparator": ". ",
+  "commentHintMine": "Write a comment",
   "commentHintTo": "Comment to {name}",
   "commentSend": "Send",
   "commentSendFailed": "Couldn't send your comment. Please try again.",
