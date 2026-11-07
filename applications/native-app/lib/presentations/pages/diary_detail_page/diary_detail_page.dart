@@ -11,6 +11,7 @@ import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
+import '../../components/dismissible_selectable_text.dart';
 import '../../components/floating_surface.dart';
 import '../../components/floating_top_bar.dart';
 import '../../components/page_turn_view.dart';
@@ -557,7 +558,7 @@ class _DiaryBody extends StatelessWidget {
       const SizedBox(height: 20),
       // 日記を書く画面と同じく、タイトルの下に線を引き、本文には罫線を敷く。
       if (diaryTitle.isNotEmpty) ...[
-        SelectableText(
+        DismissibleSelectableText(
           diaryTitle,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
         ),
@@ -605,7 +606,7 @@ class _DiaryBody extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            SelectableText(
+                            DismissibleSelectableText(
                               body,
                               style: _bodyStyle,
                               strutStyle: _bodyStrut,

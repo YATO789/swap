@@ -9,6 +9,7 @@ import '../../../../domains/post/timeline_post.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
+import '../../../components/dismissible_selectable_text.dart';
 import '../../../components/user_avatar.dart';
 import 'diary_section.dart';
 import '../../../components/reactions.dart';
@@ -507,10 +508,18 @@ class _PostCard extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: _headerGap),
-                        Text(
-                          post.message,
-                          style: const TextStyle(fontSize: 15),
-                        ),
+                        // 本文は長押しからなぞって選び、コピーできるようにする。
+                        // 浮かせた見本では選ばせない。
+                        if (lifted)
+                          Text(
+                            post.message,
+                            style: const TextStyle(fontSize: 15),
+                          )
+                        else
+                          DismissibleSelectableText(
+                            post.message,
+                            style: const TextStyle(fontSize: 15),
+                          ),
                       ],
                     ),
                   ),
