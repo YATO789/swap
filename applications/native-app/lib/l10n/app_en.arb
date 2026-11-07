@@ -300,5 +300,11 @@
   "coverEditNeedsUpdate": "Update the app to edit this cover",
   "emojiSheetTitle": "Choose an emoji",
   "emojiSheetNoRecents": "None yet",
-  "emojiSheetSearch": "Search emoji"
+  "emojiSheetSearch": "Search emoji",
+  "settingsDiaryReminder": "Diary reminder",
+  "settingsDiaryReminderDescription": "Reminds you to write at this time every day, unless you've already written today",
+  "settingsDiaryReminderTime": "Remind me at",
+  "settingsNotificationDenied": "Notifications are off. Allow them in your device settings.",
+  "settingsOpenDeviceSettings": "Open Settings",
+  "diaryReminderBody": "How was your day? Write it in your diary"
 }

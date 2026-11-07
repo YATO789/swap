@@ -7,9 +7,12 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/app_update/app_update.dart';
+import '../../../domains/diary/diary.dart';
 import '../../../domains/diary_book/diary_book.dart';
 import '../../providers/diary_book_notifier.dart';
+import '../../../infrastructures/repositories/diary_reminder_repository.dart';
 import '../../../infrastructures/repositories/opened_notification_repository.dart';
+import '../../providers/diary_reminder_notifier.dart';
 import '../../providers/settings_notifier.dart';
 import '../../providers/profile_notifier.dart';
 import '../../providers/push_token_notifier.dart';
@@ -50,6 +53,8 @@ class HomePage extends HookConsumerWidget {
     );
     // サインインしている間、この端末を通知の送り先にしておく。結果は画面に出さない。
     ref.listen(pushTokenProvider, (_, _) {});
+    // サインインしている間、日記のリマインダーの予約を合わせておく。結果は画面に出さない。
+    ref.listen(diaryReminderProvider, (_, _) {});
 
     // コントローラーは見ていないと捨てられ、読み直しの途中で状態を書けなくなるので見ておく。
     ref.watch(homePageControllerProvider);
@@ -130,6 +135,24 @@ class HomePage extends HookConsumerWidget {
             final route = DiaryBookRoute(id: diaryBookId);
             // もうその日記帳を一番上に開いていれば、同じページを重ねない。
             if (GoRouter.of(context).state.uri.path == route.location) return;
+            route.push<void>(context);
+          });
+      return subscription.cancel;
+    }, const []);
+
+    // 日記のリマインダーをタップしたら、今日の日記を書くページを開く。投稿先は書いてから選ぶ。
+    useEffect(() {
+      final subscription = ref
+          .read(diaryReminderRepositoryProvider)
+          .opened()
+          .listen((_) {
+            if (!context.mounted) return;
+            final route = DiaryEditorRoute(date: diaryToday(), blank: true);
+            // もう日記を書くページを開いていれば、同じページを重ねない。
+            if (GoRouter.of(context).state.uri.path ==
+                Uri.parse(route.location).path) {
+              return;
+            }
             route.push<void>(context);
           });
       return subscription.cancel;

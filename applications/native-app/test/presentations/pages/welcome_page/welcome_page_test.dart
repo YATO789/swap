@@ -5,6 +5,7 @@ import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_reminder_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/l10n/l10n.dart';
@@ -29,6 +30,9 @@ Future<void> _pumpRouterApp(WidgetTester tester, {Profile? profile}) {
         ),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
+        ),
+        diaryReminderRepositoryProvider.overrideWithValue(
+          FakeDiaryReminderRepository(),
         ),
         profileRepositoryProvider.overrideWithValue(
           FakeProfileRepository(profile: profile),

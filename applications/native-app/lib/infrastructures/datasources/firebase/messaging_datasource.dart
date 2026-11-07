@@ -20,6 +20,12 @@ class MessagingDatasource {
     await _messaging.requestPermission();
   }
 
+  /// 通知を出してよいかの今の状態。聞きはしない。
+  Future<AuthorizationStatus> fetchAuthorizationStatus() async {
+    final settings = await _messaging.getNotificationSettings();
+    return settings.authorizationStatus;
+  }
+
   /// アプリを開いているときに届いた通知も、iOS で出すようにする。許可は聞かない。
   Future<void> showNotificationsInForeground() async {
     await _messaging.setForegroundNotificationPresentationOptions(

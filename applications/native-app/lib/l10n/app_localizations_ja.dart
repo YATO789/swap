@@ -1020,4 +1020,23 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get emojiSheetSearch => '絵文字を検索';
+
+  @override
+  String get settingsDiaryReminder => '日記のリマインダー';
+
+  @override
+  String get settingsDiaryReminderDescription =>
+      '毎日この時刻に、日記を書くよう知らせます。今日の日記を書いた日は知らせません';
+
+  @override
+  String get settingsDiaryReminderTime => '知らせる時刻';
+
+  @override
+  String get settingsNotificationDenied => '通知がオフになっています。端末の設定で通知を許可してください';
+
+  @override
+  String get settingsOpenDeviceSettings => '設定を開く';
+
+  @override
+  String get diaryReminderBody => '今日はどんな一日だった？日記を書こう';
 }

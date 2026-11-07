@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../domains/diary/diary.dart';
+import '../../../domains/notification/notification_permission.dart';
 import '../../providers/settings_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
@@ -12,6 +14,7 @@ import '../../components/confirm_sheet.dart';
 import '../router/router.dart';
 import 'components/diary_book_layout_picker.dart';
 import 'components/profile_section.dart';
+import 'components/reminder_time_sheet.dart';
 import 'components/theme_mode_picker.dart';
 import 'controller/my_page_controller.dart';
 
@@ -44,6 +47,36 @@ class MyPage extends HookConsumerWidget {
       if (!await openLegalPage(url) && context.mounted) {
         showMessage(l10n.commonOpenLinkFailed);
       }
+    }
+
+    // オンにしても通知が許可されていなければ届かないので、端末の設定へ案内する。
+    Future<void> saveDiaryReminderEnabled(bool enabled) async {
+      final permission = await ref
+          .read(myPageControllerProvider.notifier)
+          .saveDiaryReminderEnabled(enabled);
+      if (permission != NotificationPermission.denied || !context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(l10n.settingsNotificationDenied),
+            action: SnackBarAction(
+              label: l10n.settingsOpenDeviceSettings,
+              onPressed: () => launchUrl(Uri.parse('app-settings:')),
+            ),
+          ),
+        );
+    }
+
+    Future<void> pickDiaryReminderTime() async {
+      final time = await showReminderTimeSheet(
+        context,
+        initialTime: settings.diaryReminderTime,
+      );
+      if (time == null) return;
+      await settingsNotifier.saveDiaryReminderTime(time);
     }
 
     Future<void> signOut() async {
@@ -122,6 +155,29 @@ class MyPage extends HookConsumerWidget {
             subtitle: l10n.settingsDayStartDescription,
             value: l10n.settingsDayStartValue(diaryDayStartHour),
           ),
+          SwitchListTile(
+            contentPadding: _tilePadding,
+            title: Text(l10n.settingsDiaryReminder, style: _titleStyle),
+            subtitle: Text(
+              l10n.settingsDiaryReminderDescription,
+              style: TextStyle(
+                fontSize: 12,
+                color: context.appColors.textSecondary,
+              ),
+            ),
+            value: settings.diaryReminderEnabled,
+            onChanged: saveDiaryReminderEnabled,
+          ),
+          ListTile(
+            contentPadding: _tilePadding,
+            title: Text(l10n.settingsDiaryReminderTime, style: _titleStyle),
+            trailing: _TimeChip(
+              time: settings.diaryReminderTime,
+              enabled: settings.diaryReminderEnabled,
+            ),
+            enabled: settings.diaryReminderEnabled,
+            onTap: pickDiaryReminderTime,
+          ),
           _SectionHeader(l10n.settingsOtherSection),
           _LinkTile(
             title: l10n.settingsFeedback,
@@ -192,6 +248,37 @@ class _SectionHeader extends StatelessWidget {
 
 const _titleStyle = TextStyle(fontSize: 16);
 const _tilePadding = EdgeInsets.symmetric(horizontal: 24);
+
+/// 押すと時刻を選べることがわかるよう、時刻を色の付いた角丸の中に出す。
+class _TimeChip extends StatelessWidget {
+  const _TimeChip({required this.time, required this.enabled});
+
+  final TimeOfDay time;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final color = enabled ? primary : context.appColors.disabled;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        MaterialLocalizations.of(context).formatTimeOfDay(time),
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: color,
+          fontFeatures: const [FontFeature.tabularFigures()],
+        ),
+      ),
+    );
+  }
+}
 
 class _LinkTile extends StatelessWidget {
   const _LinkTile({required this.title, required this.onTap});

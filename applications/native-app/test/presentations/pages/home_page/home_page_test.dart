@@ -12,6 +12,7 @@ import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_reminder_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/l10n/l10n.dart';
@@ -59,6 +60,9 @@ List<Override> _overrides(
   ),
   openedNotificationRepositoryProvider.overrideWithValue(
     notifications ?? FakeOpenedNotificationRepository(),
+  ),
+  diaryReminderRepositoryProvider.overrideWithValue(
+    FakeDiaryReminderRepository(),
   ),
 ];
 

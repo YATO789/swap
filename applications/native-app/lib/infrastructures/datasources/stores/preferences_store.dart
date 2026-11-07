@@ -10,6 +10,8 @@ const postHintVisibleKey = 'post_hint_visible';
 const themeModeKey = 'theme_mode';
 const updateSkippedAtKey = 'update_skipped_at';
 const notificationPermissionSkippedKey = 'notification_permission_skipped';
+const diaryReminderEnabledKey = 'diary_reminder_enabled';
+const diaryReminderMinutesKey = 'diary_reminder_minutes';
 
 /// 端末に保存する値の読み書きに使う SharedPreferences。
 /// 読み込みを待ってから使いたいので、main で作ったものに差し替える。
@@ -35,6 +37,8 @@ class PreferencesStore {
     themeModeKey,
     updateSkippedAtKey,
     notificationPermissionSkippedKey,
+    diaryReminderEnabledKey,
+    diaryReminderMinutesKey,
   };
 
   final SharedPreferencesWithCache _preferences;
@@ -97,5 +101,27 @@ class PreferencesStore {
 
   Future<void> saveNotificationPermissionSkipped(bool skipped) {
     return _preferences.setBool(notificationPermissionSkippedKey, skipped);
+  }
+
+  /// 日記のリマインダーを出すか。まだ切り替えたことがなければ出す。
+  bool readDiaryReminderEnabled() {
+    return _preferences.getBool(diaryReminderEnabledKey) ?? true;
+  }
+
+  Future<void> saveDiaryReminderEnabled(bool enabled) {
+    return _preferences.setBool(diaryReminderEnabledKey, enabled);
+  }
+
+  /// 日記のリマインダーを出す時刻。まだ選んだことがなければ 21:00。
+  TimeOfDay readDiaryReminderTime() {
+    final minutes = _preferences.getInt(diaryReminderMinutesKey) ?? 21 * 60;
+    return TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
+  }
+
+  Future<void> saveDiaryReminderTime(TimeOfDay time) {
+    return _preferences.setInt(
+      diaryReminderMinutesKey,
+      time.hour * 60 + time.minute,
+    );
   }
 }

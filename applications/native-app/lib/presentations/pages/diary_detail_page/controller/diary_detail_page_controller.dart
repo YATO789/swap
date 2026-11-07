@@ -9,6 +9,7 @@ import '../../../../domains/reaction/reaction.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
 import '../../../../infrastructures/repositories/post_repository.dart';
+import '../../../providers/diary_reminder_notifier.dart';
 import '../../../providers/profile_notifier.dart';
 
 part '_generated/diary_detail_page_controller.freezed.dart';
@@ -124,6 +125,8 @@ class DiaryDetailPageController extends _$DiaryDetailPageController {
   Future<bool> delete(Diary diary) async {
     try {
       await ref.read(diaryRepositoryProvider).delete(diary.id);
+      // 今日の日記がなくなったら、今日のリマインダーを出すようにする。
+      ref.read(diaryReminderProvider.notifier).sync();
       return true;
     } catch (error, stackTrace) {
       debugPrint('日記を消せませんでした: $error\n$stackTrace');

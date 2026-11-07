@@ -15,6 +15,7 @@ import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_reminder_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/feedback_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
@@ -157,6 +158,28 @@ class FakeOpenedNotificationRepository implements OpenedNotificationRepository {
   @override
   Stream<String> openedDiaryBookIds() {
     return diaryBookIds.stream;
+  }
+}
+
+/// 端末に予約せず、予約した時刻を [scheduled] に覚えておく。
+/// [taps] に流すと、日記のリマインダーがタップされたことにする。
+class FakeDiaryReminderRepository implements DiaryReminderRepository {
+  final taps = StreamController<void>.broadcast();
+  List<DateTime> scheduled = [];
+
+  @override
+  Future<void> replace(List<DateTime> times, {required String body}) async {
+    scheduled = times;
+  }
+
+  @override
+  Future<void> cancelAll() async {
+    scheduled = [];
+  }
+
+  @override
+  Stream<void> opened() {
+    return taps.stream;
   }
 }
 

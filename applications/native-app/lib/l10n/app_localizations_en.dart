@@ -1113,4 +1113,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emojiSheetSearch => 'Search emoji';
+
+  @override
+  String get settingsDiaryReminder => 'Diary reminder';
+
+  @override
+  String get settingsDiaryReminderDescription =>
+      'Reminds you to write at this time every day, unless you\'ve already written today';
+
+  @override
+  String get settingsDiaryReminderTime => 'Remind me at';
+
+  @override
+  String get settingsNotificationDenied =>
+      'Notifications are off. Allow them in your device settings.';
+
+  @override
+  String get settingsOpenDeviceSettings => 'Open Settings';
+
+  @override
+  String get diaryReminderBody => 'How was your day? Write it in your diary';
 }

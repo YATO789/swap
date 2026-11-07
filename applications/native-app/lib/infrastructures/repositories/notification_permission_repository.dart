@@ -1,4 +1,6 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:swap/domains/notification/notification_permission.dart';
 import 'package:swap/infrastructures/datasources/firebase/messaging_datasource.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 
@@ -22,6 +24,17 @@ class NotificationPermissionRepository {
   /// オンボーディングで、通知の許可を聞かずに「あとで」で始めたか。
   bool get skipped {
     return _store.readNotificationPermissionSkipped();
+  }
+
+  /// 通知を出してよいかの今の状態。聞きはしない。
+  Future<NotificationPermission> fetch() async {
+    return switch (await _messaging.fetchAuthorizationStatus()) {
+      AuthorizationStatus.authorized ||
+      AuthorizationStatus.provisional => NotificationPermission.granted,
+      AuthorizationStatus.denied ||
+      AuthorizationStatus.deniedPermanently => NotificationPermission.denied,
+      AuthorizationStatus.notDetermined => NotificationPermission.notDetermined,
+    };
   }
 
   /// 通知の許可を聞く。「あとで」で始めたことは忘れる。

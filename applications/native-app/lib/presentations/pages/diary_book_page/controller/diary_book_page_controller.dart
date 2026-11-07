@@ -10,6 +10,7 @@ import '../../../../domains/post/timeline_post.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
 import '../../../../infrastructures/repositories/post_repository.dart';
+import '../../../providers/diary_reminder_notifier.dart';
 
 part '_generated/diary_book_page_controller.freezed.dart';
 part '_generated/diary_book_page_controller.g.dart';
@@ -108,6 +109,8 @@ class DiaryBookPageController extends _$DiaryBookPageController {
       debugPrint('日記を消せませんでした: $error\n$stackTrace');
       return false;
     }
+    // 今日の日記がなくなったら、今日のリマインダーを出すようにする。
+    ref.read(diaryReminderProvider.notifier).sync();
     final current = state.value;
     if (current != null) {
       state = AsyncData(

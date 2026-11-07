@@ -1908,6 +1908,42 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'絵文字を検索'**
   String get emojiSheetSearch;
+
+  /// No description provided for @settingsDiaryReminder.
+  ///
+  /// In ja, this message translates to:
+  /// **'日記のリマインダー'**
+  String get settingsDiaryReminder;
+
+  /// No description provided for @settingsDiaryReminderDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'毎日この時刻に、日記を書くよう知らせます。今日の日記を書いた日は知らせません'**
+  String get settingsDiaryReminderDescription;
+
+  /// No description provided for @settingsDiaryReminderTime.
+  ///
+  /// In ja, this message translates to:
+  /// **'知らせる時刻'**
+  String get settingsDiaryReminderTime;
+
+  /// No description provided for @settingsNotificationDenied.
+  ///
+  /// In ja, this message translates to:
+  /// **'通知がオフになっています。端末の設定で通知を許可してください'**
+  String get settingsNotificationDenied;
+
+  /// No description provided for @settingsOpenDeviceSettings.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定を開く'**
+  String get settingsOpenDeviceSettings;
+
+  /// 毎日決まった時刻に出す、日記を書くよう知らせる通知の本文
+  ///
+  /// In ja, this message translates to:
+  /// **'今日はどんな一日だった？日記を書こう'**
+  String get diaryReminderBody;
 }
 
 class _AppLocalizationsDelegate
