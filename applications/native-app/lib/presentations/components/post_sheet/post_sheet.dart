@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/post.dart';
+import '../../../domains/post/track.dart';
 import '../../providers/diary_book_notifier.dart';
 import '../../providers/post_diary_book_notifier.dart';
 import '../../../l10n/l10n.dart';
@@ -13,7 +14,9 @@ import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../discard_guard.dart';
 import '../ruled_lines.dart';
+import 'components/attached_track.dart';
 import 'components/diary_book_chip.dart';
+import 'components/track_search_sheet.dart';
 import 'controller/post_sheet_controller.dart';
 
 const _lines = 3;
@@ -49,6 +52,9 @@ class _PostSheet extends HookConsumerWidget {
     useListenable(controller);
     final message = controller.text.trim();
 
+    /// 記録に添える曲。1回の記録につき1曲。
+    final track = useState<Track?>(null);
+
     final savedIds = ref.watch(postDiaryBookProvider);
     final selectedIds = fixedDiaryBook != null
         ? [fixedDiaryBook.id]
@@ -79,11 +85,24 @@ class _PostSheet extends HookConsumerWidget {
       ref.read(postDiaryBookProvider.notifier).save(ids);
     }
 
+    /// 曲を探すシートを開き、選んだ曲を添える。選ばずに閉じたら今の曲のままにする。
+    Future<void> pickTrack() async {
+      final picked = await showTrackSearchSheet(context);
+      if (picked == null || !context.mounted) return;
+      track.value = picked;
+    }
+
     Future<void> submit() async {
       if (!canSubmit) return;
       final ok = await ref
           .read(postSheetControllerProvider.notifier)
-          .submit(Post(message: message, diaryBookIds: selectedIds));
+          .submit(
+            Post(
+              message: message,
+              diaryBookIds: selectedIds,
+              track: track.value,
+            ),
+          );
       if (!context.mounted) return;
       final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
       if (!ok) {
@@ -96,7 +115,7 @@ class _PostSheet extends HookConsumerWidget {
     }
 
     return DiscardGuard(
-      dirty: message.isNotEmpty,
+      dirty: message.isNotEmpty || track.value != null,
       child: Padding(
         // キーボードが出たらその上に持ち上げる。
         padding: EdgeInsets.only(
@@ -164,7 +183,20 @@ class _PostSheet extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 4),
+                // 曲を添えたら、ボタンの場所に曲を出す。
+                if (track.value case final attached?)
+                  AttachedTrackCard(
+                    track: attached,
+                    onChange: pickTrack,
+                    onRemove: () => track.value = null,
+                  )
+                else
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: AttachTrackButton(onPressed: pickTrack),
+                  ),
+                const SizedBox(height: 20),
                 if (fixedDiaryBook != null)
                   // 投稿先が決まっているときも、どこに出るかは見せておく。
                   Text(

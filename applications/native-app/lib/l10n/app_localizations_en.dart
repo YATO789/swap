@@ -174,6 +174,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get postSheetShareTo => 'Share to';
 
   @override
+  String get trackAttach => 'Add a song';
+
+  @override
+  String get trackRemove => 'Remove song';
+
+  @override
+  String trackAttachedLabel(String title, String artist) {
+    return 'Song: $title by $artist. Tap to change';
+  }
+
+  @override
+  String trackPlay(String title) {
+    return 'Play preview of $title';
+  }
+
+  @override
+  String trackStopPreview(String title) {
+    return 'Stop preview of $title';
+  }
+
+  @override
+  String get trackPreviewFailed =>
+      'Couldn\'t play the preview. Please try again.';
+
+  @override
+  String trackOpenInStore(String title) {
+    return 'Open $title in Apple Music';
+  }
+
+  @override
+  String get trackOpenFailed => 'Couldn\'t open Apple Music';
+
+  @override
+  String get trackSearchHint => 'Song or artist';
+
+  @override
+  String get trackSearchClear => 'Clear';
+
+  @override
+  String get trackSearchEmpty => 'Search by song or artist name';
+
+  @override
+  String trackSearchNoResults(String query) {
+    return 'No songs found for “$query”';
+  }
+
+  @override
+  String get trackSearchFailed =>
+      'Couldn\'t search for songs. Please try again.';
+
+  @override
   String get postButtonWriteToday => 'Write today\'s diary';
 
   @override

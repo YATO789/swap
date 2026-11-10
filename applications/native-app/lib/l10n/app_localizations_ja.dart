@@ -166,6 +166,55 @@ class AppLocalizationsJa extends AppLocalizations {
   String get postSheetShareTo => '共有する日記帳';
 
   @override
+  String get trackAttach => '曲を添える';
+
+  @override
+  String get trackRemove => '曲を外す';
+
+  @override
+  String trackAttachedLabel(String title, String artist) {
+    return '添えた曲：$title、$artist。押すと選び直せます';
+  }
+
+  @override
+  String trackPlay(String title) {
+    return '$titleの試聴を再生';
+  }
+
+  @override
+  String trackStopPreview(String title) {
+    return '$titleの試聴を止める';
+  }
+
+  @override
+  String get trackPreviewFailed => '試聴を再生できませんでした。もう一度お試しください';
+
+  @override
+  String trackOpenInStore(String title) {
+    return '$titleを Apple Music で開く';
+  }
+
+  @override
+  String get trackOpenFailed => 'Apple Music を開けませんでした';
+
+  @override
+  String get trackSearchHint => '曲名・アーティスト名';
+
+  @override
+  String get trackSearchClear => '消す';
+
+  @override
+  String get trackSearchEmpty => '曲名やアーティスト名で探せます';
+
+  @override
+  String trackSearchNoResults(String query) {
+    return '「$query」に合う曲は見つかりませんでした';
+  }
+
+  @override
+  String get trackSearchFailed => '曲を探せませんでした。もう一度お試しください';
+
+  @override
   String get postButtonWriteToday => '今日の日記を書く';
 
   @override

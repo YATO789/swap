@@ -380,6 +380,84 @@ abstract class AppLocalizations {
   /// **'共有する日記帳'**
   String get postSheetShareTo;
 
+  /// No description provided for @trackAttach.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲を添える'**
+  String get trackAttach;
+
+  /// No description provided for @trackRemove.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲を外す'**
+  String get trackRemove;
+
+  /// No description provided for @trackAttachedLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'添えた曲：{title}、{artist}。押すと選び直せます'**
+  String trackAttachedLabel(String title, String artist);
+
+  /// No description provided for @trackPlay.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}の試聴を再生'**
+  String trackPlay(String title);
+
+  /// No description provided for @trackStopPreview.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}の試聴を止める'**
+  String trackStopPreview(String title);
+
+  /// No description provided for @trackPreviewFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'試聴を再生できませんでした。もう一度お試しください'**
+  String get trackPreviewFailed;
+
+  /// No description provided for @trackOpenInStore.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}を Apple Music で開く'**
+  String trackOpenInStore(String title);
+
+  /// No description provided for @trackOpenFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'Apple Music を開けませんでした'**
+  String get trackOpenFailed;
+
+  /// No description provided for @trackSearchHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲名・アーティスト名'**
+  String get trackSearchHint;
+
+  /// No description provided for @trackSearchClear.
+  ///
+  /// In ja, this message translates to:
+  /// **'消す'**
+  String get trackSearchClear;
+
+  /// No description provided for @trackSearchEmpty.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲名やアーティスト名で探せます'**
+  String get trackSearchEmpty;
+
+  /// No description provided for @trackSearchNoResults.
+  ///
+  /// In ja, this message translates to:
+  /// **'「{query}」に合う曲は見つかりませんでした'**
+  String trackSearchNoResults(String query);
+
+  /// No description provided for @trackSearchFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲を探せませんでした。もう一度お試しください'**
+  String get trackSearchFailed;
+
   /// No description provided for @postButtonWriteToday.
   ///
   /// In ja, this message translates to:

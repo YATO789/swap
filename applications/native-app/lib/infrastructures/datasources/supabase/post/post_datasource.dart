@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:swap/infrastructures/datasources/supabase/post/models/post_response.dart';
+import 'package:swap/infrastructures/datasources/supabase/post/models/track_response.dart';
 
 part '_generated/post_datasource.g.dart';
 
@@ -16,14 +17,20 @@ class PostDatasource {
   final SupabaseClient _client;
 
   /// [message] を書いて [diaryBookIds] の日記帳に出し、記録の id を返す。書いた時刻は DB が決める。
+  /// [track] は記録に添える曲。
   /// 複数のテーブルにまとめて追加したいためRPCを使用。
   Future<String> create({
     required String message,
     required List<String> diaryBookIds,
+    TrackResponse? track,
   }) {
     return _client.rpc<String>(
       'create_post',
-      params: {'p_message': message, 'p_diary_book_ids': diaryBookIds},
+      params: {
+        'p_message': message,
+        'p_diary_book_ids': diaryBookIds,
+        'p_track': track?.toJson(),
+      },
     );
   }
 
@@ -100,7 +107,7 @@ class PostDatasource {
     final rows = await _client
         .from('posts')
         .select(
-          'id, author_id, message, posted_at, '
+          'id, author_id, message, posted_at, track, '
           'post_diary_books!inner(diary_book_id, '
           'post_reactions(user_id, emoji, created_at), '
           'post_comments(id, user_id, message, created_at))',
@@ -122,7 +129,7 @@ class PostDatasource {
   }) async {
     final rows = await _client
         .from('posts')
-        .select('id, author_id, message, posted_at')
+        .select('id, author_id, message, posted_at, track')
         .inFilter('author_id', authorIds)
         .gte('posted_at', from.toUtc().toIso8601String())
         .lt('posted_at', to.toUtc().toIso8601String())

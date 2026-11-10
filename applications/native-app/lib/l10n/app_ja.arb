@@ -117,6 +117,57 @@
     }
   },
   "postSheetShareTo": "共有する日記帳",
+  "trackAttach": "曲を添える",
+  "trackRemove": "曲を外す",
+  "trackAttachedLabel": "添えた曲：{title}、{artist}。押すと選び直せます",
+  "@trackAttachedLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "artist": {
+        "type": "String"
+      }
+    }
+  },
+  "trackPlay": "{title}の試聴を再生",
+  "@trackPlay": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "trackStopPreview": "{title}の試聴を止める",
+  "@trackStopPreview": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "trackPreviewFailed": "試聴を再生できませんでした。もう一度お試しください",
+  "trackOpenInStore": "{title}を Apple Music で開く",
+  "@trackOpenInStore": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "trackOpenFailed": "Apple Music を開けませんでした",
+  "trackSearchHint": "曲名・アーティスト名",
+  "trackSearchClear": "消す",
+  "trackSearchEmpty": "曲名やアーティスト名で探せます",
+  "trackSearchNoResults": "「{query}」に合う曲は見つかりませんでした",
+  "@trackSearchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSearchFailed": "曲を探せませんでした。もう一度お試しください",
   "postButtonWriteToday": "今日の日記を書く",
   "postButtonWriteYesterday": "昨日の日記を書く",
   "coverColorLabel": "表紙の色",

@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'track.dart';
+
 part '_generated/post.freezed.dart';
 
 /// 記録（「ひとこと」）。書いた内容と、それを出す日記帳。
@@ -10,6 +12,9 @@ abstract class Post with _$Post {
 
     /// 記録を出す日記帳の id。1冊以上。
     required List<String> diaryBookIds,
+
+    /// 記録に添えた曲。添えていなければ null。
+    Track? track,
   }) = _Post;
 }
 
