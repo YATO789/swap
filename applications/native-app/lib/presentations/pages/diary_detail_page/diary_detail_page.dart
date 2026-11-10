@@ -4,17 +4,20 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../domains/diary/diary.dart';
 import '../../../domains/post/timeline_post.dart';
+import '../../../domains/reaction/reaction.dart';
 import '../../providers/diary_book_notifier.dart';
 import '../../providers/profile_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
+import '../../components/dismissible_selectable_text.dart';
 import '../../components/floating_surface.dart';
 import '../../components/floating_top_bar.dart';
 import '../../components/page_turn_view.dart';
 import '../../components/paper_title.dart';
 import '../../components/post_line.dart';
+import '../../components/reactions.dart';
 import '../../components/ruled_lines.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
@@ -54,6 +57,8 @@ class DiaryDetailPage extends HookConsumerWidget {
         initialAuthorId: initialAuthorId,
         onRefresh: () => ref.read(provider.notifier).refresh(),
         onDelete: (diary) => ref.read(provider.notifier).delete(diary),
+        onReact: (diary, myId, emoji) =>
+            ref.read(provider.notifier).react(diary.id, myId, emoji),
       ),
       AsyncError() => _PlainPage(
         title: title,
@@ -101,6 +106,7 @@ class _DiaryPages extends HookConsumerWidget {
     required this.initialAuthorId,
     required this.onRefresh,
     required this.onDelete,
+    required this.onReact,
   });
 
   final String title;
@@ -111,6 +117,9 @@ class _DiaryPages extends HookConsumerWidget {
 
   /// 自分の日記を消す。消せたら true。
   final Future<bool> Function(Diary diary) onDelete;
+
+  /// 自分（myId）のリアクションを付ける。同じ絵文字なら取り消す。保存できたら true。
+  final Future<bool> Function(Diary diary, String myId, String emoji) onReact;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -136,6 +145,29 @@ class _DiaryPages extends HookConsumerWidget {
         diaryBook: diaryBookId,
       ).push<void>(context);
       await onRefresh();
+    }
+
+    // 押したらすぐ映し、保存できなかったら元に戻して知らせる。
+    Future<void> react(Diary diary, String emoji) async {
+      if (myId == null) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final l10n = context.l10n;
+      final saved = await onReact(diary, myId, emoji);
+      if (saved) return;
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.diaryDetailReactionFailed)),
+      );
+    }
+
+    // 日記帳を抜けた人の名前は読めない。
+    String nameOf(String userId) {
+      return state.members[userId]?.displayName ??
+          context.l10n.commonFormerMember;
+    }
+
+    String? avatarUrlOf(String userId) {
+      return state.members[userId]?.avatarUrl;
     }
 
     Future<void> confirmDelete() async {
@@ -182,10 +214,7 @@ class _DiaryPages extends HookConsumerWidget {
                     icon: const Icon(Icons.more_horiz),
                     onSelected: (action) => action(),
                     itemBuilder: (context) => [
-                      if (isEditableDiaryDate(
-                        diary.date,
-                        today: diaryDateOf(DateTime.now()),
-                      ))
+                      if (isEditableDiaryDate(diary.date, today: diaryToday()))
                         PopupMenuItem(
                           value: edit,
                           child: ListTile(
@@ -220,27 +249,50 @@ class _DiaryPages extends HookConsumerWidget {
         builder: (page) {
           // めくっている間に読み直して日記が減っても、はみ出さないようにする。
           final diary = diaries[page.clamp(0, pageCount - 1)];
+          // ページにするのは読める日記だけなので、自分の日記でなければリアクションを付けられる。
+          final canReact = myId != null && diary.authorId != myId;
           return Column(
             children: [
               // ページ番号の上で本文が切れるよう、下の安全な余白はページ番号の側であける。
               // 上のボタンの高さが入った Scaffold の中の余白から外すため、Builder の context を使う。
               Expanded(
-                child: Builder(
-                  builder: (context) => MediaQuery.removePadding(
-                    context: context,
-                    removeBottom: true,
-                    child: _DiaryBody(
-                      title: title,
-                      diary: diary,
-                      // 日記帳を抜けた人の名前は読めない。
-                      name:
-                          state.members[diary.authorId]?.displayName ??
-                          context.l10n.commonFormerMember,
-                      avatarUrl: state.members[diary.authorId]?.avatarUrl,
-                      isMine: diary.authorId == myId,
-                      posts: state.posts[diary.authorId] ?? const [],
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Builder(
+                        builder: (context) => MediaQuery.removePadding(
+                          context: context,
+                          removeBottom: true,
+                          child: _DiaryBody(
+                            title: title,
+                            diary: diary,
+                            name: nameOf(diary.authorId),
+                            avatarUrl: avatarUrlOf(diary.authorId),
+                            isMine: diary.authorId == myId,
+                            posts: state.posts[diary.authorId] ?? const [],
+                            reactions: _DiaryReactions(
+                              reactions: diary.reactions,
+                              myId: myId,
+                              canReact: canReact,
+                              nameOf: nameOf,
+                              avatarUrlOf: avatarUrlOf,
+                              onTap: (emoji) => react(diary, emoji),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    // リアクションのボタンは、どこまで読んでいても押せるよう右下に浮かせる。
+                    if (canReact)
+                      Positioned(
+                        right: _reactionButtonRight,
+                        bottom: _reactionButtonBottom,
+                        child: _FloatingReactionButton(
+                          current: diary.reactionOf(myId),
+                          onPicked: (emoji) => react(diary, emoji),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               SafeArea(
@@ -253,6 +305,100 @@ class _DiaryPages extends HookConsumerWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// 右下に浮かせるリアクションボタンの位置。
+const _reactionButtonRight = 20.0;
+const _reactionButtonBottom = 16.0;
+
+/// 本文の終わりで、浮かせたボタンに重ならないようにあける高さ。
+const _reactionButtonClearance =
+    _reactionButtonBottom +
+    ReactionButton.floatingSize +
+    8 -
+    _bodyBottomPadding;
+
+/// 右下に浮かせる、リアクションを付けるボタン。押すと絵文字の吹き出しを出す。
+class _FloatingReactionButton extends StatelessWidget {
+  const _FloatingReactionButton({
+    required this.current,
+    required this.onPicked,
+  });
+
+  /// 自分が付けた絵文字。付けていなければ null。
+  final String? current;
+  final ValueChanged<String> onPicked;
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (button) => ReactionButton(
+        floating: true,
+        current: current,
+        onPressed: () async {
+          final emoji = await showReactionPicker(
+            context,
+            target: button,
+            current: current,
+          );
+          if (emoji != null) onPicked(emoji);
+        },
+      ),
+    );
+  }
+}
+
+/// 本文を読み終えたところに、付いたリアクションを左から並べる。
+/// 最後までスクロールしても右下のボタンに隠れないよう、ボタンの高さぶんをあけておく。
+class _DiaryReactions extends StatelessWidget {
+  const _DiaryReactions({
+    required this.reactions,
+    required this.myId,
+    required this.canReact,
+    required this.nameOf,
+    required this.avatarUrlOf,
+    required this.onTap,
+  });
+
+  final List<Reaction> reactions;
+  final String? myId;
+
+  /// ほかの人の日記なら、チップを押してその絵文字で付けられる。
+  final bool canReact;
+  final String Function(String userId) nameOf;
+  final String? Function(String userId) avatarUrlOf;
+  final ValueChanged<String> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!canReact && reactions.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 12,
+        bottom: canReact ? 0 : 12,
+        // チップがボタンの下にもぐらないよう、ボタンの幅ぶん右をあける。
+        right: canReact
+            ? ReactionButton.floatingSize + _reactionButtonRight - 24 + 8
+            : 0,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: canReact ? _reactionButtonClearance - 12 : 0,
+        ),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: ReactionChips(
+            reactions: reactions,
+            myId: myId,
+            nameOf: nameOf,
+            avatarUrlOf: avatarUrlOf,
+            onTap: canReact ? onTap : null,
+          ),
+        ),
       ),
     );
   }
@@ -344,6 +490,7 @@ class _DiaryBody extends StatelessWidget {
     required this.avatarUrl,
     required this.isMine,
     required this.posts,
+    required this.reactions,
   });
 
   /// ページのいちばん上に書く日付。
@@ -356,6 +503,9 @@ class _DiaryBody extends StatelessWidget {
 
   /// 書いた人のその日の記録。古い順。
   final List<TimelinePost> posts;
+
+  /// 本文を読み終えたところに出す、付いたリアクション。
+  final Widget reactions;
 
   @override
   Widget build(BuildContext context) {
@@ -405,7 +555,7 @@ class _DiaryBody extends StatelessWidget {
       const SizedBox(height: 20),
       // 日記を書く画面と同じく、タイトルの下に線を引き、本文には罫線を敷く。
       if (diaryTitle.isNotEmpty) ...[
-        SelectableText(
+        DismissibleSelectableText(
           diaryTitle,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
         ),
@@ -447,12 +597,19 @@ class _DiaryBody extends StatelessWidget {
                       filledLines: lines.count,
                       fadeOut: false,
                       // 本文だけの高さだと下まで引けないので、残りの高さを空けておく。
+                      // リアクションは本文を読み終えたところに、罫線の上に置く。
                       child: ConstrainedBox(
                         constraints: BoxConstraints(minHeight: remaining),
-                        child: SelectableText(
-                          body,
-                          style: _bodyStyle,
-                          strutStyle: _bodyStrut,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            DismissibleSelectableText(
+                              body,
+                              style: _bodyStyle,
+                              strutStyle: _bodyStrut,
+                            ),
+                            reactions,
+                          ],
                         ),
                       ),
                     );

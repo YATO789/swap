@@ -4,7 +4,14 @@ import '../../../../domains/diary/diary.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
+import '../../../components/reactions.dart';
 import '../../../components/user_avatar.dart';
+
+/// 日記のカードの内側の余白。
+const _cardPadding = EdgeInsets.symmetric(horizontal: 16, vertical: 14);
+
+/// 日記のカードどうしのあいだ。
+const double _cardGap = 10;
 
 /// タイムラインの上に出す、その日の日記のまとまり。
 /// 自分の日記を先頭に、メンバーの日記を書いた時刻の新しい順に並べる。
@@ -18,6 +25,7 @@ class DiarySection extends StatelessWidget {
     required this.avatarUrlOf,
     required this.onOpen,
     required this.onWrite,
+    required this.onLongPressMine,
   });
 
   /// その日の日記。書いた時刻の新しい順。
@@ -36,11 +44,14 @@ class DiarySection extends StatelessWidget {
   /// 伏せてある日記を押したとき。その日の自分の日記を書く。
   final ValueChanged<Diary> onWrite;
 
+  /// 自分の日記を長押ししたとき。編集や削除のメニューを出す。
+  final ValueChanged<Diary> onLongPressMine;
+
   @override
   Widget build(BuildContext context) {
     final mine = diaries.where((diary) => diary.authorId == myId).firstOrNull;
     final others = diaries.where((diary) => diary.authorId != myId);
-    final today = diaryDateOf(DateTime.now());
+    final today = diaryToday();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,8 +61,11 @@ class DiarySection extends StatelessWidget {
             diary: mine,
             name: nameOf(mine.authorId),
             avatarUrl: avatarUrlOf(mine.authorId),
-            isMine: true,
+            myId: myId,
+            nameOf: nameOf,
+            avatarUrlOf: avatarUrlOf,
             onTap: () => onOpen(mine),
+            onLongPress: () => onLongPressMine(mine),
           ),
         for (final diary in others)
           diary.isLocked
@@ -70,7 +84,9 @@ class DiarySection extends StatelessWidget {
                   diary: diary,
                   name: nameOf(diary.authorId),
                   avatarUrl: avatarUrlOf(diary.authorId),
-                  isMine: false,
+                  myId: myId,
+                  nameOf: nameOf,
+                  avatarUrlOf: avatarUrlOf,
                   onTap: () => onOpen(diary),
                 ),
       ],
@@ -79,20 +95,27 @@ class DiarySection extends StatelessWidget {
 }
 
 /// 日記の冒頭を表示するカード。タップで全文を開く。
+/// 付いたリアクションはカードの下に並べて見せるだけ。付けるのは開いた日記のページから。
 class _DiaryCard extends StatelessWidget {
   const _DiaryCard({
     required this.diary,
     required this.name,
     required this.avatarUrl,
-    required this.isMine,
+    required this.myId,
+    required this.nameOf,
+    required this.avatarUrlOf,
     required this.onTap,
+    this.onLongPress,
   });
 
   final Diary diary;
   final String name;
   final String? avatarUrl;
-  final bool isMine;
+  final String? myId;
+  final String Function(String userId) nameOf;
+  final String? Function(String userId) avatarUrlOf;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +123,7 @@ class _DiaryCard extends StatelessWidget {
     final body = diary.body ?? '';
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: _cardGap),
       child: Material(
         color: colors.surface,
         shape: RoundedRectangleBorder(
@@ -109,18 +132,23 @@ class _DiaryCard extends StatelessWidget {
         ),
         child: InkWell(
           onTap: onTap,
+          onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: _cardPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _CardHeader(name: name, avatarUrl: avatarUrl, isMine: isMine),
-                const SizedBox(height: 10),
+                _CardHeader(
+                  name: name,
+                  avatarUrl: avatarUrl,
+                  writtenAt: diary.writtenAt,
+                ),
+                const SizedBox(height: 6),
                 // 冒頭だけ見せて、続きはタップした詳細で読む。
                 _DiaryTitle(title: diary.title),
                 // 本文は1行だけ。本文がなくても1行ぶんの高さを取り、カードの高さを揃える。
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   body,
                   maxLines: 1,
@@ -131,6 +159,17 @@ class _DiaryCard extends StatelessWidget {
                     color: colors.textSecondary,
                   ),
                 ),
+                if (diary.reactions.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  // チップは押せない。押すとカードと同じく日記を開く。
+                  ReactionChips(
+                    reactions: diary.reactions,
+                    myId: myId,
+                    nameOf: nameOf,
+                    avatarUrlOf: avatarUrlOf,
+                    filled: true,
+                  ),
+                ],
               ],
             ),
           ),
@@ -169,7 +208,7 @@ class _LockedDiaryCard extends StatelessWidget {
         : context.l10n.diarySectionLockedYesterday;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: _cardGap),
       child: Semantics(
         button: canWrite,
         label: context.l10n.diarySectionLockedSemantics(
@@ -191,12 +230,16 @@ class _LockedDiaryCard extends StatelessWidget {
             onTap: onTap,
             borderRadius: BorderRadius.circular(16),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: _cardPadding,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _CardHeader(name: name, avatarUrl: avatarUrl, isMine: false),
-                  const SizedBox(height: 10),
+                  _CardHeader(
+                    name: name,
+                    avatarUrl: avatarUrl,
+                    writtenAt: diary.writtenAt,
+                  ),
+                  const SizedBox(height: 6),
                   // タイトルは続きを読みたくなる予告として見せる。
                   _DiaryTitle(title: diary.title),
                   // 本文の1行目の場所に、読めるようにする方法を出す。
@@ -205,18 +248,17 @@ class _LockedDiaryCard extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.lock_outline,
-                        size: 14,
+                        size: 16,
                         color: colors.textSecondary,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 6),
                       Expanded(
-                        // 本文の1行ぶんに収め、読めるカードと高さを揃える。
                         child: Text(
                           hint,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             color: colors.textSecondary,
                           ),
                         ),
@@ -225,7 +267,7 @@ class _LockedDiaryCard extends StatelessWidget {
                         Text(
                           context.l10n.commonWriteDiary,
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -243,17 +285,19 @@ class _LockedDiaryCard extends StatelessWidget {
   }
 }
 
-/// カード上部の「（アイコン） 名前 の日記」の行。
+/// カード上部の「（アイコン） 名前 時刻」の行。名前を太字にして、誰の日記かを先に読ませる。
 class _CardHeader extends StatelessWidget {
   const _CardHeader({
     required this.name,
     required this.avatarUrl,
-    required this.isMine,
+    required this.writtenAt,
   });
 
   final String name;
   final String? avatarUrl;
-  final bool isMine;
+
+  /// 日記を書いた時刻。
+  final DateTime writtenAt;
 
   @override
   Widget build(BuildContext context) {
@@ -263,13 +307,18 @@ class _CardHeader extends StatelessWidget {
         const SizedBox(width: 8),
         Flexible(
           child: Text(
-            context.l10n.diarySectionAuthor(name),
+            name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 13,
-              color: context.appColors.textSecondary,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          formatTime(writtenAt),
+          style: TextStyle(
+            fontSize: 14,
+            color: context.appColors.textSecondary,
           ),
         ),
       ],
@@ -291,7 +340,7 @@ class _DiaryTitle extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: FontWeight.w700,
         color: title.isNotEmpty ? null : context.appColors.disabled,
       ),

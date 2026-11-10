@@ -30,7 +30,12 @@ GoRouter router(Ref ref) {
   // ルーターは作り直さず、状態が変わったことだけを伝える。値に意味はない。
   final refresh = ValueNotifier(0);
   ref
-    ..listen(appUpdateProvider, (_, _) => refresh.value++)
+    // アプリに戻るたびに確かめ直すので、行き先が変わる「必須かどうか」が変わったときだけ伝える。
+    ..listen(appUpdateProvider, (previous, next) {
+      final wasRequired = previous?.value == AppUpdate.required;
+      final isRequired = next.value == AppUpdate.required;
+      if (wasRequired != isRequired) refresh.value++;
+    })
     ..listen(authenticationProvider, (_, _) => refresh.value++)
     ..listen(profileProvider, (_, _) => refresh.value++);
 
@@ -168,14 +173,15 @@ class DiaryBookRoute extends GoRouteData with $DiaryBookRoute {
   final DiaryBookOrigin? $extra;
 
   // 画面の中ほどの左右スワイプは日付の移動に使うので、戻るのは画面の端からだけにする。
-  // 表紙から開かないとき（通知から開いたときなど）は、端から戻れるよう iOS の標準の画面遷移で開く
-  // （_materialPage を参照）。
+  // 表紙から開かないとき（通知から開いたときなど）は、端から戻れるよう iOS の標準の画面遷移で開く。
+  // どちらでも同じ型の Page を返す（openBookPage を参照）。
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    final page = DiaryBookPage(diaryBookId: id);
-    final origin = $extra;
-    if (origin == null) return _materialPage(state, page);
-    return openBookPage(key: state.pageKey, origin: origin, child: page);
+    return openBookPage(
+      key: state.pageKey,
+      origin: $extra,
+      child: DiaryBookPage(diaryBookId: id),
+    );
   }
 }
 
@@ -238,17 +244,20 @@ class DiaryDetailRoute extends GoRouteData with $DiaryDetailRoute {
   }
 }
 
-/// 自分の [date] の日記を書くページ。[diaryBook] が null なら参加している日記帳すべてに書く。
+/// 自分の [date] の日記を書くページ。[diaryBook] があれば、投稿先を聞かずにその日記帳に書く。
+/// [blank] なら、もう書いた日記があっても読み込まずに白紙で開く。
 @TypedGoRoute<DiaryEditorRoute>(path: '/diaries/write')
 class DiaryEditorRoute extends GoRouteData with $DiaryEditorRoute {
   const DiaryEditorRoute({
     @TypedQueryParameter(encoder: _encodeDate, decoder: _decodeDate)
     required this.date,
     this.diaryBook,
+    this.blank = false,
   });
 
   final DateTime date;
   final String? diaryBook;
+  final bool blank;
 
   // 下から出てくるモーダルにして、閉じるボタンで閉じる。
   @override
@@ -256,7 +265,11 @@ class DiaryEditorRoute extends GoRouteData with $DiaryEditorRoute {
       MaterialPage(
         key: state.pageKey,
         fullscreenDialog: true,
-        child: DiaryEditorPage(date: date, diaryBookId: diaryBook),
+        child: DiaryEditorPage(
+          date: date,
+          diaryBookId: diaryBook,
+          blank: blank,
+        ),
       );
 }
 

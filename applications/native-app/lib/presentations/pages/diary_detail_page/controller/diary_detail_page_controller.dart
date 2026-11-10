@@ -5,9 +5,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../domains/diary/diary.dart';
 import '../../../../domains/diary_book/diary_book_member.dart';
 import '../../../../domains/post/timeline_post.dart';
+import '../../../../domains/reaction/reaction.dart';
 import '../../../../infrastructures/repositories/diary_book_repository.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
 import '../../../../infrastructures/repositories/post_repository.dart';
+import '../../../providers/diary_reminder_notifier.dart';
 import '../../../providers/profile_notifier.dart';
 
 part '_generated/diary_detail_page_controller.freezed.dart';
@@ -69,10 +71,62 @@ class DiaryDetailPageController extends _$DiaryDetailPageController {
     }
   }
 
+  /// 自分（[myId]）のリアクションを、[diaryId] の日記に [emoji] で付ける。同じ絵文字なら取り消す。
+  /// 待たずにすぐ画面に映し、保存できなかったら元に戻して false を返す。
+  Future<bool> react(String diaryId, String myId, String emoji) async {
+    final before = _diaryOf(diaryId);
+    if (before == null) return false;
+    final removing = before.reactionOf(myId) == emoji;
+    _replaceDiary(before.reactedBy(myId, emoji));
+
+    final repository = ref.read(diaryRepositoryProvider);
+    try {
+      if (removing) {
+        await repository.removeReaction(diaryId);
+      } else {
+        await repository.react(diaryId, emoji);
+      }
+    } catch (error, stackTrace) {
+      debugPrint('リアクションを保存できませんでした: $error\n$stackTrace');
+      // 待っている間にほかの絵文字を選んでいても、自分のリアクションだけをこの前に戻す。
+      final latest = _diaryOf(diaryId);
+      if (latest != null) {
+        _replaceDiary(
+          latest.copyWith(
+            reactions: latest.reactions.withReactionOf(myId, before.reactions),
+          ),
+        );
+      }
+      return false;
+    }
+    return true;
+  }
+
+  Diary? _diaryOf(String diaryId) {
+    return state.value?.diaries
+        .where((diary) => diary.id == diaryId)
+        .firstOrNull;
+  }
+
+  void _replaceDiary(Diary replaced) {
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(
+      current.copyWith(
+        diaries: [
+          for (final diary in current.diaries)
+            if (diary.id == replaced.id) replaced else diary,
+        ],
+      ),
+    );
+  }
+
   /// 自分の [diary] を消す。消せたら true。
   Future<bool> delete(Diary diary) async {
     try {
       await ref.read(diaryRepositoryProvider).delete(diary.id);
+      // 今日の日記がなくなったら、今日のリマインダーを出すようにする。
+      ref.read(diaryReminderProvider.notifier).sync();
       return true;
     } catch (error, stackTrace) {
       debugPrint('日記を消せませんでした: $error\n$stackTrace');

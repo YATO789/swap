@@ -9,9 +9,11 @@ import '../../../../domains/post/timeline_post.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
+import '../../../components/dismissible_selectable_text.dart';
 import '../../../components/user_avatar.dart';
 import 'diary_section.dart';
-import 'reactions.dart';
+import 'post_responder.dart';
+import '../../../components/reactions.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
 /// 今日を表示しているときは、今の時間にまだ記録していないほかのメンバーを一番上に出す。
@@ -21,6 +23,7 @@ class TimelineView extends HookWidget {
   const TimelineView({
     super.key,
     required this.heading,
+    required this.diaryBookId,
     required this.date,
     required this.myId,
     required this.members,
@@ -29,6 +32,7 @@ class TimelineView extends HookWidget {
     required this.onRefresh,
     required this.onOpenDiary,
     required this.onWriteDiary,
+    required this.onLongPressMyDiary,
     required this.onDeletePost,
     required this.onReact,
   });
@@ -36,6 +40,7 @@ class TimelineView extends HookWidget {
   /// いちばん上に置く見出し。上に浮かせたボタンの高さぶんを自分で占め、記録と一緒にスクロールする。
   final Widget heading;
 
+  final String diaryBookId;
   final DateTime date;
   final String? myId;
   final List<DiaryBookMember> members;
@@ -50,6 +55,9 @@ class TimelineView extends HookWidget {
   final Future<void> Function() onRefresh;
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
+
+  /// 自分の日記を長押ししたとき。
+  final ValueChanged<Diary> onLongPressMyDiary;
 
   /// 自分の記録を長押ししたとき。
   final ValueChanged<TimelinePost> onDeletePost;
@@ -123,6 +131,7 @@ class TimelineView extends HookWidget {
                 avatarUrlOf: avatarUrlOf,
                 onOpen: onOpenDiary,
                 onWrite: onWriteDiary,
+                onLongPressMine: onLongPressMyDiary,
               ),
             ),
           ),
@@ -157,6 +166,8 @@ class TimelineView extends HookWidget {
               sliver: SliverList.separated(
                 itemCount: hours.length,
                 itemBuilder: (context, index) => _HourSection(
+                  diaryBookId: diaryBookId,
+                  date: date,
                   hour: hours[index],
                   myId: myId,
                   nameOf: nameOf,
@@ -237,6 +248,8 @@ class _BlankPage extends StatelessWidget {
 
 class _HourSection extends StatelessWidget {
   const _HourSection({
+    required this.diaryBookId,
+    required this.date,
     required this.hour,
     required this.myId,
     required this.nameOf,
@@ -245,6 +258,8 @@ class _HourSection extends StatelessWidget {
     required this.onReact,
   });
 
+  final String diaryBookId;
+  final DateTime date;
   final _TimelineHour hour;
   final String? myId;
   final String Function(String userId) nameOf;
@@ -265,6 +280,8 @@ class _HourSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: _PostCard(
+                diaryBookId: diaryBookId,
+                date: date,
                 post: post,
                 myId: myId,
                 nameOf: nameOf,
@@ -401,6 +418,8 @@ class _PendingOthersRow extends StatelessWidget {
 
 class _PostCard extends StatelessWidget {
   const _PostCard({
+    required this.diaryBookId,
+    required this.date,
     required this.post,
     required this.myId,
     required this.nameOf,
@@ -410,6 +429,9 @@ class _PostCard extends StatelessWidget {
     this.lifted = false,
   });
 
+  /// コメントを読み書きする、日記帳の id とページの日付。
+  final String diaryBookId;
+  final DateTime date;
   final TimelinePost post;
   final String? myId;
   final String Function(String userId) nameOf;
@@ -428,12 +450,30 @@ class _PostCard extends StatelessWidget {
   /// 名前の行と本文のあいだ。
   static const double _headerGap = 4;
 
-  Future<void> _pickReaction(BuildContext context) async {
-    final emoji = await showReactionPicker(
+  /// 左に出す、書いた人のアイコンの大きさ。
+  static const double _avatarSize = 36;
+
+  /// リアクションとコメントの画面を開く。自分の記録ではコメントだけにする。
+  Future<void> _respond(BuildContext context) async {
+    final l10n = context.l10n;
+    final canReact = post.authorId != myId;
+    final emoji = await showPostResponder(
       context,
       target: context,
+      diaryBookId: diaryBookId,
+      date: date,
+      postId: post.id,
+      myId: myId,
+      canReact: canReact,
       current: post.reactionOf(myId),
+      hintText: canReact
+          ? l10n.commentHintTo(nameOf(post.authorId))
+          : l10n.commentHintMine,
+      nameOf: nameOf,
+      avatarUrlOf: avatarUrlOf,
       liftedBuilder: (_) => _PostCard(
+        diaryBookId: diaryBookId,
+        date: date,
         post: post,
         myId: myId,
         nameOf: nameOf,
@@ -443,7 +483,7 @@ class _PostCard extends StatelessWidget {
         lifted: true,
       ),
     );
-    if (emoji == null) return;
+    if (emoji == null || !canReact) return;
     onReact(emoji);
   }
 
@@ -451,22 +491,10 @@ class _PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final isMine = post.authorId == myId;
-    // 自分の記録には付けない。
+    // リアクションは自分の記録には付けない。コメントは自分の記録にも書ける。
     final canReact = !isMine && !lifted;
-    // ハートの中心を、名前の行と本文のあいだのちょうど真ん中に合わせる。
-    // 名前の行の高さは文字の大きさの設定で変わるので、実際に測る。
-    final nameLine = TextPainter(
-      text: TextSpan(
-        text: nameOf(post.authorId),
-        style: DefaultTextStyle.of(context).style.merge(_nameStyle),
-      ),
-      textDirection: Directionality.of(context),
-      textScaler: MediaQuery.textScalerOf(context),
-      maxLines: 1,
-    )..layout();
-    final buttonTop =
-        nameLine.height + _headerGap / 2 - ReactionButton.size / 2;
-    nameLine.dispose();
+    // ボタンの中心を、左のアイコンの中心に合わせる。本文が何行あっても動かさない。
+    const buttonTop = (_avatarSize - ReactionButton.size) / 2;
 
     // 自分の記録は長押しで削除できる。
     return InkWell(
@@ -480,7 +508,7 @@ class _PostCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserAvatar(imageUrl: avatarUrlOf(post.authorId), size: 36),
+            UserAvatar(imageUrl: avatarUrlOf(post.authorId), size: _avatarSize),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -511,10 +539,18 @@ class _PostCard extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: _headerGap),
-                        Text(
-                          post.message,
-                          style: const TextStyle(fontSize: 15),
-                        ),
+                        // 本文は長押しからなぞって選び、コピーできるようにする。
+                        // 浮かせた見本では選ばせない。
+                        if (lifted)
+                          Text(
+                            post.message,
+                            style: const TextStyle(fontSize: 15),
+                          )
+                        else
+                          DismissibleSelectableText(
+                            post.message,
+                            style: const TextStyle(fontSize: 15),
+                          ),
                       ],
                     ),
                   ),
@@ -531,15 +567,17 @@ class _PostCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (canReact)
+            if (!lifted)
               Transform.translate(
-                offset: Offset(0, buttonTop),
+                offset: const Offset(0, buttonTop),
                 child: ReactionButton(
                   current: post.reactionOf(myId),
-                  onPressed: () => _pickReaction(context),
+                  withComments: true,
+                  commentCount: post.comments.length,
+                  onPressed: () => _respond(context),
                 ),
               )
-            else if (lifted && !isMine)
+            else
               // 浮かせた見本でも、ボタンの場所は空けて元の並びと揃える。
               const SizedBox(width: ReactionButton.size),
           ],

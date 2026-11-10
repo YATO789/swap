@@ -48,7 +48,7 @@ Future<FakePostRepository> _openSheet(
     ],
   );
   await tester.pumpAndSettle();
-  await tester.tap(find.text('今なにしてる？'));
+  await tester.tap(find.text('ひとこと'));
   await tester.pumpAndSettle();
   return postRepository;
 }

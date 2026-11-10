@@ -18,6 +18,7 @@ import '../../components/page_turn_view.dart';
 import '../../components/paper_title.dart';
 import '../../components/post_button.dart';
 import '../router/router.dart';
+import 'components/diary_actions_sheet.dart';
 import 'components/timeline_calendar_sheet.dart';
 import 'components/timeline_view.dart';
 import 'controller/diary_book_page_controller.dart';
@@ -33,18 +34,23 @@ class DiaryBookPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     // 開いたまま朝4時を過ぎても今日が変わるよう、読み直したときとアプリに戻ったときに今日を確かめ直す。
-    final todayState = useState(diaryDateOf(DateTime.now()));
+    final todayState = useState(diaryToday());
     final today = todayState.value;
-    void catchUpToday() => todayState.value = diaryDateOf(DateTime.now());
+    void catchUpToday() {
+      todayState.value = diaryToday();
+    }
+
     useOnAppLifecycleStateChange((_, state) {
       if (state == AppLifecycleState.resumed) catchUpToday();
     });
     // カレンダーで選んだ日。null なら今日を見ていて、日付が変わったら新しい今日に移る。
     final pickedDate = useState<DateTime?>(null);
     final date = pickedDate.value ?? today;
+    //「この日記帳はもう見られません」というシートをもう出したかどうか
     final notifiedRemoval = useRef(false);
 
     final diaryBooksState = ref.watch(diaryBookProvider);
+    //自分の日記帳の一覧から、今開いている日記帳を1冊探し出す
     final diaryBook = diaryBooksState.value
         ?.where((diaryBook) => diaryBook.id == diaryBookId)
         .firstOrNull;
@@ -67,7 +73,7 @@ class DiaryBookPage extends HookConsumerWidget {
     final provider = diaryBookPageControllerProvider(diaryBookId, date);
     DiaryBookPageController controller() => ref.read(provider.notifier);
 
-    // 開いている間に外されたら、もう見られないことを知らせてホームに戻る。読み直すたびに出さないよう1回だけ。
+    // 日記帳を開いている間にほかの人に外されたとき、それを知らせてホームに戻す処理
     // 外されたと分かると気まずいので、外されたとは書かない。
     ref.listen(provider, (_, next) async {
       if (next.error is! RemovedFromDiaryBookException) return;
@@ -86,6 +92,11 @@ class DiaryBookPage extends HookConsumerWidget {
       diaryBooks.forget(diaryBookId);
     });
 
+    // 見る日を変える。今日なら null にして、日付が変わったら新しい今日に移るようにする。
+    void showDay(DateTime day) {
+      pickedDate.value = day == today ? null : day;
+    }
+
     Future<void> pickDate() async {
       final picked = await showTimelineCalendar(
         context,
@@ -93,12 +104,8 @@ class DiaryBookPage extends HookConsumerWidget {
         fetchMarkedDates: controller().fetchMarkedDates,
       );
       if (picked == null) return;
-      pickedDate.value = picked == today ? null : picked;
+      showDay(picked);
     }
-
-    // ページをめくって、ほかの日に移ったとき。
-    void turnTo(DateTime turned) =>
-        pickedDate.value = turned == today ? null : turned;
 
     // 引っ張って読み直したとき、今日を見ていて日付が変わっていれば、新しい今日を読む。
     Future<void> refresh() async {
@@ -123,6 +130,50 @@ class DiaryBookPage extends HookConsumerWidget {
         diaryBook: diaryBookId,
       ).push<void>(context);
       await controller().refresh();
+    }
+
+    Future<void> confirmDeleteDiary(Diary diary) async {
+      final l10n = context.l10n;
+      final confirmed = await showConfirmSheet(
+        context,
+        title: l10n.diaryDetailDeleteTitle,
+        message: l10n.diaryDetailDeleteMessage(diaryBook.name),
+        irreversible: true,
+        confirmLabel: l10n.commonDelete,
+        destructive: true,
+      );
+      if (!confirmed || !context.mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final deleted = await ref
+          .read(
+            diaryBookPageControllerProvider(diaryBookId, diary.date).notifier,
+          )
+          .deleteDiary(diary);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            deleted ? l10n.diaryDetailDeleted : l10n.diaryDetailDeleteFailed,
+          ),
+        ),
+      );
+    }
+
+    // 自分の日記を長押ししたら、編集と削除を選べるようにする。
+    Future<void> showMyDiaryActions(Diary diary) async {
+      final action = await showDiaryActionsSheet(
+        context,
+        canEdit: isEditableDiaryDate(diary.date, today: diaryToday()),
+      );
+      if (!context.mounted) return;
+      switch (action) {
+        case DiaryAction.edit:
+          await writeDiary(diary);
+        case DiaryAction.delete:
+          await confirmDeleteDiary(diary);
+        case null:
+          return;
+      }
     }
 
     Future<void> confirmDeletePost(TimelinePost post) async {
@@ -199,7 +250,8 @@ class DiaryBookPage extends HookConsumerWidget {
           final next = DateTime(day.year, day.month, day.day + 1);
           return next.isAfter(today) ? null : next;
         },
-        onChanged: turnTo,
+        // ページをめくって、ほかの日に移ったとき。
+        onChanged: showDay,
         builder: (day) => _DayTimeline(
           diaryBookId: diaryBookId,
           diaryBookName: diaryBook.name,
@@ -208,6 +260,7 @@ class DiaryBookPage extends HookConsumerWidget {
           onRefresh: refresh,
           onOpenDiary: openDiary,
           onWriteDiary: writeDiary,
+          onLongPressMyDiary: showMyDiaryActions,
           onDeletePost: confirmDeletePost,
           onReact: react,
         ),
@@ -235,6 +288,7 @@ class _DayTimeline extends ConsumerWidget {
     required this.onRefresh,
     required this.onOpenDiary,
     required this.onWriteDiary,
+    required this.onLongPressMyDiary,
     required this.onDeletePost,
     required this.onReact,
   });
@@ -246,6 +300,7 @@ class _DayTimeline extends ConsumerWidget {
   final Future<void> Function() onRefresh;
   final ValueChanged<Diary> onOpenDiary;
   final ValueChanged<Diary> onWriteDiary;
+  final ValueChanged<Diary> onLongPressMyDiary;
   final ValueChanged<TimelinePost> onDeletePost;
   final void Function(TimelinePost post, String emoji) onReact;
 
@@ -261,6 +316,7 @@ class _DayTimeline extends ConsumerWidget {
     return switch (ref.watch(provider)) {
       AsyncValue(:final value?, hasError: false) => TimelineView(
         heading: heading,
+        diaryBookId: diaryBookId,
         date: date,
         myId: myId,
         members: value.members,
@@ -269,6 +325,7 @@ class _DayTimeline extends ConsumerWidget {
         onRefresh: onRefresh,
         onOpenDiary: onOpenDiary,
         onWriteDiary: onWriteDiary,
+        onLongPressMyDiary: onLongPressMyDiary,
         onDeletePost: onDeletePost,
         onReact: onReact,
       ),

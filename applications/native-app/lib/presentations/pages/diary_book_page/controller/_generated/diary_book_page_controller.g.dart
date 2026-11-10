@@ -59,7 +59,7 @@ final class DiaryBookPageControllerProvider
 }
 
 String _$diaryBookPageControllerHash() =>
-    r'1993983fc97724c2adc361cad5cb5cdff9f1bdac';
+    r'6618f2776bbb13287181d487cfe4030cc1368878';
 
 /// 日記帳のページで、[diaryBookId] の日記帳の [date] の日記と記録を読む。
 /// もう参加していなければ [RemovedFromDiaryBookException] で失敗する。

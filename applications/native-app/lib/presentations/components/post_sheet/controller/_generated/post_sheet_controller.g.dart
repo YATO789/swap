@@ -8,15 +8,15 @@ part of '../post_sheet_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 「今なにしてる？」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
+/// 「ひとこと」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
 
 @ProviderFor(PostSheetController)
 final postSheetControllerProvider = PostSheetControllerProvider._();
 
-/// 「今なにしてる？」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
+/// 「ひとこと」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
 final class PostSheetControllerProvider
     extends $NotifierProvider<PostSheetController, AsyncValue<void>> {
-  /// 「今なにしてる？」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
+  /// 「ひとこと」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
   PostSheetControllerProvider._()
     : super(
         from: null,
@@ -47,7 +47,7 @@ final class PostSheetControllerProvider
 String _$postSheetControllerHash() =>
     r'a959ba61f28d7f0f3f69f5e37dc2e8e4d0045fb9';
 
-/// 「今なにしてる？」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
+/// 「ひとこと」の投稿シートの投稿処理を受け持つ。状態は投稿の進み具合。
 
 abstract class _$PostSheetController extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();

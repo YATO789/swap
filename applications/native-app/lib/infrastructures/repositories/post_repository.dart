@@ -1,7 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/post/post.dart';
+import 'package:swap/domains/post/post_comment.dart';
 import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/infrastructures/datasources/supabase/post/models/post_response.dart';
 import 'package:swap/infrastructures/datasources/supabase/post/post_datasource.dart';
 
@@ -12,7 +14,7 @@ PostRepository postRepository(Ref ref) {
   return PostRepository(ref.watch(postDatasourceProvider));
 }
 
-/// 記録（「今なにしてる？」）を読み書きする。
+/// 記録（「ひとこと」）を読み書きする。
 class PostRepository {
   const PostRepository(this._datasource);
 
@@ -42,8 +44,23 @@ class PostRepository {
     return _datasource.removeReaction(postId, diaryBookId);
   }
 
+  /// 自分のコメント [message] を、[diaryBookId] の日記帳に出た [postId] の記録に書き、書いたコメントを返す。
+  Future<PostComment> addComment(
+    String postId,
+    String diaryBookId,
+    String message,
+  ) async {
+    final response = await _datasource.addComment(postId, diaryBookId, message);
+    return _toPostComment(response);
+  }
+
+  /// 自分のコメント [commentId] を消す。
+  Future<void> deleteComment(String commentId) {
+    return _datasource.deleteComment(commentId);
+  }
+
   /// [diaryBookId] の日記帳に出された、日記の [date]（朝4時区切り）に当たる記録を古い順に返す。
-  /// その日記帳で付いたリアクションも付ける。
+  /// その日記帳で付いたリアクションとコメントも付ける。
   Future<List<TimelinePost>> fetchInDiaryBook(
     String diaryBookId,
     DateTime date,
@@ -88,6 +105,10 @@ class PostRepository {
       for (final diaryBook in response.postDiaryBooks)
         ...diaryBook.postReactions,
     ]..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final comments = [
+      for (final diaryBook in response.postDiaryBooks)
+        for (final comment in diaryBook.postComments) _toPostComment(comment),
+    ]..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return TimelinePost(
       id: response.id,
       authorId: response.authorId,
@@ -95,8 +116,18 @@ class PostRepository {
       postedAt: response.postedAt,
       reactions: [
         for (final reaction in reactions)
-          PostReaction(userId: reaction.userId, emoji: reaction.emoji),
+          Reaction(userId: reaction.userId, emoji: reaction.emoji),
       ],
+      comments: comments,
+    );
+  }
+
+  PostComment _toPostComment(PostCommentResponse response) {
+    return PostComment(
+      id: response.id,
+      userId: response.userId,
+      message: response.message,
+      createdAt: response.createdAt,
     );
   }
 }

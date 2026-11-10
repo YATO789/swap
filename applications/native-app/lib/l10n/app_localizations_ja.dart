@@ -70,7 +70,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get commonPost => '記録する';
 
   @override
-  String get commonWhatAreYouDoing => '今なにしてる？';
+  String get commonSaySomething => 'ひとこと';
 
   @override
   String get commonTermsOfService => '利用規約';
@@ -111,7 +111,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String inviteSheetMessage(String name, String url, String code) {
-    return 'Swap!で「$name」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\nアプリはこちら: $url\n招待コード: $code';
+    return 'Swap!で「$name」に参加しよう！\n\nアプリはこちら\n$url\n\nアプリの「招待コードで参加」から、このコードを入力してね\n\n【招待コード】\n$code';
   }
 
   @override
@@ -292,6 +292,47 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diaryBookReactionFailed => 'リアクションを保存できませんでした。もう一度お試しください';
 
   @override
+  String get respondLabel => 'リアクションとコメント';
+
+  @override
+  String respondMyReaction(String emoji) {
+    return '自分のリアクションは$emoji';
+  }
+
+  @override
+  String respondCommentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'コメント$count件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get respondLabelSeparator => '。';
+
+  @override
+  String get commentHintMine => 'コメントを書く';
+
+  @override
+  String commentHintTo(String name) {
+    return '$nameにコメント';
+  }
+
+  @override
+  String get commentSend => '送る';
+
+  @override
+  String get commentSendFailed => 'コメントを送れませんでした。もう一度お試しください';
+
+  @override
+  String get commentDeleteTitle => 'コメントを削除しますか？';
+
+  @override
+  String get commentDeleteFailed => 'コメントを削除できませんでした。もう一度お試しください';
+
+  @override
   String get reactionAdd => 'リアクションを付ける';
 
   @override
@@ -348,11 +389,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get diarySectionUntitled => 'タイトルなし';
 
   @override
-  String diarySectionAuthor(String name) {
-    return '$name の日記';
-  }
-
-  @override
   String get diarySectionLockedPast => 'この日に日記を書いていないので読めません';
 
   @override
@@ -399,6 +435,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get diaryDetailDeleteFailed => '日記を削除できませんでした。もう一度お試しください';
+
+  @override
+  String get diaryDetailReactionFailed => 'リアクションを保存できませんでした。もう一度お試しください';
 
   @override
   String get diaryDetailDeleted => '日記を削除しました';
@@ -576,13 +615,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get editorLoadFailed => '日記を読み込めませんでした';
 
   @override
-  String get editorPickerTitle => '日記を書く日記帳';
-
-  @override
-  String editorAllStatus(String day, int total, int written) {
-    String _temp0 = intl.Intl.selectLogic(day, {'today': '今日', 'other': '昨日'});
-    return '$_temp0の日記: $total冊中$written冊に書いた';
-  }
+  String get editorPickerTitle => 'どの日記帳に投稿しますか？';
 
   @override
   String editorStatusWritten(String day) {
@@ -595,6 +628,18 @@ class AppLocalizationsJa extends AppLocalizations {
     String _temp0 = intl.Intl.selectLogic(day, {'today': '今日', 'other': '昨日'});
     return '$_temp0の日記: まだ';
   }
+
+  @override
+  String get editorOverwriteTitle => '上書きしますか？';
+
+  @override
+  String editorOverwriteMessage(String names, String day) {
+    String _temp0 = intl.Intl.selectLogic(day, {'today': '今日', 'other': '昨日'});
+    return '$namesの$_temp0の日記は、この内容で上書きされます。';
+  }
+
+  @override
+  String get editorOverwriteConfirm => '上書きする';
 
   @override
   String get editorSaveFailed => '日記を書けませんでした。もう一度お試しください';
@@ -628,17 +673,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get editorNoDiaryBook => '日記帳を作ると書けます';
-
-  @override
-  String editorDiaryBookSemantics(String name) {
-    return '日記を書く日記帳: $name';
-  }
-
-  @override
-  String get editorChangeDiaryBook => '日記帳を選び直す';
-
-  @override
-  String get diaryBookPickerAll => 'すべての日記帳';
 
   @override
   String get settingsTitle => '設定';
@@ -858,6 +892,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get coverEditUndo => '元に戻す';
 
   @override
+  String get coverEditRedo => 'やり直す';
+
+  @override
   String get coverEditEmoji => '絵文字';
 
   @override
@@ -870,7 +907,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get coverEditColor => '色';
 
   @override
-  String get coverEditDone => '終わる';
+  String get coverEditDone => '閉じる';
 
   @override
   String get coverEditBringForward => '前へ';
@@ -931,6 +968,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get coverEditStrokeLimit => 'これ以上描けません。消しゴムで消すと描けます';
+
+  @override
+  String get coverEditPenExtraThin => '極細のペン';
 
   @override
   String get coverEditPenThin => '細いペン';
@@ -999,7 +1039,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get coverTextSheetPlaceName => '日記帳の名前を置く';
 
   @override
-  String get coverEditDoodleArea => 'らくがきをする場所。表紙をなぞって線を描く';
+  String get coverEditDoodleArea => 'らくがきをする場所。表紙をなぞって線を描き、2本指で拡大する';
+
+  @override
+  String get coverEditResetZoom => '等倍に戻す';
 
   @override
   String get coverEditSaved => '表紙を保存しました';
@@ -1018,4 +1061,23 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get emojiSheetSearch => '絵文字を検索';
+
+  @override
+  String get settingsDiaryReminder => '日記のリマインダー';
+
+  @override
+  String get settingsDiaryReminderDescription =>
+      '毎日この時刻に、日記を書くよう知らせます。今日の日記を書いた日は知らせません';
+
+  @override
+  String get settingsDiaryReminderTime => '知らせる時刻';
+
+  @override
+  String get settingsNotificationDenied => '通知がオフになっています。端末の設定で通知を許可してください';
+
+  @override
+  String get settingsOpenDeviceSettings => '設定を開く';
+
+  @override
+  String get diaryReminderBody => '今日はどんな一日だった？日記を書こう';
 }

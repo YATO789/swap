@@ -76,9 +76,25 @@ class DiaryDatasource {
     await _client.from('diaries').delete().eq('id', diaryId);
   }
 
+  /// 自分のリアクションを、ほかの人の [diaryId] の日記に [emoji] で付ける。
+  /// もう付けていれば [emoji] に付け替える。付けた時刻は DB が決める。
+  Future<void> react(String diaryId, String emoji) async {
+    // user_id は DB の既定値（auth.uid()）で入る。
+    await _client.from('diary_reactions').upsert({
+      'diary_id': diaryId,
+      'emoji': emoji,
+    }, onConflict: 'diary_id,user_id');
+  }
+
+  /// [diaryId] の日記から、自分のリアクションを取り消す。
+  Future<void> removeReaction(String diaryId) async {
+    // RLS で消せるのは自分のリアクションだけ。
+    await _client.from('diary_reactions').delete().eq('diary_id', diaryId);
+  }
+
   static const _columns =
       'id, diary_book_id, author_id, date, written_at, title, '
-      'diary_contents(body)';
+      'diary_contents(body), diary_reactions(user_id, emoji, created_at)';
 
   String _toDateString(DateTime date) =>
       '${date.year.toString().padLeft(4, '0')}-'

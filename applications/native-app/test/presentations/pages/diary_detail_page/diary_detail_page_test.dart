@@ -7,10 +7,12 @@ import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/post/timeline_post.dart';
 import 'package:swap/domains/profile/profile.dart';
+import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_reminder_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
@@ -54,6 +56,9 @@ Future<FakeDiaryRepository> _openDiaryBook(
         preferencesStoreProvider.overrideWithValue(FakePreferencesStore()),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
+        ),
+        diaryReminderRepositoryProvider.overrideWithValue(
+          FakeDiaryReminderRepository(),
         ),
         authenticationRepositoryProvider.overrideWithValue(
           FakeAuthenticationRepository(
@@ -230,6 +235,120 @@ void main() {
     expect(find.text('1'), findsOneWidget);
     expect(find.text('自分の日記'), findsOneWidget);
     expect(find.byTooltip('メニュー'), findsOneWidget);
+  });
+
+  group('日記のリアクション', () {
+    List<Reaction> mioDiaryReactions(FakeDiaryRepository repository) {
+      return repository.diaries[_university.id]!
+          .firstWhere((diary) => diary.authorId == 'mio')
+          .reactions;
+    }
+
+    testWidgets('右下のボタンから絵文字を選ぶとチップが出て、ボタンがその絵文字になる', (tester) async {
+      final repository = await _openDiaryBook(
+        tester,
+        diaries: [diary('me', '自分の日記'), diary('mio', '美緒の日記')],
+      );
+      await tester.tap(find.text('美緒の日記'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('リアクションを付ける'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('😂'));
+      await tester.pumpAndSettle();
+
+      expect(find.bySemanticsLabel('あなたが😂'), findsOneWidget);
+      expect(find.byTooltip('リアクションを変える。今は😂'), findsOneWidget);
+      expect(mioDiaryReactions(repository), [
+        const Reaction(userId: 'me', emoji: '😂'),
+      ]);
+    });
+
+    testWidgets('チップを押すと、その絵文字で付けられて、もう一度押すと取り消せる', (tester) async {
+      final repository = await _openDiaryBook(
+        tester,
+        diaries: [
+          diary('me', '自分の日記'),
+          diary('mio', '美緒の日記').copyWith(
+            reactions: const [Reaction(userId: 'ken', emoji: '👏')],
+          ),
+        ],
+      );
+      await tester.tap(find.text('美緒の日記'));
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('健太が👏'), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('健太が👏'));
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('健太、あなたが👏'), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel('健太、あなたが👏'));
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('健太が👏'), findsOneWidget);
+      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+      expect(mioDiaryReactions(repository), [
+        const Reaction(userId: 'ken', emoji: '👏'),
+      ]);
+    });
+
+    testWidgets('自分の日記には、付いたリアクションだけを出してボタンは出さない', (tester) async {
+      await _openDiaryBook(
+        tester,
+        diaries: [
+          diary('me', '自分の日記').copyWith(
+            reactions: const [
+              Reaction(userId: 'mio', emoji: '❤️'),
+              Reaction(userId: 'ken', emoji: '❤️'),
+            ],
+          ),
+        ],
+      );
+      // タイムラインのカードにも出す。
+      expect(find.bySemanticsLabel('美緒、健太が❤️'), findsOneWidget);
+
+      await tester.tap(find.text('自分の日記'));
+      await tester.pumpAndSettle();
+
+      expect(find.bySemanticsLabel('美緒、健太が❤️'), findsOneWidget);
+      expect(find.byTooltip('リアクションを付ける'), findsNothing);
+    });
+
+    testWidgets('保存できなかったら、元に戻して知らせる', (tester) async {
+      final repository = await _openDiaryBook(
+        tester,
+        diaries: [diary('me', '自分の日記'), diary('mio', '美緒の日記')],
+      );
+      repository.failsReactions = true;
+      await tester.tap(find.text('美緒の日記'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('リアクションを付ける'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('❤️'));
+      await tester.pumpAndSettle();
+
+      expect(find.bySemanticsLabel('あなたが❤️'), findsNothing);
+      expect(find.byTooltip('リアクションを付ける'), findsOneWidget);
+      expect(find.text('リアクションを保存できませんでした。もう一度お試しください'), findsOneWidget);
+    });
+
+    testWidgets('リアクションを付けて戻ると、タイムラインのカードにチップが出る', (tester) async {
+      await _openDiaryBook(
+        tester,
+        diaries: [diary('me', '自分の日記'), diary('mio', '美緒の日記')],
+      );
+      await tester.tap(find.text('美緒の日記'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('リアクションを付ける'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('❤️'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('戻る'));
+      await tester.pumpAndSettle();
+
+      expect(find.bySemanticsLabel('あなたが❤️'), findsOneWidget);
+    });
   });
 
   testWidgets('自分の日記を消すと、日記帳のページに戻って日記が消える', (tester) async {

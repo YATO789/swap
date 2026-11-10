@@ -9,11 +9,14 @@ import 'package:swap/domains/diary_book/diary_book_cover_field.dart';
 import 'package:swap/domains/diary_book/diary_book_member.dart';
 import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/domains/post/post.dart';
+import 'package:swap/domains/post/post_comment.dart';
 import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_reminder_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
 import 'package:swap/infrastructures/repositories/feedback_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
@@ -84,9 +87,6 @@ class FakePushTokenRepository implements PushTokenRepository {
   Stream<String> get onTokenRefresh {
     return const Stream.empty();
   }
-
-  @override
-  Future<void> requestPermission() async {}
 
   @override
   Future<String?> fetchToken() async {
@@ -161,6 +161,28 @@ class FakeOpenedNotificationRepository implements OpenedNotificationRepository {
   }
 }
 
+/// 端末に予約せず、予約した時刻を [scheduled] に覚えておく。
+/// [taps] に流すと、日記のリマインダーがタップされたことにする。
+class FakeDiaryReminderRepository implements DiaryReminderRepository {
+  final taps = StreamController<void>.broadcast();
+  List<DateTime> scheduled = [];
+
+  @override
+  Future<void> replace(List<DateTime> times, {required String body}) async {
+    scheduled = times;
+  }
+
+  @override
+  Future<void> cancelAll() async {
+    scheduled = [];
+  }
+
+  @override
+  Stream<void> opened() {
+    return taps.stream;
+  }
+}
+
 /// 書いた記録を [posts] にためる。日記帳のタイムラインには [timelinePosts] を返し、
 /// 書いた記録も自分（id: me）の記録として足す。
 class FakePostRepository implements PostRepository {
@@ -203,7 +225,7 @@ class FakePostRepository implements PostRepository {
         reactions: [
           for (final reaction in post.reactions)
             if (reaction.userId != 'me') reaction,
-          PostReaction(userId: 'me', emoji: emoji),
+          Reaction(userId: 'me', emoji: emoji),
         ],
       );
     });
@@ -220,6 +242,43 @@ class FakePostRepository implements PostRepository {
         ],
       );
     });
+  }
+
+  /// true なら、コメントを書くのも消すのも失敗する。
+  bool failsComments = false;
+
+  @override
+  Future<PostComment> addComment(
+    String postId,
+    String diaryBookId,
+    String message,
+  ) async {
+    if (failsComments) throw Exception('コメントを書けない');
+    final comment = PostComment(
+      id: 'comment${DateTime.now().microsecondsSinceEpoch}',
+      userId: 'me',
+      message: message,
+      createdAt: DateTime.now(),
+    );
+    _updatePost(diaryBookId, postId, (post) {
+      return post.copyWith(comments: [...post.comments, comment]);
+    });
+    return comment;
+  }
+
+  @override
+  Future<void> deleteComment(String commentId) async {
+    if (failsComments) throw Exception('コメントを消せない');
+    for (final posts in timelinePosts.values) {
+      for (final (index, post) in posts.indexed) {
+        posts[index] = post.copyWith(
+          comments: [
+            for (final comment in post.comments)
+              if (comment.id != commentId) comment,
+          ],
+        );
+      }
+    }
   }
 
   void _updatePost(
@@ -348,6 +407,44 @@ class FakeDiaryRepository implements DiaryRepository {
     return {
       for (final diary in diaries[diaryBookId] ?? const <Diary>[]) diary.date,
     };
+  }
+
+  /// true なら、リアクションの保存に失敗する。
+  bool failsReactions = false;
+
+  @override
+  Future<void> react(String diaryId, String emoji) async {
+    if (failsReactions) throw Exception('リアクションを保存できない');
+    _updateDiary(diaryId, (diary) {
+      return diary.copyWith(
+        reactions: [
+          for (final reaction in diary.reactions)
+            if (reaction.userId != 'me') reaction,
+          Reaction(userId: 'me', emoji: emoji),
+        ],
+      );
+    });
+  }
+
+  @override
+  Future<void> removeReaction(String diaryId) async {
+    if (failsReactions) throw Exception('リアクションを保存できない');
+    _updateDiary(diaryId, (diary) {
+      return diary.copyWith(
+        reactions: [
+          for (final reaction in diary.reactions)
+            if (reaction.userId != 'me') reaction,
+        ],
+      );
+    });
+  }
+
+  void _updateDiary(String diaryId, Diary Function(Diary diary) update) {
+    for (final list in diaries.values) {
+      for (final (index, diary) in list.indexed) {
+        if (diary.id == diaryId) list[index] = update(diary);
+      }
+    }
   }
 }
 

@@ -7,6 +7,7 @@ import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/feedback_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_reminder_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
 import 'package:swap/infrastructures/repositories/push_token_repository.dart';
@@ -45,6 +46,9 @@ Future<void> _openMyPage(
         ),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
+        ),
+        diaryReminderRepositoryProvider.overrideWithValue(
+          FakeDiaryReminderRepository(),
         ),
         authenticationRepositoryProvider.overrideWithValue(authentication),
         profileRepositoryProvider.overrideWithValue(
@@ -211,6 +215,9 @@ void main() {
       200,
       scrollable: _settingsList,
     );
+    // 一覧の下の端にかかって止まることがあるので、押せるところまで出す。
+    await tester.ensureVisible(find.text('ログアウト'));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('ログアウト'));
     await tester.pumpAndSettle();
@@ -231,6 +238,9 @@ void main() {
       200,
       scrollable: _settingsList,
     );
+    // 一覧の下の端にかかって止まることがあるので、押せるところまで出す。
+    await tester.ensureVisible(find.text('ログアウト'));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('ログアウト'));
     await tester.pumpAndSettle();

@@ -1,58 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../../../domains/diary_book/diary_book.dart';
-import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../components/diary_book_icon.dart';
 
-/// 「すべての日記帳」を選んだときに [showDiaryBookPicker] が返す値。
-const allDiaryBooks = '*';
-
-/// [diaryBooks] から1冊選ぶシートを開く。選んだ日記帳の id を返し、閉じたら null を返す。
-/// [selectedId] の日記帳には印を付ける。[statusOf] を渡すと、名前の下に添える。
-/// [allStatus] を渡すと、先頭に「すべての日記帳」を出し、その下に添える。
-/// 選ばれたら [allDiaryBooks] を返す。
-Future<String?> showDiaryBookPicker(
+/// [diaryBooks] から日記帳を何冊でも選ぶシートを開く。
+/// [confirmLabel] のボタンを押すと選んだ日記帳の id を返し、閉じたら null を返す。
+/// [initialIds] の日記帳は最初から選んでおく。[statusOf] を渡すと、名前の下に添える。
+Future<List<String>?> showDiaryBookPicker(
   BuildContext context, {
   required String title,
+  required String confirmLabel,
   required List<DiaryBook> diaryBooks,
-  String? selectedId,
+  Set<String> initialIds = const {},
   String Function(DiaryBook diaryBook)? statusOf,
-  String? allStatus,
 }) {
-  return showModalBottomSheet<String>(
+  return showModalBottomSheet<List<String>>(
     context: context,
     isScrollControlled: true,
     builder: (context) => _DiaryBookPickerSheet(
       title: title,
+      confirmLabel: confirmLabel,
       diaryBooks: diaryBooks,
-      selectedId: selectedId,
+      initialIds: initialIds,
       statusOf: statusOf,
-      allStatus: allStatus,
     ),
   );
 }
 
-class _DiaryBookPickerSheet extends StatelessWidget {
+class _DiaryBookPickerSheet extends HookWidget {
   const _DiaryBookPickerSheet({
     required this.title,
+    required this.confirmLabel,
     required this.diaryBooks,
-    required this.selectedId,
+    required this.initialIds,
     required this.statusOf,
-    required this.allStatus,
   });
 
   final String title;
+  final String confirmLabel;
   final List<DiaryBook> diaryBooks;
-  final String? selectedId;
+  final Set<String> initialIds;
   final String Function(DiaryBook diaryBook)? statusOf;
-  final String? allStatus;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final statusOf = this.statusOf;
-    final allStatus = this.allStatus;
+    final selectedIds = useState({...initialIds});
+
+    void toggle(String id) {
+      final ids = {...selectedIds.value};
+      if (!ids.remove(id)) ids.add(id);
+      selectedIds.value = ids;
+    }
+
+    void confirm() {
+      // 日記帳の並び順のまま返す。
+      Navigator.of(context).pop([
+        for (final diaryBook in diaryBooks)
+          if (selectedIds.value.contains(diaryBook.id)) diaryBook.id,
+      ]);
+    }
 
     return SafeArea(
       child: Padding(
@@ -60,7 +70,7 @@ class _DiaryBookPickerSheet extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               title,
@@ -72,32 +82,11 @@ class _DiaryBookPickerSheet extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  if (allStatus != null)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      // 日記帳のアイコン（36）と幅を揃える。
-                      leading: const SizedBox(
-                        width: 36,
-                        child: Icon(Icons.library_books_outlined, size: 28),
-                      ),
-                      title: Text(context.l10n.diaryBookPickerAll),
-                      subtitle: Text(
-                        allStatus,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: colors.textSecondary,
-                        ),
-                      ),
-                      trailing: selectedId == allDiaryBooks
-                          ? const Icon(Icons.check)
-                          : null,
-                      selected: selectedId == allDiaryBooks,
-                      onTap: () => Navigator.of(context).pop(allDiaryBooks),
-                    ),
                   for (final diaryBook in diaryBooks)
-                    ListTile(
+                    CheckboxListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: DiaryBookIcon(
+                      controlAffinity: ListTileControlAffinity.trailing,
+                      secondary: DiaryBookIcon(
                         name: diaryBook.name,
                         coverColor: diaryBook.coverColor,
                         size: 36,
@@ -115,14 +104,16 @@ class _DiaryBookPickerSheet extends StatelessWidget {
                                 color: colors.textSecondary,
                               ),
                             ),
-                      trailing: diaryBook.id == selectedId
-                          ? const Icon(Icons.check)
-                          : null,
-                      selected: diaryBook.id == selectedId,
-                      onTap: () => Navigator.of(context).pop(diaryBook.id),
+                      value: selectedIds.value.contains(diaryBook.id),
+                      onChanged: (_) => toggle(diaryBook.id),
                     ),
                 ],
               ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: selectedIds.value.isEmpty ? null : confirm,
+              child: Text(confirmLabel),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:swap/domains/diary/diary.dart';
+import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/infrastructures/datasources/supabase/diary/diary_datasource.dart';
 import 'package:swap/infrastructures/datasources/supabase/diary/models/diary_response.dart';
 
@@ -59,7 +60,19 @@ class DiaryRepository {
     return _datasource.delete(diaryId);
   }
 
+  /// 自分のリアクションを、ほかの人の [diaryId] の日記に [emoji] で付ける。もう付けていれば付け替える。
+  Future<void> react(String diaryId, String emoji) {
+    return _datasource.react(diaryId, emoji);
+  }
+
+  /// [diaryId] の日記から、自分のリアクションを取り消す。
+  Future<void> removeReaction(String diaryId) {
+    return _datasource.removeReaction(diaryId);
+  }
+
   Diary _toDiary(DiaryResponse response) {
+    final reactions = [...response.diaryReactions]
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return Diary(
       id: response.id,
       authorId: response.authorId,
@@ -67,6 +80,10 @@ class DiaryRepository {
       writtenAt: response.writtenAt,
       title: response.title,
       body: response.content?.body,
+      reactions: [
+        for (final reaction in reactions)
+          Reaction(userId: reaction.userId, emoji: reaction.emoji),
+      ],
     );
   }
 }

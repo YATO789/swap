@@ -8,15 +8,18 @@ part of '../my_page_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// マイページのログアウトとアカウント削除を受け持つ。状態はその処理の進み具合。
+/// マイページのログアウトとアカウント削除、日記のリマインダーの切り替えを受け持つ。
+/// 状態はログアウトとアカウント削除の進み具合。
 
 @ProviderFor(MyPageController)
 final myPageControllerProvider = MyPageControllerProvider._();
 
-/// マイページのログアウトとアカウント削除を受け持つ。状態はその処理の進み具合。
+/// マイページのログアウトとアカウント削除、日記のリマインダーの切り替えを受け持つ。
+/// 状態はログアウトとアカウント削除の進み具合。
 final class MyPageControllerProvider
     extends $NotifierProvider<MyPageController, AsyncValue<void>> {
-  /// マイページのログアウトとアカウント削除を受け持つ。状態はその処理の進み具合。
+  /// マイページのログアウトとアカウント削除、日記のリマインダーの切り替えを受け持つ。
+  /// 状態はログアウトとアカウント削除の進み具合。
   MyPageControllerProvider._()
     : super(
         from: null,
@@ -44,9 +47,10 @@ final class MyPageControllerProvider
   }
 }
 
-String _$myPageControllerHash() => r'06d9fe1ee73c5e9b0a80f09bad27c43259b2923f';
+String _$myPageControllerHash() => r'78ea40a40f768c495afc96e240cb74c00c882a1b';
 
-/// マイページのログアウトとアカウント削除を受け持つ。状態はその処理の進み具合。
+/// マイページのログアウトとアカウント削除、日記のリマインダーの切り替えを受け持つ。
+/// 状態はログアウトとアカウント削除の進み具合。
 
 abstract class _$MyPageController extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();

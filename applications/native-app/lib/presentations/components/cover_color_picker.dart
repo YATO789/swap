@@ -12,18 +12,14 @@ const coverBlackColor = Color(0xFF2A2A2E);
 
 /// 選べる表紙の色。先頭の null は決まったグレーで、黒のあとは色相の順。
 /// 黒のほかは明るいパステルにしてあり、表紙の文字は [coverInkColor] で黒になる。
+/// 虹色の丸と合わせて1列に収まるよう、6色にしている。ほかの色は虹色の丸のパレットから選ぶ。
 const coverColors = <Color?>[
   null,
   coverBlackColor,
   Color(0xFFFFB4A8),
-  Color(0xFFFFC98A),
   Color(0xFFFFE07A),
-  Color(0xFFC8E68C),
   initialCoverColor,
-  Color(0xFF9EDCF0),
   Color(0xFFA8C8FF),
-  Color(0xFFD9C2FF),
-  Color(0xFFFFB3D9),
 ];
 
 /// 表紙の色を選ぶ丸の並び。選んでいる色は外側に輪を付ける。
@@ -37,7 +33,7 @@ class CoverColorPicker extends StatelessWidget {
     this.choices = coverColors,
     this.defaultColor,
     this.label,
-    this.trailing,
+    this.leading,
   });
 
   final Color? selected;
@@ -53,8 +49,8 @@ class CoverColorPicker extends StatelessWidget {
   /// 読み上げで丸に付ける名前。なければ「表紙の色」。
   final String? label;
 
-  /// 色の丸のあとに並べる部品（パレットを開く丸など）。
-  final Widget? trailing;
+  /// 色の丸の前（一番左）に並べる部品（パレットを開く丸など）。
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +61,8 @@ class CoverColorPicker extends StatelessWidget {
       spacing: 4,
       runSpacing: 4,
       children: [
+        if (leading case final leading?)
+          Padding(padding: const EdgeInsets.all(6), child: leading),
         for (final color in choices)
           Semantics(
             button: true,
@@ -101,8 +99,6 @@ class CoverColorPicker extends StatelessWidget {
               ),
             ),
           ),
-        if (trailing case final trailing?)
-          Padding(padding: const EdgeInsets.all(6), child: trailing),
       ],
     );
   }

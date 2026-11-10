@@ -35,7 +35,7 @@ class _CalendarSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final today = diaryDateOf(DateTime.now());
+    final today = diaryToday();
     // 端末の言語の曜日。日曜から始まるので、下の日曜始まりの列とそのまま揃う。
     final weekdays = MaterialLocalizations.of(context).narrowWeekdays;
     final month = useState(DateTime(selected.year, selected.month));

@@ -20,6 +20,8 @@ class SettingsNotifier extends _$SettingsNotifier {
       diaryBookPaged: _store.readDiaryBookPaged(),
       postHintVisible: _store.readPostHintVisible(),
       themeMode: _store.readThemeMode(),
+      diaryReminderEnabled: _store.readDiaryReminderEnabled(),
+      diaryReminderTime: _store.readDiaryReminderTime(),
     );
   }
 
@@ -39,5 +41,17 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> saveThemeMode(ThemeMode mode) async {
     state = state.copyWith(themeMode: mode);
     await _store.saveThemeMode(mode);
+  }
+
+  /// 日記のリマインダーを出すかを [enabled] にして保存する。
+  Future<void> saveDiaryReminderEnabled(bool enabled) async {
+    state = state.copyWith(diaryReminderEnabled: enabled);
+    await _store.saveDiaryReminderEnabled(enabled);
+  }
+
+  /// 日記のリマインダーを出す時刻を [time] にして保存する。
+  Future<void> saveDiaryReminderTime(TimeOfDay time) async {
+    state = state.copyWith(diaryReminderTime: time);
+    await _store.saveDiaryReminderTime(time);
   }
 }

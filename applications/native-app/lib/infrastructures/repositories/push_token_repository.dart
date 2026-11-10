@@ -13,6 +13,7 @@ PushTokenRepository pushTokenRepository(Ref ref) {
 }
 
 /// この端末を自分のプッシュ通知の送り先にしたり、送り先から外したりする。
+/// 通知の許可は NotificationPermissionRepository が扱う。
 class PushTokenRepository {
   const PushTokenRepository(this._messaging, this._pushTokens);
 
@@ -22,11 +23,6 @@ class PushTokenRepository {
   /// FCM トークンが替わったら、新しいトークンを流す。
   Stream<String> get onTokenRefresh {
     return _messaging.onTokenRefresh;
-  }
-
-  /// 通知の許可を聞く。
-  Future<void> requestPermission() {
-    return _messaging.requestPermission();
   }
 
   /// この端末の FCM トークン。

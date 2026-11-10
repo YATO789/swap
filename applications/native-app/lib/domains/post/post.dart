@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part '_generated/post.freezed.dart';
 
-/// 記録（「今なにしてる？」）。書いた内容と、それを出す日記帳。
+/// 記録（「ひとこと」）。書いた内容と、それを出す日記帳。
 @freezed
 abstract class Post with _$Post {
   const factory Post({

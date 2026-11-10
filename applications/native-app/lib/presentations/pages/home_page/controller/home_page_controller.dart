@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../infrastructures/repositories/notification_permission_repository.dart';
 import '../../../providers/app_update_notifier.dart';
 import '../../../providers/diary_book_notifier.dart';
 import '../../../providers/push_token_notifier.dart';
@@ -18,6 +19,19 @@ class HomePageController extends _$HomePageController {
   /// 通知の未読数を 0 に戻す。失敗しても画面には出さない。
   Future<void> resetUnreadCount() {
     return ref.read(pushTokenProvider.notifier).resetUnreadCount();
+  }
+
+  /// 通知の許可を聞く。オンボーディングを通らずに来た端末（別の端末でサインインし直したときなど）のため。
+  /// オンボーディングで「あとで」を押した端末では聞かない。答えたことがあれば何も出ない。
+  /// 失敗しても画面には出さない。
+  Future<void> requestNotificationPermission() async {
+    try {
+      final permission = ref.read(notificationPermissionRepositoryProvider);
+      if (permission.skipped) return;
+      await permission.request();
+    } on Object catch (e, stackTrace) {
+      debugPrint('通知の許可を聞けませんでした: $e\n$stackTrace');
+    }
   }
 
   /// 日記帳の一覧を読み直す。ほかの人が変えた名前や表紙を映す。

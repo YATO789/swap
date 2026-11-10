@@ -9,6 +9,7 @@ import 'package:swap/infrastructures/datasources/stores/preferences_store.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_repository.dart';
+import 'package:swap/infrastructures/repositories/diary_reminder_repository.dart';
 import 'package:swap/infrastructures/repositories/opened_notification_repository.dart';
 import 'package:swap/infrastructures/repositories/post_repository.dart';
 import 'package:swap/infrastructures/repositories/profile_repository.dart';
@@ -43,6 +44,9 @@ Future<void> _pumpHome(
         ),
         openedNotificationRepositoryProvider.overrideWithValue(
           FakeOpenedNotificationRepository(),
+        ),
+        diaryReminderRepositoryProvider.overrideWithValue(
+          FakeDiaryReminderRepository(),
         ),
         authenticationRepositoryProvider.overrideWithValue(
           FakeAuthenticationRepository(
@@ -112,7 +116,7 @@ void main() {
     await tester.tap(find.text('招待メッセージをコピー'));
     await tester.pumpAndSettle();
     expect(find.text('招待メッセージをコピーしました'), findsOneWidget);
-    expect(copied, contains('招待コード: New2345'));
+    expect(copied, endsWith('【招待コード】\nNew2345'));
     expect(find.text('「大学」を作りました'), findsNothing);
     expect(find.text('大学'), findsOneWidget);
   });

@@ -2,17 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../../../domains/post/timeline_post.dart';
-import '../../../../l10n/l10n.dart';
-import '../../../../theme/app_theme.dart';
-import '../../../components/emoji_sheet.dart';
-import '../../../components/user_avatar.dart';
+import '../../domains/reaction/reaction.dart';
+import '../../l10n/l10n.dart';
+import '../../theme/app_theme.dart';
+import 'emoji_sheet.dart';
+import 'floating_surface.dart';
+import 'user_avatar.dart';
 
 /// ハートを押したときに並べる、よく使う絵文字。❤️ を先頭に置いて、いつもの良いねは2タップで付けられるようにする。
 const quickReactions = ['❤️', '😂', '😮', '😢', '👏'];
 
 /// 絵文字の吹き出しで「＋」を押したときに返す値。
-const _moreEmojis = '+';
+const moreEmojis = '+';
 
 /// 吹き出しの大きさ。絵文字5つと「＋」が並ぶ。
 const _barButtonSize = 44.0;
@@ -27,40 +28,198 @@ const _barWidth =
     _barPadding * 2;
 const _barHeight = _barButtonSize + _barPadding * 2;
 
+/// 絵文字の吹き出しの高さ。
+const reactionBarHeight = _barHeight;
+
 /// リアクションを付けるボタン。まだ付けていなければハート、付けていればその絵文字を出す。
+/// [floating] は日記の詳細で、画面の右下に浮かせておく大きいボタン。
+/// [withComments] なら、リアクションとコメントをまとめた「反応する」ボタンにする。
+/// リアクションを付けていても絵文字にせず、いつも吹き出しの中にスマイルを出し、コメントがあれば右上に数を出す。
 class ReactionButton extends StatelessWidget {
   const ReactionButton({
     super.key,
     required this.current,
     required this.onPressed,
+    this.floating = false,
+    this.withComments = false,
+    this.commentCount = 0,
   });
 
   /// 自分が付けた絵文字。付けていなければ null。
   final String? current;
   final VoidCallback onPressed;
+  final bool floating;
+  final bool withComments;
+
+  /// 付いているコメントの数。[withComments] のときだけ使う。
+  final int commentCount;
 
   /// ボタン全体（押せる範囲）の一辺。中の丸は 34。
   static const double size = 48;
 
+  /// 右下に浮かせるボタンの一辺。
+  static const double floatingSize = 56;
+
+  String _label(AppLocalizations l10n) {
+    final current = this.current;
+    if (!withComments) {
+      return current == null ? l10n.reactionAdd : l10n.reactionChange(current);
+    }
+    return [
+      l10n.respondLabel,
+      if (current != null) l10n.respondMyReaction(current),
+      if (commentCount > 0) l10n.respondCommentCount(commentCount),
+    ].join(l10n.respondLabelSeparator);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final l10n = context.l10n;
     final current = this.current;
-    final label = current == null
-        ? l10n.reactionAdd
-        : l10n.reactionChange(current);
-    final content = current == null
-        ? Icon(Icons.favorite_border, size: 18, color: colors.textSecondary)
-        : _Emoji(current, size: 18);
+    final label = _label(context.l10n);
+    final Widget content;
+    if (withComments) {
+      // 付けたリアクションは記録の下のチップで分かるので、絵文字に変えず吹き出しのままにする。
+      content = _SmileBubbleIcon(size: 20, color: colors.textSecondary);
+    } else if (current != null) {
+      content = _Emoji(current, size: floating ? 26 : 18);
+    } else {
+      content = Icon(
+        Icons.favorite_border,
+        size: floating ? 24 : 18,
+        color: floating ? colors.textPrimary : colors.textSecondary,
+      );
+    }
 
-    return IconButton(
-      onPressed: onPressed,
-      tooltip: label,
-      padding: const EdgeInsets.all((size - 34) / 2),
-      constraints: const BoxConstraints.tightFor(width: size, height: size),
-      icon: _GlassCircle(size: 34, child: content),
+    if (!floating) {
+      return IconButton(
+        onPressed: onPressed,
+        tooltip: label,
+        padding: const EdgeInsets.all((size - 34) / 2),
+        constraints: const BoxConstraints.tightFor(width: size, height: size),
+        icon: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            _GlassCircle(size: 34, child: content),
+            if (withComments && commentCount > 0)
+              Positioned(top: -6, right: -8, child: _CountBadge(commentCount)),
+          ],
+        ),
+      );
+    }
+    // 上の戻るボタンと同じ、紙の色の丸に影を付けた台に載せる。
+    return Tooltip(
+      message: label,
+      child: FloatingSurface(
+        child: InkWell(
+          onTap: onPressed,
+          child: SizedBox.square(
+            dimension: floatingSize,
+            child: Center(child: content),
+          ),
+        ),
+      ),
     );
+  }
+}
+
+/// ボタンの右上に重ねる、コメントの数。地の色の縁で丸から浮かせる。
+class _CountBadge extends StatelessWidget {
+  const _CountBadge(this.count);
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+
+    return Container(
+      constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: colors.textPrimary,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colors.surface, width: 2),
+      ),
+      child: Text(
+        count > 99 ? '99+' : '$count',
+        // 部品の大きさに合わせてあるので、文字の大きさの設定では大きくしない。
+        textScaler: TextScaler.noScaling,
+        style: TextStyle(
+          fontSize: 10,
+          height: 1,
+          fontWeight: FontWeight.w700,
+          color: colors.surface,
+        ),
+      ),
+    );
+  }
+}
+
+/// 吹き出しの中にスマイルを描いたアイコン。リアクションとコメントをまとめた「反応する」ボタンに使う。
+class _SmileBubbleIcon extends StatelessWidget {
+  const _SmileBubbleIcon({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _SmileBubblePainter(color),
+    );
+  }
+}
+
+class _SmileBubblePainter extends CustomPainter {
+  const _SmileBubblePainter(this.color);
+
+  final Color color;
+
+  /// 吹き出しの丸の中心と半径（24×24 の枠で）。
+  static const _center = Offset(12.5, 11.5);
+  static const _radius = 8.5;
+
+  /// 丸から左下のしっぽへ出ていく角度と、戻ってくる角度。
+  static const _tailStart = 116.6 * pi / 180;
+  static const _tailEnd = 148.8 * pi / 180;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.scale(size.width / 24);
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.9
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final circle = Rect.fromCircle(center: _center, radius: _radius);
+
+    final bubble = Path()
+      ..moveTo(_center.dx + _radius, _center.dy)
+      ..arcTo(circle, 0, _tailStart, false)
+      ..lineTo(3.5, 20.5)
+      ..lineTo(4.9, 16.1)
+      ..arcTo(circle, _tailEnd, 2 * pi - _tailEnd, false)
+      ..close();
+    canvas.drawPath(bubble, stroke);
+
+    final smile = Path()
+      ..moveTo(9.5, 13.2)
+      ..cubicTo(10.3, 14.2, 11.3, 14.7, 12.5, 14.7)
+      ..cubicTo(13.7, 14.7, 14.7, 14.2, 15.5, 13.2);
+    canvas.drawPath(smile, stroke);
+
+    final eye = Paint()..color = color;
+    canvas.drawCircle(const Offset(9.9, 9.6), 0.85, eye);
+    canvas.drawCircle(const Offset(15.1, 9.6), 0.85, eye);
+  }
+
+  @override
+  bool shouldRepaint(_SmileBubblePainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
 
@@ -170,14 +329,18 @@ class ReactionChips extends StatelessWidget {
     required this.nameOf,
     required this.avatarUrlOf,
     this.onTap,
+    this.filled = false,
   });
 
   /// 付いたリアクション。付けた順。
-  final List<PostReaction> reactions;
+  final List<Reaction> reactions;
   final String? myId;
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;
   final ValueChanged<String>? onTap;
+
+  /// 地を薄い灰色で塗る。枠は自分が入っている絵文字にだけ付ける。日記のカードで使う。
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
@@ -200,6 +363,7 @@ class ReactionChips extends StatelessWidget {
             nameOf: nameOf,
             avatarUrlOf: avatarUrlOf,
             onTap: onTap == null ? null : () => onTap(entry.key),
+            filled: filled,
           ),
       ],
     );
@@ -214,6 +378,7 @@ class _ReactionChip extends StatelessWidget {
     required this.nameOf,
     required this.avatarUrlOf,
     required this.onTap,
+    required this.filled,
   });
 
   final String emoji;
@@ -222,13 +387,19 @@ class _ReactionChip extends StatelessWidget {
   final String Function(String userId) nameOf;
   final String? Function(String userId) avatarUrlOf;
   final VoidCallback? onTap;
+  final bool filled;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final l10n = context.l10n;
     final isMine = reactors.contains(myId);
-    final background = isMine ? colors.placeholder : colors.surface;
+    final background = isMine || filled ? colors.placeholder : colors.surface;
+    final border = isMine
+        ? BorderSide(color: colors.textPrimary)
+        : filled
+        ? BorderSide.none
+        : BorderSide(color: colors.border);
     final names = [
       for (final reactor in reactors)
         reactor == myId ? l10n.reactionYou : nameOf(reactor),
@@ -243,14 +414,12 @@ class _ReactionChip extends StatelessWidget {
       excludeSemantics: true,
       child: Material(
         color: background,
-        shape: StadiumBorder(
-          side: BorderSide(color: isMine ? colors.textPrimary : colors.border),
-        ),
+        shape: StadiumBorder(side: border),
         child: InkWell(
           onTap: onTap,
           customBorder: const StadiumBorder(),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(6, 3, 8, 3),
+            padding: EdgeInsets.fromLTRB(6, filled ? 4 : 3, 8, filled ? 4 : 3),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -358,7 +527,7 @@ Future<String?> showReactionPicker(
       animation: animation,
     ),
   );
-  if (picked != _moreEmojis) return picked;
+  if (picked != moreEmojis) return picked;
   if (!context.mounted) return null;
   return showEmojiSheet(context);
 }
@@ -441,7 +610,7 @@ class _ReactionPickerOverlay extends StatelessWidget {
                 : Alignment.topRight,
             child: FadeTransition(
               opacity: animation,
-              child: _ReactionBar(current: current),
+              child: ReactionBar(current: current),
             ),
           ),
         ),
@@ -451,8 +620,8 @@ class _ReactionPickerOverlay extends StatelessWidget {
 }
 
 /// よく使う絵文字と「＋」を並べた吹き出し。
-class _ReactionBar extends StatelessWidget {
-  const _ReactionBar({required this.current});
+class ReactionBar extends StatelessWidget {
+  const ReactionBar({super.key, required this.current});
 
   final String? current;
 
@@ -484,7 +653,7 @@ class _ReactionBar extends StatelessWidget {
               // よく使う絵文字以外を付けているときは「＋」に地を付ける。
               selected: current != null && !quickReactions.contains(current),
               tooltip: l10n.reactionMoreEmojis,
-              onPressed: () => Navigator.of(context).pop(_moreEmojis),
+              onPressed: () => Navigator.of(context).pop(moreEmojis),
               background: colors.placeholder,
               child: Icon(Icons.add, size: 22, color: colors.textPrimary),
             ),

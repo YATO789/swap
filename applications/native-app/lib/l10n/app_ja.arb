@@ -23,7 +23,7 @@
   "commonDiaryBookUnavailable": "この日記帳は表示できません",
   "commonWriteDiary": "日記を書く",
   "commonPost": "記録する",
-  "commonWhatAreYouDoing": "今なにしてる？",
+  "commonSaySomething": "ひとこと",
   "commonTermsOfService": "利用規約",
   "commonPrivacyPolicy": "プライバシーポリシー",
   "commonMemberCount": "{count}人",
@@ -56,7 +56,7 @@
   "discardGuardMessage": "保存していない内容は失われます。",
   "discardGuardKeepEditing": "編集を続ける",
   "discardGuardDiscard": "破棄する",
-  "inviteSheetMessage": "Swap!で「{name}」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\nアプリはこちら: {url}\n招待コード: {code}",
+  "inviteSheetMessage": "Swap!で「{name}」に参加しよう！\n\nアプリはこちら\n{url}\n\nアプリの「招待コードで参加」から、このコードを入力してね\n\n【招待コード】\n{code}",
   "@inviteSheetMessage": {
     "description": "友達に送る招待メッセージ。参加するシートは最後に見つかったコードを使うので、コードは必ず最後に置く。url はアプリを入れていない友達のための App Store のページ",
     "placeholders": {
@@ -202,6 +202,46 @@
   "diaryBookPickDate": "日付を選ぶ",
   "diaryBookLoadFailed": "日記帳を読み込めませんでした",
   "diaryBookReactionFailed": "リアクションを保存できませんでした。もう一度お試しください",
+  "respondLabel": "リアクションとコメント",
+  "@respondLabel": {
+    "description": "記録の「反応する」ボタンの読み上げの先頭"
+  },
+  "respondMyReaction": "自分のリアクションは{emoji}",
+  "@respondMyReaction": {
+    "description": "「反応する」ボタンの読み上げに添える、今付けている絵文字",
+    "placeholders": {
+      "emoji": {
+        "type": "String"
+      }
+    }
+  },
+  "respondCommentCount": "{count, plural, other{コメント{count}件}}",
+  "@respondCommentCount": {
+    "description": "「反応する」ボタンの読み上げに添える、付いているコメントの数",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "respondLabelSeparator": "。",
+  "@respondLabelSeparator": {
+    "description": "「反応する」ボタンの読み上げをつなぐ区切り"
+  },
+  "commentHintMine": "コメントを書く",
+  "commentHintTo": "{name}にコメント",
+  "@commentHintTo": {
+    "description": "ほかの人の記録にコメントするときの入力欄のヒント。name は記録を書いた人の名前",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentSend": "送る",
+  "commentSendFailed": "コメントを送れませんでした。もう一度お試しください",
+  "commentDeleteTitle": "コメントを削除しますか？",
+  "commentDeleteFailed": "コメントを削除できませんでした。もう一度お試しください",
   "reactionAdd": "リアクションを付ける",
   "reactionChange": "リアクションを変える。今は{emoji}",
   "@reactionChange": {
@@ -287,14 +327,6 @@
   "timelineBlankTitle": "今日のページはまだ白紙です",
   "timelineBlankMessage": "最初に書いた人の一言から、今日が始まります",
   "diarySectionUntitled": "タイトルなし",
-  "diarySectionAuthor": "{name} の日記",
-  "@diarySectionAuthor": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "diarySectionLockedPast": "この日に日記を書いていないので読めません",
   "diarySectionLockedToday": "今日の日記を書くと読めます",
   "diarySectionLockedYesterday": "昨日の日記を書くと読めます",
@@ -338,6 +370,7 @@
     }
   },
   "diaryDetailDeleteFailed": "日記を削除できませんでした。もう一度お試しください",
+  "diaryDetailReactionFailed": "リアクションを保存できませんでした。もう一度お試しください",
   "diaryDetailDeleted": "日記を削除しました",
   "diaryDetailMenu": "メニュー",
   "diaryDetailEdit": "編集",
@@ -510,22 +543,7 @@
   },
   "createDiaryBookIconHint": "名前の最初の1文字がアイコンになります",
   "editorLoadFailed": "日記を読み込めませんでした",
-  "editorPickerTitle": "日記を書く日記帳",
-  "editorAllStatus": "{day, select, today{今日} other{昨日}}の日記: {total}冊中{written}冊に書いた",
-  "@editorAllStatus": {
-    "description": "「すべての日記帳」の下に添える。day は today か yesterday",
-    "placeholders": {
-      "day": {
-        "type": "String"
-      },
-      "total": {
-        "type": "int"
-      },
-      "written": {
-        "type": "int"
-      }
-    }
-  },
+  "editorPickerTitle": "どの日記帳に投稿しますか？",
   "editorStatusWritten": "{day, select, today{今日} other{昨日}}の日記: 書いた",
   "@editorStatusWritten": {
     "description": "日記帳の名前の下に添える。day は today か yesterday",
@@ -544,6 +562,20 @@
       }
     }
   },
+  "editorOverwriteTitle": "上書きしますか？",
+  "editorOverwriteMessage": "{names}の{day, select, today{今日} other{昨日}}の日記は、この内容で上書きされます。",
+  "@editorOverwriteMessage": {
+    "description": "names はもう書いてある日記帳の名前を「」で囲んで並べたもの。day は today か yesterday",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "editorOverwriteConfirm": "上書きする",
   "editorSaveFailed": "日記を書けませんでした。もう一度お試しください",
   "editorPosted": "日記を投稿しました",
   "editorUpdated": "日記を更新しました",
@@ -575,17 +607,6 @@
     }
   },
   "editorNoDiaryBook": "日記帳を作ると書けます",
-  "editorDiaryBookSemantics": "日記を書く日記帳: {name}",
-  "@editorDiaryBookSemantics": {
-    "description": "name は日記帳の名前か「すべての日記帳」",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "editorChangeDiaryBook": "日記帳を選び直す",
-  "diaryBookPickerAll": "すべての日記帳",
   "settingsTitle": "設定",
   "settingsSignOutConfirmTitle": "ログアウトしますか？",
   "settingsSignOut": "ログアウト",
@@ -701,6 +722,10 @@
   "updateLater": "あとで",
   "coverEditTitle": "表紙を編集",
   "coverEditUndo": "元に戻す",
+  "coverEditRedo": "やり直す",
+  "@coverEditRedo": {
+    "description": "表紙の編集ページの、元に戻した操作をもう一度するボタン"
+  },
   "coverEditEmoji": "絵文字",
   "@coverEditEmoji": {
     "description": "表紙の編集ページの、絵文字を貼るボタン"
@@ -717,7 +742,7 @@
   "@coverEditColor": {
     "description": "表紙の編集ページの、表紙の色を選ぶボタン"
   },
-  "coverEditDone": "終わる",
+  "coverEditDone": "閉じる",
   "@coverEditDone": {
     "description": "らくがきや色を選ぶのを終えるボタン"
   },
@@ -798,6 +823,7 @@
     "description": "表紙の色を選ぶパレットのシートの題名"
   },
   "coverEditStrokeLimit": "これ以上描けません。消しゴムで消すと描けます",
+  "coverEditPenExtraThin": "極細のペン",
   "coverEditPenThin": "細いペン",
   "coverEditPenMedium": "ふつうのペン",
   "coverEditPenThick": "太いペン",
@@ -846,7 +872,11 @@
   "@coverTextSheetPlaceName": {
     "description": "表紙から外した日記帳の名前を、もう一度表紙に置くボタン"
   },
-  "coverEditDoodleArea": "らくがきをする場所。表紙をなぞって線を描く",
+  "coverEditDoodleArea": "らくがきをする場所。表紙をなぞって線を描き、2本指で拡大する",
+  "coverEditResetZoom": "等倍に戻す",
+  "@coverEditResetZoom": {
+    "description": "表紙の編集ページで、らくがきのために拡大した表紙を元の大きさに戻すボタン"
+  },
   "coverEditSaved": "表紙を保存しました",
   "coverEditSaveFailed": "保存できませんでした。もう一度お試しください",
   "coverEditNeedsUpdate": "表紙を編集するには、アプリをアップデートしてください",
@@ -855,5 +885,14 @@
   "@emojiSheetNoRecents": {
     "description": "最近使った絵文字がないときの文"
   },
-  "emojiSheetSearch": "絵文字を検索"
+  "emojiSheetSearch": "絵文字を検索",
+  "settingsDiaryReminder": "日記のリマインダー",
+  "settingsDiaryReminderDescription": "毎日この時刻に、日記を書くよう知らせます。今日の日記を書いた日は知らせません",
+  "settingsDiaryReminderTime": "知らせる時刻",
+  "settingsNotificationDenied": "通知がオフになっています。端末の設定で通知を許可してください",
+  "settingsOpenDeviceSettings": "設定を開く",
+  "diaryReminderBody": "今日はどんな一日だった？日記を書こう",
+  "@diaryReminderBody": {
+    "description": "毎日決まった時刻に出す、日記を書くよう知らせる通知の本文"
+  }
 }

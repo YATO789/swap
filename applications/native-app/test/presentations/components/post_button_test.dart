@@ -8,7 +8,7 @@ void main() {
   testWidgets('入力欄風の欄と日記を書くボタンが出る', (tester) async {
     await tester.pumpApp(const Scaffold(bottomNavigationBar: PostButton()));
 
-    expect(find.text('今なにしてる？'), findsOneWidget);
+    expect(find.text('ひとこと'), findsOneWidget);
     expect(find.byTooltip('今日の日記を書く'), findsOneWidget);
   });
 
@@ -18,7 +18,7 @@ void main() {
       locale: const Locale('en'),
     );
 
-    expect(find.text('What are you up to?'), findsOneWidget);
+    expect(find.text('Say something'), findsOneWidget);
     expect(find.byTooltip("Write today's diary"), findsOneWidget);
   });
 }

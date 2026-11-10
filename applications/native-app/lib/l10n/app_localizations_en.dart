@@ -70,7 +70,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonPost => 'Post';
 
   @override
-  String get commonWhatAreYouDoing => 'What are you up to?';
+  String get commonSaySomething => 'Say something';
 
   @override
   String get commonTermsOfService => 'Terms of Service';
@@ -117,7 +117,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String inviteSheetMessage(String name, String url, String code) {
-    return 'Join “$name” on Swap!\nIn the app, tap “Join with invite code” and enter this code.\nGet the app: $url\nInvite code: $code';
+    return 'Join “$name” on Swap!\n\nGet the app\n$url\n\nIn the app, tap “Join with invite code” and enter this code.\n\n【Invite code】\n$code';
   }
 
   @override
@@ -321,6 +321,50 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t save your reaction. Please try again.';
 
   @override
+  String get respondLabel => 'Reactions and comments';
+
+  @override
+  String respondMyReaction(String emoji) {
+    return 'Your reaction is $emoji';
+  }
+
+  @override
+  String respondCommentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comments',
+      one: '1 comment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get respondLabelSeparator => '. ';
+
+  @override
+  String get commentHintMine => 'Write a comment';
+
+  @override
+  String commentHintTo(String name) {
+    return 'Comment to $name';
+  }
+
+  @override
+  String get commentSend => 'Send';
+
+  @override
+  String get commentSendFailed =>
+      'Couldn\'t send your comment. Please try again.';
+
+  @override
+  String get commentDeleteTitle => 'Delete this comment?';
+
+  @override
+  String get commentDeleteFailed =>
+      'Couldn\'t delete your comment. Please try again.';
+
+  @override
   String get reactionAdd => 'Add a reaction';
 
   @override
@@ -377,11 +421,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diarySectionUntitled => 'Untitled';
 
   @override
-  String diarySectionAuthor(String name) {
-    return '$name\'s diary';
-  }
-
-  @override
   String get diarySectionLockedPast =>
       'You can\'t read this because you didn\'t write a diary that day';
 
@@ -431,6 +470,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diaryDetailDeleteFailed =>
       'Couldn\'t delete the diary. Please try again.';
+
+  @override
+  String get diaryDetailReactionFailed =>
+      'Couldn\'t save your reaction. Please try again.';
 
   @override
   String get diaryDetailDeleted => 'Diary deleted';
@@ -640,16 +683,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editorLoadFailed => 'Couldn\'t load the diary';
 
   @override
-  String get editorPickerTitle => 'Diary book to write in';
-
-  @override
-  String editorAllStatus(String day, int total, int written) {
-    String _temp0 = intl.Intl.selectLogic(day, {
-      'today': 'Today\'s',
-      'other': 'Yesterday\'s',
-    });
-    return '$_temp0 diary: written in $written of $total';
-  }
+  String get editorPickerTitle => 'Which diary books to post to?';
 
   @override
   String editorStatusWritten(String day) {
@@ -668,6 +702,21 @@ class AppLocalizationsEn extends AppLocalizations {
     });
     return '$_temp0 diary: not yet';
   }
+
+  @override
+  String get editorOverwriteTitle => 'Overwrite?';
+
+  @override
+  String editorOverwriteMessage(String names, String day) {
+    String _temp0 = intl.Intl.selectLogic(day, {
+      'today': 'Today\'s',
+      'other': 'Yesterday\'s',
+    });
+    return '$_temp0 diary in $names will be replaced with this one.';
+  }
+
+  @override
+  String get editorOverwriteConfirm => 'Overwrite';
 
   @override
   String get editorSaveFailed => 'Couldn\'t save the diary. Please try again.';
@@ -707,17 +756,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editorNoDiaryBook => 'Create a diary book to start writing';
-
-  @override
-  String editorDiaryBookSemantics(String name) {
-    return 'Diary book to write in: $name';
-  }
-
-  @override
-  String get editorChangeDiaryBook => 'Change diary book';
-
-  @override
-  String get diaryBookPickerAll => 'All diary books';
 
   @override
   String get settingsTitle => 'Settings';
@@ -948,6 +986,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coverEditUndo => 'Undo';
 
   @override
+  String get coverEditRedo => 'Redo';
+
+  @override
   String get coverEditEmoji => 'Emoji';
 
   @override
@@ -960,7 +1001,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coverEditColor => 'Color';
 
   @override
-  String get coverEditDone => 'Done';
+  String get coverEditDone => 'Close';
 
   @override
   String get coverEditBringForward => 'Forward';
@@ -1022,6 +1063,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get coverEditStrokeLimit =>
       'You can\'t draw any more. Erase some lines to keep drawing.';
+
+  @override
+  String get coverEditPenExtraThin => 'Extra-thin pen';
 
   @override
   String get coverEditPenThin => 'Thin pen';
@@ -1090,7 +1134,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coverTextSheetPlaceName => 'Add the diary book name';
 
   @override
-  String get coverEditDoodleArea => 'Drawing area. Trace on the cover to draw.';
+  String get coverEditDoodleArea =>
+      'Drawing area. Trace on the cover to draw, and use two fingers to zoom.';
+
+  @override
+  String get coverEditResetZoom => 'Reset zoom';
 
   @override
   String get coverEditSaved => 'Cover saved';
@@ -1109,4 +1157,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emojiSheetSearch => 'Search emoji';
+
+  @override
+  String get settingsDiaryReminder => 'Diary reminder';
+
+  @override
+  String get settingsDiaryReminderDescription =>
+      'Reminds you to write at this time every day, unless you\'ve already written today';
+
+  @override
+  String get settingsDiaryReminderTime => 'Remind me at';
+
+  @override
+  String get settingsNotificationDenied =>
+      'Notifications are off. Allow them in your device settings.';
+
+  @override
+  String get settingsOpenDeviceSettings => 'Open Settings';
+
+  @override
+  String get diaryReminderBody => 'How was your day? Write it in your diary';
 }

@@ -16,5 +16,11 @@ abstract class Settings with _$Settings {
 
     /// ライト・ダーク・端末の設定に合わせる、のどれで表示するか。
     required ThemeMode themeMode,
+
+    /// 毎日決まった時刻に、日記を書くよう知らせるか。
+    required bool diaryReminderEnabled,
+
+    /// 日記のリマインダーを出す時刻。
+    required TimeOfDay diaryReminderTime,
   }) = _Settings;
 }

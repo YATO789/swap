@@ -218,11 +218,11 @@ abstract class AppLocalizations {
   /// **'記録する'**
   String get commonPost;
 
-  /// No description provided for @commonWhatAreYouDoing.
+  /// No description provided for @commonSaySomething.
   ///
   /// In ja, this message translates to:
-  /// **'今なにしてる？'**
-  String get commonWhatAreYouDoing;
+  /// **'ひとこと'**
+  String get commonSaySomething;
 
   /// No description provided for @commonTermsOfService.
   ///
@@ -293,7 +293,7 @@ abstract class AppLocalizations {
   /// 友達に送る招待メッセージ。参加するシートは最後に見つかったコードを使うので、コードは必ず最後に置く。url はアプリを入れていない友達のための App Store のページ
   ///
   /// In ja, this message translates to:
-  /// **'Swap!で「{name}」に参加しよう！\nアプリの「招待コードで参加」から、このコードを入力してね。\nアプリはこちら: {url}\n招待コード: {code}'**
+  /// **'Swap!で「{name}」に参加しよう！\n\nアプリはこちら\n{url}\n\nアプリの「招待コードで参加」から、このコードを入力してね\n\n【招待コード】\n{code}'**
   String inviteSheetMessage(String name, String url, String code);
 
   /// No description provided for @inviteSheetCopied.
@@ -608,6 +608,66 @@ abstract class AppLocalizations {
   /// **'リアクションを保存できませんでした。もう一度お試しください'**
   String get diaryBookReactionFailed;
 
+  /// 記録の「反応する」ボタンの読み上げの先頭
+  ///
+  /// In ja, this message translates to:
+  /// **'リアクションとコメント'**
+  String get respondLabel;
+
+  /// 「反応する」ボタンの読み上げに添える、今付けている絵文字
+  ///
+  /// In ja, this message translates to:
+  /// **'自分のリアクションは{emoji}'**
+  String respondMyReaction(String emoji);
+
+  /// 「反応する」ボタンの読み上げに添える、付いているコメントの数
+  ///
+  /// In ja, this message translates to:
+  /// **'{count, plural, other{コメント{count}件}}'**
+  String respondCommentCount(int count);
+
+  /// 「反応する」ボタンの読み上げをつなぐ区切り
+  ///
+  /// In ja, this message translates to:
+  /// **'。'**
+  String get respondLabelSeparator;
+
+  /// No description provided for @commentHintMine.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを書く'**
+  String get commentHintMine;
+
+  /// ほかの人の記録にコメントするときの入力欄のヒント。name は記録を書いた人の名前
+  ///
+  /// In ja, this message translates to:
+  /// **'{name}にコメント'**
+  String commentHintTo(String name);
+
+  /// No description provided for @commentSend.
+  ///
+  /// In ja, this message translates to:
+  /// **'送る'**
+  String get commentSend;
+
+  /// No description provided for @commentSendFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを送れませんでした。もう一度お試しください'**
+  String get commentSendFailed;
+
+  /// No description provided for @commentDeleteTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを削除しますか？'**
+  String get commentDeleteTitle;
+
+  /// No description provided for @commentDeleteFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'コメントを削除できませんでした。もう一度お試しください'**
+  String get commentDeleteFailed;
+
   /// No description provided for @reactionAdd.
   ///
   /// In ja, this message translates to:
@@ -692,12 +752,6 @@ abstract class AppLocalizations {
   /// **'タイトルなし'**
   String get diarySectionUntitled;
 
-  /// No description provided for @diarySectionAuthor.
-  ///
-  /// In ja, this message translates to:
-  /// **'{name} の日記'**
-  String diarySectionAuthor(String name);
-
   /// No description provided for @diarySectionLockedPast.
   ///
   /// In ja, this message translates to:
@@ -780,6 +834,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'日記を削除できませんでした。もう一度お試しください'**
   String get diaryDetailDeleteFailed;
+
+  /// No description provided for @diaryDetailReactionFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'リアクションを保存できませんでした。もう一度お試しください'**
+  String get diaryDetailReactionFailed;
 
   /// No description provided for @diaryDetailDeleted.
   ///
@@ -1084,14 +1144,8 @@ abstract class AppLocalizations {
   /// No description provided for @editorPickerTitle.
   ///
   /// In ja, this message translates to:
-  /// **'日記を書く日記帳'**
+  /// **'どの日記帳に投稿しますか？'**
   String get editorPickerTitle;
-
-  /// 「すべての日記帳」の下に添える。day は today か yesterday
-  ///
-  /// In ja, this message translates to:
-  /// **'{day, select, today{今日} other{昨日}}の日記: {total}冊中{written}冊に書いた'**
-  String editorAllStatus(String day, int total, int written);
 
   /// 日記帳の名前の下に添える。day は today か yesterday
   ///
@@ -1104,6 +1158,24 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'{day, select, today{今日} other{昨日}}の日記: まだ'**
   String editorStatusNotYet(String day);
+
+  /// No description provided for @editorOverwriteTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'上書きしますか？'**
+  String get editorOverwriteTitle;
+
+  /// names はもう書いてある日記帳の名前を「」で囲んで並べたもの。day は today か yesterday
+  ///
+  /// In ja, this message translates to:
+  /// **'{names}の{day, select, today{今日} other{昨日}}の日記は、この内容で上書きされます。'**
+  String editorOverwriteMessage(String names, String day);
+
+  /// No description provided for @editorOverwriteConfirm.
+  ///
+  /// In ja, this message translates to:
+  /// **'上書きする'**
+  String get editorOverwriteConfirm;
 
   /// No description provided for @editorSaveFailed.
   ///
@@ -1158,24 +1230,6 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'日記帳を作ると書けます'**
   String get editorNoDiaryBook;
-
-  /// name は日記帳の名前か「すべての日記帳」
-  ///
-  /// In ja, this message translates to:
-  /// **'日記を書く日記帳: {name}'**
-  String editorDiaryBookSemantics(String name);
-
-  /// No description provided for @editorChangeDiaryBook.
-  ///
-  /// In ja, this message translates to:
-  /// **'日記帳を選び直す'**
-  String get editorChangeDiaryBook;
-
-  /// No description provided for @diaryBookPickerAll.
-  ///
-  /// In ja, this message translates to:
-  /// **'すべての日記帳'**
-  String get diaryBookPickerAll;
 
   /// No description provided for @settingsTitle.
   ///
@@ -1603,6 +1657,12 @@ abstract class AppLocalizations {
   /// **'元に戻す'**
   String get coverEditUndo;
 
+  /// 表紙の編集ページの、元に戻した操作をもう一度するボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'やり直す'**
+  String get coverEditRedo;
+
   /// 表紙の編集ページの、絵文字を貼るボタン
   ///
   /// In ja, this message translates to:
@@ -1630,7 +1690,7 @@ abstract class AppLocalizations {
   /// らくがきや色を選ぶのを終えるボタン
   ///
   /// In ja, this message translates to:
-  /// **'終わる'**
+  /// **'閉じる'**
   String get coverEditDone;
 
   /// 選んだものを1つ上の重なりへ移すボタン
@@ -1734,6 +1794,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'これ以上描けません。消しゴムで消すと描けます'**
   String get coverEditStrokeLimit;
+
+  /// No description provided for @coverEditPenExtraThin.
+  ///
+  /// In ja, this message translates to:
+  /// **'極細のペン'**
+  String get coverEditPenExtraThin;
 
   /// No description provided for @coverEditPenThin.
   ///
@@ -1858,8 +1924,14 @@ abstract class AppLocalizations {
   /// No description provided for @coverEditDoodleArea.
   ///
   /// In ja, this message translates to:
-  /// **'らくがきをする場所。表紙をなぞって線を描く'**
+  /// **'らくがきをする場所。表紙をなぞって線を描き、2本指で拡大する'**
   String get coverEditDoodleArea;
+
+  /// 表紙の編集ページで、らくがきのために拡大した表紙を元の大きさに戻すボタン
+  ///
+  /// In ja, this message translates to:
+  /// **'等倍に戻す'**
+  String get coverEditResetZoom;
 
   /// No description provided for @coverEditSaved.
   ///
@@ -1896,6 +1968,42 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'絵文字を検索'**
   String get emojiSheetSearch;
+
+  /// No description provided for @settingsDiaryReminder.
+  ///
+  /// In ja, this message translates to:
+  /// **'日記のリマインダー'**
+  String get settingsDiaryReminder;
+
+  /// No description provided for @settingsDiaryReminderDescription.
+  ///
+  /// In ja, this message translates to:
+  /// **'毎日この時刻に、日記を書くよう知らせます。今日の日記を書いた日は知らせません'**
+  String get settingsDiaryReminderDescription;
+
+  /// No description provided for @settingsDiaryReminderTime.
+  ///
+  /// In ja, this message translates to:
+  /// **'知らせる時刻'**
+  String get settingsDiaryReminderTime;
+
+  /// No description provided for @settingsNotificationDenied.
+  ///
+  /// In ja, this message translates to:
+  /// **'通知がオフになっています。端末の設定で通知を許可してください'**
+  String get settingsNotificationDenied;
+
+  /// No description provided for @settingsOpenDeviceSettings.
+  ///
+  /// In ja, this message translates to:
+  /// **'設定を開く'**
+  String get settingsOpenDeviceSettings;
+
+  /// 毎日決まった時刻に出す、日記を書くよう知らせる通知の本文
+  ///
+  /// In ja, this message translates to:
+  /// **'今日はどんな一日だった？日記を書こう'**
+  String get diaryReminderBody;
 }
 
 class _AppLocalizationsDelegate

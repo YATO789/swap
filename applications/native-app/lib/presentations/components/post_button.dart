@@ -8,11 +8,11 @@ import '../pages/router/router.dart';
 import 'floating_surface.dart';
 import 'post_sheet/post_sheet.dart';
 
-/// 画面の下に浮かせる書き込みバー。左は「今なにしてる？」の入力欄風の欄で、
+/// 画面の下に浮かせる書き込みバー。左は「ひとこと」の入力欄風の欄で、
 /// 押すと投稿シートを開く。右のペンは日記を書くページを開く。
 /// 背景は持たないので、Scaffold の extendBody と合わせて一覧の上に重ね、一覧はこの下をくぐらせる。
 /// [diaryBook] を渡すと、記録も日記もその日記帳に入れる前提で開く。
-/// 渡さなければ、日記は参加している日記帳すべてに書く（書くページで選び直せる）。
+/// どの日記帳に日記を書くかは、書くページで投稿するときに選ぶ。
 class PostButton extends StatelessWidget {
   const PostButton({
     super.key,
@@ -42,6 +42,8 @@ class PostButton extends StatelessWidget {
     await DiaryEditorRoute(
       date: date,
       diaryBook: diaryBook?.id,
+      // 書いた日記を直すのは日記の詳細からなので、ここからは白紙で開く。
+      blank: true,
     ).push<void>(context);
     onDiaryClosed?.call();
   }
@@ -50,7 +52,7 @@ class PostButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final l10n = context.l10n;
-    final today = diaryDateOf(DateTime.now());
+    final today = diaryToday();
     final date = diaryDate ?? today;
 
     return SafeArea(
@@ -72,7 +74,7 @@ class PostButton extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        l10n.commonWhatAreYouDoing,
+                        l10n.commonSaySomething,
                         style: TextStyle(
                           fontSize: 17,
                           color: colors.textSecondary,

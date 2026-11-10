@@ -6,6 +6,7 @@ import 'package:swap/domains/diary_book/diary_book.dart';
 import 'package:swap/infrastructures/repositories/authentication_repository.dart';
 import 'package:swap/infrastructures/repositories/diary_book_repository.dart';
 import 'package:swap/presentations/components/cover_decoration_layer.dart';
+import 'package:swap/presentations/components/diary_cover.dart';
 import 'package:swap/presentations/pages/cover_decoration_page/components/color_palette.dart';
 import 'package:swap/presentations/pages/cover_decoration_page/cover_decoration_page.dart';
 
@@ -43,6 +44,9 @@ Future<FakeDiaryBookRepository> _open(
   await tester.pumpAndSettle();
   return repository;
 }
+
+/// らくがきのモードで、表紙をなぞる場所の読み上げ。
+const _doodleArea = 'らくがきをする場所。表紙をなぞって線を描き、2本指で拡大する';
 
 /// 編集中の表紙に描いているらくがきの線。
 List<CoverStroke> _strokes(WidgetTester tester) {
@@ -165,14 +169,14 @@ void main() {
 
     await tester.tap(find.text('らくがき'));
     await tester.pumpAndSettle();
-    final area = find.bySemanticsLabel('らくがきをする場所。表紙をなぞって線を描く');
+    final area = find.bySemanticsLabel(_doodleArea);
     final center = tester.getCenter(area);
     await tester.dragFrom(center, const Offset(60, 40));
     await tester.pumpAndSettle();
 
     expect(_strokes(tester), hasLength(1));
 
-    await tester.tap(find.text('終わる'));
+    await tester.tap(find.text('閉じる'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('保存する'));
     await tester.pumpAndSettle();
@@ -201,13 +205,131 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('消しゴム'));
     await tester.pumpAndSettle();
-    final area = find.bySemanticsLabel('らくがきをする場所。表紙をなぞって線を描く');
+    final area = find.bySemanticsLabel(_doodleArea);
     final rect = tester.getRect(area);
     // 線は表紙の幅の 0.7 の高さを横切っている。
     await tester.tapAt(Offset(rect.center.dx, rect.top + rect.width * 0.7));
     await tester.pumpAndSettle();
 
     expect(_strokes(tester), isEmpty);
+  });
+
+  testWidgets('元に戻したらやり直せ、戻したあとに描くとやり直せなくなる', (tester) async {
+    await _open(tester);
+
+    IconButton redoButton() {
+      return tester.widget<IconButton>(
+        find.widgetWithIcon(IconButton, Icons.redo),
+      );
+    }
+
+    expect(redoButton().onPressed, isNull);
+    await tester.tap(find.text('らくがき'));
+    await tester.pumpAndSettle();
+    final center = tester.getCenter(find.bySemanticsLabel(_doodleArea));
+    await tester.dragFrom(center, const Offset(60, 40));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('元に戻す'));
+    await tester.pump();
+    expect(_strokes(tester), isEmpty);
+
+    await tester.tap(find.byTooltip('やり直す'));
+    await tester.pump();
+    expect(_strokes(tester), hasLength(1));
+    expect(redoButton().onPressed, isNull);
+
+    await tester.tap(find.byTooltip('元に戻す'));
+    await tester.pump();
+    expect(redoButton().onPressed, isNotNull);
+    await tester.dragFrom(center, const Offset(-60, 40));
+    await tester.pumpAndSettle();
+
+    expect(_strokes(tester), hasLength(1));
+    expect(redoButton().onPressed, isNull);
+  });
+
+  testWidgets('らくがきで2本指を広げると拡大し、先に触れた指の線は残さない', (tester) async {
+    await _open(tester);
+
+    await tester.tap(find.text('らくがき'));
+    await tester.pumpAndSettle();
+    final area = find.bySemanticsLabel(_doodleArea);
+    final center = tester.getCenter(area);
+    final widthBefore = tester.getRect(area).width;
+
+    // 1本目の指で描き始めてから、2本目の指を足して広げる。
+    final first = await tester.startGesture(center - const Offset(40, 0));
+    await first.moveBy(const Offset(0, 30));
+    await tester.pump();
+    final second = await tester.startGesture(center + const Offset(40, 0));
+    await tester.pump();
+    for (var i = 0; i < 5; i++) {
+      await first.moveBy(const Offset(-12, 0));
+      await second.moveBy(const Offset(12, 0));
+      await tester.pump();
+    }
+    await first.up();
+    await second.up();
+    await tester.pumpAndSettle();
+
+    expect(_strokes(tester), isEmpty);
+    expect(tester.getRect(area).width, greaterThan(widthBefore));
+    expect(find.text('等倍に戻す'), findsOneWidget);
+
+    // 拡大したままでも1本指で描ける。
+    await tester.dragFrom(center, const Offset(60, 40));
+    await tester.pumpAndSettle();
+    expect(_strokes(tester), hasLength(1));
+
+    await tester.tap(find.text('等倍に戻す'));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(area).width, widthBefore);
+    expect(find.text('等倍に戻す'), findsNothing);
+  });
+
+  testWidgets('らくがきを終えると、拡大した表紙は等倍に戻る', (tester) async {
+    await _open(tester);
+
+    await tester.tap(find.text('らくがき'));
+    await tester.pumpAndSettle();
+    final area = find.bySemanticsLabel(_doodleArea);
+    final center = tester.getCenter(area);
+    final first = await tester.startGesture(center - const Offset(40, 0));
+    final second = await tester.startGesture(center + const Offset(40, 0));
+    for (var i = 0; i < 5; i++) {
+      await first.moveBy(const Offset(-12, 0));
+      await second.moveBy(const Offset(12, 0));
+      await tester.pump();
+    }
+    await first.up();
+    await second.up();
+    await tester.pumpAndSettle();
+    expect(find.text('等倍に戻す'), findsOneWidget);
+
+    await tester.tap(find.text('閉じる'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('らくがき'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('等倍に戻す'), findsNothing);
+  });
+
+  testWidgets('らくがきや色に切り替えても、表紙の大きさと位置は変わらない', (tester) async {
+    await _open(tester);
+
+    final cover = find.byType(DiaryCover);
+    final initial = tester.getRect(cover);
+
+    await tester.tap(find.text('らくがき'));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(cover), initial);
+
+    await tester.tap(find.text('閉じる'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('色'));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(cover), initial);
   });
 
   testWidgets('色を選ぶと表紙の色が変わり、保存できるようになる', (tester) async {
@@ -233,11 +355,44 @@ void main() {
     await tester.tap(_paletteColor(color));
     await tester.pumpAndSettle();
 
-    final area = find.bySemanticsLabel('らくがきをする場所。表紙をなぞって線を描く');
+    final area = find.bySemanticsLabel(_doodleArea);
     await tester.dragFrom(tester.getCenter(area), const Offset(60, 40));
     await tester.pumpAndSettle();
 
     expect(_strokes(tester).single.color, color);
+  });
+
+  testWidgets('パレットの色は黒に変えても虹色の丸に残り、押すとパレットを開かずに戻る', (tester) async {
+    await _open(tester);
+
+    await tester.tap(find.text('らくがき'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('ほかの色を選ぶ'));
+    await tester.pumpAndSettle();
+    final color = paletteColors[40];
+    await tester.tap(_paletteColor(color));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.bySemanticsLabel('黒'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('ほかの色を選ぶ'));
+    await tester.pumpAndSettle();
+    expect(find.text('ペンの色'), findsNothing);
+
+    final area = find.bySemanticsLabel(_doodleArea);
+    await tester.dragFrom(tester.getCenter(area), const Offset(60, 40));
+    await tester.pumpAndSettle();
+    expect(_strokes(tester).single.color, color);
+
+    // 閉じたら忘れるので、黒に変えて開き直すと虹色の丸はパレットを開く。
+    await tester.tap(find.bySemanticsLabel('黒'));
+    await tester.tap(find.text('閉じる'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('らくがき'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('ほかの色を選ぶ'));
+    await tester.pumpAndSettle();
+    expect(find.text('ペンの色'), findsOneWidget);
   });
 
   testWidgets('表紙の色の虹色の丸からパレットの色を選ぶと、表紙の色になる', (tester) async {

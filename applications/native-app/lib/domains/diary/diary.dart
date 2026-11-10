@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../reaction/reaction.dart';
+
 part '_generated/diary.freezed.dart';
 
 /// 1日の締めくくりに書く日記。日記帳と [date]（朝4時区切り）ごとに1人1つだけ。
@@ -22,10 +24,24 @@ abstract class Diary with _$Diary {
 
     /// 本文。まだ読めない日記（自分がその日に書いていない）なら null。
     String? body,
+
+    /// 付いた絵文字のリアクション。付けた順。1人1つ。
+    @Default([]) List<Reaction> reactions,
   }) = _Diary;
 
   /// 本文が伏せてあるか。他の人の日記は、自分も同じ日記帳にその日の日記を書くと読める。
   bool get isLocked => body == null;
+
+  /// [userId] の人が付けた絵文字。付けていなければ null。
+  String? reactionOf(String? userId) {
+    return reactions.emojiOf(userId);
+  }
+
+  /// [userId] の人のリアクションを [emoji] にした日記。同じ絵文字なら取り消す。
+  /// 付け替えたときは並びの最後に回す。
+  Diary reactedBy(String userId, String emoji) {
+    return copyWith(reactions: reactions.reactedBy(userId, emoji));
+  }
 }
 
 /// 日記のタイトルと本文の最大文字数。DB の diary_contents の制約と合わせる。
@@ -39,6 +55,11 @@ const diaryDayStartHour = 4;
 DateTime diaryDateOf(DateTime time) {
   final shifted = time.subtract(const Duration(hours: diaryDayStartHour));
   return DateTime(shifted.year, shifted.month, shifted.day);
+}
+
+/// 今の日記の日付（朝4時区切り）。呼ぶたびに今の時刻から計算する。
+DateTime diaryToday() {
+  return diaryDateOf(DateTime.now());
 }
 
 /// 日記の [date] が始まる時刻（その日の朝4時）。

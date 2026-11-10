@@ -21,11 +21,12 @@ abstract class PostResponse with _$PostResponse {
       _$PostResponseFromJson(json);
 }
 
-/// post_diary_books の1行と、その出し先に付いたリアクション。
+/// post_diary_books の1行と、その出し先に付いたリアクションとコメント。
 @freezed
 abstract class PostDiaryBookResponse with _$PostDiaryBookResponse {
   const factory PostDiaryBookResponse({
     @Default([]) List<PostReactionResponse> postReactions,
+    @Default([]) List<PostCommentResponse> postComments,
   }) = _PostDiaryBookResponse;
 
   factory PostDiaryBookResponse.fromJson(Map<String, dynamic> json) =>
@@ -43,4 +44,18 @@ abstract class PostReactionResponse with _$PostReactionResponse {
 
   factory PostReactionResponse.fromJson(Map<String, dynamic> json) =>
       _$PostReactionResponseFromJson(json);
+}
+
+/// post_comments の1行。
+@freezed
+abstract class PostCommentResponse with _$PostCommentResponse {
+  const factory PostCommentResponse({
+    required String id,
+    required String userId,
+    required String message,
+    @LocalDateTimeConverter() required DateTime createdAt,
+  }) = _PostCommentResponse;
+
+  factory PostCommentResponse.fromJson(Map<String, dynamic> json) =>
+      _$PostCommentResponseFromJson(json);
 }

@@ -135,17 +135,12 @@ class CoverStrokePainter extends CustomPainter {
         canvas.drawCircle(points.first, stroke.width / 2, paint);
         continue;
       }
+      // 点と点はまっすぐつなぐ。曲線でつなぐと、間引いて残った角の点を通らず、角が丸くなる。
+      // 間引きは元の線からほとんどずれない範囲でしか点を消さないので、まっすぐつないでも曲線はなめらかに見える。
       final path = Path()..moveTo(points.first.dx, points.first.dy);
-      for (var i = 1; i < points.length - 1; i++) {
-        final middle = (points[i] + points[i + 1]) / 2;
-        path.quadraticBezierTo(
-          points[i].dx,
-          points[i].dy,
-          middle.dx,
-          middle.dy,
-        );
+      for (final point in points.skip(1)) {
+        path.lineTo(point.dx, point.dy);
       }
-      path.lineTo(points.last.dx, points.last.dy);
       canvas.drawPath(path, paint..style = PaintingStyle.stroke);
     }
     canvas.restore();
