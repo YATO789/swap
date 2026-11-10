@@ -132,20 +132,6 @@ class TrackPlayButton extends ConsumerWidget {
     final l10n = context.l10n;
     final playing = ref.watch(trackPreviewProvider) == track.id;
 
-    Future<void> onTap() async {
-      if (track.previewUrl == null) {
-        await openTrackInStore(context, track);
-        return;
-      }
-      final messenger = ScaffoldMessenger.of(context);
-      final failedMessage = l10n.trackPreviewFailed;
-      final ok = await ref.read(trackPreviewProvider.notifier).toggle(track);
-      if (ok) return;
-      messenger
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(failedMessage)));
-    }
-
     return Semantics(
       button: true,
       label: playing
@@ -159,7 +145,9 @@ class TrackPlayButton extends ConsumerWidget {
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
-            onTap: enabled ? onTap : null,
+            onTap: enabled
+                ? () => toggleTrackPreview(context, ref, track)
+                : null,
             child: Icon(
               playing ? Icons.stop_rounded : Icons.play_arrow_rounded,
               size: size * 0.6,
@@ -170,6 +158,25 @@ class TrackPlayButton extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// [track] の試聴を流す。流していれば止める。試聴の音源がない曲は、Apple Music で開く。
+Future<void> toggleTrackPreview(
+  BuildContext context,
+  WidgetRef ref,
+  Track track,
+) async {
+  if (track.previewUrl == null) {
+    await openTrackInStore(context, track);
+    return;
+  }
+  final messenger = ScaffoldMessenger.of(context);
+  final failedMessage = context.l10n.trackPreviewFailed;
+  final ok = await ref.read(trackPreviewProvider.notifier).toggle(track);
+  if (ok) return;
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(failedMessage)));
 }
 
 /// Apple Music で [track] の曲のページを開く。Apple Music のアプリが入っていればアプリで開く。
@@ -230,8 +237,9 @@ class TrackTitle extends StatelessWidget {
   }
 }
 
-/// タイムラインの記録に添えた曲。枠で囲んだ中に、アルバム画像・曲名・再生ボタンを並べる。
-/// 押すと Apple Music で曲を開く。
+/// タイムラインの記録に添えた曲。アルバム画像を白い縁の写真のように少し傾けて貼り、
+/// 右に曲名とアーティスト名を書く。写真を押すと試聴を流し、曲名を押すと Apple Music で開く。
+/// ひとことより目立たないよう、枠や黒い再生ボタンは付けない。
 ///
 /// iTunes Search API の試聴は、出所（provided courtesy of iTunes）を書いて使う決まりなので、
 /// 試聴を流しているあいだだけ出す。
@@ -250,48 +258,113 @@ class TrackCard extends ConsumerWidget {
     final colors = context.appColors;
     final playing = ref.watch(trackPreviewProvider) == track.id;
 
-    return Material(
-      type: MaterialType.transparency,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: colors.border),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: enabled ? () => openTrackInStore(context, track) : null,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 10, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  TrackArtwork(track: track, size: 48),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Semantics(
-                      button: true,
-                      label: context.l10n.trackOpenInStore(track.title),
-                      excludeSemantics: true,
-                      child: TrackTitle(
-                        title: track.title,
-                        subtitle: track.artist,
+    return Padding(
+      // 傾けた写真の角と影が、上下の文字やチップにかからないようにあける。
+      padding: const EdgeInsets.only(left: 2, top: 4, bottom: 2),
+      child: Row(
+        children: [
+          _TrackPhoto(track: track, playing: playing, enabled: enabled),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Semantics(
+              button: enabled,
+              label: context.l10n.trackOpenInStore(track.title),
+              excludeSemantics: true,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: enabled ? () => openTrackInStore(context, track) : null,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TrackTitle(title: track.title, subtitle: track.artist),
+                    // 試聴を流しているあいだは、試聴の出所を小さく添える。
+                    if (playing)
+                      Text(
+                        previewCourtesy,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: colors.textSecondary,
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  TrackPlayButton(track: track, enabled: enabled),
-                ],
+                  ],
+                ),
               ),
-              // 試聴を流しているあいだは、試聴の出所を小さく添える。
-              if (playing) ...[
-                const SizedBox(height: 6),
-                Text(
-                  previewCourtesy,
-                  style: TextStyle(fontSize: 10, color: colors.textSecondary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 白い縁を付けて少し傾けた、写真のようなアルバム画像。真ん中に再生（流しているあいだは停止）の印を重ねる。
+class _TrackPhoto extends ConsumerWidget {
+  const _TrackPhoto({
+    required this.track,
+    required this.playing,
+    required this.enabled,
+  });
+
+  final Track track;
+  final bool playing;
+  final bool enabled;
+
+  static const double _artworkSize = 52;
+
+  /// 写真の傾き（ラジアン）。左に3度ほど。
+  static const double _tilt = -0.05;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    // 写真の縁。ダークモードでは真っ白だとまぶしいので、少し落とす。
+    final frame = dark ? const Color(0xFFDADADA) : Colors.white;
+
+    return Semantics(
+      button: enabled,
+      label: playing
+          ? l10n.trackStopPreview(track.title)
+          : l10n.trackPlay(track.title),
+      excludeSemantics: true,
+      child: Transform.rotate(
+        angle: _tilt,
+        child: GestureDetector(
+          onTap: enabled ? () => toggleTrackPreview(context, ref, track) : null,
+          child: Container(
+            // 下の縁を広めにして、ポラロイド写真に見せる。
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 12),
+            decoration: BoxDecoration(
+              color: frame,
+              borderRadius: BorderRadius.circular(2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: dark ? 0.5 : 0.18),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
                 ),
               ],
-            ],
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                TrackArtwork(track: track, size: _artworkSize, radius: 1),
+                // 画像の明るさにかかわらず見えるよう、半透明の黒い丸に白い印を置く。
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    playing ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
