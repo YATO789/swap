@@ -46,6 +46,20 @@ class PostRepository {
     return responses.map(_itunesToTrack).toList();
   }
 
+  /// 記録に添える曲の候補として、日本のいま人気の曲を、順位の高い順に返す。
+  Future<List<Track>> fetchPopularTracks() async {
+    final ids = await _itunesDatasource.fetchTopSongIds();
+    final responses = {
+      for (final response in await _itunesDatasource.lookupTracks(ids))
+        '${response.trackId}': response,
+    };
+    // lookup は順位どおりに返すとは限らないので、順位の順に並べ直す。
+    return [
+      for (final id in ids)
+        if (responses[id] case final response?) _itunesToTrack(response),
+    ];
+  }
+
   /// 自分の記録を [diaryBookId] の日記帳から外す。ほかの日記帳に出した分は残る。
   Future<void> removeFromDiaryBook(String postId, String diaryBookId) {
     return _datasource.removeFromDiaryBook(postId, diaryBookId);

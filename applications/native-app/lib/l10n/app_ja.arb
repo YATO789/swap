@@ -159,6 +159,15 @@
   "trackSearchHint": "曲名・アーティスト名",
   "trackSearchClear": "消す",
   "trackSearchEmpty": "曲名やアーティスト名で探せます",
+  "trackSearchPopular": "いま人気の曲",
+  "trackSelect": "{title}を添える",
+  "@trackSelect": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "trackSearchNoResults": "「{query}」に合う曲は見つかりませんでした",
   "@trackSearchNoResults": {
     "placeholders": {

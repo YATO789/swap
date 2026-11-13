@@ -207,6 +207,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trackSearchEmpty => '曲名やアーティスト名で探せます';
 
   @override
+  String get trackSearchPopular => 'いま人気の曲';
+
+  @override
+  String trackSelect(String title) {
+    return '$titleを添える';
+  }
+
+  @override
   String trackSearchNoResults(String query) {
     return '「$query」に合う曲は見つかりませんでした';
   }

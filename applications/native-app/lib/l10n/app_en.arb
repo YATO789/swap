@@ -58,6 +58,8 @@
   "trackSearchHint": "Song or artist",
   "trackSearchClear": "Clear",
   "trackSearchEmpty": "Search by song or artist name",
+  "trackSearchPopular": "Popular now",
+  "trackSelect": "Add {title}",
   "trackSearchNoResults": "No songs found for “{query}”",
   "trackSearchFailed": "Couldn't search for songs. Please try again.",
   "postButtonWriteToday": "Write today's diary",

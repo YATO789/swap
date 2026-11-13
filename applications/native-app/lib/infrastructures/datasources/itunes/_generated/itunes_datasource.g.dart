@@ -26,7 +26,7 @@ final class ItunesDatasourceProvider
         argument: null,
         retry: null,
         name: r'itunesDatasourceProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -53,4 +53,4 @@ final class ItunesDatasourceProvider
   }
 }
 
-String _$itunesDatasourceHash() => r'18a5a04ce1ae045395f1e8ebee795a92cb9a4bbf';
+String _$itunesDatasourceHash() => r'ecb2243ec3488a8e37684d34e706a9c6ce13debe';

@@ -226,6 +226,18 @@ class FakePostRepository implements PostRepository {
     ];
   }
 
+  /// 曲を探すシートを開いたときに出す、人気の曲。
+  List<Track> popularTracks = const [];
+
+  /// true なら、人気の曲を取るのに失敗する。
+  bool failsPopularTracks = false;
+
+  @override
+  Future<List<Track>> fetchPopularTracks() async {
+    if (failsPopularTracks) throw Exception('人気の曲を取れない');
+    return popularTracks;
+  }
+
   @override
   Future<void> removeFromDiaryBook(String postId, String diaryBookId) async {
     timelinePosts[diaryBookId]?.removeWhere((post) => post.id == postId);

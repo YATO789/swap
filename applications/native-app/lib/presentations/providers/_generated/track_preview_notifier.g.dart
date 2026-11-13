@@ -48,7 +48,7 @@ final class TrackPreviewNotifierProvider
 }
 
 String _$trackPreviewNotifierHash() =>
-    r'f80286d7d32c88ac50ca1322e1aed5136bf81253';
+    r'773e45d3c84cc8c5c723c929ab87402c0dcab144';
 
 /// いま試聴を流している曲の id を持つ。流していなければ null。
 /// どの画面の再生ボタンからでも同じ曲を止められるよう、アプリで1つにする。

@@ -446,6 +446,18 @@ abstract class AppLocalizations {
   /// **'曲名やアーティスト名で探せます'**
   String get trackSearchEmpty;
 
+  /// No description provided for @trackSearchPopular.
+  ///
+  /// In ja, this message translates to:
+  /// **'いま人気の曲'**
+  String get trackSearchPopular;
+
+  /// No description provided for @trackSelect.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}を添える'**
+  String trackSelect(String title);
+
   /// No description provided for @trackSearchNoResults.
   ///
   /// In ja, this message translates to:

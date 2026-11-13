@@ -8,6 +8,7 @@ import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/post.dart';
 import '../../../domains/post/track.dart';
 import '../../providers/diary_book_notifier.dart';
+import '../../providers/popular_tracks_notifier.dart';
 import '../../providers/post_diary_book_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
@@ -55,6 +56,12 @@ class _PostSheet extends HookConsumerWidget {
     /// 記録に添える曲。1回の記録につき1曲。
     final track = useState<Track?>(null);
 
+    // 曲を探すシートを開いたときに人気の曲を並べられるよう、先に取りに行っておく。
+    useEffect(() {
+      ref.read(popularTracksProvider.notifier).prefetch();
+      return null;
+    }, const []);
+
     final savedIds = ref.watch(postDiaryBookProvider);
     final selectedIds = fixedDiaryBook != null
         ? [fixedDiaryBook.id]
@@ -86,8 +93,12 @@ class _PostSheet extends HookConsumerWidget {
     }
 
     /// 曲を探すシートを開き、選んだ曲を添える。選ばずに閉じたら今の曲のままにする。
+    /// もう曲を添えていれば、その曲名で探した状態で開く。
     Future<void> pickTrack() async {
-      final picked = await showTrackSearchSheet(context);
+      final picked = await showTrackSearchSheet(
+        context,
+        initialQuery: track.value?.title,
+      );
       if (picked == null || !context.mounted) return;
       track.value = picked;
     }

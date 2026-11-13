@@ -110,56 +110,6 @@ class _MissingArtwork extends StatelessWidget {
   }
 }
 
-/// 曲の試聴を流す丸いボタン。流しているあいだは止めるボタンになる。
-/// 試聴の音源がない曲は、押すと Apple Music で曲を開く。
-class TrackPlayButton extends ConsumerWidget {
-  const TrackPlayButton({
-    super.key,
-    required this.track,
-    this.size = 36,
-    this.enabled = true,
-  });
-
-  final Track track;
-  final double size;
-
-  /// false なら見た目だけで押せない。浮かせた見本の記録などに使う。
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = context.appColors;
-    final l10n = context.l10n;
-    final playing = ref.watch(trackPreviewProvider) == track.id;
-
-    return Semantics(
-      button: true,
-      label: playing
-          ? l10n.trackStopPreview(track.title)
-          : l10n.trackPlay(track.title),
-      excludeSemantics: true,
-      child: SizedBox.square(
-        dimension: size,
-        child: Material(
-          color: colors.textPrimary,
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: enabled
-                ? () => toggleTrackPreview(context, ref, track)
-                : null,
-            child: Icon(
-              playing ? Icons.stop_rounded : Icons.play_arrow_rounded,
-              size: size * 0.6,
-              color: colors.surface,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// [track] の試聴を流す。流していれば止める。試聴の音源がない曲は、Apple Music で開く。
 Future<void> toggleTrackPreview(
   BuildContext context,
