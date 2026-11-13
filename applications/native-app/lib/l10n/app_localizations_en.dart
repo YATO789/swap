@@ -1020,7 +1020,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateRequiredMessage =>
-      'A new version is available.\nYou need to update to keep using the app.';
+      'You need to update to keep using the app.';
 
   @override
   String get updateOptionalTitle => 'A new version is available';
@@ -1034,6 +1034,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateLater => 'Later';
+
+  @override
+  String updateReleaseNotesTitle(String version) {
+    return 'What\'s new in $version';
+  }
 
   @override
   String get coverEditTitle => 'Edit cover';

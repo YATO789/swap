@@ -2,7 +2,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part '_generated/app_update.freezed.dart';
 
-enum AppUpdate {
+/// アップデートをどのくらい促すか。
+enum AppUpdateLevel {
   none,
 
   /// アプリを使い続けられる。
@@ -10,6 +11,23 @@ enum AppUpdate {
 
   /// アップデートするまでアプリを使えない。
   required,
+}
+
+/// アップデートを促すかと、そのときに見せる案内。
+@freezed
+abstract class AppUpdate with _$AppUpdate {
+  const factory AppUpdate({
+    required AppUpdateLevel level,
+
+    /// ストアに出ている新しいバージョン。促さないときは null。
+    AppVersion? latestVersion,
+
+    /// 新しいバージョンで変わったこと。1行に1つずつ。Remote Config に書いていなければ空。
+    @Default([]) List<String> releaseNotes,
+  }) = _AppUpdate;
+
+  /// 促さない。
+  static const none = AppUpdate(level: AppUpdateLevel.none);
 }
 
 @freezed
@@ -31,18 +49,18 @@ abstract class UpdateInfo with _$UpdateInfo {
   ///
   /// 促すだけのときは、[skippedAt] に「あとで」を押していれば、
   /// それより後に出した案内だけを出す。
-  AppUpdate evaluate({
+  AppUpdateLevel evaluate({
     required AppVersion current,
     required DateTime now,
     DateTime? skippedAt,
   }) {
-    if (enabledAt.isAfter(now)) return AppUpdate.none;
-    if (current < requiredVersion) return AppUpdate.required;
-    if (current >= latestVersion) return AppUpdate.none;
+    if (enabledAt.isAfter(now)) return AppUpdateLevel.none;
+    if (current < requiredVersion) return AppUpdateLevel.required;
+    if (current >= latestVersion) return AppUpdateLevel.none;
     if (skippedAt != null && !enabledAt.isAfter(skippedAt)) {
-      return AppUpdate.none;
+      return AppUpdateLevel.none;
     }
-    return AppUpdate.optional;
+    return AppUpdateLevel.optional;
   }
 }
 

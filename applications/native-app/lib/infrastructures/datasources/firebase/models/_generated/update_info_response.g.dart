@@ -11,6 +11,7 @@ _UpdateInfoResponse _$UpdateInfoResponseFromJson(Map<String, dynamic> json) =>
       latestVersion: json['latestVersion'] as String,
       requiredVersion: json['requiredVersion'] as String,
       enabledAt: DateTime.parse(json['enabledAt'] as String),
+      releaseNotes: json['releaseNotes'] as String?,
     );
 
 Map<String, dynamic> _$UpdateInfoResponseToJson(_UpdateInfoResponse instance) =>
@@ -18,4 +19,5 @@ Map<String, dynamic> _$UpdateInfoResponseToJson(_UpdateInfoResponse instance) =>
       'latestVersion': instance.latestVersion,
       'requiredVersion': instance.requiredVersion,
       'enabledAt': instance.enabledAt.toIso8601String(),
+      'releaseNotes': instance.releaseNotes,
     };

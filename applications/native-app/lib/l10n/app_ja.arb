@@ -117,9 +117,9 @@
     }
   },
   "postSheetShareTo": "共有する日記帳",
-  "trackAttach": "曲を添える",
+  "trackAttach": "曲をつける",
   "trackRemove": "曲を外す",
-  "trackAttachedLabel": "添えた曲：{title}、{artist}。押すと選び直せます",
+  "trackAttachedLabel": "つけた曲：{title}、{artist}。押すと選び直せます",
   "@trackAttachedLabel": {
     "placeholders": {
       "title": {
@@ -159,7 +159,7 @@
   "trackSearchHint": "曲名・アーティスト名",
   "trackSearchClear": "消す",
   "trackSearchEmpty": "曲名やアーティスト名で探せます",
-  "trackSelect": "{title}を添える",
+  "trackSelect": "{title}をつける",
   "@trackSelect": {
     "placeholders": {
       "title": {
@@ -773,12 +773,20 @@
     "description": "同意文のうち、プライバシーポリシーのリンクの後"
   },
   "splashLoadFailed": "読み込めませんでした",
-  "updateRequiredTitle": "アップデートしてください",
-  "updateRequiredMessage": "新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。",
+  "updateRequiredTitle": "アップデートのお願い",
+  "updateRequiredMessage": "このまま使うには、アップデートが必要です。",
   "updateOptionalTitle": "新しいバージョンがあります",
   "updateOptionalMessage": "アップデートすると、新しい機能や改善を使えます。",
   "updateNow": "アップデート",
   "updateLater": "あとで",
+  "updateReleaseNotesTitle": "バージョン {version} で変わったこと",
+  "@updateReleaseNotesTitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "coverEditTitle": "表紙を編集",
   "coverEditUndo": "元に戻す",
   "coverEditRedo": "やり直す",

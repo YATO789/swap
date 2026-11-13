@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// No description provided for @trackAttach.
   ///
   /// In ja, this message translates to:
-  /// **'曲を添える'**
+  /// **'曲をつける'**
   String get trackAttach;
 
   /// No description provided for @trackRemove.
@@ -395,7 +395,7 @@ abstract class AppLocalizations {
   /// No description provided for @trackAttachedLabel.
   ///
   /// In ja, this message translates to:
-  /// **'添えた曲：{title}、{artist}。押すと選び直せます'**
+  /// **'つけた曲：{title}、{artist}。押すと選び直せます'**
   String trackAttachedLabel(String title, String artist);
 
   /// No description provided for @trackPlay.
@@ -449,7 +449,7 @@ abstract class AppLocalizations {
   /// No description provided for @trackSelect.
   ///
   /// In ja, this message translates to:
-  /// **'{title}を添える'**
+  /// **'{title}をつける'**
   String trackSelect(String title);
 
   /// No description provided for @trackSearchNoResults.
@@ -1696,13 +1696,13 @@ abstract class AppLocalizations {
   /// No description provided for @updateRequiredTitle.
   ///
   /// In ja, this message translates to:
-  /// **'アップデートしてください'**
+  /// **'アップデートのお願い'**
   String get updateRequiredTitle;
 
   /// No description provided for @updateRequiredMessage.
   ///
   /// In ja, this message translates to:
-  /// **'新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。'**
+  /// **'このまま使うには、アップデートが必要です。'**
   String get updateRequiredMessage;
 
   /// No description provided for @updateOptionalTitle.
@@ -1728,6 +1728,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'あとで'**
   String get updateLater;
+
+  /// No description provided for @updateReleaseNotesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'バージョン {version} で変わったこと'**
+  String updateReleaseNotesTitle(String version);
 
   /// No description provided for @coverEditTitle.
   ///

@@ -13,6 +13,311 @@ part of '../app_update.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
+mixin _$AppUpdate {
+
+ AppUpdateLevel get level;/// ストアに出ている新しいバージョン。促さないときは null。
+ AppVersion? get latestVersion;/// 新しいバージョンで変わったこと。1行に1つずつ。Remote Config に書いていなければ空。
+ List<String> get releaseNotes;
+/// Create a copy of AppUpdate
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AppUpdateCopyWith<AppUpdate> get copyWith => _$AppUpdateCopyWithImpl<AppUpdate>(this as AppUpdate, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as AppUpdate;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppUpdate&&(identical(other.level, _this.level) || other.level == _this.level)&&(identical(other.latestVersion, _this.latestVersion) || other.latestVersion == _this.latestVersion)&&const DeepCollectionEquality().equals(other.releaseNotes, _this.releaseNotes));
+}
+
+
+@override
+int get hashCode {
+  final _this = this as AppUpdate;
+  return Object.hash(runtimeType,_this.level,_this.latestVersion,const DeepCollectionEquality().hash(_this.releaseNotes));
+}
+
+@override
+String toString() {
+  final _this = this as AppUpdate;
+  return 'AppUpdate(level: ${_this.level}, latestVersion: ${_this.latestVersion}, releaseNotes: ${_this.releaseNotes})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $AppUpdateCopyWith<$Res>  {
+  factory $AppUpdateCopyWith(AppUpdate value, $Res Function(AppUpdate) _then) = _$AppUpdateCopyWithImpl;
+@useResult
+$Res call({
+ AppUpdateLevel level, AppVersion? latestVersion, List<String> releaseNotes
+});
+
+
+$AppVersionCopyWith<$Res>? get latestVersion;
+
+}
+/// @nodoc
+class _$AppUpdateCopyWithImpl<$Res>
+    implements $AppUpdateCopyWith<$Res> {
+  _$AppUpdateCopyWithImpl(this._self, this._then);
+
+  final AppUpdate _self;
+  final $Res Function(AppUpdate) _then;
+
+/// Create a copy of AppUpdate
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? level = null,Object? latestVersion = freezed,Object? releaseNotes = null,}) {
+  return _then(AppUpdate(
+level: null == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as AppUpdateLevel,latestVersion: freezed == latestVersion ? _self.latestVersion : latestVersion // ignore: cast_nullable_to_non_nullable
+as AppVersion?,releaseNotes: null == releaseNotes ? _self.releaseNotes : releaseNotes // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+/// Create a copy of AppUpdate
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppVersionCopyWith<$Res>? get latestVersion {
+    if (_self.latestVersion == null) {
+    return null;
+  }
+
+  return $AppVersionCopyWith<$Res>(_self.latestVersion!, (value) {
+    return _then(_self.copyWith(latestVersion: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [AppUpdate].
+extension AppUpdatePatterns on AppUpdate {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AppUpdate value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _AppUpdate() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AppUpdate value)  $default,){
+final _that = this;
+switch (_that) {
+case _AppUpdate():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AppUpdate value)?  $default,){
+final _that = this;
+switch (_that) {
+case _AppUpdate() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AppUpdateLevel level,  AppVersion? latestVersion,  List<String> releaseNotes)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _AppUpdate() when $default != null:
+return $default(_that.level,_that.latestVersion,_that.releaseNotes);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AppUpdateLevel level,  AppVersion? latestVersion,  List<String> releaseNotes)  $default,) {final _that = this;
+switch (_that) {
+case _AppUpdate():
+return $default(_that.level,_that.latestVersion,_that.releaseNotes);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AppUpdateLevel level,  AppVersion? latestVersion,  List<String> releaseNotes)?  $default,) {final _that = this;
+switch (_that) {
+case _AppUpdate() when $default != null:
+return $default(_that.level,_that.latestVersion,_that.releaseNotes);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _AppUpdate implements AppUpdate {
+  const _AppUpdate({required this.level, this.latestVersion,  List<String> releaseNotes = const []}): _releaseNotes = releaseNotes;
+  
+
+@override final  AppUpdateLevel level;
+/// ストアに出ている新しいバージョン。促さないときは null。
+@override final  AppVersion? latestVersion;
+/// 新しいバージョンで変わったこと。1行に1つずつ。Remote Config に書いていなければ空。
+ final  List<String> _releaseNotes;
+/// 新しいバージョンで変わったこと。1行に1つずつ。Remote Config に書いていなければ空。
+@override@JsonKey() List<String> get releaseNotes {
+  if (_releaseNotes is EqualUnmodifiableListView) return _releaseNotes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_releaseNotes);
+}
+
+
+/// Create a copy of AppUpdate
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AppUpdateCopyWith<_AppUpdate> get copyWith => __$AppUpdateCopyWithImpl<_AppUpdate>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppUpdate&&(identical(other.level, level) || other.level == level)&&(identical(other.latestVersion, latestVersion) || other.latestVersion == latestVersion)&&const DeepCollectionEquality().equals(other.releaseNotes, _releaseNotes));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,level,latestVersion,const DeepCollectionEquality().hash(_releaseNotes));
+}
+
+@override
+String toString() {
+    return 'AppUpdate(level: $level, latestVersion: $latestVersion, releaseNotes: $releaseNotes)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AppUpdateCopyWith<$Res> implements $AppUpdateCopyWith<$Res> {
+  factory _$AppUpdateCopyWith(_AppUpdate value, $Res Function(_AppUpdate) _then) = __$AppUpdateCopyWithImpl;
+@override @useResult
+$Res call({
+ AppUpdateLevel level, AppVersion? latestVersion, List<String> releaseNotes
+});
+
+
+@override $AppVersionCopyWith<$Res>? get latestVersion;
+
+}
+/// @nodoc
+class __$AppUpdateCopyWithImpl<$Res>
+    implements _$AppUpdateCopyWith<$Res> {
+  __$AppUpdateCopyWithImpl(this._self, this._then);
+
+  final _AppUpdate _self;
+  final $Res Function(_AppUpdate) _then;
+
+/// Create a copy of AppUpdate
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? level = null,Object? latestVersion = freezed,Object? releaseNotes = null,}) {
+  return _then(_AppUpdate(
+level: null == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
+as AppUpdateLevel,latestVersion: freezed == latestVersion ? _self.latestVersion : latestVersion // ignore: cast_nullable_to_non_nullable
+as AppVersion?,releaseNotes: null == releaseNotes ? _self._releaseNotes : releaseNotes // ignore: cast_nullable_to_non_nullable
+as List<String>,
+  ));
+}
+
+/// Create a copy of AppUpdate
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppVersionCopyWith<$Res>? get latestVersion {
+    if (_self.latestVersion == null) {
+    return null;
+  }
+
+  return $AppVersionCopyWith<$Res>(_self.latestVersion!, (value) {
+    return _then(_self.copyWith(latestVersion: value));
+  });
+}
+}
+
+/// @nodoc
 mixin _$UpdateInfo {
 
 /// これより古ければ、アップデートを促す。

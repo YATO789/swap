@@ -128,11 +128,11 @@ void main() {
     expect(find.text('共有する日記帳'), findsNothing);
   });
 
-  testWidgets('曲を探して添え、記録と一緒に書く', (tester) async {
+  testWidgets('曲を探してつけ、記録と一緒に書く', (tester) async {
     final postRepository = await _openSheet(tester, savedIds: {'family'});
 
     await tester.enterText(find.byType(TextField), '帰り道');
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField).last, 'しずく');
@@ -144,15 +144,15 @@ void main() {
     await tester.tap(find.text('夜の終わりのバス停'));
     await tester.pumpAndSettle();
     expect(find.text('夜の終わりのバス停'), findsNWidgets(2));
-    expect(find.byTooltip('夜の終わりのバス停を添える'), findsOneWidget);
+    expect(find.byTooltip('夜の終わりのバス停をつける'), findsOneWidget);
 
     // バーの → で選ぶ。
-    await tester.tap(find.byTooltip('夜の終わりのバス停を添える'));
+    await tester.tap(find.byTooltip('夜の終わりのバス停をつける'));
     await tester.pumpAndSettle();
 
-    // 添えた曲がボタンの場所に出る。
+    // つけた曲がボタンの場所に出る。
     expect(find.text('夜の終わりのバス停'), findsOneWidget);
-    expect(find.text('曲を添える'), findsNothing);
+    expect(find.text('曲をつける'), findsNothing);
 
     await tester.tap(find.text('記録する'));
     await tester.pumpAndSettle();
@@ -165,7 +165,7 @@ void main() {
   testWidgets('何も打つ前は人気の曲が並び、そこから選べる', (tester) async {
     await _openSheet(tester, popularTracks: [_popularTrack]);
 
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
     expect(find.text('十一月の窓'), findsOneWidget);
     expect(find.text('曲名やアーティスト名で探せます'), findsNothing);
@@ -181,16 +181,16 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('十一月の窓'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('十一月の窓を添える'));
+    await tester.tap(find.byTooltip('十一月の窓をつける'));
     await tester.pumpAndSettle();
     expect(find.text('十一月の窓'), findsOneWidget);
-    expect(find.text('曲を添える'), findsNothing);
+    expect(find.text('曲をつける'), findsNothing);
   });
 
   testWidgets('人気の曲を取れなければ、探し方を出す', (tester) async {
     await _openSheet(tester);
 
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
     expect(find.text('曲名やアーティスト名で探せます'), findsOneWidget);
   });
@@ -201,7 +201,7 @@ void main() {
       ..popularTracks = [_popularTrack];
     await _openSheet(tester, postRepository: postRepository);
 
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
     expect(find.text('曲名やアーティスト名で探せます'), findsOneWidget);
 
@@ -209,19 +209,19 @@ void main() {
     await tester.tapAt(const Offset(10, 10));
     await tester.pumpAndSettle();
     postRepository.failsPopularTracks = false;
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
     expect(find.text('十一月の窓'), findsOneWidget);
   });
 
-  testWidgets('添えた曲を押すと、その曲名で探した状態で開く', (tester) async {
+  testWidgets('つけた曲を押すと、その曲名で探した状態で開く', (tester) async {
     await _openSheet(tester, popularTracks: [_popularTrack]);
 
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('十一月の窓'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('十一月の窓を添える'));
+    await tester.tap(find.byTooltip('十一月の窓をつける'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('十一月の窓'));
@@ -232,29 +232,29 @@ void main() {
     expect(field.controller!.text, '十一月の窓');
   });
 
-  testWidgets('添えた曲は × で外せる', (tester) async {
+  testWidgets('つけた曲は × で外せる', (tester) async {
     await _openSheet(tester);
 
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).last, 'バス停');
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pumpAndSettle();
     await tester.tap(find.text('夜の終わりのバス停'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('夜の終わりのバス停を添える'));
+    await tester.tap(find.byTooltip('夜の終わりのバス停をつける'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('曲を外す'));
     await tester.pumpAndSettle();
     expect(find.text('夜の終わりのバス停'), findsNothing);
-    expect(find.text('曲を添える'), findsOneWidget);
+    expect(find.text('曲をつける'), findsOneWidget);
   });
 
   testWidgets('合う曲がなければ、見つからなかったと出す', (tester) async {
     await _openSheet(tester);
 
-    await tester.tap(find.text('曲を添える'));
+    await tester.tap(find.text('曲をつける'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).last, 'zzz');
     await tester.pump(const Duration(milliseconds: 300));

@@ -166,14 +166,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get postSheetShareTo => '共有する日記帳';
 
   @override
-  String get trackAttach => '曲を添える';
+  String get trackAttach => '曲をつける';
 
   @override
   String get trackRemove => '曲を外す';
 
   @override
   String trackAttachedLabel(String title, String artist) {
-    return '添えた曲：$title、$artist。押すと選び直せます';
+    return 'つけた曲：$title、$artist。押すと選び直せます';
   }
 
   @override
@@ -208,7 +208,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String trackSelect(String title) {
-    return '$titleを添える';
+    return '$titleをつける';
   }
 
   @override
@@ -922,10 +922,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get splashLoadFailed => '読み込めませんでした';
 
   @override
-  String get updateRequiredTitle => 'アップデートしてください';
+  String get updateRequiredTitle => 'アップデートのお願い';
 
   @override
-  String get updateRequiredMessage => '新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。';
+  String get updateRequiredMessage => 'このまま使うには、アップデートが必要です。';
 
   @override
   String get updateOptionalTitle => '新しいバージョンがあります';
@@ -938,6 +938,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get updateLater => 'あとで';
+
+  @override
+  String updateReleaseNotesTitle(String version) {
+    return 'バージョン $version で変わったこと';
+  }
 
   @override
   String get coverEditTitle => '表紙を編集';
