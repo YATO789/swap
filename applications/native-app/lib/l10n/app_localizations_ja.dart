@@ -166,6 +166,60 @@ class AppLocalizationsJa extends AppLocalizations {
   String get postSheetShareTo => '共有する日記帳';
 
   @override
+  String get trackAttach => '曲をつける';
+
+  @override
+  String get trackRemove => '曲を外す';
+
+  @override
+  String trackAttachedLabel(String title, String artist) {
+    return 'つけた曲：$title、$artist。押すと選び直せます';
+  }
+
+  @override
+  String trackPlay(String title) {
+    return '$titleの試聴を再生';
+  }
+
+  @override
+  String trackStopPreview(String title) {
+    return '$titleの試聴を止める';
+  }
+
+  @override
+  String get trackPreviewFailed => '試聴を再生できませんでした。もう一度お試しください';
+
+  @override
+  String trackOpenInStore(String title) {
+    return '$titleを Apple Music で開く';
+  }
+
+  @override
+  String get trackOpenFailed => 'Apple Music を開けませんでした';
+
+  @override
+  String get trackSearchHint => '曲名・アーティスト名';
+
+  @override
+  String get trackSearchClear => '消す';
+
+  @override
+  String get trackSearchEmpty => '曲名やアーティスト名で探せます';
+
+  @override
+  String trackSelect(String title) {
+    return '$titleをつける';
+  }
+
+  @override
+  String trackSearchNoResults(String query) {
+    return '「$query」に合う曲は見つかりませんでした';
+  }
+
+  @override
+  String get trackSearchFailed => '曲を探せませんでした。もう一度お試しください';
+
+  @override
   String get postButtonWriteToday => '今日の日記を書く';
 
   @override
@@ -868,10 +922,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get splashLoadFailed => '読み込めませんでした';
 
   @override
-  String get updateRequiredTitle => 'アップデートしてください';
+  String get updateRequiredTitle => 'アップデートのお願い';
 
   @override
-  String get updateRequiredMessage => '新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。';
+  String get updateRequiredMessage => 'このまま使うには、アップデートが必要です。';
 
   @override
   String get updateOptionalTitle => '新しいバージョンがあります';
@@ -884,6 +938,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get updateLater => 'あとで';
+
+  @override
+  String updateReleaseNotesTitle(String version) {
+    return 'バージョン $version で変わったこと';
+  }
 
   @override
   String get coverEditTitle => '表紙を編集';

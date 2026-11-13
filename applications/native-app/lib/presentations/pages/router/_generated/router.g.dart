@@ -474,7 +474,7 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'9615159c83b8bafc651f33ec5aec828c2d6e535d';
+String _$routerHash() => r'e81a6c0472f4111cb4cba9f271e32cf13df389fd';
 
 /// 起動直後の画面を消して、最初の画面を見せてよいか。
 
@@ -520,4 +520,4 @@ final class FirstScreenReadyProvider
   }
 }
 
-String _$firstScreenReadyHash() => r'cbd83411932b01cdaf2c8d763ac1ea1546a67e44';
+String _$firstScreenReadyHash() => r'158fe71ee3aa00f32aa01d09f307213bf2343ab4';

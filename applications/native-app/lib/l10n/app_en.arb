@@ -47,6 +47,20 @@
   "postSheetPosted": "Posted",
   "postSheetPostingTo": "Posting to {name}",
   "postSheetShareTo": "Share to",
+  "trackAttach": "Add a song",
+  "trackRemove": "Remove song",
+  "trackAttachedLabel": "Song: {title} by {artist}. Tap to change",
+  "trackPlay": "Play preview of {title}",
+  "trackStopPreview": "Stop preview of {title}",
+  "trackPreviewFailed": "Couldn't play the preview. Please try again.",
+  "trackOpenInStore": "Open {title} in Apple Music",
+  "trackOpenFailed": "Couldn't open Apple Music",
+  "trackSearchHint": "Song or artist",
+  "trackSearchClear": "Clear",
+  "trackSearchEmpty": "Search by song or artist name",
+  "trackSelect": "Add {title}",
+  "trackSearchNoResults": "No songs found for “{query}”",
+  "trackSearchFailed": "Couldn't search for songs. Please try again.",
   "postButtonWriteToday": "Write today's diary",
   "postButtonWriteYesterday": "Write yesterday's diary",
   "coverColorLabel": "Cover color",
@@ -252,11 +266,19 @@
   "welcomeAgreementSuffix": ".",
   "splashLoadFailed": "Couldn't load",
   "updateRequiredTitle": "Please update the app",
-  "updateRequiredMessage": "A new version is available.\nYou need to update to keep using the app.",
+  "updateRequiredMessage": "You need to update to keep using the app.",
   "updateOptionalTitle": "A new version is available",
   "updateOptionalMessage": "Update to get the latest features and improvements.",
   "updateNow": "Update",
   "updateLater": "Later",
+  "updateReleaseNotesTitle": "What's new in {version}",
+  "@updateReleaseNotesTitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "coverEditTitle": "Edit cover",
   "coverEditUndo": "Undo",
   "coverEditRedo": "Redo",

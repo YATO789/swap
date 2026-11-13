@@ -7,6 +7,7 @@ import '../../../domains/diary_book/diary_book.dart';
 import '../../../domains/post/timeline_post.dart';
 import '../../providers/diary_book_notifier.dart';
 import '../../providers/profile_notifier.dart';
+import '../../providers/track_preview_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
@@ -48,6 +49,15 @@ class DiaryBookPage extends HookConsumerWidget {
     final date = pickedDate.value ?? today;
     //「この日記帳はもう見られません」というシートをもう出したかどうか
     final notifiedRemoval = useRef(false);
+
+    // 記録に添えた曲を試聴できるので、日記帳を閉じたら試聴を止める。
+    final preview = ref.read(trackPreviewProvider.notifier);
+    useEffect(() {
+      return () {
+        // 閉じている途中に状態を変えないよう、閉じ終わってから止める。
+        Future.microtask(preview.stop);
+      };
+    }, const []);
 
     final diaryBooksState = ref.watch(diaryBookProvider);
     //自分の日記帳の一覧から、今開いている日記帳を1冊探し出す

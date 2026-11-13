@@ -14,6 +14,9 @@ _PostResponse _$PostResponseFromJson(Map<String, dynamic> json) =>
       postedAt: const LocalDateTimeConverter().fromJson(
         json['posted_at'] as String,
       ),
+      track: json['track'] == null
+          ? null
+          : TrackResponse.fromJson(json['track'] as Map<String, dynamic>),
       postDiaryBooks:
           (json['post_diary_books'] as List<dynamic>?)
               ?.map(
@@ -30,6 +33,7 @@ Map<String, dynamic> _$PostResponseToJson(_PostResponse instance) =>
       'author_id': instance.authorId,
       'message': instance.message,
       'posted_at': const LocalDateTimeConverter().toJson(instance.postedAt),
+      'track': instance.track,
       'post_diary_books': instance.postDiaryBooks,
     };
 

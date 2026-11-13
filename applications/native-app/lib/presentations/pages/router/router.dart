@@ -32,8 +32,8 @@ GoRouter router(Ref ref) {
   ref
     // アプリに戻るたびに確かめ直すので、行き先が変わる「必須かどうか」が変わったときだけ伝える。
     ..listen(appUpdateProvider, (previous, next) {
-      final wasRequired = previous?.value == AppUpdate.required;
-      final isRequired = next.value == AppUpdate.required;
+      final wasRequired = previous?.value?.level == AppUpdateLevel.required;
+      final isRequired = next.value?.level == AppUpdateLevel.required;
       if (wasRequired != isRequired) refresh.value++;
     })
     ..listen(authenticationProvider, (_, _) => refresh.value++)
@@ -52,7 +52,7 @@ GoRouter router(Ref ref) {
       String? goTo(String path) => state.matchedLocation == path ? null : path;
 
       // 確かめている間や確かめられなかったときは、使えるままにする。
-      if (ref.read(appUpdateProvider).value == AppUpdate.required) {
+      if (ref.read(appUpdateProvider).value?.level == AppUpdateLevel.required) {
         return goTo(update);
       }
       if (!ref.read(authenticationProvider).isSignedIn) {
@@ -83,7 +83,7 @@ GoRouter router(Ref ref) {
 /// 起動直後の画面を消して、最初の画面を見せてよいか。
 @riverpod
 bool firstScreenReady(Ref ref) {
-  if (ref.watch(appUpdateProvider).value == AppUpdate.required) {
+  if (ref.watch(appUpdateProvider).value?.level == AppUpdateLevel.required) {
     return true;
   }
   if (!ref.watch(authenticationProvider).isSignedIn) return true;

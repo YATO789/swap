@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/store_pages.dart';
+import '../../components/release_notes.dart';
+import '../../providers/app_update_notifier.dart';
 
 /// アップデートしないと使えないバージョンのときに出す画面。
 /// ルーターがほかの画面に行かせないので、ストアでアップデートするしかない。
-class UpdatePage extends StatelessWidget {
+/// Remote Config に変わったことを書いていれば、それも見せる。
+class UpdatePage extends ConsumerWidget {
   const UpdatePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.appColors;
     final l10n = context.l10n;
+    final update = ref.watch(appUpdateProvider).value;
+    final version = update?.latestVersion;
+    final notes = update?.releaseNotes ?? const <String>[];
 
     Future<void> openStore() async {
       if (!await openStorePage() && context.mounted) {
@@ -58,6 +65,12 @@ class UpdatePage extends StatelessWidget {
                         color: colors.textSecondary,
                       ),
                     ),
+                    if (version != null && notes.isNotEmpty) ...[
+                      const SizedBox(height: 28),
+                      Divider(height: 1, color: colors.border),
+                      const SizedBox(height: 24),
+                      ReleaseNotes(version: version.toString(), notes: notes),
+                    ],
                   ],
                 ),
               ),

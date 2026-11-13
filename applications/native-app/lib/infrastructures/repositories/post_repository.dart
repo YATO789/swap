@@ -3,29 +3,61 @@ import 'package:swap/domains/diary/diary.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/post/post_comment.dart';
 import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/post/track.dart';
 import 'package:swap/domains/reaction/reaction.dart';
+import 'package:swap/infrastructures/datasources/itunes/itunes_datasource.dart';
+import 'package:swap/infrastructures/datasources/itunes/models/itunes_track_response.dart';
 import 'package:swap/infrastructures/datasources/supabase/post/models/post_response.dart';
+import 'package:swap/infrastructures/datasources/supabase/post/models/track_response.dart';
 import 'package:swap/infrastructures/datasources/supabase/post/post_datasource.dart';
 
 part '_generated/post_repository.g.dart';
 
 @riverpod
 PostRepository postRepository(Ref ref) {
-  return PostRepository(ref.watch(postDatasourceProvider));
+  return PostRepository(
+    ref.watch(postDatasourceProvider),
+    ref.watch(itunesDatasourceProvider),
+  );
 }
 
 /// 記録（「ひとこと」）を読み書きする。
 class PostRepository {
-  const PostRepository(this._datasource);
+  const PostRepository(this._datasource, this._itunesDatasource);
 
   final PostDatasource _datasource;
+  final ItunesDatasource _itunesDatasource;
 
   /// [post] を書いて日記帳に出す。
   Future<void> create(Post post) async {
     await _datasource.create(
       message: post.message,
       diaryBookIds: post.diaryBookIds,
+      track: switch (post.track) {
+        final track? => _toTrackResponse(track),
+        null => null,
+      },
     );
+  }
+
+  /// 曲名・アーティスト名・アルバム名で、記録に添える曲を探す。
+  Future<List<Track>> searchTracks(String query) async {
+    final responses = await _itunesDatasource.searchTracks(query);
+    return responses.map(_itunesToTrack).toList();
+  }
+
+  /// 記録に添える曲の候補として、日本のいま人気の曲を、順位の高い順に返す。
+  Future<List<Track>> fetchPopularTracks() async {
+    final ids = await _itunesDatasource.fetchTopSongIds();
+    final responses = {
+      for (final response in await _itunesDatasource.lookupTracks(ids))
+        '${response.trackId}': response,
+    };
+    // lookup は順位どおりに返すとは限らないので、順位の順に並べ直す。
+    return [
+      for (final id in ids)
+        if (responses[id] case final response?) _itunesToTrack(response),
+    ];
   }
 
   /// 自分の記録を [diaryBookId] の日記帳から外す。ほかの日記帳に出した分は残る。
@@ -114,6 +146,10 @@ class PostRepository {
       authorId: response.authorId,
       message: response.message,
       postedAt: response.postedAt,
+      track: switch (response.track) {
+        final track? => _toTrack(track),
+        null => null,
+      },
       reactions: [
         for (final reaction in reactions)
           Reaction(userId: reaction.userId, emoji: reaction.emoji),
@@ -128,6 +164,58 @@ class PostRepository {
       userId: response.userId,
       message: response.message,
       createdAt: response.createdAt,
+    );
+  }
+
+  Track _toTrack(TrackResponse response) {
+    return Track(
+      id: response.id,
+      title: response.title,
+      artist: response.artist,
+      album: response.album,
+      duration: Duration(milliseconds: response.durationMs),
+      storeUrl: Uri.parse(response.storeUrl),
+      artworkUrl: switch (response.artworkUrl) {
+        final url? => Uri.parse(url),
+        null => null,
+      },
+      previewUrl: switch (response.previewUrl) {
+        final url? => Uri.parse(url),
+        null => null,
+      },
+    );
+  }
+
+  Track _itunesToTrack(ItunesTrackResponse response) {
+    return Track(
+      id: '${response.trackId}',
+      title: response.trackName,
+      artist: response.artistName,
+      album: response.collectionName,
+      duration: Duration(milliseconds: response.trackTimeMillis ?? 0),
+      storeUrl: Uri.parse(response.trackViewUrl),
+      artworkUrl: switch (response.artworkUrl100) {
+        // 100px の画像の URL の大きさを書き換えると、ほかの大きさの画像も取れる。
+        final url? => Uri.parse(url.replaceFirst('100x100bb', '300x300bb')),
+        null => null,
+      },
+      previewUrl: switch (response.previewUrl) {
+        final url? => Uri.parse(url),
+        null => null,
+      },
+    );
+  }
+
+  TrackResponse _toTrackResponse(Track track) {
+    return TrackResponse(
+      id: track.id,
+      title: track.title,
+      artist: track.artist,
+      album: track.album,
+      durationMs: track.duration.inMilliseconds,
+      storeUrl: track.storeUrl.toString(),
+      artworkUrl: track.artworkUrl?.toString(),
+      previewUrl: track.previewUrl?.toString(),
     );
   }
 }

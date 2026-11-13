@@ -13,6 +13,9 @@ abstract class UpdateInfoResponse with _$UpdateInfoResponse {
     required String latestVersion,
     required String requiredVersion,
     required DateTime enabledAt,
+
+    /// 新しいバージョンで変わったこと。改行は `\n` で書く。なくてもよい。
+    String? releaseNotes,
   }) = _UpdateInfoResponse;
 
   factory UpdateInfoResponse.fromJson(Map<String, dynamic> json) =>

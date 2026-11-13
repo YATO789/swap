@@ -47,11 +47,28 @@ class AppUpdateRepository {
     final current = AppVersion.tryParse(packageInfo.version);
     if (current == null) return AppUpdate.none;
 
-    return info.evaluate(
+    final level = info.evaluate(
       current: current,
       now: DateTime.now(),
       skippedAt: _store.readUpdateSkippedAt(),
     );
+    if (level == AppUpdateLevel.none) return AppUpdate.none;
+    return AppUpdate(
+      level: level,
+      latestVersion: info.latestVersion,
+      releaseNotes: _splitReleaseNotes(response.releaseNotes),
+    );
+  }
+
+  /// 改行で分けて1行に1つにする。行頭の「・」や「-」は、アプリで印を付けるので外す。
+  List<String> _splitReleaseNotes(String? value) {
+    if (value == null) return const [];
+    return [
+      for (final line in value.split('\n'))
+        if (line.trim().replaceFirst(RegExp(r'^[・•\-*]\s*'), '') case final note
+            when note.isNotEmpty)
+          note,
+    ];
   }
 
   /// 促すだけの案内で「あとで」を押したことを覚えておく。次に新しい案内を出すまで出さない。

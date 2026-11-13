@@ -83,13 +83,15 @@ class HomePage extends HookConsumerWidget {
         previous,
         next,
       ) {
-        if (previous?.value == AppUpdate.optional ||
-            next.value != AppUpdate.optional) {
+        final update = next.value;
+        if (previous?.value?.level == AppUpdateLevel.optional ||
+            update == null ||
+            update.level != AppUpdateLevel.optional) {
           return;
         }
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           if (!context.mounted) return;
-          final updating = await showUpdateSheet(context);
+          final updating = await showUpdateSheet(context, update);
           if (updating || !context.mounted) return;
           await controller.skipUpdate();
         });

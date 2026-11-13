@@ -189,7 +189,13 @@ void main() {
   });
 
   testWidgets('新しいバージョンがあれば知らせ、あとでにすると覚えておく', (tester) async {
-    final repository = FakeAppUpdateRepository(AppUpdate.optional);
+    final repository = FakeAppUpdateRepository(
+      const AppUpdate(
+        level: AppUpdateLevel.optional,
+        latestVersion: AppVersion([1, 7, 0]),
+        releaseNotes: ['記録に曲をつけられるように'],
+      ),
+    );
     await tester.pumpApp(
       const HomePage(),
       overrides: _overrides(_diaryBooks, appUpdateRepository: repository),
@@ -197,6 +203,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('新しいバージョンがあります'), findsOneWidget);
+    expect(find.text('バージョン 1.7.0 で変わったこと'), findsOneWidget);
+    expect(find.text('記録に曲をつけられるように'), findsOneWidget);
 
     await tester.tap(find.text('あとで'));
     await tester.pumpAndSettle();

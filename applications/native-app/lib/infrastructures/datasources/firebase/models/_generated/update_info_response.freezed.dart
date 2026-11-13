@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UpdateInfoResponse {
 
- String get latestVersion; String get requiredVersion; DateTime get enabledAt;
+ String get latestVersion; String get requiredVersion; DateTime get enabledAt;/// 新しいバージョンで変わったこと。改行は `\n` で書く。なくてもよい。
+ String? get releaseNotes;
 /// Create a copy of UpdateInfoResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +31,20 @@ $UpdateInfoResponseCopyWith<UpdateInfoResponse> get copyWith => _$UpdateInfoResp
 @override
 bool operator ==(Object other) {
   final _this = this as UpdateInfoResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateInfoResponse&&(identical(other.latestVersion, _this.latestVersion) || other.latestVersion == _this.latestVersion)&&(identical(other.requiredVersion, _this.requiredVersion) || other.requiredVersion == _this.requiredVersion)&&(identical(other.enabledAt, _this.enabledAt) || other.enabledAt == _this.enabledAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateInfoResponse&&(identical(other.latestVersion, _this.latestVersion) || other.latestVersion == _this.latestVersion)&&(identical(other.requiredVersion, _this.requiredVersion) || other.requiredVersion == _this.requiredVersion)&&(identical(other.enabledAt, _this.enabledAt) || other.enabledAt == _this.enabledAt)&&(identical(other.releaseNotes, _this.releaseNotes) || other.releaseNotes == _this.releaseNotes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as UpdateInfoResponse;
-  return Object.hash(runtimeType,_this.latestVersion,_this.requiredVersion,_this.enabledAt);
+  return Object.hash(runtimeType,_this.latestVersion,_this.requiredVersion,_this.enabledAt,_this.releaseNotes);
 }
 
 @override
 String toString() {
   final _this = this as UpdateInfoResponse;
-  return 'UpdateInfoResponse(latestVersion: ${_this.latestVersion}, requiredVersion: ${_this.requiredVersion}, enabledAt: ${_this.enabledAt})';
+  return 'UpdateInfoResponse(latestVersion: ${_this.latestVersion}, requiredVersion: ${_this.requiredVersion}, enabledAt: ${_this.enabledAt}, releaseNotes: ${_this.releaseNotes})';
 }
 
 
@@ -54,7 +55,7 @@ abstract mixin class $UpdateInfoResponseCopyWith<$Res>  {
   factory $UpdateInfoResponseCopyWith(UpdateInfoResponse value, $Res Function(UpdateInfoResponse) _then) = _$UpdateInfoResponseCopyWithImpl;
 @useResult
 $Res call({
- String latestVersion, String requiredVersion, DateTime enabledAt
+ String latestVersion, String requiredVersion, DateTime enabledAt, String? releaseNotes
 });
 
 
@@ -71,12 +72,13 @@ class _$UpdateInfoResponseCopyWithImpl<$Res>
 
 /// Create a copy of UpdateInfoResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? latestVersion = null,Object? requiredVersion = null,Object? enabledAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? latestVersion = null,Object? requiredVersion = null,Object? enabledAt = null,Object? releaseNotes = freezed,}) {
   return _then(UpdateInfoResponse(
 latestVersion: null == latestVersion ? _self.latestVersion : latestVersion // ignore: cast_nullable_to_non_nullable
 as String,requiredVersion: null == requiredVersion ? _self.requiredVersion : requiredVersion // ignore: cast_nullable_to_non_nullable
 as String,enabledAt: null == enabledAt ? _self.enabledAt : enabledAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,releaseNotes: freezed == releaseNotes ? _self.releaseNotes : releaseNotes // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -161,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String latestVersion,  String requiredVersion,  DateTime enabledAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String latestVersion,  String requiredVersion,  DateTime enabledAt,  String? releaseNotes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UpdateInfoResponse() when $default != null:
-return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt);case _:
+return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt,_that.releaseNotes);case _:
   return orElse();
 
 }
@@ -182,10 +184,10 @@ return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String latestVersion,  String requiredVersion,  DateTime enabledAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String latestVersion,  String requiredVersion,  DateTime enabledAt,  String? releaseNotes)  $default,) {final _that = this;
 switch (_that) {
 case _UpdateInfoResponse():
-return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt);case _:
+return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt,_that.releaseNotes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +204,10 @@ return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt);case 
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String latestVersion,  String requiredVersion,  DateTime enabledAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String latestVersion,  String requiredVersion,  DateTime enabledAt,  String? releaseNotes)?  $default,) {final _that = this;
 switch (_that) {
 case _UpdateInfoResponse() when $default != null:
-return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt);case _:
+return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt,_that.releaseNotes);case _:
   return null;
 
 }
@@ -217,12 +219,14 @@ return $default(_that.latestVersion,_that.requiredVersion,_that.enabledAt);case 
 
 @JsonSerializable(fieldRename: FieldRename.none)
 class _UpdateInfoResponse implements UpdateInfoResponse {
-  const _UpdateInfoResponse({required this.latestVersion, required this.requiredVersion, required this.enabledAt});
+  const _UpdateInfoResponse({required this.latestVersion, required this.requiredVersion, required this.enabledAt, this.releaseNotes});
   factory _UpdateInfoResponse.fromJson(Map<String, dynamic> json) => _$UpdateInfoResponseFromJson(json);
 
 @override final  String latestVersion;
 @override final  String requiredVersion;
 @override final  DateTime enabledAt;
+/// 新しいバージョンで変わったこと。改行は `\n` で書く。なくてもよい。
+@override final  String? releaseNotes;
 
 /// Create a copy of UpdateInfoResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -237,18 +241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateInfoResponse&&(identical(other.latestVersion, latestVersion) || other.latestVersion == latestVersion)&&(identical(other.requiredVersion, requiredVersion) || other.requiredVersion == requiredVersion)&&(identical(other.enabledAt, enabledAt) || other.enabledAt == enabledAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateInfoResponse&&(identical(other.latestVersion, latestVersion) || other.latestVersion == latestVersion)&&(identical(other.requiredVersion, requiredVersion) || other.requiredVersion == requiredVersion)&&(identical(other.enabledAt, enabledAt) || other.enabledAt == enabledAt)&&(identical(other.releaseNotes, releaseNotes) || other.releaseNotes == releaseNotes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,latestVersion,requiredVersion,enabledAt);
+    return Object.hash(runtimeType,latestVersion,requiredVersion,enabledAt,releaseNotes);
 }
 
 @override
 String toString() {
-    return 'UpdateInfoResponse(latestVersion: $latestVersion, requiredVersion: $requiredVersion, enabledAt: $enabledAt)';
+    return 'UpdateInfoResponse(latestVersion: $latestVersion, requiredVersion: $requiredVersion, enabledAt: $enabledAt, releaseNotes: $releaseNotes)';
 }
 
 
@@ -259,7 +263,7 @@ abstract mixin class _$UpdateInfoResponseCopyWith<$Res> implements $UpdateInfoRe
   factory _$UpdateInfoResponseCopyWith(_UpdateInfoResponse value, $Res Function(_UpdateInfoResponse) _then) = __$UpdateInfoResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String latestVersion, String requiredVersion, DateTime enabledAt
+ String latestVersion, String requiredVersion, DateTime enabledAt, String? releaseNotes
 });
 
 
@@ -276,12 +280,13 @@ class __$UpdateInfoResponseCopyWithImpl<$Res>
 
 /// Create a copy of UpdateInfoResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? latestVersion = null,Object? requiredVersion = null,Object? enabledAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? latestVersion = null,Object? requiredVersion = null,Object? enabledAt = null,Object? releaseNotes = freezed,}) {
   return _then(_UpdateInfoResponse(
 latestVersion: null == latestVersion ? _self.latestVersion : latestVersion // ignore: cast_nullable_to_non_nullable
 as String,requiredVersion: null == requiredVersion ? _self.requiredVersion : requiredVersion // ignore: cast_nullable_to_non_nullable
 as String,enabledAt: null == enabledAt ? _self.enabledAt : enabledAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,releaseNotes: freezed == releaseNotes ? _self.releaseNotes : releaseNotes // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

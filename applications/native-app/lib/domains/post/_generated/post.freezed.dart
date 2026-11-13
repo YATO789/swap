@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 mixin _$Post {
 
  String get message;/// 記録を出す日記帳の id。1冊以上。
- List<String> get diaryBookIds;
+ List<String> get diaryBookIds;/// 記録に添えた曲。添えていなければ null。
+ Track? get track;
 /// Create a copy of Post
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,20 +29,20 @@ $PostCopyWith<Post> get copyWith => _$PostCopyWithImpl<Post>(this as Post, _$ide
 @override
 bool operator ==(Object other) {
   final _this = this as Post;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Post&&(identical(other.message, _this.message) || other.message == _this.message)&&const DeepCollectionEquality().equals(other.diaryBookIds, _this.diaryBookIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Post&&(identical(other.message, _this.message) || other.message == _this.message)&&const DeepCollectionEquality().equals(other.diaryBookIds, _this.diaryBookIds)&&(identical(other.track, _this.track) || other.track == _this.track));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Post;
-  return Object.hash(runtimeType,_this.message,const DeepCollectionEquality().hash(_this.diaryBookIds));
+  return Object.hash(runtimeType,_this.message,const DeepCollectionEquality().hash(_this.diaryBookIds),_this.track);
 }
 
 @override
 String toString() {
   final _this = this as Post;
-  return 'Post(message: ${_this.message}, diaryBookIds: ${_this.diaryBookIds})';
+  return 'Post(message: ${_this.message}, diaryBookIds: ${_this.diaryBookIds}, track: ${_this.track})';
 }
 
 
@@ -52,11 +53,11 @@ abstract mixin class $PostCopyWith<$Res>  {
   factory $PostCopyWith(Post value, $Res Function(Post) _then) = _$PostCopyWithImpl;
 @useResult
 $Res call({
- String message, List<String> diaryBookIds
+ String message, List<String> diaryBookIds, Track? track
 });
 
 
-
+$TrackCopyWith<$Res>? get track;
 
 }
 /// @nodoc
@@ -69,14 +70,27 @@ class _$PostCopyWithImpl<$Res>
 
 /// Create a copy of Post
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? diaryBookIds = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? diaryBookIds = null,Object? track = freezed,}) {
   return _then(Post(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,diaryBookIds: null == diaryBookIds ? _self.diaryBookIds : diaryBookIds // ignore: cast_nullable_to_non_nullable
-as List<String>,
+as List<String>,track: freezed == track ? _self.track : track // ignore: cast_nullable_to_non_nullable
+as Track?,
   ));
 }
+/// Create a copy of Post
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TrackCopyWith<$Res>? get track {
+    if (_self.track == null) {
+    return null;
+  }
 
+  return $TrackCopyWith<$Res>(_self.track!, (value) {
+    return _then(_self.copyWith(track: value));
+  });
+}
 }
 
 
@@ -158,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  List<String> diaryBookIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  List<String> diaryBookIds,  Track? track)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Post() when $default != null:
-return $default(_that.message,_that.diaryBookIds);case _:
+return $default(_that.message,_that.diaryBookIds,_that.track);case _:
   return orElse();
 
 }
@@ -179,10 +193,10 @@ return $default(_that.message,_that.diaryBookIds);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  List<String> diaryBookIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  List<String> diaryBookIds,  Track? track)  $default,) {final _that = this;
 switch (_that) {
 case _Post():
-return $default(_that.message,_that.diaryBookIds);case _:
+return $default(_that.message,_that.diaryBookIds,_that.track);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +213,10 @@ return $default(_that.message,_that.diaryBookIds);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  List<String> diaryBookIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  List<String> diaryBookIds,  Track? track)?  $default,) {final _that = this;
 switch (_that) {
 case _Post() when $default != null:
-return $default(_that.message,_that.diaryBookIds);case _:
+return $default(_that.message,_that.diaryBookIds,_that.track);case _:
   return null;
 
 }
@@ -214,7 +228,7 @@ return $default(_that.message,_that.diaryBookIds);case _:
 
 
 class _Post implements Post {
-  const _Post({required this.message, required  List<String> diaryBookIds}): _diaryBookIds = diaryBookIds;
+  const _Post({required this.message, required  List<String> diaryBookIds, this.track}): _diaryBookIds = diaryBookIds;
   
 
 @override final  String message;
@@ -227,6 +241,8 @@ class _Post implements Post {
   return EqualUnmodifiableListView(_diaryBookIds);
 }
 
+/// 記録に添えた曲。添えていなければ null。
+@override final  Track? track;
 
 /// Create a copy of Post
 /// with the given fields replaced by the non-null parameter values.
@@ -238,18 +254,18 @@ _$PostCopyWith<_Post> get copyWith => __$PostCopyWithImpl<_Post>(this, _$identit
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Post&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.diaryBookIds, _diaryBookIds));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Post&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other.diaryBookIds, _diaryBookIds)&&(identical(other.track, track) || other.track == track));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_diaryBookIds));
+    return Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_diaryBookIds),track);
 }
 
 @override
 String toString() {
-    return 'Post(message: $message, diaryBookIds: $diaryBookIds)';
+    return 'Post(message: $message, diaryBookIds: $diaryBookIds, track: $track)';
 }
 
 
@@ -260,11 +276,11 @@ abstract mixin class _$PostCopyWith<$Res> implements $PostCopyWith<$Res> {
   factory _$PostCopyWith(_Post value, $Res Function(_Post) _then) = __$PostCopyWithImpl;
 @override @useResult
 $Res call({
- String message, List<String> diaryBookIds
+ String message, List<String> diaryBookIds, Track? track
 });
 
 
-
+@override $TrackCopyWith<$Res>? get track;
 
 }
 /// @nodoc
@@ -277,15 +293,28 @@ class __$PostCopyWithImpl<$Res>
 
 /// Create a copy of Post
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? diaryBookIds = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? diaryBookIds = null,Object? track = freezed,}) {
   return _then(_Post(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,diaryBookIds: null == diaryBookIds ? _self._diaryBookIds : diaryBookIds // ignore: cast_nullable_to_non_nullable
-as List<String>,
+as List<String>,track: freezed == track ? _self.track : track // ignore: cast_nullable_to_non_nullable
+as Track?,
   ));
 }
 
+/// Create a copy of Post
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TrackCopyWith<$Res>? get track {
+    if (_self.track == null) {
+    return null;
+  }
 
+  return $TrackCopyWith<$Res>(_self.track!, (value) {
+    return _then(_self.copyWith(track: value));
+  });
+}
 }
 
 // dart format on

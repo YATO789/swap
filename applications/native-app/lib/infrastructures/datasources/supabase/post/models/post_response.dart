@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:swap/utils/local_date_time_converter.dart';
 
+import 'track_response.dart';
+
 part '_generated/post_response.freezed.dart';
 part '_generated/post_response.g.dart';
 
@@ -12,6 +14,7 @@ abstract class PostResponse with _$PostResponse {
     required String authorId,
     required String message,
     @LocalDateTimeConverter() required DateTime postedAt,
+    TrackResponse? track,
 
     /// 日記帳を絞って読んだときの出し先。その日記帳の1つだけが入る。
     @Default([]) List<PostDiaryBookResponse> postDiaryBooks,

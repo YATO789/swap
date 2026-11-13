@@ -380,6 +380,90 @@ abstract class AppLocalizations {
   /// **'共有する日記帳'**
   String get postSheetShareTo;
 
+  /// No description provided for @trackAttach.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲をつける'**
+  String get trackAttach;
+
+  /// No description provided for @trackRemove.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲を外す'**
+  String get trackRemove;
+
+  /// No description provided for @trackAttachedLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'つけた曲：{title}、{artist}。押すと選び直せます'**
+  String trackAttachedLabel(String title, String artist);
+
+  /// No description provided for @trackPlay.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}の試聴を再生'**
+  String trackPlay(String title);
+
+  /// No description provided for @trackStopPreview.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}の試聴を止める'**
+  String trackStopPreview(String title);
+
+  /// No description provided for @trackPreviewFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'試聴を再生できませんでした。もう一度お試しください'**
+  String get trackPreviewFailed;
+
+  /// No description provided for @trackOpenInStore.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}を Apple Music で開く'**
+  String trackOpenInStore(String title);
+
+  /// No description provided for @trackOpenFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'Apple Music を開けませんでした'**
+  String get trackOpenFailed;
+
+  /// No description provided for @trackSearchHint.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲名・アーティスト名'**
+  String get trackSearchHint;
+
+  /// No description provided for @trackSearchClear.
+  ///
+  /// In ja, this message translates to:
+  /// **'消す'**
+  String get trackSearchClear;
+
+  /// No description provided for @trackSearchEmpty.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲名やアーティスト名で探せます'**
+  String get trackSearchEmpty;
+
+  /// No description provided for @trackSelect.
+  ///
+  /// In ja, this message translates to:
+  /// **'{title}をつける'**
+  String trackSelect(String title);
+
+  /// No description provided for @trackSearchNoResults.
+  ///
+  /// In ja, this message translates to:
+  /// **'「{query}」に合う曲は見つかりませんでした'**
+  String trackSearchNoResults(String query);
+
+  /// No description provided for @trackSearchFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'曲を探せませんでした。もう一度お試しください'**
+  String get trackSearchFailed;
+
   /// No description provided for @postButtonWriteToday.
   ///
   /// In ja, this message translates to:
@@ -1612,13 +1696,13 @@ abstract class AppLocalizations {
   /// No description provided for @updateRequiredTitle.
   ///
   /// In ja, this message translates to:
-  /// **'アップデートしてください'**
+  /// **'アップデートのお願い'**
   String get updateRequiredTitle;
 
   /// No description provided for @updateRequiredMessage.
   ///
   /// In ja, this message translates to:
-  /// **'新しいバージョンが出ています。\nこのまま使うには、アップデートが必要です。'**
+  /// **'このまま使うには、アップデートが必要です。'**
   String get updateRequiredMessage;
 
   /// No description provided for @updateOptionalTitle.
@@ -1644,6 +1728,12 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'あとで'**
   String get updateLater;
+
+  /// No description provided for @updateReleaseNotesTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'バージョン {version} で変わったこと'**
+  String updateReleaseNotesTitle(String version);
 
   /// No description provided for @coverEditTitle.
   ///

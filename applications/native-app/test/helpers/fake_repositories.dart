@@ -11,6 +11,7 @@ import 'package:swap/domains/diary_book/invited_diary_book.dart';
 import 'package:swap/domains/post/post.dart';
 import 'package:swap/domains/post/post_comment.dart';
 import 'package:swap/domains/post/timeline_post.dart';
+import 'package:swap/domains/post/track.dart';
 import 'package:swap/domains/reaction/reaction.dart';
 import 'package:swap/domains/profile/profile.dart';
 import 'package:swap/infrastructures/repositories/app_update_repository.dart';
@@ -204,9 +205,37 @@ class FakePostRepository implements PostRepository {
           authorId: 'me',
           message: post.message,
           postedAt: DateTime.now(),
+          track: post.track,
         ),
       );
     }
+  }
+
+  /// 曲の検索で返す曲。曲名・アーティスト名・アルバム名に検索語を含むものだけ返す。
+  List<Track> tracks = const [];
+
+  @override
+  Future<List<Track>> searchTracks(String query) async {
+    final words = query.toLowerCase();
+    return [
+      for (final track in tracks)
+        if ('${track.title} ${track.artist} ${track.album}'
+            .toLowerCase()
+            .contains(words))
+          track,
+    ];
+  }
+
+  /// 曲を探すシートを開いたときに出す、人気の曲。
+  List<Track> popularTracks = const [];
+
+  /// true なら、人気の曲を取るのに失敗する。
+  bool failsPopularTracks = false;
+
+  @override
+  Future<List<Track>> fetchPopularTracks() async {
+    if (failsPopularTracks) throw Exception('人気の曲を取れない');
+    return popularTracks;
   }
 
   @override

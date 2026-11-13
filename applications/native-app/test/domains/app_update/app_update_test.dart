@@ -37,21 +37,21 @@ void main() {
     test('必須のバージョンより古ければ、アップデートするまで使えない', () {
       expect(
         _info().evaluate(current: _version('1.0.9'), now: _now),
-        AppUpdate.required,
+        AppUpdateLevel.required,
       );
     });
 
     test('最新より古いだけなら、促すだけにする', () {
       expect(
         _info().evaluate(current: _version('1.1.0'), now: _now),
-        AppUpdate.optional,
+        AppUpdateLevel.optional,
       );
     });
 
     test('最新なら促さない', () {
       expect(
         _info().evaluate(current: _version('1.2.0'), now: _now),
-        AppUpdate.none,
+        AppUpdateLevel.none,
       );
     });
 
@@ -59,7 +59,7 @@ void main() {
       expect(
         _info(enabledAt: DateTime(2026, 10, 21))
             .evaluate(current: _version('1.0.0'), now: _now),
-        AppUpdate.none,
+        AppUpdateLevel.none,
       );
     });
 
@@ -72,7 +72,7 @@ void main() {
           now: _now,
           skippedAt: DateTime(2026, 10, 20, 11),
         ),
-        AppUpdate.none,
+        AppUpdateLevel.none,
       );
       expect(
         info.evaluate(
@@ -80,7 +80,7 @@ void main() {
           now: _now,
           skippedAt: DateTime(2026, 10, 19),
         ),
-        AppUpdate.optional,
+        AppUpdateLevel.optional,
       );
     });
 
@@ -91,7 +91,7 @@ void main() {
           now: _now,
           skippedAt: DateTime(2026, 10, 20, 11),
         ),
-        AppUpdate.required,
+        AppUpdateLevel.required,
       );
     });
   });

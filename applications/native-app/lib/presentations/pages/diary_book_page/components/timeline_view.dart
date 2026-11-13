@@ -10,6 +10,7 @@ import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
 import '../../../components/dismissible_selectable_text.dart';
+import '../../../components/track_view.dart';
 import '../../../components/user_avatar.dart';
 import 'diary_section.dart';
 import 'post_responder.dart';
@@ -453,6 +454,9 @@ class _PostCard extends StatelessWidget {
   /// 左に出す、書いた人のアイコンの大きさ。
   static const double _avatarSize = 36;
 
+  /// 本文の左端。アイコンの幅とその右の間隔のぶん。
+  static const double _contentIndent = _avatarSize + 12;
+
   /// リアクションとコメントの画面を開く。自分の記録ではコメントだけにする。
   Future<void> _respond(BuildContext context) async {
     final l10n = context.l10n;
@@ -504,18 +508,21 @@ class _PostCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 6),
-        // 記録が長くても、アイコンは左上に置いたままにする。
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            UserAvatar(imageUrl: avatarUrlOf(post.authorId), size: _avatarSize),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            // 記録が長くても、アイコンは左上に置いたままにする。
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                UserAvatar(
+                  imageUrl: avatarUrlOf(post.authorId),
+                  size: _avatarSize,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
                   // 名前・時刻・本文は1つにまとめて読み上げる。リアクションは押せるので分けておく。
-                  MergeSemantics(
+                  child: MergeSemantics(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -554,32 +561,40 @@ class _PostCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (post.reactions.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    ReactionChips(
-                      reactions: post.reactions,
-                      myId: myId,
-                      nameOf: nameOf,
-                      avatarUrlOf: avatarUrlOf,
-                      onTap: canReact ? onReact : null,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (!lifted)
-              Transform.translate(
-                offset: const Offset(0, buttonTop),
-                child: ReactionButton(
-                  current: post.reactionOf(myId),
-                  withComments: true,
-                  commentCount: post.comments.length,
-                  onPressed: () => _respond(context),
                 ),
-              )
-            else
-              // 浮かせた見本でも、ボタンの場所は空けて元の並びと揃える。
-              const SizedBox(width: ReactionButton.size),
+                if (!lifted)
+                  Transform.translate(
+                    offset: const Offset(0, buttonTop),
+                    child: ReactionButton(
+                      current: post.reactionOf(myId),
+                      withComments: true,
+                      commentCount: post.comments.length,
+                      onPressed: () => _respond(context),
+                    ),
+                  )
+                else
+                  // 浮かせた見本でも、ボタンの場所は空けて元の並びと揃える。
+                  const SizedBox(width: ReactionButton.size),
+              ],
+            ),
+            // 添えた曲とリアクションは、本文と左を揃え、右はリアクションのボタンの右端まで広げる。
+            // 曲は名前・時刻・本文とは分けて、再生ボタンを押せるようにする。
+            if (post.track case final track?)
+              Padding(
+                padding: const EdgeInsets.only(left: _contentIndent, top: 8),
+                child: TrackCard(track: track, enabled: !lifted),
+              ),
+            if (post.reactions.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: _contentIndent, top: 6),
+                child: ReactionChips(
+                  reactions: post.reactions,
+                  myId: myId,
+                  nameOf: nameOf,
+                  avatarUrlOf: avatarUrlOf,
+                  onTap: canReact ? onReact : null,
+                ),
+              ),
           ],
         ),
       ),

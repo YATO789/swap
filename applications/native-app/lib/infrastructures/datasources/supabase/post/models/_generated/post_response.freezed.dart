@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PostResponse {
 
- String get id; String get authorId; String get message;@LocalDateTimeConverter() DateTime get postedAt;/// 日記帳を絞って読んだときの出し先。その日記帳の1つだけが入る。
+ String get id; String get authorId; String get message;@LocalDateTimeConverter() DateTime get postedAt; TrackResponse? get track;/// 日記帳を絞って読んだときの出し先。その日記帳の1つだけが入る。
  List<PostDiaryBookResponse> get postDiaryBooks;
 /// Create a copy of PostResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -31,20 +31,20 @@ $PostResponseCopyWith<PostResponse> get copyWith => _$PostResponseCopyWithImpl<P
 @override
 bool operator ==(Object other) {
   final _this = this as PostResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.postedAt, _this.postedAt) || other.postedAt == _this.postedAt)&&const DeepCollectionEquality().equals(other.postDiaryBooks, _this.postDiaryBooks));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PostResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.message, _this.message) || other.message == _this.message)&&(identical(other.postedAt, _this.postedAt) || other.postedAt == _this.postedAt)&&(identical(other.track, _this.track) || other.track == _this.track)&&const DeepCollectionEquality().equals(other.postDiaryBooks, _this.postDiaryBooks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PostResponse;
-  return Object.hash(runtimeType,_this.id,_this.authorId,_this.message,_this.postedAt,const DeepCollectionEquality().hash(_this.postDiaryBooks));
+  return Object.hash(runtimeType,_this.id,_this.authorId,_this.message,_this.postedAt,_this.track,const DeepCollectionEquality().hash(_this.postDiaryBooks));
 }
 
 @override
 String toString() {
   final _this = this as PostResponse;
-  return 'PostResponse(id: ${_this.id}, authorId: ${_this.authorId}, message: ${_this.message}, postedAt: ${_this.postedAt}, postDiaryBooks: ${_this.postDiaryBooks})';
+  return 'PostResponse(id: ${_this.id}, authorId: ${_this.authorId}, message: ${_this.message}, postedAt: ${_this.postedAt}, track: ${_this.track}, postDiaryBooks: ${_this.postDiaryBooks})';
 }
 
 
@@ -55,11 +55,11 @@ abstract mixin class $PostResponseCopyWith<$Res>  {
   factory $PostResponseCopyWith(PostResponse value, $Res Function(PostResponse) _then) = _$PostResponseCopyWithImpl;
 @useResult
 $Res call({
- String id, String authorId, String message,@LocalDateTimeConverter() DateTime postedAt, List<PostDiaryBookResponse> postDiaryBooks
+ String id, String authorId, String message,@LocalDateTimeConverter() DateTime postedAt, TrackResponse? track, List<PostDiaryBookResponse> postDiaryBooks
 });
 
 
-
+$TrackResponseCopyWith<$Res>? get track;
 
 }
 /// @nodoc
@@ -72,17 +72,30 @@ class _$PostResponseCopyWithImpl<$Res>
 
 /// Create a copy of PostResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? postDiaryBooks = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? track = freezed,Object? postDiaryBooks = null,}) {
   return _then(PostResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,postedAt: null == postedAt ? _self.postedAt : postedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,postDiaryBooks: null == postDiaryBooks ? _self.postDiaryBooks : postDiaryBooks // ignore: cast_nullable_to_non_nullable
+as DateTime,track: freezed == track ? _self.track : track // ignore: cast_nullable_to_non_nullable
+as TrackResponse?,postDiaryBooks: null == postDiaryBooks ? _self.postDiaryBooks : postDiaryBooks // ignore: cast_nullable_to_non_nullable
 as List<PostDiaryBookResponse>,
   ));
 }
+/// Create a copy of PostResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TrackResponseCopyWith<$Res>? get track {
+    if (_self.track == null) {
+    return null;
+  }
 
+  return $TrackResponseCopyWith<$Res>(_self.track!, (value) {
+    return _then(_self.copyWith(track: value));
+  });
+}
 }
 
 
@@ -164,10 +177,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt,  List<PostDiaryBookResponse> postDiaryBooks)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt,  TrackResponse? track,  List<PostDiaryBookResponse> postDiaryBooks)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PostResponse() when $default != null:
-return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.postDiaryBooks);case _:
+return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.track,_that.postDiaryBooks);case _:
   return orElse();
 
 }
@@ -185,10 +198,10 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.postD
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt,  List<PostDiaryBookResponse> postDiaryBooks)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt,  TrackResponse? track,  List<PostDiaryBookResponse> postDiaryBooks)  $default,) {final _that = this;
 switch (_that) {
 case _PostResponse():
-return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.postDiaryBooks);case _:
+return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.track,_that.postDiaryBooks);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +218,10 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.postD
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt,  List<PostDiaryBookResponse> postDiaryBooks)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  String message, @LocalDateTimeConverter()  DateTime postedAt,  TrackResponse? track,  List<PostDiaryBookResponse> postDiaryBooks)?  $default,) {final _that = this;
 switch (_that) {
 case _PostResponse() when $default != null:
-return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.postDiaryBooks);case _:
+return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.track,_that.postDiaryBooks);case _:
   return null;
 
 }
@@ -220,13 +233,14 @@ return $default(_that.id,_that.authorId,_that.message,_that.postedAt,_that.postD
 @JsonSerializable()
 
 class _PostResponse implements PostResponse {
-  const _PostResponse({required this.id, required this.authorId, required this.message, @LocalDateTimeConverter() required this.postedAt,  List<PostDiaryBookResponse> postDiaryBooks = const []}): _postDiaryBooks = postDiaryBooks;
+  const _PostResponse({required this.id, required this.authorId, required this.message, @LocalDateTimeConverter() required this.postedAt, this.track,  List<PostDiaryBookResponse> postDiaryBooks = const []}): _postDiaryBooks = postDiaryBooks;
   factory _PostResponse.fromJson(Map<String, dynamic> json) => _$PostResponseFromJson(json);
 
 @override final  String id;
 @override final  String authorId;
 @override final  String message;
 @override@LocalDateTimeConverter() final  DateTime postedAt;
+@override final  TrackResponse? track;
 /// 日記帳を絞って読んだときの出し先。その日記帳の1つだけが入る。
  final  List<PostDiaryBookResponse> _postDiaryBooks;
 /// 日記帳を絞って読んだときの出し先。その日記帳の1つだけが入る。
@@ -250,18 +264,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.message, message) || other.message == message)&&(identical(other.postedAt, postedAt) || other.postedAt == postedAt)&&const DeepCollectionEquality().equals(other.postDiaryBooks, _postDiaryBooks));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PostResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.message, message) || other.message == message)&&(identical(other.postedAt, postedAt) || other.postedAt == postedAt)&&(identical(other.track, track) || other.track == track)&&const DeepCollectionEquality().equals(other.postDiaryBooks, _postDiaryBooks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,authorId,message,postedAt,const DeepCollectionEquality().hash(_postDiaryBooks));
+    return Object.hash(runtimeType,id,authorId,message,postedAt,track,const DeepCollectionEquality().hash(_postDiaryBooks));
 }
 
 @override
 String toString() {
-    return 'PostResponse(id: $id, authorId: $authorId, message: $message, postedAt: $postedAt, postDiaryBooks: $postDiaryBooks)';
+    return 'PostResponse(id: $id, authorId: $authorId, message: $message, postedAt: $postedAt, track: $track, postDiaryBooks: $postDiaryBooks)';
 }
 
 
@@ -272,11 +286,11 @@ abstract mixin class _$PostResponseCopyWith<$Res> implements $PostResponseCopyWi
   factory _$PostResponseCopyWith(_PostResponse value, $Res Function(_PostResponse) _then) = __$PostResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String authorId, String message,@LocalDateTimeConverter() DateTime postedAt, List<PostDiaryBookResponse> postDiaryBooks
+ String id, String authorId, String message,@LocalDateTimeConverter() DateTime postedAt, TrackResponse? track, List<PostDiaryBookResponse> postDiaryBooks
 });
 
 
-
+@override $TrackResponseCopyWith<$Res>? get track;
 
 }
 /// @nodoc
@@ -289,18 +303,31 @@ class __$PostResponseCopyWithImpl<$Res>
 
 /// Create a copy of PostResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? postDiaryBooks = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? message = null,Object? postedAt = null,Object? track = freezed,Object? postDiaryBooks = null,}) {
   return _then(_PostResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
 as String,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,postedAt: null == postedAt ? _self.postedAt : postedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,postDiaryBooks: null == postDiaryBooks ? _self._postDiaryBooks : postDiaryBooks // ignore: cast_nullable_to_non_nullable
+as DateTime,track: freezed == track ? _self.track : track // ignore: cast_nullable_to_non_nullable
+as TrackResponse?,postDiaryBooks: null == postDiaryBooks ? _self._postDiaryBooks : postDiaryBooks // ignore: cast_nullable_to_non_nullable
 as List<PostDiaryBookResponse>,
   ));
 }
 
+/// Create a copy of PostResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TrackResponseCopyWith<$Res>? get track {
+    if (_self.track == null) {
+    return null;
+  }
 
+  return $TrackResponseCopyWith<$Res>(_self.track!, (value) {
+    return _then(_self.copyWith(track: value));
+  });
+}
 }
 
 
