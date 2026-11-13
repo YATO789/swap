@@ -10,6 +10,7 @@ import '../../../domains/post/track.dart';
 import '../../providers/diary_book_notifier.dart';
 import '../../providers/popular_tracks_notifier.dart';
 import '../../providers/post_diary_book_notifier.dart';
+import '../../providers/track_preview_notifier.dart';
 import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
@@ -60,6 +61,15 @@ class _PostSheet extends HookConsumerWidget {
     useEffect(() {
       ref.read(popularTracksProvider.notifier).prefetch();
       return null;
+    }, const []);
+
+    // 添えた曲を試聴できるので、シートを閉じたら（記録したときも）試聴を止める。
+    final preview = ref.read(trackPreviewProvider.notifier);
+    useEffect(() {
+      return () {
+        // 閉じている途中に状態を変えないよう、閉じ終わってから止める。
+        Future.microtask(preview.stop);
+      };
     }, const []);
 
     final savedIds = ref.watch(postDiaryBookProvider);

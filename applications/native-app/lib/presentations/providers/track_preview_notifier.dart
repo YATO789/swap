@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domains/post/track.dart';
@@ -20,6 +20,9 @@ class TrackPreviewNotifier extends _$TrackPreviewNotifier {
       state = null;
     });
     ref.onDispose(subscription.cancel);
+    // アプリをバックグラウンドに移したら、試聴を止める。
+    final listener = AppLifecycleListener(onHide: stop);
+    ref.onDispose(listener.dispose);
     return null;
   }
 
