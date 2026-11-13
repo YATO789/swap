@@ -216,9 +216,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackSearchEmpty => 'Search by song or artist name';
 
   @override
-  String get trackSearchPopular => 'Popular now';
-
-  @override
   String trackSelect(String title) {
     return 'Add $title';
   }

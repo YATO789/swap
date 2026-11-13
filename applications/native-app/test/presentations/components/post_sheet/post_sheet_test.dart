@@ -144,7 +144,6 @@ void main() {
     await tester.tap(find.text('夜の終わりのバス停'));
     await tester.pumpAndSettle();
     expect(find.text('夜の終わりのバス停'), findsNWidgets(2));
-    expect(find.text('いま人気の曲'), findsNothing);
     expect(find.byTooltip('夜の終わりのバス停を添える'), findsOneWidget);
 
     // バーの → で選ぶ。
@@ -168,15 +167,15 @@ void main() {
 
     await tester.tap(find.text('曲を添える'));
     await tester.pumpAndSettle();
-    expect(find.text('いま人気の曲'), findsOneWidget);
+    expect(find.text('十一月の窓'), findsOneWidget);
     expect(find.text('曲名やアーティスト名で探せます'), findsNothing);
 
     // 打ち始めたら、検索の結果に入れ替わる。
     await tester.enterText(find.byType(TextField).last, 'バス停');
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pumpAndSettle();
-    expect(find.text('いま人気の曲'), findsNothing);
     expect(find.text('十一月の窓'), findsNothing);
+    expect(find.text('夜の終わりのバス停'), findsOneWidget);
 
     await tester.tap(find.byTooltip('消す'));
     await tester.pumpAndSettle();
@@ -231,7 +230,6 @@ void main() {
 
     final field = tester.widget<TextField>(find.byType(TextField).last);
     expect(field.controller!.text, '十一月の窓');
-    expect(find.text('いま人気の曲'), findsNothing);
   });
 
   testWidgets('添えた曲は × で外せる', (tester) async {

@@ -128,11 +128,14 @@ class _TrackSearchSheet extends HookConsumerWidget {
       }
     }
 
-    return Padding(
-      // キーボードが出たら、結果の欄を縮めてその上に収める。
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      child: SizedBox(
-        height: MediaQuery.sizeOf(context).height * 0.85,
+    // シートの高さは変えず、キーボードが出たら結果の欄を縮めてその上に収める。
+    // 高さにキーボードのぶんを足すと、画面の上まで伸びて隙間がなくなってしまう。
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.85,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.viewInsetsOf(context).bottom,
+        ),
         child: SafeArea(
           top: false,
           child: Column(
@@ -240,7 +243,6 @@ class _Results extends StatelessWidget {
         null => const SizedBox.shrink(),
         [] => _Message(l10n.trackSearchEmpty),
         final tracks => _TrackList(
-          header: l10n.trackSearchPopular,
           tracks: tracks,
           focused: focused,
           onTapTrack: onTapTrack,
@@ -292,50 +294,29 @@ class _Message extends StatelessWidget {
   }
 }
 
-/// 曲を並べる。[header] があれば一番上に見出しとして出す。
+/// 曲を並べる。
 class _TrackList extends StatelessWidget {
   const _TrackList({
     required this.tracks,
     required this.focused,
     required this.onTapTrack,
     required this.bottomInset,
-    this.header,
   });
 
   final List<Track> tracks;
   final Track? focused;
   final ValueChanged<Track> onTapTrack;
   final double bottomInset;
-  final String? header;
 
   @override
   Widget build(BuildContext context) {
-    final header = this.header;
-    final offset = header == null ? 0 : 1;
-
     return ListView.builder(
       // 指でスクロールしたらキーボードを閉じて、結果を見やすくする。
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: EdgeInsets.fromLTRB(16, 4, 16, bottomInset),
-      itemCount: tracks.length + offset,
+      itemCount: tracks.length,
       itemBuilder: (context, index) {
-        if (header != null && index == 0) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
-            child: Semantics(
-              header: true,
-              child: Text(
-                header,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: context.appColors.textSecondary,
-                ),
-              ),
-            ),
-          );
-        }
-        final track = tracks[index - offset];
+        final track = tracks[index];
         return _TrackResultTile(
           track: track,
           focused: track.id == focused?.id,
@@ -387,24 +368,9 @@ class _TrackResultTile extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          // 流している曲には、曲名の前に音の印を付ける。
-                          if (playing) ...[
-                            Icon(
-                              Icons.graphic_eq_rounded,
-                              size: 16,
-                              color: colors.textPrimary,
-                            ),
-                            const SizedBox(width: 4),
-                          ],
-                          Expanded(
-                            child: TrackTitle(
-                              title: track.title,
-                              subtitle: '${track.artist} ・ ${track.album}',
-                            ),
-                          ),
-                        ],
+                      TrackTitle(
+                        title: track.title,
+                        subtitle: '${track.artist} ・ ${track.album}',
                       ),
                       // 試聴を流しているあいだは、試聴の出所を小さく添える。
                       if (playing)
