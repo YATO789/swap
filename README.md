@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/swap-hero.png" width="420" alt="Swap! のアプリ画面" />
+</p>
+
 # Swap!
 
 **少人数で回す、交換日記アプリ。**
