@@ -60,23 +60,6 @@ https://github.com/user-attachments/assets/07f7ffa3-82de-4944-9df2-7fdaf28cf141
 
 レイヤーを分けた構成で、依存は外側から内側への一方向です。
 
-```mermaid
-flowchart TD
-  P["presentations<br/>Page / Component / Controller / Provider"]
-  U["usecases<br/>複数の Repository をまたぐ処理"]
-  R["infrastructures/repositories<br/>Response → ドメインモデルへの変換"]
-  D["infrastructures/datasources<br/>Supabase / Firebase / iTunes / 端末"]
-  M["domains<br/>freezed のモデルと業務ルール"]
-
-  P --> U
-  P --> R
-  U --> R
-  R --> D
-  P -.-> M
-  U -.-> M
-  R -.-> M
-```
-
 | レイヤー | 役割 | 例 |
 |---|---|---|
 | `domains` | 外部に依存しないモデルと業務ルール。freezed で不変にしています | `Diary.isLocked`、`diaryDateOf()`（朝4時で日付を区切る） |
