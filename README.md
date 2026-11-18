@@ -1,6 +1,5 @@
-<p align="center">
-  <img src="docs/images/swap-hero.png" width="420" alt="Swap! のアプリ画面" />
-</p>
+https://github.com/user-attachments/assets/07f7ffa3-82de-4944-9df2-7fdaf28cf141
+
 
 # Swap!
 
