@@ -1,10 +1,11 @@
 // 日記の写真を R2 に上げる・R2 から見るための、期限付き URL（署名付き URL）を出す。
 // アプリからログイン情報（JWT）を付けて呼ぶ。R2 の鍵はアプリに持たせず、ここだけが持つ。
 //
-// 上げる: {"action": "upload", "diary_id": "...", "content_type": "image/jpeg" | "image/png"}
-//   → {"path": "diaries/{日記ID}/{ランダムな ID}.jpg", "url": "...", "expires_in": 600}
-//   今日か昨日の自分の日記のときだけ出す。アプリは url に PUT で上げたあと、
-//   diaries.photo_path に path を書く（書けるかどうかは diaries の RLS が決める）。
+// 上げる: {"action": "upload", "content_type": "image/jpeg" | "image/png"}
+//   → {"path": "diaries/{ユーザーID}/{ランダムな ID}.jpg", "url": "...", "expires_in": 600}
+//   写真は呼んだ人のフォルダに置く。日記は1回書くと日記帳ごとに別の行になるので、
+//   1回だけ上げて、同じ内容の日記すべての diaries.photo_path に同じ path を書く。
+//   どの日記に付けてよいか（今日か昨日の自分の日記だけ）は、photo_path を書くときに diaries の RLS が決める。
 // 見る: {"action": "view", "diary_ids": ["...", ...]}
 //   → {"urls": {"{日記ID}": "...", ...}, "expires_in": 3600}
 //   写真のある日記だけが urls に入る。読めない日記（参加していない日記帳など）は黙って省く。
@@ -63,7 +64,7 @@ Deno.serve(async (req) => {
   const body = await req.json().catch(() => ({}));
   switch (body.action) {
     case "upload":
-      return await upload(supabase, user.id, body);
+      return await upload(user.id, body);
     case "view":
       return await view(supabase, body);
     default:
@@ -72,39 +73,17 @@ Deno.serve(async (req) => {
 });
 
 async function upload(
-  supabase: SupabaseClient,
   userId: string,
-  { diary_id: diaryId, content_type: contentType }: Record<string, unknown>,
+  { content_type: contentType }: Record<string, unknown>,
 ) {
-  if (typeof diaryId !== "string") {
-    return new Response("diary_id is required", { status: 400 });
-  }
-
   // contentType : 「これから上げるファイルが何の種類か」
   const extension = typeof contentType === "string" ? extensions[contentType] : undefined;
   if (!extension) {
     return new Response("content_type must be image/jpeg or image/png", { status: 400 });
   }
 
-  const { data: diary, error } = await supabase
-    .from("diaries")
-    .select("author_id, date")
-    .eq("id", diaryId)
-    .maybeSingle<{ author_id: string; date: string }>();
-  if (error) throw error;
-  if (!diary) return new Response("diary not found", { status: 404 });
-  if (diary.author_id !== userId) {
-    return new Response("not your diary", { status: 403 });
-  }
-
-  // 写真を付けられるのは、本文と同じく今日か昨日の日記だけ。
-  const { data: editable, error: editableError } = await supabase
-    .rpc("is_editable_date", { p_date: diary.date });
-  if (editableError) throw editableError;
-  if (!editable) return new Response("diary is not editable", { status: 403 });
-
   // 上げるたびに名前を変える。同じ名前で上書きすると、端末のキャッシュに古い写真が残るため。
-  const path = `diaries/${diaryId}/${crypto.randomUUID()}.${extension}`;
+  const path = `diaries/${userId}/${crypto.randomUUID()}.${extension}`;
   const url = await sign("PUT", path, uploadExpiresIn);
   return Response.json({ path, url, expires_in: uploadExpiresIn });
 }
