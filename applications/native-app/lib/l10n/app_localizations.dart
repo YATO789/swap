@@ -1315,6 +1315,30 @@ abstract class AppLocalizations {
   /// **'日記帳を作ると書けます'**
   String get editorNoDiaryBook;
 
+  /// No description provided for @editorAddPhoto.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を付ける'**
+  String get editorAddPhoto;
+
+  /// No description provided for @editorRemovePhoto.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を外す'**
+  String get editorRemovePhoto;
+
+  /// No description provided for @editorPickPhotoFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を読み込めませんでした'**
+  String get editorPickPhotoFailed;
+
+  /// 日記に付けた写真の読み上げ
+  ///
+  /// In ja, this message translates to:
+  /// **'日記の写真'**
+  String get diaryPhotoSemantics;
+
   /// No description provided for @settingsTitle.
   ///
   /// In ja, this message translates to:

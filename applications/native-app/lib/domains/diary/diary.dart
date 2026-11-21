@@ -25,6 +25,14 @@ abstract class Diary with _$Diary {
     /// 本文。まだ読めない日記（自分がその日に書いていない）なら null。
     String? body,
 
+    /// 付けた写真の、保存先の中のパス。写真がなければ null。
+    /// 同じ内容で複数の日記帳に書いた日記は、同じ写真を指す。端末のキャッシュのキーにも使う。
+    String? photoPath,
+
+    /// 付けた写真を見るための URL。1時間ほどで切れる。
+    /// 写真があっても、URL をもらえなかったときは null。
+    String? photoUrl,
+
     /// 付いた絵文字のリアクション。付けた順。1人1つ。
     @Default([]) List<Reaction> reactions,
   }) = _Diary;

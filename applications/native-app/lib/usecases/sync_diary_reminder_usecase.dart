@@ -59,7 +59,7 @@ class SyncDiaryReminderUseCase {
   /// 自分が [date] の日記をどれか1冊にでも書いたか。確かめられなければ書いていないことにする。
   Future<bool> _wroteOn(DateTime date) async {
     try {
-      return (await _diaryRepository.fetchMineOn(date)).isNotEmpty;
+      return await _diaryRepository.wroteOn(date);
     } on Object catch (e, stackTrace) {
       debugPrint('今日の日記があるか確かめられませんでした: $e\n$stackTrace');
       return false;

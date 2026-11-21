@@ -4,6 +4,7 @@ import '../../../../domains/diary/diary.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../utils/format.dart';
+import '../../../components/diary_photo.dart';
 import '../../../components/reactions.dart';
 import '../../../components/user_avatar.dart';
 
@@ -130,12 +131,14 @@ class _DiaryCard extends StatelessWidget {
           side: BorderSide(color: colors.border),
           borderRadius: BorderRadius.circular(16),
         ),
+        // 右端に敷いた写真の角を、カードの丸みで切り取る。
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: _cardPadding,
+          child: _CardBody(
+            diary: diary,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -226,11 +229,14 @@ class _LockedDiaryCard extends StatelessWidget {
             side: BorderSide(color: colors.border),
             borderRadius: BorderRadius.circular(16),
           ),
+          // 右端に敷いた写真の角を、カードの丸みで切り取る。
+          clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: _cardPadding,
+            // 写真はタイトルと同じくメンバー全員に見せるので、伏せてある日記でも出す。
+            child: _CardBody(
+              diary: diary,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -281,6 +287,51 @@ class _LockedDiaryCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// カードの右端に敷く写真の幅。
+const double _photoWidth = 72;
+
+/// 写真と文字のあいだ。
+const double _photoGap = 14;
+
+/// カードの中身。内側の余白をあけて [child] を置く。
+/// 日記に写真があれば、カードの右端を余白なしで縦長の写真にする。
+/// 文字の左端は写真のないカードと同じなので、アイコンと名前の位置がそろう。
+/// 写真の高さはカードに合わせるので、写真があってもなくてもカードの高さは変わらない。
+class _CardBody extends StatelessWidget {
+  const _CardBody({required this.diary, required this.child});
+
+  final Diary diary;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final photoPath = diary.photoPath;
+    if (photoPath == null) {
+      return Padding(padding: _cardPadding, child: child);
+    }
+    // カードの高さは文字の側で決め、写真はその高さいっぱいに広げる。
+    return Stack(
+      children: [
+        Padding(
+          padding: _cardPadding.copyWith(right: _photoWidth + _photoGap),
+          child: child,
+        ),
+        Positioned(
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: _photoWidth,
+          child: DiaryPhoto(
+            url: diary.photoUrl,
+            cacheKey: photoPath,
+            borderRadius: 0,
+          ),
+        ),
+      ],
     );
   }
 }

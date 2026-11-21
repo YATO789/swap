@@ -49,4 +49,4 @@ final class DiaryRepositoryProvider
   }
 }
 
-String _$diaryRepositoryHash() => r'ed117fa56a7cc5cec339c387c341aa17b402d4aa';
+String _$diaryRepositoryHash() => r'95945a76cb6479e65c2502d5095242445340a214';

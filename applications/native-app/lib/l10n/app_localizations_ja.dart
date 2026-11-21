@@ -729,6 +729,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get editorNoDiaryBook => '日記帳を作ると書けます';
 
   @override
+  String get editorAddPhoto => '写真を付ける';
+
+  @override
+  String get editorRemovePhoto => '写真を外す';
+
+  @override
+  String get editorPickPhotoFailed => '写真を読み込めませんでした';
+
+  @override
+  String get diaryPhotoSemantics => '日記の写真';
+
+  @override
   String get settingsTitle => '設定';
 
   @override

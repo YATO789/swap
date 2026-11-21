@@ -395,19 +395,38 @@ class FakeDiaryRepository implements DiaryRepository {
   }
 
   @override
+  Future<bool> wroteOn(DateTime date) async {
+    return (await fetchMineOn(date)).isNotEmpty;
+  }
+
+  /// これまでに上げた写真。
+  final List<Uint8List> uploadedPhotos = [];
+
+  @override
   Future<void> save({
     required List<String> diaryBookIds,
     required DateTime date,
     required String title,
     required String body,
+    String? photoPath,
+    Uint8List? newPhoto,
   }) async {
+    String? path = photoPath;
+    if (newPhoto != null) {
+      uploadedPhotos.add(newPhoto);
+      path = 'diaries/me/photo-${uploadedPhotos.length}.jpg';
+    }
     for (final id in diaryBookIds) {
       final list = diaries[id] ??= [];
       final index = list.indexWhere(
         (diary) => diary.authorId == 'me' && diary.date == date,
       );
       if (index >= 0) {
-        list[index] = list[index].copyWith(title: title, body: body);
+        list[index] = list[index].copyWith(
+          title: title,
+          body: body,
+          photoPath: path,
+        );
       } else {
         list.insert(
           0,
@@ -418,6 +437,7 @@ class FakeDiaryRepository implements DiaryRepository {
             writtenAt: DateTime.now(),
             title: title,
             body: body,
+            photoPath: path,
           ),
         );
       }

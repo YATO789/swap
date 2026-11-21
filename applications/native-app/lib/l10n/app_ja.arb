@@ -666,6 +666,13 @@
     }
   },
   "editorNoDiaryBook": "日記帳を作ると書けます",
+  "editorAddPhoto": "写真を付ける",
+  "editorRemovePhoto": "写真を外す",
+  "editorPickPhotoFailed": "写真を読み込めませんでした",
+  "diaryPhotoSemantics": "日記の写真",
+  "@diaryPhotoSemantics": {
+    "description": "日記に付けた写真の読み上げ"
+  },
   "settingsTitle": "設定",
   "settingsSignOutConfirmTitle": "ログアウトしますか？",
   "settingsSignOut": "ログアウト",

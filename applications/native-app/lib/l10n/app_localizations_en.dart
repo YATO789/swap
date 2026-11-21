@@ -814,6 +814,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editorNoDiaryBook => 'Create a diary book to start writing';
 
   @override
+  String get editorAddPhoto => 'Add a photo';
+
+  @override
+  String get editorRemovePhoto => 'Remove photo';
+
+  @override
+  String get editorPickPhotoFailed => 'Couldn\'t load the photo';
+
+  @override
+  String get diaryPhotoSemantics => 'Diary photo';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override

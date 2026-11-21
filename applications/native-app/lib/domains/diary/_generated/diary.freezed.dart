@@ -19,7 +19,11 @@ mixin _$Diary {
  DateTime get date;/// 実際に書いた時刻。端末の時計ではなくサーバーの時刻。
  DateTime get writtenAt;/// 空ならタイトルなし。まだ読めない日記でも見える。
  String get title;/// 本文。まだ読めない日記（自分がその日に書いていない）なら null。
- String? get body;/// 付いた絵文字のリアクション。付けた順。1人1つ。
+ String? get body;/// 付けた写真の、保存先の中のパス。写真がなければ null。
+/// 同じ内容で複数の日記帳に書いた日記は、同じ写真を指す。端末のキャッシュのキーにも使う。
+ String? get photoPath;/// 付けた写真を見るための URL。1時間ほどで切れる。
+/// 写真があっても、URL をもらえなかったときは null。
+ String? get photoUrl;/// 付いた絵文字のリアクション。付けた順。1人1つ。
  List<Reaction> get reactions;
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
@@ -32,20 +36,20 @@ $DiaryCopyWith<Diary> get copyWith => _$DiaryCopyWithImpl<Diary>(this as Diary, 
 @override
 bool operator ==(Object other) {
   final _this = this as Diary;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Diary&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.writtenAt, _this.writtenAt) || other.writtenAt == _this.writtenAt)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.body, _this.body) || other.body == _this.body)&&const DeepCollectionEquality().equals(other.reactions, _this.reactions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Diary&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.writtenAt, _this.writtenAt) || other.writtenAt == _this.writtenAt)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.body, _this.body) || other.body == _this.body)&&(identical(other.photoPath, _this.photoPath) || other.photoPath == _this.photoPath)&&(identical(other.photoUrl, _this.photoUrl) || other.photoUrl == _this.photoUrl)&&const DeepCollectionEquality().equals(other.reactions, _this.reactions));
 }
 
 
 @override
 int get hashCode {
   final _this = this as Diary;
-  return Object.hash(runtimeType,_this.id,_this.authorId,_this.date,_this.writtenAt,_this.title,_this.body,const DeepCollectionEquality().hash(_this.reactions));
+  return Object.hash(runtimeType,_this.id,_this.authorId,_this.date,_this.writtenAt,_this.title,_this.body,_this.photoPath,_this.photoUrl,const DeepCollectionEquality().hash(_this.reactions));
 }
 
 @override
 String toString() {
   final _this = this as Diary;
-  return 'Diary(id: ${_this.id}, authorId: ${_this.authorId}, date: ${_this.date}, writtenAt: ${_this.writtenAt}, title: ${_this.title}, body: ${_this.body}, reactions: ${_this.reactions})';
+  return 'Diary(id: ${_this.id}, authorId: ${_this.authorId}, date: ${_this.date}, writtenAt: ${_this.writtenAt}, title: ${_this.title}, body: ${_this.body}, photoPath: ${_this.photoPath}, photoUrl: ${_this.photoUrl}, reactions: ${_this.reactions})';
 }
 
 
@@ -56,7 +60,7 @@ abstract mixin class $DiaryCopyWith<$Res>  {
   factory $DiaryCopyWith(Diary value, $Res Function(Diary) _then) = _$DiaryCopyWithImpl;
 @useResult
 $Res call({
- String id, String authorId, DateTime date, DateTime writtenAt, String title, String? body, List<Reaction> reactions
+ String id, String authorId, DateTime date, DateTime writtenAt, String title, String? body, String? photoPath, String? photoUrl, List<Reaction> reactions
 });
 
 
@@ -73,7 +77,7 @@ class _$DiaryCopyWithImpl<$Res>
 
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? body = freezed,Object? reactions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? body = freezed,Object? photoPath = freezed,Object? photoUrl = freezed,Object? reactions = null,}) {
   return _then(Diary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
@@ -81,6 +85,8 @@ as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
 as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as String?,photoPath: freezed == photoPath ? _self.photoPath : photoPath // ignore: cast_nullable_to_non_nullable
+as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,reactions: null == reactions ? _self.reactions : reactions // ignore: cast_nullable_to_non_nullable
 as List<Reaction>,
   ));
@@ -167,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body,  List<Reaction> reactions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body,  String? photoPath,  String? photoUrl,  List<Reaction> reactions)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Diary() when $default != null:
-return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body,_that.reactions);case _:
+return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body,_that.photoPath,_that.photoUrl,_that.reactions);case _:
   return orElse();
 
 }
@@ -188,10 +194,10 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body,  List<Reaction> reactions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body,  String? photoPath,  String? photoUrl,  List<Reaction> reactions)  $default,) {final _that = this;
 switch (_that) {
 case _Diary():
-return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body,_that.reactions);case _:
+return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body,_that.photoPath,_that.photoUrl,_that.reactions);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -208,10 +214,10 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body,  List<Reaction> reactions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String authorId,  DateTime date,  DateTime writtenAt,  String title,  String? body,  String? photoPath,  String? photoUrl,  List<Reaction> reactions)?  $default,) {final _that = this;
 switch (_that) {
 case _Diary() when $default != null:
-return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body,_that.reactions);case _:
+return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.body,_that.photoPath,_that.photoUrl,_that.reactions);case _:
   return null;
 
 }
@@ -223,7 +229,7 @@ return $default(_that.id,_that.authorId,_that.date,_that.writtenAt,_that.title,_
 
 
 class _Diary extends Diary {
-  const _Diary({required this.id, required this.authorId, required this.date, required this.writtenAt, this.title = '', this.body,  List<Reaction> reactions = const []}): _reactions = reactions,super._();
+  const _Diary({required this.id, required this.authorId, required this.date, required this.writtenAt, this.title = '', this.body, this.photoPath, this.photoUrl,  List<Reaction> reactions = const []}): _reactions = reactions,super._();
   
 
 @override final  String id;
@@ -236,6 +242,12 @@ class _Diary extends Diary {
 @override@JsonKey() final  String title;
 /// 本文。まだ読めない日記（自分がその日に書いていない）なら null。
 @override final  String? body;
+/// 付けた写真の、保存先の中のパス。写真がなければ null。
+/// 同じ内容で複数の日記帳に書いた日記は、同じ写真を指す。端末のキャッシュのキーにも使う。
+@override final  String? photoPath;
+/// 付けた写真を見るための URL。1時間ほどで切れる。
+/// 写真があっても、URL をもらえなかったときは null。
+@override final  String? photoUrl;
 /// 付いた絵文字のリアクション。付けた順。1人1つ。
  final  List<Reaction> _reactions;
 /// 付いた絵文字のリアクション。付けた順。1人1つ。
@@ -256,18 +268,18 @@ _$DiaryCopyWith<_Diary> get copyWith => __$DiaryCopyWithImpl<_Diary>(this, _$ide
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Diary&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.date, date) || other.date == date)&&(identical(other.writtenAt, writtenAt) || other.writtenAt == writtenAt)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body)&&const DeepCollectionEquality().equals(other.reactions, _reactions));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Diary&&(identical(other.id, id) || other.id == id)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.date, date) || other.date == date)&&(identical(other.writtenAt, writtenAt) || other.writtenAt == writtenAt)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body)&&(identical(other.photoPath, photoPath) || other.photoPath == photoPath)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&const DeepCollectionEquality().equals(other.reactions, _reactions));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,authorId,date,writtenAt,title,body,const DeepCollectionEquality().hash(_reactions));
+    return Object.hash(runtimeType,id,authorId,date,writtenAt,title,body,photoPath,photoUrl,const DeepCollectionEquality().hash(_reactions));
 }
 
 @override
 String toString() {
-    return 'Diary(id: $id, authorId: $authorId, date: $date, writtenAt: $writtenAt, title: $title, body: $body, reactions: $reactions)';
+    return 'Diary(id: $id, authorId: $authorId, date: $date, writtenAt: $writtenAt, title: $title, body: $body, photoPath: $photoPath, photoUrl: $photoUrl, reactions: $reactions)';
 }
 
 
@@ -278,7 +290,7 @@ abstract mixin class _$DiaryCopyWith<$Res> implements $DiaryCopyWith<$Res> {
   factory _$DiaryCopyWith(_Diary value, $Res Function(_Diary) _then) = __$DiaryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String authorId, DateTime date, DateTime writtenAt, String title, String? body, List<Reaction> reactions
+ String id, String authorId, DateTime date, DateTime writtenAt, String title, String? body, String? photoPath, String? photoUrl, List<Reaction> reactions
 });
 
 
@@ -295,7 +307,7 @@ class __$DiaryCopyWithImpl<$Res>
 
 /// Create a copy of Diary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? body = freezed,Object? reactions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? body = freezed,Object? photoPath = freezed,Object? photoUrl = freezed,Object? reactions = null,}) {
   return _then(_Diary(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast_nullable_to_non_nullable
@@ -303,6 +315,8 @@ as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
 as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,body: freezed == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as String?,photoPath: freezed == photoPath ? _self.photoPath : photoPath // ignore: cast_nullable_to_non_nullable
+as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,reactions: null == reactions ? _self._reactions : reactions // ignore: cast_nullable_to_non_nullable
 as List<Reaction>,
   ));

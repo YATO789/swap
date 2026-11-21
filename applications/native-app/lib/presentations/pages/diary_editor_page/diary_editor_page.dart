@@ -1,8 +1,10 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../domains/diary/diary.dart';
 import '../../../domains/diary_book/diary_book.dart';
@@ -15,6 +17,7 @@ import '../../components/discard_guard.dart';
 import '../../components/post_line.dart';
 import '../../components/ruled_lines.dart';
 import 'components/diary_book_picker_sheet.dart';
+import 'components/diary_photo_field.dart';
 import 'controller/diary_editor_page_controller.dart';
 
 const _bodyFontSize = 16.0;
@@ -86,10 +89,22 @@ class DiaryEditorPage extends HookConsumerWidget {
           blank: blank,
           diaryBooks: diaryBooks,
           state: value,
-          onSave: ({required diaryBookIds, required title, required body}) =>
-              ref
+          onSave:
+              ({
+                required diaryBookIds,
+                required title,
+                required body,
+                photoPath,
+                newPhoto,
+              }) => ref
                   .read(provider.notifier)
-                  .save(diaryBookIds: diaryBookIds, title: title, body: body),
+                  .save(
+                    diaryBookIds: diaryBookIds,
+                    title: title,
+                    body: body,
+                    photoPath: photoPath,
+                    newPhoto: newPhoto,
+                  ),
         ),
       (AsyncError(), _) || (_, AsyncError()) => scaffold(
         Center(
@@ -139,10 +154,13 @@ class _DiaryEditor extends HookWidget {
   final DiaryEditorPageState state;
 
   /// [diaryBookIds] の日記帳に日記を書く。書けたら true。
+  /// 写真は [newPhoto] があればその写真、なければ [photoPath] の写真を付け、どちらも null なら外す。
   final Future<bool> Function({
     required List<String> diaryBookIds,
     required String title,
     required String body,
+    String? photoPath,
+    Uint8List? newPhoto,
   })
   onSave;
 
@@ -188,10 +206,24 @@ class _DiaryEditor extends HookWidget {
     useListenable(bodyController);
     final submitting = useState(false);
 
+    /// 選んだばかりで、まだ保存していない写真。
+    final newPhoto = useState<Uint8List?>(null);
+
+    /// 保存してある写真を外したか。
+    final removedPhoto = useState(false);
+
+    /// 保存するときに付ける、保存してある写真のパス。外したか選び直したら使わない。
+    final keptPhotoPath = removedPhoto.value ? null : existing?.photoPath;
+
     final title = titleController.text.trim();
     final body = bodyController.text.trim();
+    final photoChanged =
+        newPhoto.value != null ||
+        (removedPhoto.value && existing?.photoPath != null);
     final isDirty =
-        title != (existing?.title ?? '') || body != (existing?.body ?? '');
+        title != (existing?.title ?? '') ||
+        body != (existing?.body ?? '') ||
+        photoChanged;
     // 書いたままの日記は送り直さなくてよいので、変えたときか、
     // まだ書いていない日記帳があるときだけ押せる。
     final canSubmit =
@@ -262,6 +294,8 @@ class _DiaryEditor extends HookWidget {
         diaryBookIds: diaryBookIds,
         title: title,
         body: body,
+        photoPath: keptPhotoPath,
+        newPhoto: newPhoto.value,
       );
       if (!context.mounted) return;
       submitting.value = false;
@@ -275,6 +309,35 @@ class _DiaryEditor extends HookWidget {
       );
       // 書けたので、書きかけの確認（DiscardGuard）を通さずに閉じる。
       Navigator.of(context).pop();
+    }
+
+    /// 写真ライブラリから1枚選ぶ。選ぶだけで、上げるのは投稿を押したとき。
+    Future<void> pickPhoto() async {
+      final Uint8List bytes;
+      try {
+        // 長い辺を 1440px に縮め、JPEG の画質 80 にする。画面いっぱいに出してもぼやけない大きさ。
+        final file = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 1440,
+          maxHeight: 1440,
+          imageQuality: 80,
+        );
+        if (file == null) return;
+        bytes = await file.readAsBytes();
+      } on Object catch (e, stackTrace) {
+        debugPrint('写真を読み込めませんでした: $e\n$stackTrace');
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(l10n.editorPickPhotoFailed)));
+        return;
+      }
+      newPhoto.value = bytes;
+    }
+
+    void removePhoto() {
+      newPhoto.value = null;
+      removedPhoto.value = true;
     }
 
     return DiscardGuard(
@@ -349,6 +412,16 @@ class _DiaryEditor extends HookWidget {
             // 日記の詳細と同じく、記録と本文を線で分ける。
             const SizedBox(height: 20),
             const Divider(),
+            const SizedBox(height: 20),
+            // 写真はタイトルの上。日記の詳細と同じ位置にして、書いたとおりに見えるようにする。
+            DiaryPhotoField(
+              hasPhoto: newPhoto.value != null || keptPhotoPath != null,
+              url: removedPhoto.value ? null : existing?.photoUrl,
+              cacheKey: keptPhotoPath,
+              bytes: newPhoto.value,
+              onPick: pickPhoto,
+              onRemove: removePhoto,
+            ),
             const SizedBox(height: 20),
             // タイトルは任意。空なら本文だけの日記になる。
             // まだ書いていない日を開いたときは、タイトルから書き始められるようにする。
