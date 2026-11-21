@@ -417,6 +417,10 @@ verify_jwt = false
 [functions.diary-photo-url]
 verify_jwt = false
 
+# どの日記からも指されなくなった日記の写真を R2 から消す。通知と同じく DB のトリガーから pg_net で呼ぶ。
+[functions.delete-diary-photos]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

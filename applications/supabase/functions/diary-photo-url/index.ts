@@ -13,12 +13,10 @@
 // 誰が何をしてよいかは、呼んだ本人のログイン情報で DB を読み、今の RLS に任せる。
 // 写真はタイトルと同じく日記帳のメンバー全員に見せる。
 //
-// 環境変数（ローカルは functions/.env、本番は supabase secrets set）:
-//   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_PRIVATE_BUCKET
-// キーは dev 用・prod 用で分け、それぞれ自分の環境のバケットしか触れないようにしてある。
+// R2 の鍵と環境変数は _shared/r2.ts にある。
 
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
-import { AwsClient } from "npm:aws4fetch@1";
+import { objectUrl, r2 } from "../_shared/r2.ts";
 
 /** 上げる URL の有効期間（秒）。 */
 const uploadExpiresIn = 600;
@@ -33,16 +31,6 @@ const extensions: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
 };
-
-const r2 = new AwsClient({
-  accessKeyId: Deno.env.get("R2_ACCESS_KEY_ID")!,
-  secretAccessKey: Deno.env.get("R2_SECRET_ACCESS_KEY")!,
-  service: "s3",
-  region: "auto",
-});
-const bucketUrl = `https://${Deno.env.get("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com/${
-  Deno.env.get("R2_PRIVATE_BUCKET")
-}`;
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
@@ -120,7 +108,7 @@ async function view(supabase: SupabaseClient,{ diary_ids: diaryIds }: Record<str
 
 /** R2 の [path] に [method] でアクセスできる、[expiresIn] 秒だけ有効な URL を作る。 */
 async function sign(method: "GET" | "PUT", path: string, expiresIn: number) {
-  const url = new URL(`${bucketUrl}/${path}`);
+  const url = objectUrl(path);
   url.searchParams.set("X-Amz-Expires", String(expiresIn));
   const signed = await r2.sign(new Request(url, { method }), { aws: { signQuery: true } });
   return signed.url;
