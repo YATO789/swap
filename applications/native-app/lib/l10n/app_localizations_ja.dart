@@ -414,26 +414,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String timelineNowHour(String time) {
-    return '$time ・ いま';
-  }
-
-  @override
-  String timelinePendingOne(String name) {
-    return '$nameはまだ';
-  }
-
-  @override
-  String timelinePendingTwo(String first, String second) {
-    return '$first・$secondはまだ';
-  }
-
-  @override
-  String timelinePendingMany(String first, String second, int rest) {
-    return '$first・$second ほか$rest人はまだ';
-  }
-
-  @override
   String get timelineBlankTitle => '今日のページはまだ白紙です';
 
   @override

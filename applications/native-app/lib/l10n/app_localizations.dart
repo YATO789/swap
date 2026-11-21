@@ -794,30 +794,6 @@ abstract class AppLocalizations {
   /// **'{names}が{emoji}'**
   String reactionChipLabel(String names, String emoji);
 
-  /// 今の時間の欄の見出し。time は「14:00」
-  ///
-  /// In ja, this message translates to:
-  /// **'{time} ・ いま'**
-  String timelineNowHour(String time);
-
-  /// 今の時間にまだ記録していない人が1人のとき
-  ///
-  /// In ja, this message translates to:
-  /// **'{name}はまだ'**
-  String timelinePendingOne(String name);
-
-  /// 今の時間にまだ記録していない人が2人のとき
-  ///
-  /// In ja, this message translates to:
-  /// **'{first}・{second}はまだ'**
-  String timelinePendingTwo(String first, String second);
-
-  /// 今の時間にまだ記録していない人が3人以上のとき。rest は名前を出さなかった人数
-  ///
-  /// In ja, this message translates to:
-  /// **'{first}・{second} ほか{rest}人はまだ'**
-  String timelinePendingMany(String first, String second, int rest);
-
   /// No description provided for @timelineBlankTitle.
   ///
   /// In ja, this message translates to:

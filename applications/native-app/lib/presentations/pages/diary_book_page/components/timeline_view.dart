@@ -17,7 +17,6 @@ import 'post_responder.dart';
 import '../../../components/reactions.dart';
 
 /// その日の日記と、時間帯ごとの記録を表示するタイムライン。
-/// 今日を表示しているときは、今の時間にまだ記録していないほかのメンバーを一番上に出す。
 /// 自分の記録は下の書き込みバーから書くので、ここには自分の書き込み欄を置かない。
 /// 上下に浮かせたボタンの下までのばして置き、最初と最後はボタンに隠れないようあける。
 class TimelineView extends HookWidget {
@@ -68,7 +67,7 @@ class TimelineView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 今の時間の一覧に使う現在時刻。正時ごとに更新する。
+    // 今日のページかを決める現在時刻。日付は朝4時の正時に変わるので、正時ごとに更新する。
     final now = useState(DateTime.now());
     useEffect(() {
       Timer? timer;
@@ -98,17 +97,7 @@ class TimelineView extends HookWidget {
 
     // 新しい時間帯が上に来るように逆順で表示する。
     final hours = _groupByHour(posts).reversed.toList();
-    final currentHour = date == diaryDateOf(now.value) ? now.value.hour : null;
-    // 今の時間にまだ記録していない、自分以外のメンバー。記録した人は時間帯の欄に出す。
-    final postedIds = {
-      for (final post in posts)
-        if (post.postedAt.hour == currentHour) post.authorId,
-    };
-    final pendingMembers = currentHour == null
-        ? <DiaryBookMember>[]
-        : members
-              .where((m) => m.userId != myId && !postedIds.contains(m.userId))
-              .toList();
+    final isToday = date == diaryDateOf(now.value);
     final insets = MediaQuery.paddingOf(context);
     final bottomPadding = 24 + insets.bottom;
 
@@ -136,32 +125,15 @@ class TimelineView extends HookWidget {
               ),
             ),
           ),
-          if (currentHour != null && pendingMembers.isNotEmpty)
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              sliver: SliverToBoxAdapter(
-                child: _PendingMembersSection(
-                  hour: currentHour,
-                  members: pendingMembers,
-                ),
-              ),
-            ),
           if (hours.isEmpty)
             SliverPadding(
               padding: EdgeInsets.fromLTRB(24, 40, 24, bottomPadding),
               // 今日は白紙のページとして出し、画面が寂しくならないようにする。
               sliver: SliverToBoxAdapter(
-                child: currentHour != null
-                    ? const _BlankPage()
-                    : const _EmptyPosts(),
+                child: isToday ? const _BlankPage() : const _EmptyPosts(),
               ),
             )
-          else ...[
-            if (pendingMembers.isNotEmpty)
-              const SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: 24),
-                sliver: SliverToBoxAdapter(child: Divider()),
-              ),
+          else
             SliverPadding(
               padding: EdgeInsets.fromLTRB(24, 0, 24, bottomPadding),
               sliver: SliverList.separated(
@@ -179,7 +151,6 @@ class TimelineView extends HookWidget {
                 separatorBuilder: (context, index) => const Divider(),
               ),
             ),
-          ],
         ],
       ),
     );
@@ -298,121 +269,18 @@ class _HourSection extends StatelessWidget {
 }
 
 class _HourHeader extends StatelessWidget {
-  const _HourHeader({required this.hour, this.isNow = false});
+  const _HourHeader({required this.hour});
 
   final int hour;
 
-  /// 今の時間の欄では、時間を小さく出して「いま」を添える。
-  final bool isNow;
-
   @override
   Widget build(BuildContext context) {
-    final time = '${hour.toString().padLeft(2, '0')}:00';
-
     return Semantics(
       header: true,
       child: Text(
-        isNow ? context.l10n.timelineNowHour(time) : time,
-        style: isNow
-            ? TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: context.appColors.textSecondary,
-              )
-            : const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+        '${hour.toString().padLeft(2, '0')}:00',
+        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
       ),
-    );
-  }
-}
-
-/// 今の時間にまだ記録していない、自分以外のメンバーの欄。記録すると、この欄から外れて時間帯の欄に出る。
-/// メンバーは日記帳に参加した順。
-class _PendingMembersSection extends StatelessWidget {
-  const _PendingMembersSection({required this.hour, required this.members});
-
-  final int hour;
-  final List<DiaryBookMember> members;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _HourHeader(hour: hour, isNow: true),
-          const SizedBox(height: 10),
-          _PendingOthersRow(members: members),
-        ],
-      ),
-    );
-  }
-}
-
-/// まだ記録していない人を1行にまとめる。人数が増えても長くならないよう、
-/// アイコンを重ねて、最初の2人の名前と残りの人数を出す。
-class _PendingOthersRow extends StatelessWidget {
-  const _PendingOthersRow({required this.members});
-
-  final List<DiaryBookMember> members;
-
-  /// 重ねて出すアイコンの数。
-  static const _maxAvatars = 4;
-  static const _avatarSize = 22.0;
-
-  /// アイコンのまわりに付ける、地の色の縁の太さ。重なった境目を見せる。
-  static const _ring = 2.0;
-
-  /// 隣のアイコンと重ねる幅。
-  static const _overlap = 8.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.appColors;
-    final l10n = context.l10n;
-    final names = [for (final member in members) member.displayName];
-    final label = switch (names.length) {
-      1 => l10n.timelinePendingOne(names[0]),
-      2 => l10n.timelinePendingTwo(names[0], names[1]),
-      _ => l10n.timelinePendingMany(names[0], names[1], names.length - 2),
-    };
-    final shown = members.take(_maxAvatars).toList();
-    const outer = _avatarSize + _ring * 2;
-    const step = outer - _overlap;
-
-    return Row(
-      children: [
-        SizedBox(
-          width: outer + step * (shown.length - 1),
-          height: outer,
-          child: Stack(
-            children: [
-              for (final (index, member) in shown.indexed)
-                Positioned(
-                  left: step * index,
-                  child: Container(
-                    padding: const EdgeInsets.all(_ring),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colors.surface,
-                    ),
-                    child: UserAvatar(
-                      imageUrl: member.avatarUrl,
-                      size: _avatarSize,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 13, color: colors.textSecondary),
-          ),
-        ),
-      ],
     );
   }
 }
