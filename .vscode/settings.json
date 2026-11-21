@@ -1,0 +1,6 @@
+{
+  // Supabase の Edge Function は Deno で動くので、このフォルダだけ Deno の拡張機能で読む。
+  // ほかの場所（Flutter など）には影響しない。
+  "deno.enablePaths": ["applications/supabase/functions"],
+  "deno.lint": true
+}

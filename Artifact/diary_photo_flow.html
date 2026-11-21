@@ -1,0 +1,307 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>日記の写真の保存フロー</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 1カラムの手順書。上から順に、端末 → Edge Function → R2 → DB と進む流れを番号付きの段で見せる */
+:root {
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --fg: #1d2421;
+  --muted: #5d6963;
+  --line: #dde2de;
+  --accent: #2f6f5e;
+  --accent-soft: #e3efea;
+  --warn: #9a6a1f;
+  --warn-soft: #f6ecd9;
+  --code-bg: #eef1ee;
+  --font-display: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141917; --surface: #1b211f; --fg: #e4ebe7; --muted: #9aa8a1; --line: #2c3532;
+    --accent: #7cc4ad; --accent-soft: #1f3530; --warn: #e0b46a; --warn-soft: #3a2f1c;
+    --code-bg: #222a27; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141917; --surface: #1b211f; --fg: #e4ebe7; --muted: #9aa8a1; --line: #2c3532;
+  --accent: #7cc4ad; --accent-soft: #1f3530; --warn: #e0b46a; --warn-soft: #3a2f1c;
+  --code-bg: #222a27; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.8;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 48px; }
+header { display: grid; gap: 12px; }
+.eyebrow { font-size: 12px; letter-spacing: .12em; color: var(--accent); font-weight: 700; }
+h1 { font-family: var(--font-display); font-size: clamp(26px, 5vw, 36px); line-height: 1.35; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--font-display); font-size: 22px; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-size: 17px; margin: 0; }
+p { margin: 0; max-width: 68ch; }
+.lead { color: var(--muted); }
+section { display: grid; gap: 16px; }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+ul { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; overflow-x: auto; }
+pre.mermaid { margin: 0; background: transparent; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: step; }
+.step { display: grid; grid-template-columns: 44px 1fr; gap: 16px; position: relative; padding-bottom: 28px; }
+.step:last-child { padding-bottom: 0; }
+.step::before {
+  counter-increment: step; content: counter(step);
+  width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--font-mono); font-weight: 500; font-size: 14px;
+  color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent);
+  justify-self: center;
+}
+.step::after { content: ""; position: absolute; left: 21px; top: 36px; bottom: 4px; width: 2px; background: var(--line); }
+.step:last-child::after { display: none; }
+.step-body { display: grid; gap: 8px; min-width: 0; }
+.where { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--surface); }
+.tag.app { color: var(--accent); border-color: var(--accent); }
+.file { font-family: var(--font-mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.step-body p, .step-body li { font-size: 14px; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel p, .panel li { font-size: 14px; }
+.panel .kv { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 700; color: var(--muted); font-size: 12px; letter-spacing: .06em; background: var(--code-bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; }
+.result { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.result.ok { color: var(--accent); background: var(--accent-soft); }
+.result.warn { color: var(--warn); background: var(--warn-soft); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">SWAP / 日記の写真</div>
+    <h1>日記の写真を保存する流れ</h1>
+    <p class="lead">写真を選んでから、R2 に上げて日記に付けるまで。写真は先に R2 に上げ、上げられたときだけ日記を保存する。保存した日記すべてに、同じ写真のパスを書く。</p>
+  </header>
+
+  <section>
+    <h2>全体</h2>
+    <div class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+  actor U as 書く人
+  participant P as 書くページ
+  participant Repo as DiaryRepository
+  participant EF as diary-photo-url
+  participant R2 as R2（非公開）
+  participant DB as diaries
+  U->>P: 写真を選ぶ
+  P->>P: 1440px・画質80に縮めて<br/>バイト列で持つ
+  U->>P: 保存
+  P->>Repo: save(日記帳, タイトル, 本文, newPhoto)
+  Repo->>EF: upload（content_type）
+  EF-->>Repo: path と PUT の URL（10分）
+  Repo->>R2: PUT 写真（60秒で打ち切り）
+  R2-->>Repo: 200
+  Repo->>DB: save_diary（日記帳の数だけ同時に）
+  DB-->>Repo: 日記の id
+  Repo->>DB: photo_path = path（保存した日記すべて）
+  Note over DB: 前の写真を誰も指さなくなれば<br/>トリガーが R2 から消す
+</pre>
+    </div>
+  </section>
+
+  <section>
+    <h2>手順</h2>
+    <ol class="steps">
+      <li class="step">
+        <div class="step-body">
+          <div class="where"><span class="tag app">アプリ</span><h3>写真を選んで縮める</h3></div>
+          <div class="file">diary_editor_page.dart</div>
+          <p><code>ImagePicker().pickImage</code> で、長い辺 1440px・JPEG の画質 80 に縮めて選ぶ。1枚 200〜400KB ほどになる。<code>readAsBytes()</code> でバイト列にして、ページの状態（<code>newPhoto</code>）に持つ。</p>
+          <p>この時点ではまだどこにも上げない。プレビューは <code>Image.memory</code> でバイト列から出す。</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="step-body">
+          <div class="where"><span class="tag app">アプリ</span><h3>保存を押す</h3></div>
+          <div class="file">diary_editor_page_controller.dart → DiaryRepository.save</div>
+          <p>選んだ日記帳の id、日付、タイトル、本文と一緒に、写真を次のどれかで渡す。</p>
+          <ul>
+            <li><code>newPhoto</code>: 新しく選んだ写真のバイト列</li>
+            <li><code>photoPath</code>: 今付いている写真のパス（変えないとき）</li>
+            <li>どちらも null: 写真を外す</li>
+          </ul>
+        </div>
+      </li>
+      <li class="step">
+        <div class="step-body">
+          <div class="where"><span class="tag">Edge Function</span><h3>上げるための URL をもらう</h3></div>
+          <div class="file">DiaryPhotoDatasource.upload → functions/diary-photo-url</div>
+          <p>先頭のバイトで PNG か JPEG かを見分け、<code>{"action": "upload", "content_type"}</code> を送る。Edge Function はログインを確かめ、置き場所を決めて、10分だけ使える PUT の署名付き URL を返す。</p>
+          <p>置き場所は <code>diaries/{ユーザーID}/{ランダムな UUID}.jpg</code>。上げるたびに名前を変えるので、端末のキャッシュに前の写真が残らない。</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="step-body">
+          <div class="where"><span class="tag">R2</span><h3>R2 に直接上げる</h3></div>
+          <div class="file">DiaryPhotoDatasource.upload</div>
+          <p>もらった URL に <code>Content-Type</code> を付けて PUT する。この種類が、あとで読むときに R2 が返す種類になる。60秒で終わらなければ失敗にする。200 以外も失敗。</p>
+          <p>ここで失敗したら日記は保存しない。書くページに残ったまま、もう一度保存できる。</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="step-body">
+          <div class="where"><span class="tag">DB</span><h3>日記を保存する</h3></div>
+          <div class="file">DiaryDatasource.save → rpc save_diary</div>
+          <p>選んだ日記帳の数だけ <code>save_diary</code> を同時に呼ぶ。日記帳ごとに別の行になる（ADR 0001）。もう書いていればタイトルと本文を書き換え、日記の id を返す。</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="step-body">
+          <div class="where"><span class="tag">DB</span><h3>写真のパスを書く</h3></div>
+          <div class="file">DiaryDatasource.setPhotoPath</div>
+          <p>保存した日記すべての <code>diaries.photo_path</code> に、同じパスを1回の update で書く。前にほかの写真が付いていた日記も、同じ写真にそろう。</p>
+          <p>書けるのは「今日か昨日の自分の日記」だけ（RLS）。パスは <code>diaries/{書いた人の ID}/…</code> の形だけを許す（check 制約）。</p>
+        </div>
+      </li>
+      <li class="step">
+        <div class="step-body">
+          <div class="where"><span class="tag">DB → Edge Function</span><h3>前の写真を片付ける</h3></div>
+          <div class="file">trigger delete_unused_diary_photos → functions/delete-diary-photos</div>
+          <p>6 の update のあと、トリガーが前の写真のうちどの日記も指さなくなったものを集め、pg_net で <code>delete-diary-photos</code> を呼ぶ。Edge Function はもう一度確かめてから R2 から消す。保存はこれを待たない。</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>写真の渡し方ごとの違い</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>新しい写真を付ける</h3>
+        <div class="kv">newPhoto = バイト列</div>
+        <p>3〜7 をすべて通る。前の写真があれば、誰も指さなくなったときに消える。</p>
+      </div>
+      <div class="panel">
+        <h3>今の写真のまま</h3>
+        <div class="kv">photoPath = 今のパス</div>
+        <p>上げずに 5 と 6 だけ。新しく選んだ日記帳にも同じ写真が付く。</p>
+      </div>
+      <div class="panel">
+        <h3>写真を外す</h3>
+        <div class="kv">どちらも null</div>
+        <p>5 のあと、6 で <code>photo_path</code> を null にする。ほかの日記帳がまだ指していれば、写真は残る。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>途中で失敗したとき</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>どこで</th><th>日記</th><th>写真</th></tr></thead>
+        <tbody>
+          <tr><td>3 URL をもらう</td><td><span class="result ok">保存しない</span></td><td>上がらない</td></tr>
+          <tr><td>4 R2 に上げる</td><td><span class="result ok">保存しない</span></td><td>上がらない（途中まで上がっても R2 は捨てる）</td></tr>
+          <tr><td>5 日記を保存</td><td><span class="result warn">一部だけ保存されることがある</span></td><td>R2 に残るが、どの日記も指さない</td></tr>
+          <tr><td>6 パスを書く</td><td><span class="result warn">本文は保存済み、写真は前のまま</span></td><td>R2 に残るが、どの日記も指さない</td></tr>
+          <tr><td>7 前の写真を消す</td><td><span class="result ok">保存済み</span></td><td>前の写真が R2 に残る（やり直しはしない）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead">5〜7 で残った写真は、今は R2 に残ったままになる。定期的にまとめて消すかは「あとで決めること」にしてある（docs/diary_photo.md）。</p>
+  </section>
+</div>
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.16.1/dist/mermaid.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+
+</body></html>

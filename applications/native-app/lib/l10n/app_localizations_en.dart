@@ -448,26 +448,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String timelineNowHour(String time) {
-    return '$time · Now';
-  }
-
-  @override
-  String timelinePendingOne(String name) {
-    return '$name hasn\'t posted yet';
-  }
-
-  @override
-  String timelinePendingTwo(String first, String second) {
-    return '$first and $second haven\'t posted yet';
-  }
-
-  @override
-  String timelinePendingMany(String first, String second, int rest) {
-    return '$first, $second and $rest more haven\'t posted yet';
-  }
-
-  @override
   String get timelineBlankTitle => 'Today\'s page is still blank';
 
   @override
@@ -812,6 +792,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editorNoDiaryBook => 'Create a diary book to start writing';
+
+  @override
+  String get editorAddPhoto => 'Add a photo';
+
+  @override
+  String get editorRemovePhoto => 'Remove photo';
+
+  @override
+  String get editorPickPhotoFailed => 'Couldn\'t load the photo';
+
+  @override
+  String get diaryPhotoSemantics => 'Diary photo';
 
   @override
   String get settingsTitle => 'Settings';

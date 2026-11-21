@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../domains/constant.dart';
 import '../../../../domains/profile/profile.dart';
 import '../../../../l10n/l10n.dart';
 import '../../../../theme/app_theme.dart';
@@ -88,12 +89,11 @@ class ProfileSection extends HookConsumerWidget {
       }
       final Uint8List bytes;
       try {
-        // 長い辺を 256px に縮め、JPEG の画質 75 にして容量を抑える。
         final file = await ImagePicker().pickImage(
           source: ImageSource.gallery,
-          maxWidth: 256,
-          maxHeight: 256,
-          imageQuality: 75,
+          maxWidth: avatarImageMaxSide,
+          maxHeight: avatarImageMaxSide,
+          imageQuality: avatarImageQuality,
         );
         if (file == null) return;
         bytes = await file.readAsBytes();

@@ -16,6 +16,7 @@ _DiaryResponse _$DiaryResponseFromJson(Map<String, dynamic> json) =>
         json['written_at'] as String,
       ),
       title: json['title'] as String,
+      photoPath: json['photo_path'] as String?,
       content: json['diary_contents'] == null
           ? null
           : DiaryContentResponse.fromJson(
@@ -39,6 +40,7 @@ Map<String, dynamic> _$DiaryResponseToJson(_DiaryResponse instance) =>
       'date': instance.date.toIso8601String(),
       'written_at': const LocalDateTimeConverter().toJson(instance.writtenAt),
       'title': instance.title,
+      'photo_path': instance.photoPath,
       'diary_contents': instance.content,
       'diary_reactions': instance.diaryReactions,
     };

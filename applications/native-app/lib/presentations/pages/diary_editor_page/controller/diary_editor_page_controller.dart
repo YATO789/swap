@@ -6,6 +6,7 @@ import '../../../../domains/diary/diary.dart';
 import '../../../../domains/post/timeline_post.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
 import '../../../../infrastructures/repositories/post_repository.dart';
+import '../../../../usecases/save_diary_usecase.dart';
 import '../../../providers/diary_reminder_notifier.dart';
 import '../../../providers/profile_notifier.dart';
 
@@ -48,20 +49,24 @@ class DiaryEditorPageController extends _$DiaryEditorPageController {
   }
 
   /// [diaryBookIds] の日記帳に、自分の日記として同じ内容を書く。書けたら true。
+  /// 写真は、[newPhoto] があればその写真、なければ [photoPath] の写真（今の写真のまま）を付ける。
+  /// どちらも null なら写真を外す。
   Future<bool> save({
     required List<String> diaryBookIds,
     required String title,
     required String body,
+    String? photoPath,
+    Uint8List? newPhoto,
   }) async {
     try {
-      await ref
-          .read(diaryRepositoryProvider)
-          .save(
-            diaryBookIds: diaryBookIds,
-            date: date,
-            title: title,
-            body: body,
-          );
+      await ref.read(saveDiaryUseCaseProvider)(
+        diaryBookIds: diaryBookIds,
+        date: date,
+        title: title,
+        body: body,
+        photoPath: photoPath,
+        newPhoto: newPhoto,
+      );
       // 今日の日記を書いたら、今日のリマインダーを出さないようにする。
       ref.read(diaryReminderProvider.notifier).sync();
       return true;

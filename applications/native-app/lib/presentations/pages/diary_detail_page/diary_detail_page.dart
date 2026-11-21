@@ -11,6 +11,7 @@ import '../../../l10n/l10n.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/format.dart';
 import '../../components/confirm_sheet.dart';
+import '../../components/diary_photo.dart';
 import '../../components/dismissible_selectable_text.dart';
 import '../../components/floating_surface.dart';
 import '../../components/floating_top_bar.dart';
@@ -21,6 +22,7 @@ import '../../components/reactions.dart';
 import '../../components/ruled_lines.dart';
 import '../../components/user_avatar.dart';
 import '../router/router.dart';
+import 'components/photo_viewer.dart';
 import 'controller/diary_detail_page_controller.dart';
 
 /// その日の日記の全文と、書いた人のその日の記録を表示する。
@@ -512,6 +514,8 @@ class _DiaryBody extends StatelessWidget {
     final colors = context.appColors;
     final diaryTitle = diary.title;
     final body = diary.body ?? '';
+    final photoPath = diary.photoPath;
+    final photoUrl = diary.photoUrl;
 
     final header = [
       PaperTitle(title: title),
@@ -553,6 +557,23 @@ class _DiaryBody extends StatelessWidget {
       const SizedBox(height: 20),
       const Divider(),
       const SizedBox(height: 20),
+      // 日記を書く画面と同じく、写真はタイトルの上。真ん中で切り取って出し、押すと全体を全画面で見られる。
+      if (photoPath != null) ...[
+        AspectRatio(
+          aspectRatio: diaryPhotoAspectRatio,
+          child: GestureDetector(
+            onTap: photoUrl == null
+                ? null
+                : () => showPhotoViewer(
+                    context,
+                    url: photoUrl,
+                    cacheKey: photoPath,
+                  ),
+            child: DiaryPhoto(url: photoUrl, cacheKey: photoPath),
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
       // 日記を書く画面と同じく、タイトルの下に線を引き、本文には罫線を敷く。
       if (diaryTitle.isNotEmpty) ...[
         DismissibleSelectableText(

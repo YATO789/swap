@@ -52,15 +52,26 @@ class DiaryDatasource {
     return rows.map(DiaryResponse.fromJson).toList();
   }
 
-  /// [diaryBookId] の日記帳に自分の [date] の日記を書く。
+  /// 自分が [date] の日記をどれか1冊にでも書いたか。中身は読まない。
+  Future<bool> wroteOn(DateTime date) async {
+    final rows = await _client
+        .from('diaries')
+        .select('id')
+        .eq('author_id', _client.auth.currentUser!.id)
+        .eq('date', _toDateString(date))
+        .limit(1);
+    return rows.isNotEmpty;
+  }
+
+  /// [diaryBookId] の日記帳に自分の [date] の日記を書き、日記の id を返す。
   /// もう書いていればタイトルと本文を書き換える（書いた時刻は変えない）。
-  Future<void> save({
+  Future<String> save({
     required String diaryBookId,
     required DateTime date,
     required String title,
     required String body,
-  }) async {
-    await _client.rpc<String>(
+  }) {
+    return _client.rpc<String>(
       'save_diary',
       params: {
         'p_diary_book_id': diaryBookId,
@@ -69,6 +80,15 @@ class DiaryDatasource {
         'p_body': body,
       },
     );
+  }
+
+  /// 自分の [diaryIds] の日記の写真を、R2 の中の [photoPath] にする。null なら写真を外す。
+  /// 書き換えられるのは、今日か昨日の自分の日記だけ（RLS）。
+  Future<void> setPhotoPath(List<String> diaryIds, String? photoPath) async {
+    await _client
+        .from('diaries')
+        .update({'photo_path': photoPath})
+        .inFilter('id', diaryIds);
   }
 
   /// 自分の日記を消す。本文（diary_contents）も一緒に消える。
@@ -93,7 +113,7 @@ class DiaryDatasource {
   }
 
   static const _columns =
-      'id, diary_book_id, author_id, date, written_at, title, '
+      'id, diary_book_id, author_id, date, written_at, title, photo_path, '
       'diary_contents(body), diary_reactions(user_id, emoji, created_at)';
 
   String _toDateString(DateTime date) =>

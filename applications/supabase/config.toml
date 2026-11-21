@@ -412,6 +412,15 @@ verify_jwt = false
 [functions.notify-comment]
 verify_jwt = false
 
+# 日記の写真を R2 に上げる・見るための期限付き URL。アプリからログイン情報付きで呼ぶ。
+# ゲートウェイでは確かめず、関数の中で auth.getUser() でログインを確かめる。
+[functions.diary-photo-url]
+verify_jwt = false
+
+# どの日記からも指されなくなった日記の写真を R2 から消す。通知と同じく DB のトリガーから pg_net で呼ぶ。
+[functions.delete-diary-photos]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

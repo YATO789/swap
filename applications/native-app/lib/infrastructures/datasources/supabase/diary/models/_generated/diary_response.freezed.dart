@@ -17,7 +17,8 @@ T _$identity<T>(T value) => value;
 mixin _$DiaryResponse {
 
  String get id; String get diaryBookId; String get authorId; DateTime get date;@LocalDateTimeConverter() DateTime get writtenAt;/// 空ならタイトルなし。まだ読めない日記でも返る。
- String get title;/// diary_id が主キーなので1対1になる。RLS で読めなければ null。
+ String get title;/// 写真の R2 の中のパス。写真がなければ null。
+ String? get photoPath;/// diary_id が主キーなので1対1になる。RLS で読めなければ null。
 @JsonKey(name: 'diary_contents') DiaryContentResponse? get content;/// 付いたリアクション。
  List<DiaryReactionResponse> get diaryReactions;
 /// Create a copy of DiaryResponse
@@ -33,20 +34,20 @@ $DiaryResponseCopyWith<DiaryResponse> get copyWith => _$DiaryResponseCopyWithImp
 @override
 bool operator ==(Object other) {
   final _this = this as DiaryResponse;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.diaryBookId, _this.diaryBookId) || other.diaryBookId == _this.diaryBookId)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.writtenAt, _this.writtenAt) || other.writtenAt == _this.writtenAt)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.content, _this.content) || other.content == _this.content)&&const DeepCollectionEquality().equals(other.diaryReactions, _this.diaryReactions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiaryResponse&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.diaryBookId, _this.diaryBookId) || other.diaryBookId == _this.diaryBookId)&&(identical(other.authorId, _this.authorId) || other.authorId == _this.authorId)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.writtenAt, _this.writtenAt) || other.writtenAt == _this.writtenAt)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.photoPath, _this.photoPath) || other.photoPath == _this.photoPath)&&(identical(other.content, _this.content) || other.content == _this.content)&&const DeepCollectionEquality().equals(other.diaryReactions, _this.diaryReactions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as DiaryResponse;
-  return Object.hash(runtimeType,_this.id,_this.diaryBookId,_this.authorId,_this.date,_this.writtenAt,_this.title,_this.content,const DeepCollectionEquality().hash(_this.diaryReactions));
+  return Object.hash(runtimeType,_this.id,_this.diaryBookId,_this.authorId,_this.date,_this.writtenAt,_this.title,_this.photoPath,_this.content,const DeepCollectionEquality().hash(_this.diaryReactions));
 }
 
 @override
 String toString() {
   final _this = this as DiaryResponse;
-  return 'DiaryResponse(id: ${_this.id}, diaryBookId: ${_this.diaryBookId}, authorId: ${_this.authorId}, date: ${_this.date}, writtenAt: ${_this.writtenAt}, title: ${_this.title}, content: ${_this.content}, diaryReactions: ${_this.diaryReactions})';
+  return 'DiaryResponse(id: ${_this.id}, diaryBookId: ${_this.diaryBookId}, authorId: ${_this.authorId}, date: ${_this.date}, writtenAt: ${_this.writtenAt}, title: ${_this.title}, photoPath: ${_this.photoPath}, content: ${_this.content}, diaryReactions: ${_this.diaryReactions})';
 }
 
 
@@ -57,7 +58,7 @@ abstract mixin class $DiaryResponseCopyWith<$Res>  {
   factory $DiaryResponseCopyWith(DiaryResponse value, $Res Function(DiaryResponse) _then) = _$DiaryResponseCopyWithImpl;
 @useResult
 $Res call({
- String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String title,@JsonKey(name: 'diary_contents') DiaryContentResponse? content, List<DiaryReactionResponse> diaryReactions
+ String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String title, String? photoPath,@JsonKey(name: 'diary_contents') DiaryContentResponse? content, List<DiaryReactionResponse> diaryReactions
 });
 
 
@@ -74,7 +75,7 @@ class _$DiaryResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? content = freezed,Object? diaryReactions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? photoPath = freezed,Object? content = freezed,Object? diaryReactions = null,}) {
   return _then(DiaryResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,diaryBookId: null == diaryBookId ? _self.diaryBookId : diaryBookId // ignore: cast_nullable_to_non_nullable
@@ -82,7 +83,8 @@ as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
 as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as String,photoPath: freezed == photoPath ? _self.photoPath : photoPath // ignore: cast_nullable_to_non_nullable
+as String?,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as DiaryContentResponse?,diaryReactions: null == diaryReactions ? _self.diaryReactions : diaryReactions // ignore: cast_nullable_to_non_nullable
 as List<DiaryReactionResponse>,
   ));
@@ -181,10 +183,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content,  List<DiaryReactionResponse> diaryReactions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title,  String? photoPath, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content,  List<DiaryReactionResponse> diaryReactions)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiaryResponse() when $default != null:
-return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.content,_that.diaryReactions);case _:
+return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.photoPath,_that.content,_that.diaryReactions);case _:
   return orElse();
 
 }
@@ -202,10 +204,10 @@ return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content,  List<DiaryReactionResponse> diaryReactions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title,  String? photoPath, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content,  List<DiaryReactionResponse> diaryReactions)  $default,) {final _that = this;
 switch (_that) {
 case _DiaryResponse():
-return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.content,_that.diaryReactions);case _:
+return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.photoPath,_that.content,_that.diaryReactions);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -222,10 +224,10 @@ return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content,  List<DiaryReactionResponse> diaryReactions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String diaryBookId,  String authorId,  DateTime date, @LocalDateTimeConverter()  DateTime writtenAt,  String title,  String? photoPath, @JsonKey(name: 'diary_contents')  DiaryContentResponse? content,  List<DiaryReactionResponse> diaryReactions)?  $default,) {final _that = this;
 switch (_that) {
 case _DiaryResponse() when $default != null:
-return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.content,_that.diaryReactions);case _:
+return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writtenAt,_that.title,_that.photoPath,_that.content,_that.diaryReactions);case _:
   return null;
 
 }
@@ -237,7 +239,7 @@ return $default(_that.id,_that.diaryBookId,_that.authorId,_that.date,_that.writt
 @JsonSerializable()
 
 class _DiaryResponse implements DiaryResponse {
-  const _DiaryResponse({required this.id, required this.diaryBookId, required this.authorId, required this.date, @LocalDateTimeConverter() required this.writtenAt, required this.title, @JsonKey(name: 'diary_contents') this.content,  List<DiaryReactionResponse> diaryReactions = const []}): _diaryReactions = diaryReactions;
+  const _DiaryResponse({required this.id, required this.diaryBookId, required this.authorId, required this.date, @LocalDateTimeConverter() required this.writtenAt, required this.title, this.photoPath, @JsonKey(name: 'diary_contents') this.content,  List<DiaryReactionResponse> diaryReactions = const []}): _diaryReactions = diaryReactions;
   factory _DiaryResponse.fromJson(Map<String, dynamic> json) => _$DiaryResponseFromJson(json);
 
 @override final  String id;
@@ -247,6 +249,8 @@ class _DiaryResponse implements DiaryResponse {
 @override@LocalDateTimeConverter() final  DateTime writtenAt;
 /// 空ならタイトルなし。まだ読めない日記でも返る。
 @override final  String title;
+/// 写真の R2 の中のパス。写真がなければ null。
+@override final  String? photoPath;
 /// diary_id が主キーなので1対1になる。RLS で読めなければ null。
 @override@JsonKey(name: 'diary_contents') final  DiaryContentResponse? content;
 /// 付いたリアクション。
@@ -272,18 +276,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.diaryBookId, diaryBookId) || other.diaryBookId == diaryBookId)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.date, date) || other.date == date)&&(identical(other.writtenAt, writtenAt) || other.writtenAt == writtenAt)&&(identical(other.title, title) || other.title == title)&&(identical(other.content, content) || other.content == content)&&const DeepCollectionEquality().equals(other.diaryReactions, _diaryReactions));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiaryResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.diaryBookId, diaryBookId) || other.diaryBookId == diaryBookId)&&(identical(other.authorId, authorId) || other.authorId == authorId)&&(identical(other.date, date) || other.date == date)&&(identical(other.writtenAt, writtenAt) || other.writtenAt == writtenAt)&&(identical(other.title, title) || other.title == title)&&(identical(other.photoPath, photoPath) || other.photoPath == photoPath)&&(identical(other.content, content) || other.content == content)&&const DeepCollectionEquality().equals(other.diaryReactions, _diaryReactions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,diaryBookId,authorId,date,writtenAt,title,content,const DeepCollectionEquality().hash(_diaryReactions));
+    return Object.hash(runtimeType,id,diaryBookId,authorId,date,writtenAt,title,photoPath,content,const DeepCollectionEquality().hash(_diaryReactions));
 }
 
 @override
 String toString() {
-    return 'DiaryResponse(id: $id, diaryBookId: $diaryBookId, authorId: $authorId, date: $date, writtenAt: $writtenAt, title: $title, content: $content, diaryReactions: $diaryReactions)';
+    return 'DiaryResponse(id: $id, diaryBookId: $diaryBookId, authorId: $authorId, date: $date, writtenAt: $writtenAt, title: $title, photoPath: $photoPath, content: $content, diaryReactions: $diaryReactions)';
 }
 
 
@@ -294,7 +298,7 @@ abstract mixin class _$DiaryResponseCopyWith<$Res> implements $DiaryResponseCopy
   factory _$DiaryResponseCopyWith(_DiaryResponse value, $Res Function(_DiaryResponse) _then) = __$DiaryResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String title,@JsonKey(name: 'diary_contents') DiaryContentResponse? content, List<DiaryReactionResponse> diaryReactions
+ String id, String diaryBookId, String authorId, DateTime date,@LocalDateTimeConverter() DateTime writtenAt, String title, String? photoPath,@JsonKey(name: 'diary_contents') DiaryContentResponse? content, List<DiaryReactionResponse> diaryReactions
 });
 
 
@@ -311,7 +315,7 @@ class __$DiaryResponseCopyWithImpl<$Res>
 
 /// Create a copy of DiaryResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? content = freezed,Object? diaryReactions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? diaryBookId = null,Object? authorId = null,Object? date = null,Object? writtenAt = null,Object? title = null,Object? photoPath = freezed,Object? content = freezed,Object? diaryReactions = null,}) {
   return _then(_DiaryResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,diaryBookId: null == diaryBookId ? _self.diaryBookId : diaryBookId // ignore: cast_nullable_to_non_nullable
@@ -319,7 +323,8 @@ as String,authorId: null == authorId ? _self.authorId : authorId // ignore: cast
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
 as DateTime,writtenAt: null == writtenAt ? _self.writtenAt : writtenAt // ignore: cast_nullable_to_non_nullable
 as DateTime,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
+as String,photoPath: freezed == photoPath ? _self.photoPath : photoPath // ignore: cast_nullable_to_non_nullable
+as String?,content: freezed == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as DiaryContentResponse?,diaryReactions: null == diaryReactions ? _self._diaryReactions : diaryReactions // ignore: cast_nullable_to_non_nullable
 as List<DiaryReactionResponse>,
   ));

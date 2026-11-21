@@ -395,31 +395,53 @@ class FakeDiaryRepository implements DiaryRepository {
   }
 
   @override
-  Future<void> save({
-    required List<String> diaryBookIds,
+  Future<bool> wroteOn(DateTime date) async {
+    return (await fetchMineOn(date)).isNotEmpty;
+  }
+
+  /// これまでに上げた写真。
+  final List<Uint8List> uploadedPhotos = [];
+
+  @override
+  Future<String> save({
+    required String diaryBookId,
     required DateTime date,
     required String title,
     required String body,
   }) async {
-    for (final id in diaryBookIds) {
-      final list = diaries[id] ??= [];
-      final index = list.indexWhere(
-        (diary) => diary.authorId == 'me' && diary.date == date,
-      );
-      if (index >= 0) {
-        list[index] = list[index].copyWith(title: title, body: body);
-      } else {
-        list.insert(
-          0,
-          Diary(
-            id: '$id-${list.length}',
-            authorId: 'me',
-            date: date,
-            writtenAt: DateTime.now(),
-            title: title,
-            body: body,
-          ),
-        );
+    final list = diaries[diaryBookId] ??= [];
+    final index = list.indexWhere(
+      (diary) => diary.authorId == 'me' && diary.date == date,
+    );
+    if (index >= 0) {
+      list[index] = list[index].copyWith(title: title, body: body);
+      return list[index].id;
+    }
+    final diary = Diary(
+      id: '$diaryBookId-${list.length}',
+      authorId: 'me',
+      date: date,
+      writtenAt: DateTime.now(),
+      title: title,
+      body: body,
+    );
+    list.insert(0, diary);
+    return diary.id;
+  }
+
+  @override
+  Future<String> uploadPhoto(Uint8List bytes) async {
+    uploadedPhotos.add(bytes);
+    return 'diaries/me/photo-${uploadedPhotos.length}.jpg';
+  }
+
+  @override
+  Future<void> setPhotoPath(List<String> diaryIds, String? photoPath) async {
+    for (final list in diaries.values) {
+      for (final (index, diary) in list.indexed) {
+        if (diaryIds.contains(diary.id)) {
+          list[index] = diary.copyWith(photoPath: photoPath);
+        }
       }
     }
   }

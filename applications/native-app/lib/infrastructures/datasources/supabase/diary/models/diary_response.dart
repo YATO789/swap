@@ -17,6 +17,9 @@ abstract class DiaryResponse with _$DiaryResponse {
     /// 空ならタイトルなし。まだ読めない日記でも返る。
     required String title,
 
+    /// 写真の R2 の中のパス。写真がなければ null。
+    String? photoPath,
+
     /// diary_id が主キーなので1対1になる。RLS で読めなければ null。
     @JsonKey(name: 'diary_contents') DiaryContentResponse? content,
 

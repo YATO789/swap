@@ -157,9 +157,6 @@ void main() {
   testWidgets('下の書き込みバーから、この日記帳に記録できる', (tester) async {
     await _openDiaryBook(tester);
 
-    // 今日を見ているので、今の時間の欄に、まだ記録していないほかの人を1行にまとめて出す。
-    // 自分は下のバーから記録するので、この欄には出さない。
-    expect(find.text('美緒・健太はまだ'), findsOneWidget);
     // 誰も記録していないので、白紙のページを出す。
     expect(find.text('今日のページはまだ白紙です'), findsOneWidget);
 
@@ -220,8 +217,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('昨日の記録'), findsOneWidget);
-    // 今日ではないので、今の時間の欄は出ない。
-    expect(find.text('美緒・健太はまだ'), findsNothing);
   });
 
   group('記録のリアクション', () {

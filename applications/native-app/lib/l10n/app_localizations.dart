@@ -794,30 +794,6 @@ abstract class AppLocalizations {
   /// **'{names}が{emoji}'**
   String reactionChipLabel(String names, String emoji);
 
-  /// 今の時間の欄の見出し。time は「14:00」
-  ///
-  /// In ja, this message translates to:
-  /// **'{time} ・ いま'**
-  String timelineNowHour(String time);
-
-  /// 今の時間にまだ記録していない人が1人のとき
-  ///
-  /// In ja, this message translates to:
-  /// **'{name}はまだ'**
-  String timelinePendingOne(String name);
-
-  /// 今の時間にまだ記録していない人が2人のとき
-  ///
-  /// In ja, this message translates to:
-  /// **'{first}・{second}はまだ'**
-  String timelinePendingTwo(String first, String second);
-
-  /// 今の時間にまだ記録していない人が3人以上のとき。rest は名前を出さなかった人数
-  ///
-  /// In ja, this message translates to:
-  /// **'{first}・{second} ほか{rest}人はまだ'**
-  String timelinePendingMany(String first, String second, int rest);
-
   /// No description provided for @timelineBlankTitle.
   ///
   /// In ja, this message translates to:
@@ -1314,6 +1290,30 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'日記帳を作ると書けます'**
   String get editorNoDiaryBook;
+
+  /// No description provided for @editorAddPhoto.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を付ける'**
+  String get editorAddPhoto;
+
+  /// No description provided for @editorRemovePhoto.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を外す'**
+  String get editorRemovePhoto;
+
+  /// No description provided for @editorPickPhotoFailed.
+  ///
+  /// In ja, this message translates to:
+  /// **'写真を読み込めませんでした'**
+  String get editorPickPhotoFailed;
+
+  /// 日記に付けた写真の読み上げ
+  ///
+  /// In ja, this message translates to:
+  /// **'日記の写真'**
+  String get diaryPhotoSemantics;
 
   /// No description provided for @settingsTitle.
   ///
