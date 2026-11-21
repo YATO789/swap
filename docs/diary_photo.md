@@ -5,7 +5,7 @@
 
 ## いまの状況（2026-11-21）
 
-サーバー側とアプリのコードを書き、アプリはシミュレータで確かめたところ。本番にはまだ出していない。
+サーバー側は本番に出した。アプリはシミュレータで確かめたところで、まだリリースしていない。
 
 - 2026-11-14: 画像の置き場所を R2 に決め、バケットを4つ作った（どれもまだ非公開）
 - 2026-11-21: API トークンを dev 用と prod 用に作り、キーをローカルの `.env` と本番の Supabase に入れた
@@ -75,7 +75,7 @@ Supabase の Edge Function（`diary-photo-url`）で出す。
 4. [x] DB に写真のパスの列を足す（2026-11-21、ローカルのみ）
     - `migrations/20261121000000_diary_photo.sql`: `diaries.photo_path`。`diaries/{書いた人の ID}/{UUID}.(jpg|png)` の形だけ許す（制約の名前は `diaries_check`）
     - 自分の今日か昨日の日記なら、アプリから直接書き換えられる（diaries の update ポリシー）
-5. [ ] 本番に出す: `supabase db push` と `supabase functions deploy diary-photo-url delete-diary-photos`
+5. [x] 本番に出す: `supabase functions deploy diary-photo-url delete-diary-photos` と `supabase db push`（2026-11-21）
 6. [x] アプリで日記に写真を付けてアップロードし、表示する（2026-11-21。シミュレータで確かめた）
     - 置き場所: 書くページはタイトルの上（4:3）、タイムラインのカードは右端を幅 72 の縦長の写真にする（余白なし、高さはカードに合わせる。案G を右に置いた形）、詳細はタイトルの上（4:3）で押すと全画面
     - データ: `DiaryPhotoDatasource`（Edge Function と R2 への PUT）、`DiaryRepository.save` が上げる → 保存 → パスを書くまで受け持つ。日記を読むときに URL も付けて返す
