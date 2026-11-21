@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../domains/constant.dart';
 import '../../../domains/diary/diary.dart';
 import '../../../domains/diary_book/diary_book.dart';
 import '../../providers/diary_book_notifier.dart';
@@ -209,10 +210,11 @@ class _DiaryEditor extends HookWidget {
     /// 選んだばかりで、まだ保存していない写真。
     final newPhoto = useState<Uint8List?>(null);
 
-    /// 保存してある写真を外したか。
+    /// 保存してある写真を使わないことにしたか。外したときと、選び直したときに true にする。
     final removedPhoto = useState(false);
 
-    /// 保存するときに付ける、保存してある写真のパス。外したか選び直したら使わない。
+    /// 今の写真をそのまま付けるときの、その写真のパス。
+    /// 外したとき、選び直したとき、もともと写真がないときは null。
     final keptPhotoPath = removedPhoto.value ? null : existing?.photoPath;
 
     final title = titleController.text.trim();
@@ -315,12 +317,11 @@ class _DiaryEditor extends HookWidget {
     Future<void> pickPhoto() async {
       final Uint8List bytes;
       try {
-        // 長い辺を 1440px に縮め、JPEG の画質 80 にする。画面いっぱいに出してもぼやけない大きさ。
         final file = await ImagePicker().pickImage(
           source: ImageSource.gallery,
-          maxWidth: 1440,
-          maxHeight: 1440,
-          imageQuality: 80,
+          maxWidth: diaryPhotoMaxSide,
+          maxHeight: diaryPhotoMaxSide,
+          imageQuality: diaryPhotoQuality,
         );
         if (file == null) return;
         bytes = await file.readAsBytes();
@@ -333,6 +334,8 @@ class _DiaryEditor extends HookWidget {
         return;
       }
       newPhoto.value = bytes;
+      // 選び直したら、保存してある写真は使わない。
+      removedPhoto.value = true;
     }
 
     void removePhoto() {
