@@ -6,6 +6,7 @@ import '../../../../domains/diary/diary.dart';
 import '../../../../domains/post/timeline_post.dart';
 import '../../../../infrastructures/repositories/diary_repository.dart';
 import '../../../../infrastructures/repositories/post_repository.dart';
+import '../../../../usecases/save_diary_usecase.dart';
 import '../../../providers/diary_reminder_notifier.dart';
 import '../../../providers/profile_notifier.dart';
 
@@ -58,16 +59,14 @@ class DiaryEditorPageController extends _$DiaryEditorPageController {
     Uint8List? newPhoto,
   }) async {
     try {
-      await ref
-          .read(diaryRepositoryProvider)
-          .save(
-            diaryBookIds: diaryBookIds,
-            date: date,
-            title: title,
-            body: body,
-            photoPath: photoPath,
-            newPhoto: newPhoto,
-          );
+      await ref.read(saveDiaryUseCaseProvider)(
+        diaryBookIds: diaryBookIds,
+        date: date,
+        title: title,
+        body: body,
+        photoPath: photoPath,
+        newPhoto: newPhoto,
+      );
       // 今日の日記を書いたら、今日のリマインダーを出さないようにする。
       ref.read(diaryReminderProvider.notifier).sync();
       return true;

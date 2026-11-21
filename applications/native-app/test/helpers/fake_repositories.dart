@@ -403,43 +403,45 @@ class FakeDiaryRepository implements DiaryRepository {
   final List<Uint8List> uploadedPhotos = [];
 
   @override
-  Future<void> save({
-    required List<String> diaryBookIds,
+  Future<String> save({
+    required String diaryBookId,
     required DateTime date,
     required String title,
     required String body,
-    String? photoPath,
-    Uint8List? newPhoto,
   }) async {
-    String? path = photoPath;
-    if (newPhoto != null) {
-      uploadedPhotos.add(newPhoto);
-      path = 'diaries/me/photo-${uploadedPhotos.length}.jpg';
+    final list = diaries[diaryBookId] ??= [];
+    final index = list.indexWhere(
+      (diary) => diary.authorId == 'me' && diary.date == date,
+    );
+    if (index >= 0) {
+      list[index] = list[index].copyWith(title: title, body: body);
+      return list[index].id;
     }
-    for (final id in diaryBookIds) {
-      final list = diaries[id] ??= [];
-      final index = list.indexWhere(
-        (diary) => diary.authorId == 'me' && diary.date == date,
-      );
-      if (index >= 0) {
-        list[index] = list[index].copyWith(
-          title: title,
-          body: body,
-          photoPath: path,
-        );
-      } else {
-        list.insert(
-          0,
-          Diary(
-            id: '$id-${list.length}',
-            authorId: 'me',
-            date: date,
-            writtenAt: DateTime.now(),
-            title: title,
-            body: body,
-            photoPath: path,
-          ),
-        );
+    final diary = Diary(
+      id: '$diaryBookId-${list.length}',
+      authorId: 'me',
+      date: date,
+      writtenAt: DateTime.now(),
+      title: title,
+      body: body,
+    );
+    list.insert(0, diary);
+    return diary.id;
+  }
+
+  @override
+  Future<String> uploadPhoto(Uint8List bytes) async {
+    uploadedPhotos.add(bytes);
+    return 'diaries/me/photo-${uploadedPhotos.length}.jpg';
+  }
+
+  @override
+  Future<void> setPhotoPath(List<String> diaryIds, String? photoPath) async {
+    for (final list in diaries.values) {
+      for (final (index, diary) in list.indexed) {
+        if (diaryIds.contains(diary.id)) {
+          list[index] = diary.copyWith(photoPath: photoPath);
+        }
       }
     }
   }

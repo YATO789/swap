@@ -54,29 +54,30 @@ class DiaryRepository {
     return _datasource.wroteOn(date);
   }
 
-  /// [diaryBookIds] の日記帳それぞれに、自分の [date] の日記として同じ内容を書く。
-  /// もう書いている日記帳では、タイトルと本文を書き換える。
-  ///
-  /// 写真は、[newPhoto]（JPEG か PNG）があればその写真を1回だけ上げて、書いた日記すべてに付ける。
-  /// なければ [photoPath] の写真を付ける（今の写真のまま）。どちらも null なら写真を外す。
-  Future<void> save({
-    required List<String> diaryBookIds,
+  /// [diaryBookId] の日記帳に、自分の [date] の日記を書き、日記の id を返す。
+  /// もう書いていれば、タイトルと本文を書き換える。
+  Future<String> save({
+    required String diaryBookId,
     required DateTime date,
     required String title,
     required String body,
-    String? photoPath,
-    Uint8List? newPhoto,
-  }) async {
-    // 先に上げておく。上げられなければ日記も書かない。
-    final path = newPhoto == null
-        ? photoPath
-        : await _photoDatasource.upload(newPhoto);
-    final diaryIds = await Future.wait([
-      for (final id in diaryBookIds)
-        _datasource.save(diaryBookId: id, date: date, title: title, body: body),
-    ]);
-    // ほかの写真が付いていた日記も、上書きしたので同じ写真にそろえる。
-    await _datasource.setPhotoPath(diaryIds, path);
+  }) {
+    return _datasource.save(
+      diaryBookId: diaryBookId,
+      date: date,
+      title: title,
+      body: body,
+    );
+  }
+
+  /// 日記の写真 [bytes]（JPEG か PNG）を上げ、写真のパスを返す。
+  Future<String> uploadPhoto(Uint8List bytes) {
+    return _photoDatasource.upload(bytes);
+  }
+
+  /// [diaryIds] の日記すべてに [photoPath] の写真を付ける。null なら写真を外す。
+  Future<void> setPhotoPath(List<String> diaryIds, String? photoPath) {
+    return _datasource.setPhotoPath(diaryIds, photoPath);
   }
 
   /// 自分の日記を消す。
